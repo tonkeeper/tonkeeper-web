@@ -199,10 +199,19 @@ const signDataFeatureSchema = z.object({
 });
 export type SignDataFeature = z.infer<typeof signDataFeatureSchema>;
 
+const subscriptionFeatureSchema = z.object({
+    name: z.literal('Subscription'),
+    versions: z.object({
+        v2: z.boolean()
+    })
+});
+export type SubscriptionFeature = z.infer<typeof subscriptionFeatureSchema>;
+
 export const featureSchema = z.union([
     sendTransactionFeatureDeprecatedSchema,
     sendTransactionFeatureSchema,
-    signDataFeatureSchema
+    signDataFeatureSchema,
+    subscriptionFeatureSchema
 ]);
 export type Feature = z.infer<typeof featureSchema>;
 
@@ -268,8 +277,77 @@ const keyPairSchema = z.object({
 });
 export type KeyPair = z.infer<typeof keyPairSchema>;
 
-const rpcMethodSchema = z.enum(['disconnect', 'sendTransaction', 'signData']);
+const rpcMethodSchema = z.enum([
+    'disconnect',
+    'sendTransaction',
+    'signData',
+    'createSubscriptionV2',
+    'cancelSubscriptionV2'
+]);
 export type RpcMethod = z.infer<typeof rpcMethodSchema>;
+
+const createSubscriptionV2RpcRequestSchema = z.object({
+    id: z.string(),
+    method: z.literal('createSubscriptionV2'),
+    params: z.tuple([z.string()])
+});
+export type CreateSubscriptionV2RpcRequest = z.infer<typeof createSubscriptionV2RpcRequestSchema>;
+
+const cancelSubscriptionV2RpcRequestSchema = z.object({
+    id: z.string(),
+    method: z.literal('cancelSubscriptionV2'),
+    params: z.tuple([z.string()])
+});
+export type CancelSubscriptionV2RpcRequest = z.infer<typeof cancelSubscriptionV2RpcRequestSchema>;
+
+export enum SUBSCRIPTION_V2_ERROR_CODES {
+    UNKNOWN_ERROR = 0,
+    BAD_REQUEST_ERROR = 1,
+    UNKNOWN_APP_ERROR = 100,
+    USER_REJECTS_ERROR = 300,
+    METHOD_NOT_SUPPORTED = 400,
+    EXTENSION_NOT_FOUND = 404
+}
+
+const createSubscriptionV2RpcResponseSuccessSchema = z.object({
+    id: z.string(),
+    result: z.object({
+        boc: z.string()
+    })
+});
+export type CreateSubscriptionV2RpcResponseSuccess = z.infer<
+    typeof createSubscriptionV2RpcResponseSuccessSchema
+>;
+
+const createSubscriptionV2RpcResponseErrorSchema = z.object({
+    id: z.string(),
+    error: z.object({
+        code: z.nativeEnum(SUBSCRIPTION_V2_ERROR_CODES),
+        message: z.string()
+    })
+});
+export type CreateSubscriptionV2RpcResponseError = z.infer<
+    typeof createSubscriptionV2RpcResponseErrorSchema
+>;
+
+const cancelSubscriptionV2RpcResponseSuccessSchema = z.object({
+    id: z.string(),
+    result: z.object({})
+});
+export type CancelSubscriptionV2RpcResponseSuccess = z.infer<
+    typeof cancelSubscriptionV2RpcResponseSuccessSchema
+>;
+
+const cancelSubscriptionV2RpcResponseErrorSchema = z.object({
+    id: z.string(),
+    error: z.object({
+        code: z.nativeEnum(SUBSCRIPTION_V2_ERROR_CODES),
+        message: z.string()
+    })
+});
+export type CancelSubscriptionV2RpcResponseError = z.infer<
+    typeof cancelSubscriptionV2RpcResponseErrorSchema
+>;
 
 export enum SEND_TRANSACTION_ERROR_CODES {
     UNKNOWN_ERROR = 0,
@@ -365,7 +443,9 @@ export type SignDataRequestPayload = z.infer<typeof signDataRequestPayloadSchema
 const rpcRequestsSchema = z.object({
     sendTransaction: sendTransactionRpcRequestSchema,
     signData: signDataRpcRequestSchema,
-    disconnect: disconnectRpcRequestSchema
+    disconnect: disconnectRpcRequestSchema,
+    createSubscriptionV2: createSubscriptionV2RpcRequestSchema,
+    cancelSubscriptionV2: cancelSubscriptionV2RpcRequestSchema
 });
 export type RpcRequests = z.infer<typeof rpcRequestsSchema>;
 
@@ -411,6 +491,14 @@ const rpcResponsesSchema = z.object({
     disconnect: z.object({
         error: disconnectRpcResponseErrorSchema,
         success: disconnectRpcResponseSuccessSchema
+    }),
+    createSubscriptionV2: z.object({
+        error: createSubscriptionV2RpcResponseErrorSchema,
+        success: createSubscriptionV2RpcResponseSuccessSchema
+    }),
+    cancelSubscriptionV2: z.object({
+        error: cancelSubscriptionV2RpcResponseErrorSchema,
+        success: cancelSubscriptionV2RpcResponseSuccessSchema
     })
 });
 export type RpcResponses = z.infer<typeof rpcResponsesSchema>;
@@ -424,7 +512,11 @@ export const walletResponseSchema = z.union([
     signDataRpcResponseSuccessSchema,
     signDataRpcResponseErrorSchema,
     disconnectRpcResponseSuccessSchema,
-    disconnectRpcResponseErrorSchema
+    disconnectRpcResponseErrorSchema,
+    createSubscriptionV2RpcResponseSuccessSchema,
+    createSubscriptionV2RpcResponseErrorSchema,
+    cancelSubscriptionV2RpcResponseSuccessSchema,
+    cancelSubscriptionV2RpcResponseErrorSchema
 ]);
 
 export type WalletResponse<T extends RpcMethod> = WalletResponseSuccess<T> | WalletResponseError<T>;
@@ -439,7 +531,9 @@ assertTypesEqual<WalletMessage, z.infer<typeof walletMessageSchema>>(true);
 export const appRequestSchema = z.union([
     sendTransactionRpcRequestSchema,
     signDataRpcRequestSchema,
-    disconnectRpcRequestSchema
+    disconnectRpcRequestSchema,
+    createSubscriptionV2RpcRequestSchema,
+    cancelSubscriptionV2RpcRequestSchema
 ]);
 export type AppRequest<T extends RpcMethod> = RpcRequests[T];
 assertTypesEqual<AppRequest<RpcMethod>, z.infer<typeof appRequestSchema>>(true);
@@ -476,9 +570,39 @@ export interface SignDatAppRequest<
     payload: SignDataRequestPayload;
 }
 
+export interface CreateSubscriptionV2AppRequest<
+    T extends AccountConnection['type'] = AccountConnection['type']
+> {
+    id: string;
+    connection: T extends 'http'
+        ? AccountConnectionHttp
+        : T extends 'injected'
+        ? AccountConnectionInjected
+        : AccountConnection;
+    kind: 'createSubscriptionV2';
+    payload: CreateSubscriptionV2Payload;
+}
+
+export interface CancelSubscriptionV2AppRequest<
+    T extends AccountConnection['type'] = AccountConnection['type']
+> {
+    id: string;
+    connection: T extends 'http'
+        ? AccountConnectionHttp
+        : T extends 'injected'
+        ? AccountConnectionInjected
+        : AccountConnection;
+    kind: 'cancelSubscriptionV2';
+    payload: any;
+}
+
 export type TonConnectAppRequestPayload<
     T extends AccountConnection['type'] = AccountConnection['type']
-> = SendTransactionAppRequest<T> | SignDatAppRequest<T>;
+> =
+    | SendTransactionAppRequest<T>
+    | SignDatAppRequest<T>
+    | CreateSubscriptionV2AppRequest<T>
+    | CancelSubscriptionV2AppRequest<T>;
 
 export interface InjectedWalletInfo {
     name: string;
@@ -497,3 +621,36 @@ export interface ITonConnectInjectedBridge {
     send<T extends RpcMethod>(message: AppRequest<T>): Promise<WalletResponse<T>>;
     listen(callback: (event: WalletEvent) => void): () => void;
 }
+
+export type SubscriptionMetadataSource = z.infer<typeof subscriptionMetadataSchema>;
+
+export const subscriptionMetadataSchema = z.object({
+    logo: z.string().url(),
+    name: z.string(),
+    description: z.string(),
+    link: z.string().url(),
+    tos: z.string().url(),
+    merchant: z.string(),
+    website: z.string().url()
+});
+
+export const subscriptionSchema = z.object({
+    beneficiary: z.string(),
+    id: z.number(),
+    period: z.number().int().positive(),
+    amount: z.string(),
+    firstChargeDate: z.number(),
+    withdrawAddress: z.string(),
+    withdrawMsgBody: z.string(),
+    metadata: subscriptionMetadataSchema
+});
+
+export const createSubscriptionV2PayloadSchema = z.object({
+    validUntil: z.number(),
+    subscription: subscriptionSchema,
+    from: rawAddressSchema.optional(),
+    network: tonConnectNetworkSchema,
+    valid_until: z.number()
+});
+
+export type CreateSubscriptionV2Payload = z.infer<typeof createSubscriptionV2PayloadSchema>;

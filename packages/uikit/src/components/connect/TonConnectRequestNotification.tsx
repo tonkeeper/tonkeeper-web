@@ -9,6 +9,10 @@ import { FC } from 'react';
 import { TonTransactionNotification } from './TonTransactionNotification';
 import { SignDataNotification } from './SignDataNotification';
 import {
+    cancelSubscriptionV2ErrorResponse,
+    cancelSubscriptionV2SuccessResponse,
+    createSubscriptionV2ErrorResponse,
+    createSubscriptionV2SuccessResponse,
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
@@ -16,6 +20,8 @@ import {
     useTrackerTonConnectSendSuccess,
     useTrackTonConnectActionRequest
 } from '../../hooks/analytics/events-hooks';
+import { InstallSubscriptionV2Notification } from './InstallSubscriptionV2Notification';
+import { RemoveSubscriptionV2Notification } from './RemoveSubscriptionV2Notification';
 
 export const TonConnectRequestNotification: FC<{
     request: TonConnectAppRequestPayload | undefined;
@@ -68,6 +74,30 @@ export const TonConnectRequestNotification: FC<{
                                           message: 'Reject Request'
                                       }
                                   } as RpcResponses['signData']['error'])
+                        );
+                    }
+                }}
+            />
+            <InstallSubscriptionV2Notification
+                params={request?.kind === 'createSubscriptionV2' ? request.payload : null}
+                handleClose={boc => {
+                    if (request) {
+                        handleClose(
+                            boc
+                                ? createSubscriptionV2SuccessResponse(request.id, boc)
+                                : createSubscriptionV2ErrorResponse(request.id)
+                        );
+                    }
+                }}
+            />
+            <RemoveSubscriptionV2Notification
+                params={request?.kind === 'cancelSubscriptionV2' ? request.payload : null}
+                handleClose={boc => {
+                    if (request) {
+                        handleClose(
+                            boc
+                                ? cancelSubscriptionV2SuccessResponse(request.id, boc)
+                                : cancelSubscriptionV2ErrorResponse(request.id)
                         );
                     }
                 }}
