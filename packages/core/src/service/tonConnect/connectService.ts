@@ -16,6 +16,7 @@ import {
     SEND_TRANSACTION_ERROR_CODES,
     SendTransactionRpcResponseError,
     SendTransactionRpcResponseSuccess,
+    SUBSCRIPTION_V2_ERROR_CODES,
     TonAddressItemReply,
     TonConnectEventPayload,
     TonConnectNetwork,
@@ -211,6 +212,10 @@ export const getDeviceInfo = (
             {
                 name: 'SignData',
                 types: ['text', 'binary', 'cell']
+            },
+            {
+                name: 'Subscription',
+                versions: { v2: true }
             }
         ]
     };
@@ -608,3 +613,43 @@ export async function checkTonConnectFromAndNetwork(
         }
     }
 }
+
+export const createSubscriptionV2SuccessResponse = (id: string, boc: string) => {
+    return {
+        id,
+        result: { boc }
+    };
+};
+
+export const createSubscriptionV2ErrorResponse = (
+    id: string,
+    message = 'User rejected subscription'
+) => {
+    return {
+        id,
+        error: {
+            code: SUBSCRIPTION_V2_ERROR_CODES.USER_REJECTS_ERROR,
+            message
+        }
+    };
+};
+
+export const cancelSubscriptionV2SuccessResponse = (id: string, boc: string) => {
+    return {
+        id,
+        result: { boc }
+    };
+};
+
+export const cancelSubscriptionV2ErrorResponse = (
+    id: string,
+    message = 'User rejected cancellation'
+) => {
+    return {
+        id,
+        error: {
+            code: SUBSCRIPTION_V2_ERROR_CODES.USER_REJECTS_ERROR,
+            message
+        }
+    };
+};

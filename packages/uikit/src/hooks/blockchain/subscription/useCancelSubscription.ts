@@ -6,7 +6,7 @@ import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { QueryKey } from '../../../libs/queryKey';
 import { CancelParams } from './commonTypes';
-import { Address } from '@ton/core';
+import { Address, Cell } from '@ton/core';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 
 export const useCancelSubscription = () => {
@@ -15,7 +15,7 @@ export const useCancelSubscription = () => {
     const client = useQueryClient();
     const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
 
-    return useMutation<boolean, Error, CancelParams>(async subscriptionParams => {
+    return useMutation<Cell, Error, CancelParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
 
         const { selectedWallet, extensionContract, destroyValue } = subscriptionParams;
@@ -40,10 +40,10 @@ export const useCancelSubscription = () => {
 
         const outgoingMsg = encoder.encodeDestructAction(extensionAddress, BigInt(destroyValue));
 
-        await sender.send(outgoingMsg);
+        const boc = await sender.send(outgoingMsg);
 
         await client.invalidateQueries([QueryKey.pro]);
 
-        return true;
+        return boc;
     });
 };

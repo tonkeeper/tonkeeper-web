@@ -14,6 +14,7 @@ import { useAtomValue } from '../../libs/useAtom';
 interface IProps {
     title?: ReactNode;
     belowCaption?: ReactNode;
+    rawAddress?: string;
     isCurrentSubscription?: ReactNode;
     onDisconnect?: () => Promise<void>;
     isLoading: boolean;
@@ -24,6 +25,7 @@ export const ProActiveWallet: FC<IProps> = props => {
     const {
         onDisconnect,
         isLoading,
+        rawAddress,
         title,
         belowCaption,
         isCurrentSubscription,
@@ -34,6 +36,10 @@ export const ProActiveWallet: FC<IProps> = props => {
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
         (() => {
+            if (rawAddress) {
+                return rawAddress;
+            }
+
             const currentAuth = subscription?.auth;
 
             if (targetAuth && !isCurrentSubscription) {
