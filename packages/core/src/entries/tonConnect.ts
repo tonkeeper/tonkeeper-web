@@ -639,9 +639,9 @@ export const subscriptionSchema = z.object({
     id: z.number(),
     period: z.number().int().positive(),
     amount: z.string(),
-    firstChargeDate: z.number(),
-    withdrawAddress: z.string(),
-    withdrawMsgBody: z.string(),
+    first_charge_date: z.number(),
+    withdraw_address: z.string(),
+    withdraw_msg_body: z.string(),
     metadata: subscriptionMetadataSchema
 });
 

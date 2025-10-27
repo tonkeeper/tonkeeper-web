@@ -73,7 +73,7 @@ export const InstallSubscriptionV2Notification: FC<{
         version: SubscriptionExtensionVersion.V2,
         status: SubscriptionExtensionStatus.NOT_INITIALIZED,
         admin: subscription.beneficiary,
-        recipient: subscription.beneficiary,
+        recipient: subscription.withdraw_address,
         subscription_id: subscription.id,
         first_charging_date: 0,
         last_charging_date: 0,
@@ -81,12 +81,13 @@ export const InstallSubscriptionV2Notification: FC<{
         payment_per_period: subscription.amount,
         currency: CryptoCurrency.TON,
         created_at: Date.now(),
-        deploy_value: toNano('0.1').toString(),
-        destroy_value: toNano('0.05').toString(),
-        caller_fee: toNano('0.05').toString(),
+        deploy_value: toNano('0.11').toString(),
+        destroy_value: toNano('0.08').toString(),
+        caller_fee: '10000000',
         payer: params.from,
         contract: '',
         period: subscription.period,
+        withdraw_msg_body: subscription.withdraw_msg_body,
         metadata: toSubscriptionMetadata(subscription.metadata)
     };
 
@@ -175,7 +176,7 @@ const ProInstallExtensionNotificationContent: FC<
         });
 
         setTimeout(() => {
-            onClose(boc.toString());
+            onClose(boc.toBoc().toString('base64'));
         }, 1500);
 
         return !!boc;
