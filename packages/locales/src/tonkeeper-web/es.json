@@ -147,6 +147,7 @@
   "deleting_wallets_warning": "Después de eliminar todas las billeteras, las funciones PRO dejarán de estar disponibles. Se restaurarán después de iniciar sesión con una billetera que tenga una suscripción activa.",
   "deleting_wallet_warning": "Después de eliminar la billetera, las funciones PRO dejarán de estar disponibles. Se restaurarán después de iniciar sesión con una billetera que tenga una suscripción activa.",
   "desktop_only": "Solo para escritorio",
+  "disable": "Desactivar",
   "disabled": "Desactivado",
   "disconnect": "Desconectar",
   "disconnect_all_apps": "Desconectar Todas las Aplicaciones",
@@ -693,6 +694,9 @@
   "Unexpected_QR_Code": "Código QR inesperado",
   "unknown_operation": "Operación desconocida",
   "Unlock": "Desbloquear",
+  "unsubscribe_legacy_plugin_banner_subtitle": "Puede seguir cobrando a su cartera. Desactívelo para evitar más pagos.",
+  "unsubscribe_legacy_plugin_banner_title": "Tienes {count} suscripción expirada de @donate",
+  "unsubscribe_legacy_plugin_success_toast": "La cancelación de la suscripción será confirmada en blockchain en unos minutos",
   "unsupported_two_fa": "Las carteras con 2FA no son soportadas temporalmente. Utiliza una cartera sin 2FA o desactívala.\n",
   "unused": {
     "Edit_jettons": "Editar",

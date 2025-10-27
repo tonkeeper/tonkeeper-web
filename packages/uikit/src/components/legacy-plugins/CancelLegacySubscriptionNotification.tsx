@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect } from 'react';
 import { Notification } from '../Notification';
-import { ConfirmView } from '../transfer/ConfirmView';
+import { ConfirmView, ConfirmViewHeading, ConfirmViewHeadingSlot } from '../transfer/ConfirmView';
 import {
     useCancelSubscription,
     useEstimateRemoveExtension
@@ -13,14 +13,12 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 
-export default CancelLegacySubscriptionNotification;
-
 export const CancelLegacySubscriptionNotification: FC<{
     onClose: () => void;
     pluginAddress: string | undefined;
 }> = ({ onClose, pluginAddress }) => {
     return (
-        <Notification isOpen={!!pluginAddress} handleClose={onClose}>
+        <Notification isOpen={!!pluginAddress} handleClose={onClose} hideButton>
             {() =>
                 !!pluginAddress && (
                     <CancelLegacySubscription onClose={onClose} pluginAddress={pluginAddress} />
@@ -44,7 +42,7 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
     const { t } = useTranslation();
 
     const unsubscribeCallback = useCallback(() => {
-        if (!isStandardTonWallet(wallet) || wallet.version !== WalletVersion.V4R1) {
+        if (!isStandardTonWallet(wallet) || wallet.version !== WalletVersion.V4R2) {
             throw new Error('Unexpected wallet is used to unsubscribe from legacy subscription');
         }
 
@@ -63,7 +61,7 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
     }, [wallet, pluginAddress, t]);
 
     useEffect(() => {
-        if (!isStandardTonWallet(wallet) || wallet.version !== WalletVersion.V4R1) {
+        if (!isStandardTonWallet(wallet) || wallet.version !== WalletVersion.V4R2) {
             console.error('Unexpected wallet is used to unsubscribe from legacy subscription');
             return onClose();
         }
@@ -81,6 +79,13 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
             estimation={estimation}
             {...unsubscribeMutation}
             mutateAsync={unsubscribeCallback}
-        />
+        >
+            <ConfirmViewHeadingSlot>
+                <ConfirmViewHeading
+                    title={t('cancel_subscription')}
+                    caption={t('confirm_action')}
+                />
+            </ConfirmViewHeadingSlot>
+        </ConfirmView>
     );
 };

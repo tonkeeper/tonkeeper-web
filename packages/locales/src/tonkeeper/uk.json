@@ -141,7 +141,7 @@
   "exchange_title": "Купити TON",
   "import_add_wallet": "Додати гаманець",
   "import_add_wallet_description": "Створіть новий гаманець або додайте існуючий.",
-  "import_existing_wallet": "Існуючий Гаманець",
+  "import_existing_wallet": "Імпортувати існуючий гаманець",
   "import_existing_wallet_description": "Імпорт гаманця за допомогою 24 секретних фраз відновлення",
   "import_new_wallet": "Новий Гаманець",
   "import_new_wallet_description": "Створіть новий гаманець",
@@ -555,12 +555,11 @@
       "description": {
         "empty": "Обмінюйте через Tonkeeper, надсилайте токени та NFT.",
         "less_10": "У вас достатньо заряду батареї для менше ніж 10 транзакцій.",
-        "other": {
-          "few": "{count} заряди",
-          "many": "{count} зарядів",
-          "one": "{count} заряд",
-          "other": "{count} зарядів"
-        }
+        "other": "У вас достатньо заряду акумулятора для виконання більше ніж % транзакцій.",
+        "other.few": "{count} заряди",
+        "other.many": "{count} зарядів",
+        "other.one": "{count} заряд",
+        "other.other": "{count} зарядів"
       },
       "max_input_amount": "Максимальна сума {amount}",
       "ok": "OK",
@@ -870,6 +869,7 @@
     "info_about_inactive_title": "Неактивний контракт",
     "intro_item3_caption": "-",
     "intro_item3_title": "-",
+    "it_expires_on": "Термін дії закінчується",
     "jetton_buy_tether": "Купити USD₮",
     "jetton_id_copied": "ID токена скопійовано",
     "jetton_locked_till": "Заблоковано до {date}",
@@ -1096,6 +1096,8 @@
         "title": "Ви впевнені, що хочете відкрити зовнішнє посилання?"
       }
     },
+    "pro_subscription_is_active": "Підписка Pro активна.",
+    "pro_trial_is_active": "Пробна версія активна.",
     "receive_address_title": "Або використовуйте адресу гаманця",
     "receive_copy": "Копіювати",
     "receiveModal": {
@@ -1212,6 +1214,9 @@
     "send_title": "Відправити {currency}",
     "settings_appearance": "Зовнішній вигляд",
     "settings_bank_card": "Банківська картка",
+    "settings_delete_alert_button": "Видалити обліковий запис та дані",
+    "settings_delete_alert_caption": "Ця дія призведе до видалення вашого акаунту та всіх даних з цього додатку.",
+    "settings_delete_alert_title": "Ви впевнені, що хочете видалити свій акаунт?",
     "settings_delete_signer_account": "Видалити акаунт?",
     "settings_delete_watch_account": "Видалити обліковий запис для перегляду?",
     "settings_delete_watch_account_button": "Видалити",

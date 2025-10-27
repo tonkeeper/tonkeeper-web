@@ -147,6 +147,7 @@
   "deleting_wallets_warning": "Setelah menghapus semua dompet, fitur PRO akan menjadi tidak tersedia. Fitur tersebut akan dipulihkan setelah login dengan dompet yang memiliki langganan aktif.",
   "deleting_wallet_warning": "Setelah dompet dihapus, fitur PRO akan menjadi tidak tersedia. Fitur tersebut akan dipulihkan setelah masuk dengan dompet yang memiliki langganan aktif.",
   "desktop_only": "Hanya untuk Desktop",
+  "disable": "Nonaktifkan",
   "disabled": "Dinonaktifkan",
   "disconnect": "Putuskan sambungan",
   "disconnect_all_apps": "Putuskan Sambungan Semua Aplikasi",
@@ -693,6 +694,9 @@
   "Unexpected_QR_Code": "Kode QR tidak sesuai",
   "unknown_operation": "Operasi tidak dikenal",
   "Unlock": "Membuka Kunci",
+  "unsubscribe_legacy_plugin_banner_subtitle": "Ini dapat terus mengenakan biaya ke dompet Anda. Nonaktifkan untuk menghindari pembayaran lebih lanjut.",
+  "unsubscribe_legacy_plugin_banner_title": "Anda memiliki {count} langganan kedaluwarsa dari @donate",
+  "unsubscribe_legacy_plugin_success_toast": "Pembatalan langganan akan dikonfirmasi di blockchain dalam beberapa menit",
   "unsupported_two_fa": "Dompet 2FA sementara tidak didukung. Gunakan dompet tanpa 2FA atau nonaktifkan.\n",
   "unused": {
     "Edit_jettons": "Edit",

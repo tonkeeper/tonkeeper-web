@@ -147,6 +147,7 @@
   "deleting_wallets_warning": "删除所有钱包后，PRO功能将不可用。使用具有有效订阅的钱包登录后，这些功能将恢复。",
   "deleting_wallet_warning": "删除钱包后，PRO 功能将不可用。使用具有有效订阅的钱包登录后，这些功能将被恢复。",
   "desktop_only": "仅限桌面",
+  "disable": "禁用",
   "disabled": "已禁用",
   "disconnect": "断开连接",
   "disconnect_all_apps": "断开所有应用程序",
@@ -693,6 +694,9 @@
   "Unexpected_QR_Code": "非預期的二维码",
   "unknown_operation": "未知操作",
   "Unlock": "解锁",
+  "unsubscribe_legacy_plugin_banner_subtitle": "它 可能会继续 收费。禁用 它 以 避免 进一步 付款。",
+  "unsubscribe_legacy_plugin_banner_title": "您有 {count} 个已过期的订阅 从 @donate",
+  "unsubscribe_legacy_plugin_success_toast": "订阅取消将在区块链中确认几分钟后",
   "unsupported_two_fa": "暂不支持 2FA 钱包。请使用不带 2FA 的钱包或禁用 2FA。\n",
   "unused": {
     "add_wallet_existing_multisig_description": "%{number} 个钱包由您的钱包列表管理",

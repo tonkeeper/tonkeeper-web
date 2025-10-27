@@ -84,6 +84,11 @@ const TwoFARecoveryStartedBannerStyled = styled(TwoFARecoveryStartedBanner)`
     margin: 0 8px -8px;
 `;
 
+const MobileCancelLegacySubscriptionBannerStyled = styled(MobileCancelLegacySubscriptionBanner)`
+    margin: 0 8px;
+    width: unset;
+`;
+
 const BannerPadding = styled.div`
     height: 16px;
 `;
@@ -105,7 +110,9 @@ export const MobileProHomePage = () => {
             <TwoFARecoveryStartedBannerStyled>
                 <BannerPadding />
             </TwoFARecoveryStartedBannerStyled>
-            <MobileCancelLegacySubscriptionBanner />
+            <MobileCancelLegacySubscriptionBannerStyled>
+                <BannerPadding />
+            </MobileCancelLegacySubscriptionBannerStyled>
             <MobileProHomeBalance />
             <MobileProHomeActionsStyled />
             <MobileProHomeWidgetTokensStyled />

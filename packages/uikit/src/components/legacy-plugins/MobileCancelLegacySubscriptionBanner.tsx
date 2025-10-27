@@ -3,21 +3,20 @@ import styled from 'styled-components';
 import { Body2, Label1 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { ButtonFlat } from '../fields/Button';
-import React, { FC, Suspense, useState } from 'react';
-
-const CancelLegacySubscriptionNotification = React.lazy(
-    () => import('./CancelLegacySubscriptionNotification')
-);
+import React, { FC, PropsWithChildren, Suspense, useState } from 'react';
+import { CancelLegacySubscriptionNotification } from './CancelLegacySubscriptionNotification';
 
 const Banner = styled.div`
     width: 100%;
-    margin: 16px;
+    box-sizing: border-box;
+    margin: 8px 0;
 
     background: ${p => p.theme.accentOrange};
     border-radius: ${p => p.theme.cornerSmall};
     padding: 12px 16px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
 
     color: ${p => p.theme.constantBlack};
 `;
@@ -25,13 +24,16 @@ const Banner = styled.div`
 const ColumnText = styled.div`
     display: flex;
     flex-direction: column;
-    ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
     margin-bottom: 4px;
 `;
 
-export const MobileCancelLegacySubscriptionBanner: FC<{ className?: string }> = ({ className }) => {
+const ButtonFlatStyled = styled(ButtonFlat)`
+    color: ${p => p.theme.constantBlack};
+`;
+
+export const MobileCancelLegacySubscriptionBanner: FC<
+    PropsWithChildren<{ className?: string }>
+> = ({ className, children }) => {
     const { data: legacyPlugins } = useWalletLegacyPlugins();
     const { t } = useTranslation();
     const [pluginToUnsubscribe, setPluginToUnsubscribe] = useState<string | undefined>();
@@ -42,17 +44,19 @@ export const MobileCancelLegacySubscriptionBanner: FC<{ className?: string }> = 
 
     return (
         <>
+            {children}
             <Banner className={className}>
                 <ColumnText>
-                    <Label1>{t('unsubscribe_legacy_plugin_banner_title')}</Label1>
+                    <Label1>
+                        {t('unsubscribe_legacy_plugin_banner_title', {
+                            count: legacyPlugins.length
+                        })}
+                    </Label1>
                     <Body2>{t('unsubscribe_legacy_plugin_banner_subtitle')}</Body2>
                 </ColumnText>
-                <ButtonFlat
-                    primary
-                    onClick={() => setPluginToUnsubscribe(legacyPlugins![0].address)}
-                >
+                <ButtonFlatStyled onClick={() => setPluginToUnsubscribe(legacyPlugins![0].address)}>
                     {t('disable')}
-                </ButtonFlat>
+                </ButtonFlatStyled>
             </Banner>
             <Suspense>
                 <CancelLegacySubscriptionNotification

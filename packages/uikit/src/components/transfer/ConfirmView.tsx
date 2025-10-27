@@ -267,10 +267,9 @@ export const ConfirmViewHeadingSlot: FC<PropsWithChildren<{ className?: string }
     className
 }) => <ConfirmViewHeadingStyled className={className}>{children}</ConfirmViewHeadingStyled>;
 
-export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; title?: string }>> = ({
-    className,
-    title
-}) => {
+export const ConfirmViewHeading: FC<
+    PropsWithChildren<{ className?: string; title?: string; caption?: string }>
+> = ({ className, title, caption }) => {
     const { t } = useTranslation();
     const { recipient, assetAmount } = useConfirmViewContext();
     const image = useAssetImage(assetAmount.asset);
@@ -302,7 +301,7 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
                 assetAmount.asset.verification !== JettonVerificationType.Whitelist && (
                     <UnverifiedTokenLabel>{t('approval_unverified_token')}</UnverifiedTokenLabel>
                 )}
-            <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
+            <SendingTitle>{caption ?? t('confirm_sending_title')}</SendingTitle>
             <Title>{title}</Title>
         </Info>
     );

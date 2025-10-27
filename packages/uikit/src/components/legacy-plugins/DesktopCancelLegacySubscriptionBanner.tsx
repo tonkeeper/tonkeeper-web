@@ -4,10 +4,9 @@ import { Body2, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import React, { FC, Suspense, useState } from 'react';
-
-const CancelLegacySubscriptionNotification = React.lazy(
-    () => import('./CancelLegacySubscriptionNotification')
-);
+import { CancelLegacySubscriptionNotification } from './CancelLegacySubscriptionNotification';
+import { useOpenSupport } from '../../state/pro';
+import { useAppSdk } from '../../hooks/appSdk';
 
 const Banner = styled.div`
     position: absolute;
@@ -97,6 +96,7 @@ export const DesktopCancelLegacySubscriptionBanner: FC<{ className?: string }> =
     className
 }) => {
     const { data: legacyPlugins } = useWalletLegacyPlugins();
+    const openSupport = useOpenSupport();
     const { t } = useTranslation();
     const [pluginToUnsubscribe, setPluginToUnsubscribe] = useState<string | undefined>();
 
@@ -109,11 +109,15 @@ export const DesktopCancelLegacySubscriptionBanner: FC<{ className?: string }> =
             <Banner className={className}>
                 <WarnIcon />
                 <ColumnText>
-                    <Label2>{t('unsubscribe_legacy_plugin_banner_title')}</Label2>
+                    <Label2>
+                        {t('unsubscribe_legacy_plugin_banner_title', {
+                            count: legacyPlugins.length
+                        })}
+                    </Label2>
                     <Body2>{t('unsubscribe_legacy_plugin_banner_subtitle')}</Body2>
                 </ColumnText>
                 <ButtonsBlock>
-                    <Button>{t('contact_support')}</Button>
+                    <Button onClick={openSupport}>{t('contact_support')}</Button>
                     <Button
                         primary
                         onClick={() => setPluginToUnsubscribe(legacyPlugins![0].address)}

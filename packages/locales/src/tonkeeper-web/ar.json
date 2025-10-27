@@ -147,6 +147,7 @@
   "deleting_wallets_warning": "بعد حذف جميع المحافظ، ستصبح ميزات PRO غير متاحة. سيتم استعادتها بعد تسجيل الدخول إلى محفظة تحتوي على اشتراك نشط.",
   "deleting_wallet_warning": "بعد حذف المحفظة، ستصبح ميزات PRO غير متاحة. سيتم استعادتها بعد تسجيل الدخول باستخدام محفظة تحتوي على اشتراك نشط.",
   "desktop_only": "سطح المكتب فقط",
+  "disable": "تعطيل",
   "disabled": "معطل",
   "disconnect": "الغاء ربط",
   "disconnect_all_apps": "الغاء ربط كل التطبيقات",
@@ -693,6 +694,9 @@
   "Unexpected_QR_Code": "رمز الاستجابة السريعة (QR) غير المتوقع",
   "unknown_operation": "عملية غير معروفة",
   "Unlock": "فتح القفل",
+  "unsubscribe_legacy_plugin_banner_subtitle": "قد يستمر في سحب الأموال من محفظتك. عَطِّلْهُ لتفادي دفعات إضافية.",
+  "unsubscribe_legacy_plugin_banner_title": "لديك {count} اشتراك منتهي من @donate",
+  "unsubscribe_legacy_plugin_success_toast": "سيتم تأكيد إلغاء الاشتراك في البلوكشين خلال بضع دقائق",
   "unsupported_two_fa": "لا يتم دعم المحافظ التي تستخدم التحقق بخطوتين مؤقتًا. استخدم محفظة بدون التحقق بخطوتين أو قم بتعطيلها.\n",
   "unused": {
     "Edit_jettons": "تعديل",

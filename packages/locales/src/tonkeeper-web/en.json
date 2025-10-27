@@ -147,6 +147,7 @@
   "deleting_wallets_warning": "After deleting all wallets, PRO features will become unavailable. They will be restored after logging in with a wallet that has an active subscription.",
   "deleting_wallet_warning": "After deleting the wallet, PRO features will become unavailable. They will be restored after logging in with a wallet that has an active subscription.",
   "desktop_only": "DESKTOP ONLY",
+  "disable": "Disable",
   "disabled": "Disabled",
   "disconnect": "Disconnect",
   "disconnect_all_apps": "Disconnect All Apps",
@@ -693,6 +694,9 @@
   "Unexpected_QR_Code": "Unexpected QR Code",
   "unknown_operation": "Unknown Operation",
   "Unlock": "Unlock",
+  "unsubscribe_legacy_plugin_banner_subtitle": "It may continue charging your wallet. Disable it to avoid further payments.",
+  "unsubscribe_legacy_plugin_banner_title": "You have {count} expired subscription from @donate",
+  "unsubscribe_legacy_plugin_success_toast": "Subscription cancellation will be confirmed in blockchain in few minutes ",
   "unsupported_two_fa": "2FA wallets temporarily aren’t supported. Use a wallet without 2FA or disable it.\n",
   "unused": {
     "1_month": "1 month",
