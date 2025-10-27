@@ -85,6 +85,7 @@ import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/Cr
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
 import { SecureWalletNotification } from '@tonkeeper/uikit/dist/components/desktop/SecureWalletNotification';
+import { DesktopCancelLegacySubscriptionBanner } from '@tonkeeper/uikit/src/components/legacy-plugins/DesktopCancelLegacySubscriptionBanner';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -426,6 +427,7 @@ const WalletContent = () => {
                         <MemoryScroll />
                     </Wrapper>
                 </WalletRoutingWrapper>
+                <DesktopCancelLegacySubscriptionBanner />
             </WalletLayoutBody>
         </WalletLayout>
     );
