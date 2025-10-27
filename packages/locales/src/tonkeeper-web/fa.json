@@ -696,6 +696,7 @@
   "Unlock": "باز کردن",
   "unsubscribe_legacy_plugin_banner_subtitle": "این ممکن است همچنان کیف پول شما را شارژ کند. برای جلوگیری از پرداخت‌های بیشتر آن را غیرفعال کنید.",
   "unsubscribe_legacy_plugin_banner_title": "شما {count} اشتراک منقضی شده از @donate دارید",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "بعضی از آنها ممکن است به کسر از کیف پول شما ادامه دهند.",
   "unsubscribe_legacy_plugin_success_toast": "تأیید لغو اشتراک در بلاکچین تا چند دقیقه دیگر انجام خواهد شد",
   "unsupported_two_fa": "کیف پول‌های دارای 2FA به‌طور موقت پشتیبانی نمی‌شوند. از کیف پولی بدون 2FA استفاده کنید یا آن را غیرفعال نمایید.\n",
   "unused": {

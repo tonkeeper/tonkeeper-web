@@ -696,6 +696,7 @@
   "Unlock": "Desbloquear",
   "unsubscribe_legacy_plugin_banner_subtitle": "Ele pode continuar debitando sua carteira. Desative-o para evitar cobranças futuras.",
   "unsubscribe_legacy_plugin_banner_title": "Você tem {count} assinatura expirada de @doar",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Alguns deles podem continuar a cobrar da sua carteira.",
   "unsubscribe_legacy_plugin_success_toast": "O cancelamento da assinatura será confirmado no blockchain em poucos minutos",
   "unsupported_two_fa": "Carteiras 2FA temporariamente não são suportadas. Utilize uma carteira sem 2FA ou desative-o.\n",
   "update": "Atualizar",

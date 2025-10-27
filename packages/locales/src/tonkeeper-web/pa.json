@@ -696,6 +696,7 @@
   "Unlock": "ਲਾਕ ਖੋਲ੍ਹੋ",
   "unsubscribe_legacy_plugin_banner_subtitle": "ਇਹ ਤੁਹਾਡੇ ਵੌਲੇਟ ਨੂੰ ਚਾਰਜ ਕਰਦਾ ਰਹਿ ਸਕਦਾ ਹੈ। ਹੋਰ ਭੁਗਤਾਨਾਂ ਤੋਂ ਬਚਣ ਲਈ ਇਸਨੂੰ ਬੰਦ ਕਰੋ।",
   "unsubscribe_legacy_plugin_banner_title": "ਤੁਹਾਡੇ ਕੋਲ {count} ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਮਿਆਦ ਪੁੱਗ ਚੁੱਕਾ ਹੈ @donate ਤੋਂ",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "ਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਕੁਝ ਤੁਹਾਡੇ ਵੌਲਟ ਨੂੰ ਚਾਰਜ ਕਰਦੇ ਰਹਿ ਸਕਦੇ ਹਨ।",
   "unsubscribe_legacy_plugin_success_toast": "ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਰੱਦ ਕੀਤੀ ਜਾਣ ਦੀ ਪੁਸ਼ਟੀ ਬਲੌਕਚੇਨ ਵਿੱਚ ਕੁਝ ਮਿੰਟਾਂ ਵਿੱਚ ਕੀਤੀ ਜਾਵੇਗੀ",
   "unsupported_two_fa": "2FA ਬਟੂਆਂ ਨੂੰ ਅਸਥਾਈ ਤੌਰ ਤੇ ਸਮਰਥਨ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।\n2FA ਤੋਂ ਬਿਨਾ ਬਟੂਆ ਵਰਤੋਂ ਵਿੱਚ ਲਿਆਵੋ ਜਾਂ ਇਸਨੂੰ ਬੰਦ ਕਰੋ।\n",
   "update": "ਅੱਪਡੇਟ ਕਰੋ",

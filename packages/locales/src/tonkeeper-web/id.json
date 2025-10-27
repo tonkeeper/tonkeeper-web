@@ -696,6 +696,7 @@
   "Unlock": "Membuka Kunci",
   "unsubscribe_legacy_plugin_banner_subtitle": "Ini dapat terus mengenakan biaya ke dompet Anda. Nonaktifkan untuk menghindari pembayaran lebih lanjut.",
   "unsubscribe_legacy_plugin_banner_title": "Anda memiliki {count} langganan kedaluwarsa dari @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Beberapa di antaranya mungkin terus membebankan dompet Anda.",
   "unsubscribe_legacy_plugin_success_toast": "Pembatalan langganan akan dikonfirmasi di blockchain dalam beberapa menit",
   "unsupported_two_fa": "Dompet 2FA sementara tidak didukung. Gunakan dompet tanpa 2FA atau nonaktifkan.\n",
   "unused": {

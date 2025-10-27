@@ -696,6 +696,7 @@
   "Unlock": "Sblocca",
   "unsubscribe_legacy_plugin_banner_subtitle": "Potrebbe continuare a prelevare denaro dal tuo portafoglio. Disattivalo per evitare ulteriori pagamenti.",
   "unsubscribe_legacy_plugin_banner_title": "Hai {count} abbonamento scaduto da @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Alcuni di essi potrebbero continuare ad addebitare il tuo portafoglio.",
   "unsubscribe_legacy_plugin_success_toast": "La cancellazione dell'abbonamento sarà confermata sulla blockchain entro pochi minuti",
   "unsupported_two_fa": "I portafogli 2FA temporaneamente non sono supportati. Usa un portafoglio senza 2FA o disabilitalo.\n",
   "update": "Aggiorna",

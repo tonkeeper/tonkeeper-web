@@ -52,7 +52,13 @@ export const MobileCancelLegacySubscriptionBanner: FC<
                             count: legacyPlugins.length
                         })}
                     </Label1>
-                    <Body2>{t('unsubscribe_legacy_plugin_banner_subtitle')}</Body2>
+                    <Body2>
+                        {t(
+                            legacyPlugins.length === 1
+                                ? 'unsubscribe_legacy_plugin_banner_subtitle'
+                                : 'unsubscribe_legacy_plugin_many_banner_subtitle'
+                        )}
+                    </Body2>
                 </ColumnText>
                 <ButtonFlatStyled onClick={() => setPluginToUnsubscribe(legacyPlugins![0].address)}>
                     {t('disable')}

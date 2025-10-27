@@ -696,6 +696,7 @@
   "Unlock": "Desbloquear",
   "unsubscribe_legacy_plugin_banner_subtitle": "Puede seguir cobrando a su cartera. Desactívelo para evitar más pagos.",
   "unsubscribe_legacy_plugin_banner_title": "Tienes {count} suscripción expirada de @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Algunos de ellos pueden seguir cobrando de tu billetera.",
   "unsubscribe_legacy_plugin_success_toast": "La cancelación de la suscripción será confirmada en blockchain en unos minutos",
   "unsupported_two_fa": "Las carteras con 2FA no son soportadas temporalmente. Utiliza una cartera sin 2FA o desactívala.\n",
   "unused": {

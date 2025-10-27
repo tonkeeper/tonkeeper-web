@@ -6,7 +6,6 @@ import { Button } from '../fields/Button';
 import React, { FC, Suspense, useState } from 'react';
 import { CancelLegacySubscriptionNotification } from './CancelLegacySubscriptionNotification';
 import { useOpenSupport } from '../../state/pro';
-import { useAppSdk } from '../../hooks/appSdk';
 
 const Banner = styled.div`
     position: absolute;
@@ -114,7 +113,14 @@ export const DesktopCancelLegacySubscriptionBanner: FC<{ className?: string }> =
                             count: legacyPlugins.length
                         })}
                     </Label2>
-                    <Body2>{t('unsubscribe_legacy_plugin_banner_subtitle')}</Body2>
+                    <Body2>
+                        {' '}
+                        {t(
+                            legacyPlugins.length === 1
+                                ? 'unsubscribe_legacy_plugin_banner_subtitle'
+                                : 'unsubscribe_legacy_plugin_many_banner_subtitle'
+                        )}
+                    </Body2>
                 </ColumnText>
                 <ButtonsBlock>
                     <Button onClick={openSupport}>{t('contact_support')}</Button>

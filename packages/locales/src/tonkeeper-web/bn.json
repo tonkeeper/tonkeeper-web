@@ -696,6 +696,7 @@
   "Unlock": "আনলক করুন",
   "unsubscribe_legacy_plugin_banner_subtitle": "এটি আপনার ওয়ালেট থেকে চার্জ করতে পারে। পুনরায় অর্থপ্রদান এড়াতে এটি নিষ্ক্রিয় করুন।",
   "unsubscribe_legacy_plugin_banner_title": "আপনার @donate থেকে {count} মেয়াদোত্তীর্ণ সদস্যতা আছে",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "তাদের মধ্যে কিছু আপনার ওয়ালেট চার্জ করতে পারে।",
   "unsubscribe_legacy_plugin_success_toast": "গ্রাহকতা বাতিল কয়েক মিনিটের মধ্যে ব্লকচেইনে নিশ্চিত হবে",
   "unsupported_two_fa": "২এফএ ওয়ালেটগুলো আপাতত সমর্থিত নয়। ২এফএ ছাড়া একটি ওয়ালেট ব্যবহার করুন বা এটিকে নিষ্ক্রিয় করুন।\n",
   "unused": {

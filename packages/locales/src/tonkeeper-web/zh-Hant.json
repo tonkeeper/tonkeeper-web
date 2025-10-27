@@ -696,6 +696,7 @@
   "Unlock": "解鎖",
   "unsubscribe_legacy_plugin_banner_subtitle": "它 可能 會 繼續 向 你 的 賬戶 收費。 禁用 它 以 避免 更多 付款。",
   "unsubscribe_legacy_plugin_banner_title": "你有 {count} 個過期的訂閱來自 @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "有些可能會持續從你的錢包扣款。",
   "unsubscribe_legacy_plugin_success_toast": "訂閱取消將在幾分鐘內於 blockchain 中確認",
   "unsupported_two_fa": "2FA 錢包暫時不支援。請使用沒有 2FA 的錢包或停用 2FA。\n",
   "unused": {

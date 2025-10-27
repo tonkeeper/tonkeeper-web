@@ -696,6 +696,7 @@
   "Unlock": "Разблокировать",
   "unsubscribe_legacy_plugin_banner_subtitle": "Он может продолжать списывать средства. Отключите его, чтобы избежать дальнейших платежей.",
   "unsubscribe_legacy_plugin_banner_title": "У вас {count} истекшая подписка на @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Некоторые из них могут продолжать списывать средства с вашего кошелька.",
   "unsubscribe_legacy_plugin_success_toast": "Отмена подписки будет подтверждена в блокчейне через несколько минут",
   "unsupported_two_fa": "Кошельки с двухфакторной аутентификацией временно не поддерживаются. Используйте кошелек без 2FA или отключите ее.\n",
   "unused": {

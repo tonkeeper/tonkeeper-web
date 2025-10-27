@@ -696,6 +696,7 @@
   "Unlock": "Розблокувати",
   "unsubscribe_legacy_plugin_banner_subtitle": "Він може продовжити стягувати кошти з вашого рахунку. Вимкніть, щоб уникнути додаткових платежів.",
   "unsubscribe_legacy_plugin_banner_title": "У вас {count} прострочених підписок від @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Деякі з них можуть продовжувати стягувати кошти з вашого гаманця.",
   "unsubscribe_legacy_plugin_success_toast": "Скасування підписки буде підтверджено в блокчейні через кілька хвилин",
   "unsupported_two_fa": "Гаманці з двофакторною автентифікацією тимчасово не підтримуються. Використовуйте гаманець без 2FA або вимкніть його.\n",
   "unused": {

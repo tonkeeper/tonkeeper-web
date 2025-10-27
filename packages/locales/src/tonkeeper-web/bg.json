@@ -696,6 +696,7 @@
   "Unlock": "Отключи",
   "unsubscribe_legacy_plugin_banner_subtitle": "Може да продължи да таксува портфейла ви. Деактивирайте го, за да избегнете допълнителни плащания.",
   "unsubscribe_legacy_plugin_banner_title": "Имате {count} изтекъл абонамент от @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Някои от тях може да продължат да таксуват вашия портфейл.",
   "unsubscribe_legacy_plugin_success_toast": "Отмяната на абонамента ще бъде потвърдена в блокчейна след няколко минути",
   "unsupported_two_fa": "Портфейли с 2FA временно не се поддържат. Използвайте портфейл без 2FA или го деактивирайте.\n",
   "unused": {

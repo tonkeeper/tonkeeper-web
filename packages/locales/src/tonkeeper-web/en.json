@@ -696,6 +696,7 @@
   "Unlock": "Unlock",
   "unsubscribe_legacy_plugin_banner_subtitle": "It may continue charging your wallet. Disable it to avoid further payments.",
   "unsubscribe_legacy_plugin_banner_title": "You have {count} expired subscription from @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Some of them may continue charging your wallet.",
   "unsubscribe_legacy_plugin_success_toast": "Subscription cancellation will be confirmed in blockchain in few minutes ",
   "unsupported_two_fa": "2FA wallets temporarily aren’t supported. Use a wallet without 2FA or disable it.\n",
   "unused": {

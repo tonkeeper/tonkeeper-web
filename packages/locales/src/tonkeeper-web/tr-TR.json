@@ -696,6 +696,7 @@
   "Unlock": "Kilidi Aç",
   "unsubscribe_legacy_plugin_banner_subtitle": "Cüzdanınızdan ücret almaya devam edebilir. Daha fazla ödeme yapılmasını önlemek için devre dışı bırakın.",
   "unsubscribe_legacy_plugin_banner_title": "{count} adet süresi dolmuş aboneliğiniz var @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Bazıları cüzdanınızı ücretlendirmeye devam edebilir.",
   "unsubscribe_legacy_plugin_success_toast": "Aboneliğin iptali birkaç dakika içerisinde blok zincirde onaylanacaktır",
   "unsupported_two_fa": "2FA cüzdanlar geçici olarak desteklenmiyor. 2FA olmayan bir cüzdan kullanın veya devre dışı bırakın.",
   "unused": {

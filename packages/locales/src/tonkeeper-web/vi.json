@@ -696,6 +696,7 @@
   "Unlock": "Mở khóa",
   "unsubscribe_legacy_plugin_banner_subtitle": "Nó có thể tiếp tục tính phí ví của bạn. Vô hiệu hóa nó để tránh các khoản thanh toán thêm.",
   "unsubscribe_legacy_plugin_banner_title": "Bạn có {count} đăng ký hết hạn từ @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Một số trong số họ có thể tiếp tục thu phí ví của bạn.",
   "unsubscribe_legacy_plugin_success_toast": "Việc hủy đăng ký sẽ được xác nhận trên blockchain trong vài phút",
   "unsupported_two_fa": "Ví 2FA tạm thời không được hỗ trợ. Sử dụng ví không có 2FA hoặc vô hiệu hóa nó.\n",
   "update": "Cập nhật",

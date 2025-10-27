@@ -696,6 +696,7 @@
   "Unlock": "فتح القفل",
   "unsubscribe_legacy_plugin_banner_subtitle": "قد يستمر في سحب الأموال من محفظتك. عَطِّلْهُ لتفادي دفعات إضافية.",
   "unsubscribe_legacy_plugin_banner_title": "لديك {count} اشتراك منتهي من @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "قد يستمر بعضها في خصم الأموال من حسابك.",
   "unsubscribe_legacy_plugin_success_toast": "سيتم تأكيد إلغاء الاشتراك في البلوكشين خلال بضع دقائق",
   "unsupported_two_fa": "لا يتم دعم المحافظ التي تستخدم التحقق بخطوتين مؤقتًا. استخدم محفظة بدون التحقق بخطوتين أو قم بتعطيلها.\n",
   "unused": {
