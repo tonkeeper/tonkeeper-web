@@ -129,7 +129,7 @@ const ProRemoveSubscriptionV2NotificationContent: FC<{
         });
 
         setTimeout(() => {
-            onClose(boc.toString());
+            onClose(boc.toBoc().toString('base64'));
         }, 1500);
 
         return !!boc;
