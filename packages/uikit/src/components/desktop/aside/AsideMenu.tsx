@@ -41,6 +41,7 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 import { useManageFolderNotification } from '../../modals/ManageFolderNotificationControlled';
+import { AsideUpdateAvailable } from './AsideUpdateAvailable';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -421,6 +422,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             </IconWrapper>
                             <Label2>{t('aside_settings')}</Label2>
                         </AsideMenuItem>
+                        <AsideUpdateAvailable />
                     </AsideMenuBottomContent>
                     <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
                         <SubscriptionBlockWrapper>

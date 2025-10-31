@@ -1,7 +1,6 @@
-import AppUpdate from './autoUpdate';
 import * as osLocale from 'os-locale';
 import resources from '@tonkeeper/locales/dist/i18n/resources.json';
-import { Dict } from 'styled-components/dist/types';
+import type { Dict } from 'styled-components/dist/types';
 
 const locale = osLocale.osLocaleSync();
 
@@ -72,7 +71,7 @@ const WindowMenu: Electron.MenuItemConstructorOptions = {
     ]
 };
 
-const getDarwinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions => {
+const getDarwinMenu = (): Electron.MenuItemConstructorOptions => {
     return {
         label: 'Tonkeeper',
         submenu: [
@@ -118,7 +117,7 @@ const getDarwinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions =
     };
 };
 
-const getWinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions => {
+const getWinMenu = (): Electron.MenuItemConstructorOptions => {
     return {
         label: 'Tonkeeper',
         submenu: [
@@ -194,11 +193,9 @@ const ViewMenu: Electron.MenuItemConstructorOptions = {
     ]
 };
 
-export const createAppMenu = (
-    update: AppUpdate
-): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => {
+export const createAppMenu = (): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => {
     return [
-        process.platform === 'darwin' ? getDarwinMenu(update) : getWinMenu(update),
+        process.platform === 'darwin' ? getDarwinMenu() : getWinMenu(),
         EditMenu,
         ViewMenu,
         WindowMenu

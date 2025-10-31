@@ -87,6 +87,14 @@ export interface ConfirmDialog {
     options: MessageBoxSyncOptions;
 }
 
+export interface AutoUpdateQuitAndInstall {
+    king: 'auto-update-install';
+}
+
+export interface AutoUpdateGetHasNewVersion {
+    king: 'auto-update-get-has-new-version';
+}
+
 export type Message =
     | GetStorageMessage
     | SetStorageMessage
@@ -105,4 +113,6 @@ export type Message =
     | TonConnectSendDisconnectMessage
     | CleanCookieMessage
     | GetDeviceCountry
-    | ConfirmDialog;
+    | ConfirmDialog
+    | AutoUpdateQuitAndInstall
+    | AutoUpdateGetHasNewVersion;

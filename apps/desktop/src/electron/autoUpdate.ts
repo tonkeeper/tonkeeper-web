@@ -1,51 +1,80 @@
-import { app, autoUpdater, BrowserWindow, webContents } from 'electron';
+import { autoUpdater, BrowserWindow } from 'electron';
+import log from 'electron-log/main';
+import packageJson from '../../package.json';
+import { mainStorage } from './storageService';
 
-export default class AppUpdate {
-    constructor() {
-        autoUpdater.addListener('update-available', function (event: any) {
-            console.log('update available');
-        });
-        autoUpdater.addListener(
-            'update-downloaded',
-            function (event, releaseNotes, releaseName, releaseDate, updateURL) {
-                notify(
-                    'A new update is ready to install',
-                    `Version ${releaseName} is downloaded and will be automatically installed on Quit`
-                );
-            }
-        );
+export class AutoUpdateManager {
+    public static versionDownloadedKey = 'versionDownloaded';
 
-        const appVersion = app.getVersion(); // Get the app version dynamically
-        const platform = process.platform; // Get the platform dynamically (e.g., 'darwin', 'win32')
-        const arch = process.arch; // Get the architecture dynamically (e.g., 'arm64', 'x64')
+    private readonly channel = 'stable';
 
-        autoUpdater.addListener('error', function (error) {
-            console.log(error);
-        });
-        autoUpdater.addListener('checking-for-update', function (event: any) {
-            console.log('checking-for-update');
-        });
+    private newAvailableVersion: string | undefined = undefined;
 
-        // autoUpdater.addListener('update-not-available', function (event: any) {
-        //     notify('Tonkeeper Pro is up to date', `Version ${releaseName}`);
-        // });
+    private win: BrowserWindow;
 
-        // // Build the feed URL
-        // const feedURL = `https://update.electronjs.org/tonkeeper/tonkeeper-web/${platform}-${arch}/${appVersion}`;
+    // private feedBaseUrl = 'https://update.electronjs.org';
+    private feedBaseUrl = 'https://tonkeeper-web-updater-test.nkuznetsov.workers.dev';
 
-        // autoUpdater.setFeedURL({ url: feedURL });
+    public static async quitAndInstallIfFlagged() {
+        const flagged = await mainStorage.get(AutoUpdateManager.versionDownloadedKey);
+        if (flagged) {
+            return AutoUpdateManager.quitAndInstall();
+        }
     }
 
-    check() {
+    public static async quitAndInstall() {
+        await mainStorage.delete(AutoUpdateManager.versionDownloadedKey);
+        setImmediate(() => autoUpdater.quitAndInstall());
+        return true;
+    }
+
+    constructor(win: BrowserWindow) {
+        this.win = win;
+
+        this.init();
+    }
+
+    private async init() {
+        const feedURL = `${this.feedBaseUrl}/${this.getRepoUrl()}/${process.platform}/${
+            packageJson.version
+        }/${this.channel}`;
+        autoUpdater.setFeedURL({ url: feedURL });
+        this.listenDownload();
+
+        const exited = await AutoUpdateManager.quitAndInstallIfFlagged();
+        if (exited) {
+            return;
+        }
+
         autoUpdater.checkForUpdates();
-    }
-}
-
-function notify(title: string, message: string) {
-    let windows = BrowserWindow.getAllWindows();
-    if (windows.length == 0) {
-        return;
+        setInterval(() => {
+            autoUpdater.checkForUpdates();
+        }, 15 * 60_000);
     }
 
-    //  window[0].webContents.send('notify', title, message);
+    private getRepoUrl(): string {
+        return packageJson.repository.url
+            .replace(/^git\+/, '')
+            .replace(/^https:\/\/github\.com\//, '')
+            .replace(/\.git$/, '')
+            .trim();
+    }
+
+    public getNewVersionAvailable() {
+        return this.newAvailableVersion;
+    }
+
+    private listenDownload() {
+        autoUpdater.on('update-downloaded', (_, releaseNotes, releaseName) => {
+            const version = process.platform === 'win32' ? releaseNotes : releaseName;
+            this.newAvailableVersion = version;
+            this.win.webContents.send('app-update::ready', { version });
+            mainStorage.set(AutoUpdateManager.versionDownloadedKey, version);
+            log.log('[AutoUpdate] updater new version fetched:', version);
+        });
+
+        autoUpdater.on('error', err => {
+            log.error('[AutoUpdate] updater error:', err);
+        });
+    }
 }
