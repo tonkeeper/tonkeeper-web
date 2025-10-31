@@ -96,6 +96,26 @@ const WebTonConnectSubscription = () => {
                     };
                     return openNotification(params.connection.clientSessionId, value);
                 }
+                case 'createSubscriptionV2': {
+                    setRequest(undefined);
+                    const value: TonConnectAppRequestPayload = {
+                        connection: params.connection,
+                        id: params.request.id,
+                        kind: 'createSubscriptionV2',
+                        payload: JSON.parse(params.request.params[0])
+                    };
+                    return openNotification(params.connection.clientSessionId, value);
+                }
+                case 'cancelSubscriptionV2': {
+                    setRequest(undefined);
+                    const value: TonConnectAppRequestPayload = {
+                        connection: params.connection,
+                        id: params.request.id,
+                        kind: 'cancelSubscriptionV2',
+                        payload: JSON.parse(params.request.params[0])
+                    };
+                    return openNotification(params.connection.clientSessionId, value);
+                }
                 default: {
                     return badRequestResponse({
                         ...params,
