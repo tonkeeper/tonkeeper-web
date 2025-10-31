@@ -147,6 +147,7 @@
   "deleting_wallets_warning": "刪除所有錢包後，PRO 功能將不可用。登入具有有效訂閱的錢包後，這些功能將恢復。",
   "deleting_wallet_warning": "刪除錢包後，PRO 功能將無法使用。使用具有有效訂閱的錢包登入後，這些功能將恢復。",
   "desktop_only": "僅限桌面",
+  "disable": "停用",
   "disabled": "已停用",
   "disconnect": "斷開連接",
   "disconnect_all_apps": "斷開連接所有應用程式",
@@ -693,6 +694,10 @@
   "Unexpected_QR_Code": "出現未預期的二維碼",
   "unknown_operation": "未知操作",
   "Unlock": "解鎖",
+  "unsubscribe_legacy_plugin_banner_subtitle": "它 可能 會 繼續 向 你 的 賬戶 收費。 禁用 它 以 避免 更多 付款。",
+  "unsubscribe_legacy_plugin_banner_title": "你有 {count} 個過期的訂閱來自 @donate",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "有些可能會持續從你的錢包扣款。",
+  "unsubscribe_legacy_plugin_success_toast": "訂閱取消將在幾分鐘內於 blockchain 中確認",
   "unsupported_two_fa": "2FA 錢包暫時不支援。請使用沒有 2FA 的錢包或停用 2FA。\n",
   "unused": {
     "add_wallet_existing_multisig_description": "%{number} 個錢包由您的錢包列表管理",

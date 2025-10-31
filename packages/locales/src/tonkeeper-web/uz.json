@@ -147,6 +147,7 @@
   "deleting_wallets_warning": "Barcha hamyonlarni o‘chirib tashlaganingizdan so‘ng PRO funksiyalari ishlamaydi. Faol obunasi bor hamyon bilan tizimga kirganingizdan so‘ng ular tiklanadi.",
   "deleting_wallet_warning": "Hamyon o‘chirib tashlangandan so‘ng PRO funksiyalari mavjud bo‘lmaydi. Ular faollashtirilgan obunaga ega hamyon bilan tizimga kirilgandan so‘ng qayta tiklanadi.",
   "desktop_only": "Faqat kompyuterda",
+  "disable": "O‘chirish",
   "disabled": "O‘chirilgan",
   "disconnect": "Ochirish",
   "disconnect_all_apps": "Barcha ilovalarni o'chirish",
@@ -693,6 +694,10 @@
   "Unexpected_QR_Code": "Kutilmagan QR kodi",
   "unknown_operation": "Nomaʼlum operatsiya",
   "Unlock": "Qulfni ochish",
+  "unsubscribe_legacy_plugin_banner_subtitle": "U bu sizning hamyoningizdan to'lovni davom ettirish mumkin. Kelgusida to'lovlardan qochish uchun uni o'chiring.",
+  "unsubscribe_legacy_plugin_banner_title": "Sizda @donate'dan {count} eskirgan obuna mavjud",
+  "unsubscribe_legacy_plugin_many_banner_subtitle": "Ba'zilari hamyoningizdan to'lov olishni davom ettirishi mumkin.",
+  "unsubscribe_legacy_plugin_success_toast": "Obunani bekor qilish blokcheynda bir necha daqiqada tasdiqlanadi",
   "unsupported_two_fa": "Ikki faktorli autentifikatsiya hamyonlari vaqtincha qo'llab-quvvatlanmaydi. Ikkita autentifikatsiyasiz hamyon ishlating yoki uni o'chiring.\n",
   "unused": {
     "add_wallet_existing_multisig_description": "%{number} hamyonlar sizning hamyon ro'yxatingiz tomonidan boshqariladi",

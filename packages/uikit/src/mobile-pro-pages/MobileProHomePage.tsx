@@ -30,6 +30,7 @@ import { DesktopViewHeader, DesktopViewPageLayout } from '../components/desktop/
 import { TwoFARecoveryStartedBanner } from '../components/settings/two-fa/TwoFARecoveryStartedBanner';
 import { IfFeatureEnabled } from '../components/shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../state/tonendpoint';
+import { MobileCancelLegacySubscriptionBanner } from '../components/legacy-plugins/MobileCancelLegacySubscriptionBanner';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -83,6 +84,11 @@ const TwoFARecoveryStartedBannerStyled = styled(TwoFARecoveryStartedBanner)`
     margin: 0 8px -8px;
 `;
 
+const MobileCancelLegacySubscriptionBannerStyled = styled(MobileCancelLegacySubscriptionBanner)`
+    margin: 0 8px;
+    width: unset;
+`;
+
 const BannerPadding = styled.div`
     height: 16px;
 `;
@@ -104,6 +110,9 @@ export const MobileProHomePage = () => {
             <TwoFARecoveryStartedBannerStyled>
                 <BannerPadding />
             </TwoFARecoveryStartedBannerStyled>
+            <MobileCancelLegacySubscriptionBannerStyled>
+                <BannerPadding />
+            </MobileCancelLegacySubscriptionBannerStyled>
             <MobileProHomeBalance />
             <MobileProHomeActionsStyled />
             <MobileProHomeWidgetTokensStyled />

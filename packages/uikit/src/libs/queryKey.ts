@@ -89,7 +89,9 @@ export enum QueryKey {
     appCountryInfo = 'appCountryInfo',
 
     trc20TrxDefaultFee = 'trc20TrxDefaultFee',
-    trc20FreeTransfersConfig = 'trc20FreeTransfersConfig'
+    trc20FreeTransfersConfig = 'trc20FreeTransfersConfig',
+
+    legacyPlugins = 'legacyPlugins'
 }
 
 export enum JettonKey {

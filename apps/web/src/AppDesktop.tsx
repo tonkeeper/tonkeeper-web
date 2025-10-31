@@ -39,6 +39,9 @@ import {
 import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
 import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
+import {
+  DesktopCancelLegacySubscriptionBanner
+} from "@tonkeeper/uikit/dist/components/legacy-plugins/DesktopCancelLegacySubscriptionBanner";
 
 const DesktopAccountSettingsPage = React.lazy(
   () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
@@ -137,6 +140,7 @@ const WalletLayout = styled.div`
 `;
 
 const WalletLayoutBody = styled.div`
+    position: relative;
     flex: 1;
     display: flex;
     max-height: calc(100% - ${desktopHeaderContainerHeight});
@@ -280,6 +284,7 @@ const WalletContent = () => {
                       <MemoryScroll />
                     </Wrapper>
                 </WalletRoutingWrapper>
+                <DesktopCancelLegacySubscriptionBanner />
             </WalletLayoutBody>
         </WalletLayout>
     );

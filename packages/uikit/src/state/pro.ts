@@ -49,6 +49,7 @@ import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encode
 import { useProAuthNotification } from '../components/modals/ProAuthNotificationControlled';
 import { useProPurchaseNotification } from '../components/modals/ProPurchaseNotificationControlled';
 import { getWalletBalance } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { useCallback } from 'react';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -96,6 +97,15 @@ export const useSupport = () => {
             staleTime: 0,
             cacheTime: 0
         }
+    );
+};
+
+export const useOpenSupport = () => {
+    const sdk = useAppSdk();
+    const { data: support } = useSupport();
+    return useCallback(
+        () => sdk.openPage(support.url, { forceExternalBrowser: true }),
+        [support.url]
     );
 };
 
