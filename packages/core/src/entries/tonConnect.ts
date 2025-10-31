@@ -593,7 +593,7 @@ export interface CancelSubscriptionV2AppRequest<
         ? AccountConnectionInjected
         : AccountConnection;
     kind: 'cancelSubscriptionV2';
-    payload: any;
+    payload: CancelSubscriptionV2Payload;
 }
 
 export type TonConnectAppRequestPayload<
@@ -653,4 +653,13 @@ export const createSubscriptionV2PayloadSchema = z.object({
     valid_until: z.number()
 });
 
+export const cancelSubscriptionV2PayloadSchema = z.object({
+    validUntil: z.number(),
+    extensionAddress: z.string(),
+    from: rawAddressSchema.optional(),
+    network: tonConnectNetworkSchema,
+    valid_until: z.number()
+});
+
 export type CreateSubscriptionV2Payload = z.infer<typeof createSubscriptionV2PayloadSchema>;
+export type CancelSubscriptionV2Payload = z.infer<typeof cancelSubscriptionV2PayloadSchema>;

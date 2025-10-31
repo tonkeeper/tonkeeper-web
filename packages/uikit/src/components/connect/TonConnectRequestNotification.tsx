@@ -80,11 +80,11 @@ export const TonConnectRequestNotification: FC<{
             />
             <InstallSubscriptionV2Notification
                 params={request?.kind === 'createSubscriptionV2' ? request.payload : null}
-                handleClose={boc => {
+                handleClose={result => {
                     if (request) {
                         handleClose(
-                            boc
-                                ? createSubscriptionV2SuccessResponse(request.id, boc)
+                            result
+                                ? createSubscriptionV2SuccessResponse(request.id, result)
                                 : createSubscriptionV2ErrorResponse(request.id)
                         );
                     }

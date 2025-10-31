@@ -32,9 +32,10 @@ import { useToast } from '../../hooks/useNotification';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { hexToRGBA } from '../../libs/css';
 import { toNano } from '@ton/core';
+import { CancelSubscriptionV2Payload } from '@tonkeeper/core/dist/entries/tonConnect';
 
 export const RemoveSubscriptionV2Notification: FC<{
-    params: any;
+    params: CancelSubscriptionV2Payload | null;
     handleClose: (boc?: string) => void;
 }> = ({ params, handleClose }) => {
     return (
@@ -49,7 +50,7 @@ export const RemoveSubscriptionV2Notification: FC<{
                     <ErrorBoundary
                         fallbackRender={fallbackRenderOver('Failed to display Pro Confirm modal')}
                     >
-                        {!!params?.subscription && (
+                        {!!params?.extensionAddress && (
                             <ProRemoveSubscriptionV2NotificationContent
                                 params={params}
                                 onClose={handleClose}
@@ -66,12 +67,12 @@ const ProRemoveSubscriptionV2NotificationContent: FC<{
     params: any;
     onClose: (boc?: string) => void;
 }> = ({ onClose, params }) => {
-    const extensionContract = '';
+    const { extensionAddress, from } = params;
     const destroyValue = toNano('0.05').toString();
 
     const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
 
-    const accountWallet = accountsWallets.find(accWallet => accWallet.wallet.id === params?.from);
+    const accountWallet = accountsWallets.find(accWallet => accWallet.wallet.id === from);
 
     const selectedWallet = accountWallet?.wallet;
     const finalExpiresDate = new Date();
@@ -111,9 +112,9 @@ const ProRemoveSubscriptionV2NotificationContent: FC<{
         if (!selectedWallet) return;
 
         estimateFeeMutation.mutate({
+            destroyValue,
             selectedWallet,
-            extensionContract,
-            destroyValue
+            extensionContract: extensionAddress
         });
     }, [selectedWallet]);
 
@@ -123,13 +124,13 @@ const ProRemoveSubscriptionV2NotificationContent: FC<{
         }
 
         const boc = await removeMutation.mutateAsync({
+            destroyValue,
             selectedWallet,
-            extensionContract,
-            destroyValue
+            extensionContract: extensionAddress
         });
 
         setTimeout(() => {
-            onClose(boc.toBoc().toString('base64'));
+            onClose(boc);
         }, 1500);
 
         return !!boc;
