@@ -115,8 +115,10 @@ const ProInstallExtensionNotificationContent: FC<
         }
 
         const result = deployMutation.mutateAsync({
-            selectedWallet: targetAuth.wallet,
-            ...extensionData
+            subscriptionParams: {
+                selectedWallet: targetAuth.wallet,
+                ...extensionData
+            }
         });
 
         return !!result;

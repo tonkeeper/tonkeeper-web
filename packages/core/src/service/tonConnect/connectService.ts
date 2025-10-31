@@ -614,10 +614,18 @@ export async function checkTonConnectFromAndNetwork(
     }
 }
 
-export const createSubscriptionV2SuccessResponse = (id: string, boc: string) => {
+export interface ICreateSubscriptionV2Response {
+    boc: string;
+    extensionAddress: string;
+}
+
+export const createSubscriptionV2SuccessResponse = (
+    id: string,
+    result: ICreateSubscriptionV2Response
+) => {
     return {
         id,
-        result: { boc }
+        result
     };
 };
 

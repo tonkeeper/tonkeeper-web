@@ -42,10 +42,11 @@ import {
 import { useProCompatibleAccountsWallets } from '../../state/wallet';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { toNano } from '@ton/core';
+import { ICreateSubscriptionV2Response } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 
 interface IProInstallExtensionProps {
     isOpen: boolean;
-    onClose: (boc?: string) => void;
+    onClose: (result?: ICreateSubscriptionV2Response) => void;
     extensionData?: SubscriptionExtension;
 }
 
@@ -63,7 +64,7 @@ function toSubscriptionMetadata(src: SubscriptionMetadataSource): SubscriptionEx
 
 export const InstallSubscriptionV2Notification: FC<{
     params: CreateSubscriptionV2Payload | null;
-    handleClose: (boc?: string) => void;
+    handleClose: (result?: ICreateSubscriptionV2Response) => void;
 }> = ({ params, handleClose }) => {
     const subscription = params?.subscription;
 
@@ -170,16 +171,21 @@ const ProInstallExtensionNotificationContent: FC<
             throw new Error('Selected wallet is required!');
         }
 
-        const boc = await deployMutation.mutateAsync({
-            selectedWallet,
-            ...extensionData
+        const result = await deployMutation.mutateAsync({
+            subscriptionParams: {
+                selectedWallet,
+                ...extensionData
+            },
+            options: {
+                disableAddressCheck: true
+            }
         });
 
         setTimeout(() => {
-            onClose(boc.toBoc().toString('base64'));
+            onClose(result);
         }, 1500);
 
-        return !!boc;
+        return !!result;
     };
 
     const {
