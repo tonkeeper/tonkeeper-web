@@ -56,7 +56,7 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
                 if (succeed) {
                     sdk.topMessage(t('unsubscribe_legacy_plugin_success_toast'));
                 }
-                return succeed;
+                return !!succeed;
             });
     }, [wallet, pluginAddress, t]);
 
