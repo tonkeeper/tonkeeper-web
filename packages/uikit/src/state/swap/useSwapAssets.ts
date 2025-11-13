@@ -29,6 +29,10 @@ import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
 import { eqAddresses } from '@tonkeeper/core/src/utils/address';
 import { KNOWN_TON_ASSETS } from '@tonkeeper/core/src/entries/crypto/asset/constants';
+import {
+    parseJettonScaledUIMultiplier,
+    ScaledUIMultiplier
+} from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 
 export function useAllSwapAssets() {
     const { swapService } = useSwapsConfig();
@@ -203,7 +207,8 @@ export const useSwapCustomTokenSearch = () => {
                     symbol: response.metadata.symbol,
                     decimals: Number(response.metadata.decimals),
                     id: packAssetId(BLOCKCHAIN_NAME.TON, address),
-                    verification: response.verification
+                    verification: response.verification,
+                    scaledUIMultiplier: parseJettonScaledUIMultiplier(response.scaledUi)
                 };
 
                 const jb = jettons?.balances.find(j =>
@@ -239,6 +244,7 @@ type TonAssetSerialized = {
     symbol: string;
     decimals: number;
     id: string;
+    scaledUIMultiplier: ScaledUIMultiplier;
 };
 
 export const useUserCustomSwapAssets = () => {

@@ -22,59 +22,64 @@ import {
 } from './JettonVerificationType';
 
 /**
- * 
+ *
  * @export
  * @interface JettonPreview
  */
 export interface JettonPreview {
     /**
-     * 
+     *
      * @type {string}
      * @memberof JettonPreview
      */
     address: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof JettonPreview
      */
     name: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof JettonPreview
      */
     symbol: string;
     /**
-     * 
+     *
      * @type {number}
      * @memberof JettonPreview
      */
     decimals: number;
     /**
-     * 
+     *
      * @type {string}
      * @memberof JettonPreview
      */
     image: string;
     /**
-     * 
+     *
      * @type {JettonVerificationType}
      * @memberof JettonPreview
      */
     verification: JettonVerificationType;
     /**
-     * 
+     *
      * @type {string}
      * @memberof JettonPreview
      */
     customPayloadApiUri?: string;
     /**
-     * 
+     *
      * @type {number}
      * @memberof JettonPreview
      */
     score: number;
+
+    scaledUi?: {
+      numerator: string;
+      denominator: string;
+    }
 }
 
 
@@ -102,7 +107,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     return {
-        
+
         'address': json['address'],
         'name': json['name'],
         'symbol': json['symbol'],
@@ -124,7 +129,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
 
     return {
-        
+
         'address': value['address'],
         'name': value['name'],
         'symbol': value['symbol'],

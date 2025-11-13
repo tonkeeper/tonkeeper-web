@@ -14,7 +14,10 @@ import {
     TON_USDT_ASSET,
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    jettonToTonAssetAmount,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export interface TokenRate {
     diff7d: string;
@@ -156,11 +159,11 @@ export const getTonFiatAmount = (client: QueryClient, fiat: FiatCurrencies, asse
 };
 
 export const getJettonsFiatAmount = (fiat: FiatCurrencies, assets: AssetData) => {
-    return assets.ton.jettons.balances.reduce((total, { jetton, balance, price }) => {
-        const rate = price ? toTokenRate(price, fiat) : undefined;
+    return assets.ton.jettons.balances.reduce((total, b) => {
+        const rate = b.price ? toTokenRate(b.price, fiat) : undefined;
         if (!rate) {
             return total;
         }
-        return total.plus(shiftedDecimals(balance, jetton.decimals).multipliedBy(rate.prices));
+        return total.plus(jettonToTonAssetAmount(b).relativeAmount.multipliedBy(rate.prices));
     }, new BigNumber(0));
 };

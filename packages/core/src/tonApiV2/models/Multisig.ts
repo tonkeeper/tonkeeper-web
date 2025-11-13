@@ -35,10 +35,10 @@ export interface Multisig {
     address: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Multisig
      */
-    seqno: number;
+    seqno: string;
     /**
      * 
      * @type {number}

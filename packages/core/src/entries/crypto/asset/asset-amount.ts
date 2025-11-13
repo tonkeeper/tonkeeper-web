@@ -4,6 +4,8 @@ import { getDecimalSeparator, getGroupSeparator } from '../../../utils/formattin
 import { Asset } from './asset';
 import { BasicAsset } from './basic-asset';
 import { IAssetAmount } from './i-asset-amount';
+import { toBigInt } from './utils';
+import { ScaledUIMultiplier } from './scaled-ui';
 
 type AssetAmountStruct<T extends BasicAsset> = {
     asset: T;
@@ -28,8 +30,33 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
     }): AssetAmount<T> {
         return new AssetAmount({
             asset,
-            weiAmount: new BigNumber(amount).multipliedBy(10 ** asset.decimals)
+            weiAmount: new BigNumber(
+                AssetAmount.fromScalingUIAmount(
+                    new BigNumber(amount).multipliedBy(10 ** asset.decimals),
+                    asset.scaledUIMultiplier
+                ).toString()
+            )
         });
+    }
+
+    static toScalingUIAmount(
+        amount: BigNumber.Value,
+        scaledUIMultiplier: ScaledUIMultiplier | { numerator: string; denominator: string }
+    ): bigint {
+        return (
+            (toBigInt(amount) * toBigInt(scaledUIMultiplier.numerator)) /
+            toBigInt(scaledUIMultiplier.denominator)
+        );
+    }
+
+    static fromScalingUIAmount(
+        scaledUIAmount: BigNumber.Value,
+        scaledUIMultiplier: ScaledUIMultiplier | { numerator: string; denominator: string }
+    ): bigint {
+        return (
+            (toBigInt(scaledUIAmount) * toBigInt(scaledUIMultiplier.denominator)) /
+            toBigInt(scaledUIMultiplier.numerator)
+        );
     }
 
     public readonly weiAmount: BigNumber;
@@ -65,7 +92,9 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
         this.asset = asset;
         this.image = image || asset.image;
 
-        this.relativeAmount = this.weiAmount.div(10 ** this.asset.decimals);
+        this.relativeAmount = new BigNumber(
+            AssetAmount.toScalingUIAmount(this.weiAmount, this.asset.scaledUIMultiplier).toString()
+        ).div(10 ** this.asset.decimals);
     }
 
     public isEQ(assetAmount: IAssetAmount): boolean {

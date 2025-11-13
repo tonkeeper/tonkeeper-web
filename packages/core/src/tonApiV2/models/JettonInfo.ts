@@ -36,53 +36,58 @@ import {
 } from './AccountAddress';
 
 /**
- * 
+ *
  * @export
  * @interface JettonInfo
  */
 export interface JettonInfo {
     /**
-     * 
+     *
      * @type {boolean}
      * @memberof JettonInfo
      */
     mintable: boolean;
     /**
-     * 
+     *
      * @type {string}
      * @memberof JettonInfo
      */
     totalSupply: string;
     /**
-     * 
+     *
      * @type {AccountAddress}
      * @memberof JettonInfo
      */
     admin?: AccountAddress;
     /**
-     * 
+     *
      * @type {JettonMetadata}
      * @memberof JettonInfo
      */
     metadata: JettonMetadata;
     /**
-     * 
+     *
      * @type {string}
      * @memberof JettonInfo
      */
     preview: string;
     /**
-     * 
+     *
      * @type {JettonVerificationType}
      * @memberof JettonInfo
      */
     verification: JettonVerificationType;
     /**
-     * 
+     *
      * @type {number}
      * @memberof JettonInfo
      */
     holdersCount: number;
+
+    scaledUi?: {
+      numerator: string;
+      denominator: string;
+    }
 }
 
 
@@ -109,7 +114,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         return json;
     }
     return {
-        
+
         'mintable': json['mintable'],
         'totalSupply': json['total_supply'],
         'admin': json['admin'] == null ? undefined : AccountAddressFromJSON(json['admin']),
@@ -130,7 +135,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
 
     return {
-        
+
         'mintable': value['mintable'],
         'total_supply': value['totalSupply'],
         'admin': AccountAddressToJSON(value['admin']),
