@@ -9,7 +9,10 @@ import { DoneIcon, DownIcon } from '../../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
 import { Body1, Label1 } from '../../Text';
 import { Image } from '../../shared/Image';
-import { shouldHideTonJettonImageCorners } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    jettonToTonAssetAmount,
+    shouldHideTonJettonImageCorners
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const AssetValue = styled.div`
     background: ${props => props.theme.buttonTertiaryBackground};
@@ -132,7 +135,7 @@ const AssetDropDown: FC<{
                                     noRadius={shouldHideTonJettonImageCorners(item.jetton.address)}
                                 ></AssetImage>
                                 <Label1>{item.jetton.symbol}</Label1>
-                                <Amount>{format(item.balance, item.jetton.decimals)}</Amount>
+                                <Amount>{jettonToTonAssetAmount(item).stringRelativeAmount}</Amount>
                             </AssetInfo>
 
                             {item.jetton.address === jetton ? (

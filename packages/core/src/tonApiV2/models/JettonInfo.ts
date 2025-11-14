@@ -34,6 +34,13 @@ import {
     AccountAddressToJSON,
     AccountAddressToJSONTyped,
 } from './AccountAddress';
+import type { ScaledUI } from './ScaledUI';
+import {
+    ScaledUIFromJSON,
+    ScaledUIFromJSONTyped,
+    ScaledUIToJSON,
+    ScaledUIToJSONTyped,
+} from './ScaledUI';
 
 /**
  * 
@@ -83,6 +90,12 @@ export interface JettonInfo {
      * @memberof JettonInfo
      */
     holdersCount: number;
+    /**
+     * 
+     * @type {ScaledUI}
+     * @memberof JettonInfo
+     */
+    scaledUi?: ScaledUI;
 }
 
 
@@ -117,6 +130,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'preview': json['preview'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'holdersCount': json['holders_count'],
+        'scaledUi': json['scaled_ui'] == null ? undefined : ScaledUIFromJSON(json['scaled_ui']),
     };
 }
 
@@ -138,6 +152,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'preview': value['preview'],
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'holders_count': value['holdersCount'],
+        'scaled_ui': ScaledUIToJSON(value['scaledUi']),
     };
 }
 

@@ -20,6 +20,13 @@ import {
     JettonVerificationTypeToJSON,
     JettonVerificationTypeToJSONTyped,
 } from './JettonVerificationType';
+import type { ScaledUI } from './ScaledUI';
+import {
+    ScaledUIFromJSON,
+    ScaledUIFromJSONTyped,
+    ScaledUIToJSON,
+    ScaledUIToJSONTyped,
+} from './ScaledUI';
 
 /**
  * 
@@ -75,6 +82,12 @@ export interface JettonPreview {
      * @memberof JettonPreview
      */
     score: number;
+    /**
+     * 
+     * @type {ScaledUI}
+     * @memberof JettonPreview
+     */
+    scaledUi?: ScaledUI;
 }
 
 
@@ -111,6 +124,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'customPayloadApiUri': json['custom_payload_api_uri'] == null ? undefined : json['custom_payload_api_uri'],
         'score': json['score'],
+        'scaledUi': json['scaled_ui'] == null ? undefined : ScaledUIFromJSON(json['scaled_ui']),
     };
 }
 
@@ -133,6 +147,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'custom_payload_api_uri': value['customPayloadApiUri'],
         'score': value['score'],
+        'scaled_ui': ScaledUIToJSON(value['scaledUi']),
     };
 }
 

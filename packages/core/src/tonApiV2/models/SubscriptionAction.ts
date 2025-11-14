@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Price } from './Price';
+import {
+    PriceFromJSON,
+    PriceFromJSONTyped,
+    PriceToJSON,
+    PriceToJSONTyped,
+} from './Price';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -47,10 +54,23 @@ export interface SubscriptionAction {
     beneficiary: AccountAddress;
     /**
      * 
-     * @type {number}
+     * @type {AccountAddress}
      * @memberof SubscriptionAction
      */
-    amount: number;
+    admin: AccountAddress;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubscriptionAction
+     * @deprecated
+     */
+    amount?: number;
+    /**
+     * 
+     * @type {Price}
+     * @memberof SubscriptionAction
+     */
+    price: Price;
     /**
      * 
      * @type {boolean}
@@ -66,7 +86,8 @@ export function instanceOfSubscriptionAction(value: object): value is Subscripti
     if (!('subscriber' in value) || value['subscriber'] === undefined) return false;
     if (!('subscription' in value) || value['subscription'] === undefined) return false;
     if (!('beneficiary' in value) || value['beneficiary'] === undefined) return false;
-    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('admin' in value) || value['admin'] === undefined) return false;
+    if (!('price' in value) || value['price'] === undefined) return false;
     if (!('initial' in value) || value['initial'] === undefined) return false;
     return true;
 }
@@ -84,7 +105,9 @@ export function SubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator: 
         'subscriber': AccountAddressFromJSON(json['subscriber']),
         'subscription': json['subscription'],
         'beneficiary': AccountAddressFromJSON(json['beneficiary']),
-        'amount': json['amount'],
+        'admin': AccountAddressFromJSON(json['admin']),
+        'amount': json['amount'] == null ? undefined : json['amount'],
+        'price': PriceFromJSON(json['price']),
         'initial': json['initial'],
     };
 }
@@ -103,7 +126,9 @@ export function SubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator: 
         'subscriber': AccountAddressToJSON(value['subscriber']),
         'subscription': value['subscription'],
         'beneficiary': AccountAddressToJSON(value['beneficiary']),
+        'admin': AccountAddressToJSON(value['admin']),
         'amount': value['amount'],
+        'price': PriceToJSON(value['price']),
         'initial': value['initial'],
     };
 }

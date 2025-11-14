@@ -7,9 +7,7 @@ import {
     parseTonTransferWithAddress,
     TonTransferParams
 } from '@tonkeeper/core/dist/service/deeplinkingService';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import BigNumber from 'bignumber.js';
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -54,7 +52,7 @@ import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
 import { useAnalyticsTrack } from '../../hooks/analytics';
-import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import { useActiveWallet } from '../../state/wallet';
 import styled, { css } from 'styled-components';
@@ -102,7 +100,7 @@ const SendContent: FC<{
         if (initRecipient) {
             track('send_click', {
                 from: 'send_amount',
-                token: amountViewState?.token?.symbol ?? 'ton'
+                token: amountViewState?.assetAmount?.asset?.symbol ?? 'ton'
             });
         }
     }, []);
@@ -116,15 +114,17 @@ const SendContent: FC<{
 
     const setRecipient = (value: RecipientData) => {
         if (
-            amountViewState?.token?.blockchain &&
-            amountViewState?.token?.blockchain !== value.address.blockchain
+            amountViewState?.assetAmount?.asset?.blockchain &&
+            amountViewState?.assetAmount?.asset?.blockchain !== value.address.blockchain
         ) {
             setAmountViewState(undefined);
         }
 
         _setRecipient(value);
         if (activeTronWallet && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
-            setAmountViewState({ token: TRON_USDT_ASSET });
+            setAmountViewState({
+                assetAmount: AssetAmount.fromRelativeAmount({ asset: TRON_USDT_ASSET, amount: 0 })
+            });
         }
     };
 
@@ -141,7 +141,7 @@ const SendContent: FC<{
         setView('amount');
         track('send_click', {
             from: 'send_recipient',
-            token: amountViewState?.token?.symbol ?? 'ton'
+            token: amountViewState?.assetAmount?.asset?.symbol ?? 'ton'
         });
     };
 
@@ -151,7 +151,7 @@ const SendContent: FC<{
         setView('confirm');
         track('send_confirm', {
             from: 'send_amount',
-            token: amountViewState?.token?.symbol ?? 'ton'
+            token: amountViewState?.assetAmount?.asset?.symbol ?? 'ton'
         });
     };
 
@@ -214,15 +214,16 @@ const SendContent: FC<{
                 });
 
                 setAmountViewState({
-                    coinValue: assetAmount.relativeAmount,
-                    token: actualAsset,
+                    assetAmount,
                     inFiat: false,
                     isMax: false
                 });
             } else {
                 setAmountViewState({
-                    coinValue: a ? shiftedDecimals(a) : new BigNumber('0'),
-                    token: initAmountState?.token,
+                    assetAmount: new AssetAmount({
+                        asset: initAmountState?.assetAmount?.asset ?? TON_ASSET,
+                        weiAmount: a ?? 0
+                    }),
                     inFiat: false,
                     isMax: false
                 });
@@ -230,7 +231,7 @@ const SendContent: FC<{
 
             return true;
         },
-        [sdk, filter, initAmountState?.token]
+        [sdk, filter, initAmountState?.assetAmount]
     );
 
     const onScan = async (signature: string) => {
@@ -265,17 +266,6 @@ const SendContent: FC<{
         amount: amountRef,
         confirm: confirmRef
     }[view];
-
-    const assetAmount = useMemo(() => {
-        if (!amountViewState?.token || !amountViewState?.coinValue) {
-            return null;
-        }
-
-        return AssetAmount.fromRelativeAmount({
-            asset: amountViewState!.token!,
-            amount: amountViewState!.coinValue!
-        });
-    }, [amountViewState?.token?.id, amountViewState?.coinValue]);
 
     let acceptBlockchains: BLOCKCHAIN_NAME[] = [];
     if (chain) {
@@ -365,10 +355,7 @@ const SendContent: FC<{
                                         onBack={backToAmount}
                                         recipient={recipient as TonRecipientData}
                                         assetAmount={
-                                            AssetAmount.fromRelativeAmount({
-                                                asset: amountViewState!.token!,
-                                                amount: amountViewState!.coinValue!
-                                            }) as AssetAmount<TonAsset>
+                                            amountViewState!.assetAmount as AssetAmount<TonAsset>
                                         }
                                         isMax={amountViewState!.isMax!}
                                         ttl={multisigTimeout!}
@@ -399,7 +386,9 @@ const SendContent: FC<{
                                         onClose={onClose}
                                         onBack={backToAmount}
                                         recipient={recipient!}
-                                        assetAmount={assetAmount!}
+                                        assetAmount={
+                                            amountViewState!.assetAmount as AssetAmount<TonAsset>
+                                        }
                                         isMax={amountViewState!.isMax!}
                                     >
                                         <ConfirmViewTitleSlot>

@@ -11,11 +11,14 @@ import {
     TRON_TRX_ASSET,
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    TonAsset,
+    legacyTonAssetId,
+    jettonToTonAssetAmount
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { DashboardCellNumeric } from '@tonkeeper/core/dist/entries/dashboard';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
@@ -304,9 +307,8 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
             const tokensOmited: Omit<TokenDistribution, 'percent'>[] = [ton].concat(
                 assets.ton.jettons.balances.map(b => {
                     const price = b.price ? toTokenRate(b.price, fiat).prices : 0;
-                    const fiatBalance = shiftedDecimals(b.balance, b.jetton.decimals).multipliedBy(
-                        price
-                    );
+                    const fiatBalance =
+                        jettonToTonAssetAmount(b).relativeAmount.multipliedBy(price);
 
                     return {
                         fiatBalance,

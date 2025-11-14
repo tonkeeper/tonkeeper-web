@@ -7,6 +7,7 @@ import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import { Reducer } from 'react';
 import { inputToBigNumber, replaceTypedDecimalSeparator, seeIfValueValid } from './AmountViewUI';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 
 function formatStringToInput(value: BigNumber): string {
     return value.toFormat({
@@ -17,16 +18,15 @@ function formatStringToInput(value: BigNumber): string {
 
 export type AmountStateAction =
     | { kind: 'select'; payload: { token: Asset } }
-    | { kind: 'max'; payload: { value: BigNumber; prices?: number } }
+    | { kind: 'max'; payload: { balance: AssetAmount; prices?: number } }
     | { kind: 'input'; payload: { value: string; prices?: number } }
     | { kind: 'price'; payload: { prices?: number } }
     | { kind: 'toggle'; payload: undefined };
 
 export type AmountState = {
     inputValue: string;
-    coinValue: BigNumber;
+    assetAmount: AssetAmount;
     fiatValue?: BigNumber;
-    token: Asset;
     inFiat: boolean;
     isMax: boolean;
 };
@@ -40,36 +40,40 @@ export const amountStateReducer: Reducer<AmountState, AmountStateAction> = (
         case 'select':
             return {
                 inputValue: '0',
-                coinValue: new BigNumber(0),
-                token: payload.token,
+                assetAmount: AssetAmount.fromRelativeAmount({
+                    asset: payload.token,
+                    amount: 0
+                }),
                 inFiat: false,
                 isMax: false
             };
         case 'max': {
             if (payload.prices !== undefined) {
-                const fiatValue = payload.value
+                const fiatValue = payload.balance.relativeAmount
                     .multipliedBy(payload.prices)
                     .decimalPlaces(2, BigNumber.ROUND_FLOOR);
 
                 return {
                     ...state,
-                    inputValue: formatStringToInput(state.inFiat ? fiatValue : payload.value),
+                    inputValue: formatStringToInput(
+                        state.inFiat ? fiatValue : payload.balance.relativeAmount
+                    ),
                     fiatValue: fiatValue,
-                    coinValue: payload.value,
+                    assetAmount: payload.balance,
                     isMax: !state.isMax
                 };
             } else {
                 return {
                     ...state,
-                    inputValue: formatStringToInput(payload.value),
-                    coinValue: payload.value,
+                    inputValue: formatStringToInput(payload.balance.relativeAmount),
+                    assetAmount: payload.balance,
                     isMax: !state.isMax
                 };
             }
         }
 
         case 'input': {
-            const decimals = state.inFiat ? 2 : state.token.decimals;
+            const decimals = state.inFiat ? 2 : state.assetAmount.asset.decimals;
 
             let inputValue = replaceTypedDecimalSeparator(payload.value);
 
@@ -91,7 +95,10 @@ export const amountStateReducer: Reducer<AmountState, AmountStateAction> = (
             return {
                 ...state,
                 inputValue,
-                coinValue,
+                assetAmount: AssetAmount.fromRelativeAmount({
+                    asset: state.assetAmount.asset,
+                    amount: coinValue
+                }),
                 fiatValue,
                 isMax: false
             };
@@ -100,7 +107,7 @@ export const amountStateReducer: Reducer<AmountState, AmountStateAction> = (
         case 'price': {
             if (!payload.prices) return state;
 
-            const fiatValue = state.coinValue
+            const fiatValue = state.assetAmount.relativeAmount
                 .multipliedBy(payload.prices)
                 .decimalPlaces(2, BigNumber.ROUND_FLOOR);
 
@@ -113,7 +120,10 @@ export const amountStateReducer: Reducer<AmountState, AmountStateAction> = (
         case 'toggle': {
             const inputValue = formatStringToInput(
                 state.inFiat
-                    ? state.coinValue.decimalPlaces(state.token.decimals, BigNumber.ROUND_FLOOR)
+                    ? state.assetAmount.relativeAmount.decimalPlaces(
+                          state.assetAmount.asset.decimals,
+                          BigNumber.ROUND_FLOOR
+                      )
                     : state.fiatValue?.decimalPlaces(2, BigNumber.ROUND_FLOOR) ?? new BigNumber(0)
             );
 
@@ -135,23 +145,26 @@ export const toInitAmountState = (
 ): AmountState => {
     const inFiat = defaults?.inFiat ?? false;
 
+    const asset =
+        defaults?.assetAmount?.asset ||
+        (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET);
+
     return {
         inputValue:
             defaults?.inputValue ??
             formatStringToInput(
-                (inFiat ? defaults?.fiatValue : defaults?.coinValue) || new BigNumber(0)
+                (inFiat ? defaults?.fiatValue : defaults?.assetAmount?.relativeAmount) ||
+                    new BigNumber(0)
             ),
-        coinValue: defaults?.coinValue ?? new BigNumber(0),
+        assetAmount: defaults?.assetAmount ?? AssetAmount.fromRelativeAmount({ asset, amount: 0 }),
         fiatValue: defaults?.fiatValue,
-        token:
-            defaults?.token || (blockchain === BLOCKCHAIN_NAME.TON ? TON_ASSET : TRON_USDT_ASSET),
         inFiat,
         isMax: defaults?.isMax ?? false
     };
 };
 
 export const toTokenRateSymbol = (amountState: AmountState) => {
-    return amountState.token.blockchain === BLOCKCHAIN_NAME.TRON
-        ? amountState.token.symbol
-        : legacyTonAssetId(amountState.token as TonAsset, { userFriendly: true });
+    return amountState.assetAmount.asset.blockchain === BLOCKCHAIN_NAME.TRON
+        ? amountState.assetAmount.asset.symbol
+        : legacyTonAssetId(amountState.assetAmount.asset as TonAsset, { userFriendly: true });
 };

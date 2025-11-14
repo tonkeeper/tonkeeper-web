@@ -96,6 +96,13 @@ const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
             return <ErrorActivityNotification event={props.event} />;
         case 'ElectionsDepositStake':
         case 'ElectionsRecoverStake':
+        case 'AddExtension':
+        case 'RemoveExtension':
+        case 'SetSignatureAllowedAction':
+        case 'GasRelay':
+        case 'DepositTokenStake':
+        case 'WithdrawTokenStakeRequest':
+        case 'LiquidityDeposit':
             return <SimplePreviewActionNotification {...props} />;
         default: {
             assertUnreachableSoft(props.action.type);

@@ -73,6 +73,13 @@ export const HistoryAction: FC<{
             return <ExtensionDesktopActions action={action} isScam={isScam} />;
         case 'ElectionsDepositStake':
         case 'ElectionsRecoverStake':
+        case 'AddExtension':
+        case 'RemoveExtension':
+        case 'SetSignatureAllowedAction':
+        case 'GasRelay':
+        case 'DepositTokenStake':
+        case 'WithdrawTokenStakeRequest':
+        case 'LiquidityDeposit':
             return <SimplePreviewDesktopAction action={action} isScam={isScam} />;
         default: {
             assertUnreachableSoft(action.type);

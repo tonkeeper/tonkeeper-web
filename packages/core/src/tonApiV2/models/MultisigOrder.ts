@@ -42,10 +42,10 @@ export interface MultisigOrder {
     address: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof MultisigOrder
      */
-    orderSeqno: number;
+    orderSeqno: string;
     /**
      * 
      * @type {number}

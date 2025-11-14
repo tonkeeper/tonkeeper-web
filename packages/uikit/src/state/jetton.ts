@@ -12,14 +12,16 @@ import {
     JettonsApi,
     JettonsBalances
 } from '@tonkeeper/core/dist/tonApiV2';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { useActiveApi, useActiveTonNetwork, useActiveWallet } from './wallet';
 import { TON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    jettonToTonAssetAmount,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useActiveWallet();
@@ -59,10 +61,10 @@ const patchTokensImages = (balances: JettonBalance[]) => {
     });
 };
 
-const getTokenBalance = ({ price, balance, jetton }: JettonBalance, fiat: FiatCurrencies) => {
-    if (!price || !price.prices || !price.prices[fiat]) return new BigNumber(0);
-    const p = price.prices[fiat];
-    return shiftedDecimals(balance, jetton.decimals).multipliedBy(p);
+const getTokenBalance = (b: JettonBalance, fiat: FiatCurrencies) => {
+    if (!b.price || !b.price.prices || !b.price.prices[fiat]) return new BigNumber(0);
+    const p = b.price.prices[fiat];
+    return jettonToTonAssetAmount(b).relativeAmount.multipliedBy(p);
 };
 
 const compareTokensOver = (fiat: FiatCurrencies) => {

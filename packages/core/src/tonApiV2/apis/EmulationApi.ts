@@ -68,6 +68,7 @@ export interface EmulateMessageToTraceRequest {
 export interface EmulateMessageToWalletOperationRequest {
     emulateMessageToWalletRequest: EmulateMessageToWalletRequest;
     acceptLanguage?: string;
+    currency?: string;
 }
 
 /**
@@ -143,6 +144,7 @@ export interface EmulationApiInterface {
      * Emulate sending message to retrieve the resulting wallet state
      * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64/hex and additional parameters to configure emulation
      * @param {string} [acceptLanguage] 
+     * @param {string} [currency] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EmulationApiInterface
@@ -344,6 +346,10 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['currency'] != null) {
+            queryParameters['currency'] = requestParameters['currency'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
