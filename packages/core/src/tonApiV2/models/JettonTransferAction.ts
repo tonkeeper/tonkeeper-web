@@ -83,12 +83,6 @@ export interface JettonTransferAction {
      * @type {string}
      * @memberof JettonTransferAction
      */
-    scaledUiAmount?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JettonTransferAction
-     */
     comment?: string;
     /**
      * 
@@ -136,7 +130,6 @@ export function JettonTransferActionFromJSONTyped(json: any, ignoreDiscriminator
         'sendersWallet': json['senders_wallet'],
         'recipientsWallet': json['recipients_wallet'],
         'amount': json['amount'],
-        'scaledUiAmount': json['scaled_ui_amount'] == null ? undefined : json['scaled_ui_amount'],
         'comment': json['comment'] == null ? undefined : json['comment'],
         'encryptedComment': json['encrypted_comment'] == null ? undefined : EncryptedCommentFromJSON(json['encrypted_comment']),
         'refund': json['refund'] == null ? undefined : RefundFromJSON(json['refund']),
@@ -160,7 +153,6 @@ export function JettonTransferActionFromJSONTyped(json: any, ignoreDiscriminator
         'senders_wallet': value['sendersWallet'],
         'recipients_wallet': value['recipientsWallet'],
         'amount': value['amount'],
-        'scaled_ui_amount': value['scaledUiAmount'],
         'comment': value['comment'],
         'encrypted_comment': EncryptedCommentToJSON(value['encryptedComment']),
         'refund': RefundToJSON(value['refund']),

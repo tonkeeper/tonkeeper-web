@@ -214,6 +214,7 @@ export * from './Refund';
 export * from './RemoveExtensionAction';
 export * from './Risk';
 export * from './Sale';
+export * from './ScaledUI';
 export * from './SendBlockchainMessageRequest';
 export * from './SendRawMessage200Response';
 export * from './SendRawMessageRequest';

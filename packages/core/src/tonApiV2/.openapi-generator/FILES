@@ -234,6 +234,7 @@ models/Refund.ts
 models/RemoveExtensionAction.ts
 models/Risk.ts
 models/Sale.ts
+models/ScaledUI.ts
 models/SendBlockchainMessageRequest.ts
 models/SendRawMessage200Response.ts
 models/SendRawMessageRequest.ts

@@ -43,43 +43,43 @@ import {
 } from './JettonBalanceLock';
 
 /**
- *
+ * 
  * @export
  * @interface JettonBalance
  */
 export interface JettonBalance {
     /**
-     *
+     * 
      * @type {string}
      * @memberof JettonBalance
      */
     balance: string;
     /**
-     *
+     * 
      * @type {TokenRates}
      * @memberof JettonBalance
      */
     price?: TokenRates;
     /**
-     *
+     * 
      * @type {AccountAddress}
      * @memberof JettonBalance
      */
     walletAddress: AccountAddress;
     /**
-     *
+     * 
      * @type {JettonPreview}
      * @memberof JettonBalance
      */
     jetton: JettonPreview;
     /**
-     *
+     * 
      * @type {Array<string>}
      * @memberof JettonBalance
      */
     extensions?: Array<string>;
     /**
-     *
+     * 
      * @type {JettonBalanceLock}
      * @memberof JettonBalance
      */
@@ -105,7 +105,7 @@ export function JettonBalanceFromJSONTyped(json: any, ignoreDiscriminator: boole
         return json;
     }
     return {
-
+        
         'balance': json['balance'],
         'price': json['price'] == null ? undefined : TokenRatesFromJSON(json['price']),
         'walletAddress': AccountAddressFromJSON(json['wallet_address']),
@@ -125,7 +125,7 @@ export function JettonBalanceFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
 
     return {
-
+        
         'balance': value['balance'],
         'price': TokenRatesToJSON(value['price']),
         'wallet_address': AccountAddressToJSON(value['walletAddress']),

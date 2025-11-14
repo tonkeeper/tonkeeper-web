@@ -222,7 +222,7 @@ export const SecondaryAmount: FC<{ amountState: AmountState; toggleFiat: () => v
     const { fiat } = useAppContext();
 
     const secondaryAmount: BigNumber | undefined = amountState.inFiat
-        ? amountState.coinValue
+        ? amountState.assetAmount.relativeAmount
         : amountState.fiatValue;
 
     if (!secondaryAmount) {
@@ -233,9 +233,9 @@ export const SecondaryAmount: FC<{ amountState: AmountState; toggleFiat: () => v
         <FiatBlock onClick={toggleFiat}>
             {formatter.format(secondaryAmount, {
                 ignoreZeroTruncate: !amountState.inFiat,
-                decimals: amountState.inFiat ? amountState.token.decimals : 2
+                decimals: amountState.inFiat ? amountState.assetAmount.asset.decimals : 2
             })}{' '}
-            {amountState.inFiat ? amountState.token.symbol : fiat}
+            {amountState.inFiat ? amountState.assetAmount.asset.symbol : fiat}
         </FiatBlock>
     );
 };

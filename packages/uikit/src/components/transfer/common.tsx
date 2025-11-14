@@ -458,7 +458,7 @@ export const makeTransferInitAmountState = (
 
         if (!transfer.amount) {
             return {
-                token
+                assetAmount: AssetAmount.fromRelativeAmount({ asset: token, amount: 0 })
             };
         }
 
@@ -468,8 +468,7 @@ export const makeTransferInitAmountState = (
         });
 
         return {
-            coinValue: assetAmount.relativeAmount,
-            token,
+            assetAmount,
             inFiat: false,
             isMax: false
         };

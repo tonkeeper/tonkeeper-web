@@ -34,60 +34,68 @@ import {
     AccountAddressToJSON,
     AccountAddressToJSONTyped,
 } from './AccountAddress';
+import type { ScaledUI } from './ScaledUI';
+import {
+    ScaledUIFromJSON,
+    ScaledUIFromJSONTyped,
+    ScaledUIToJSON,
+    ScaledUIToJSONTyped,
+} from './ScaledUI';
 
 /**
- *
+ * 
  * @export
  * @interface JettonInfo
  */
 export interface JettonInfo {
     /**
-     *
+     * 
      * @type {boolean}
      * @memberof JettonInfo
      */
     mintable: boolean;
     /**
-     *
+     * 
      * @type {string}
      * @memberof JettonInfo
      */
     totalSupply: string;
     /**
-     *
+     * 
      * @type {AccountAddress}
      * @memberof JettonInfo
      */
     admin?: AccountAddress;
     /**
-     *
+     * 
      * @type {JettonMetadata}
      * @memberof JettonInfo
      */
     metadata: JettonMetadata;
     /**
-     *
+     * 
      * @type {string}
      * @memberof JettonInfo
      */
     preview: string;
     /**
-     *
+     * 
      * @type {JettonVerificationType}
      * @memberof JettonInfo
      */
     verification: JettonVerificationType;
     /**
-     *
+     * 
      * @type {number}
      * @memberof JettonInfo
      */
     holdersCount: number;
-
-    scaledUi?: {
-      numerator: string;
-      denominator: string;
-    }
+    /**
+     * 
+     * @type {ScaledUI}
+     * @memberof JettonInfo
+     */
+    scaledUi?: ScaledUI;
 }
 
 
@@ -114,7 +122,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         return json;
     }
     return {
-
+        
         'mintable': json['mintable'],
         'totalSupply': json['total_supply'],
         'admin': json['admin'] == null ? undefined : AccountAddressFromJSON(json['admin']),
@@ -122,6 +130,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'preview': json['preview'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'holdersCount': json['holders_count'],
+        'scaledUi': json['scaled_ui'] == null ? undefined : ScaledUIFromJSON(json['scaled_ui']),
     };
 }
 
@@ -135,7 +144,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
 
     return {
-
+        
         'mintable': value['mintable'],
         'total_supply': value['totalSupply'],
         'admin': AccountAddressToJSON(value['admin']),
@@ -143,6 +152,7 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'preview': value['preview'],
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'holders_count': value['holdersCount'],
+        'scaled_ui': ScaledUIToJSON(value['scaledUi']),
     };
 }
 
