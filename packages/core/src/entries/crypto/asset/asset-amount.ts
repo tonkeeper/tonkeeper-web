@@ -101,10 +101,14 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
                 ).toString()
             ).div(10 ** this.asset.decimals);
         } else {
-            this.relativeAmount = new BigNumber(params.relativeAmount);
+            const decimals = params.asset.decimals;
+            this.relativeAmount = new BigNumber(params.relativeAmount).decimalPlaces(
+                decimals,
+                BigNumber.ROUND_DOWN
+            );
             this.weiAmount = new BigNumber(
                 AssetAmount.fromScalingUIAmount(
-                    new BigNumber(params.relativeAmount).multipliedBy(10 ** params.asset.decimals),
+                    this.relativeAmount.multipliedBy(10 ** decimals),
                     params.asset.scaledUIMultiplier
                 ).toString()
             );
