@@ -17,7 +17,7 @@ import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
-import { useActiveAccount, useActiveApi, useActiveTonNetwork } from '../../state/wallet';
+import { useActiveApi, useActiveTonNetwork } from '../../state/wallet';
 import { Gap } from '../Layout';
 import {
     FullHeightBlock,
@@ -123,8 +123,6 @@ export const RecipientView: FC<{
     const ref = useRef<HTMLTextAreaElement | null>(null);
     const isFullWidth = useIsFullWidthMode();
     const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
-    const activeAccount = useActiveAccount();
-    const tonNetwork = activeAccount.type === 'testnet' ? Network.TESTNET : Network.MAINNET;
 
     const [comment, setComment] = useState(data && 'comment' in data ? data.comment : '');
     const [recipient, setAddress] = useState<BaseRecipient | DnsRecipient>(
@@ -170,7 +168,7 @@ export const RecipientView: FC<{
         }
 
         let validForBlockchain;
-        if (seeIfValidTonRecipient(recipient, tonNetwork)) {
+        if (seeIfValidTonRecipient(recipient, network)) {
             validForBlockchain = BLOCKCHAIN_NAME.TON;
         } else if (seeIfValidTronAddress(recipient.address)) {
             validForBlockchain = BLOCKCHAIN_NAME.TRON;
@@ -184,21 +182,21 @@ export const RecipientView: FC<{
         }
 
         return null;
-    }, [recipient, acceptBlockchains, tonNetwork]);
+    }, [recipient, acceptBlockchains, network]);
 
     const isValidAddress = useMemo(() => {
         if (acceptBlockchains && acceptBlockchains.length === 1) {
             return acceptBlockchains[0] === BLOCKCHAIN_NAME.TON
-                ? seeIfValidTonRecipient(recipient, tonNetwork)
+                ? seeIfValidTonRecipient(recipient, network)
                 : seeIfValidTronAddress(recipient.address);
         } else {
             return true;
         }
-    }, [acceptBlockchains, recipient, tonNetwork]);
+    }, [acceptBlockchains, recipient, network]);
 
     const { data: toAccount, isFetching: isAccountFetching } = useToAccount(
         isValidForBlockchain === BLOCKCHAIN_NAME.TON &&
-            seeIfValidTonRecipient(recipient, tonNetwork),
+            seeIfValidTonRecipient(recipient, network),
         recipient
     );
 

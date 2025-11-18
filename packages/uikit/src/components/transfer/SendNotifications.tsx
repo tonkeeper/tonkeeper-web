@@ -54,11 +54,13 @@ import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView
 import { useAnalyticsTrack } from '../../hooks/analytics';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
+import { Address } from '@ton/core';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -234,10 +236,24 @@ const SendContent: FC<{
         [sdk, filter, initAmountState?.assetAmount]
     );
 
+    const network = useActiveTonNetwork();
+
     const onScan = async (signature: string) => {
         const param = parseTonTransferWithAddress({ url: signature });
 
         if (param) {
+            try {
+                const parsed = Address.parseFriendly(param.address);
+                if (parsed.isTestOnly && network === Network.MAINNET) {
+                    return sdk.uiEvents.emit('copy', {
+                        method: 'copy',
+                        params: t('Unexpected_QR_Code')
+                    });
+                }
+            } catch (e) {
+                //
+            }
+
             const ok = await processJetton(param);
             if (ok) {
                 await processRecipient(param);
