@@ -59,6 +59,10 @@ export function useAllSwapAssets() {
                             noImageCorners: shouldHideTonJettonImageCorners(
                                 tonAssetAddressToString(address)
                             ),
+                            scaledUIMultiplier: {
+                                numerator: '1',
+                                denominator: '1'
+                            },
                             address
                         };
                     })
