@@ -158,8 +158,6 @@ export class SubscriptionEncoder {
     private encodeWithdrawMsgBody(message?: string): Cell {
         if (!message) return Cell.EMPTY;
 
-        const boc = Buffer.from(message, 'hex');
-
-        return Cell.fromBoc(boc)[0];
+        return beginCell().storeBuffer(Buffer.from(message, 'utf8')).endCell();
     }
 }

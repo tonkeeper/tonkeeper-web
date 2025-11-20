@@ -15,7 +15,7 @@ export const useCancelSubscription = () => {
     const client = useQueryClient();
     const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
 
-    return useMutation<boolean, Error, CancelParams>(async subscriptionParams => {
+    return useMutation<string, Error, CancelParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
 
         const { selectedWallet, extensionContract, destroyValue } = subscriptionParams;
@@ -40,10 +40,10 @@ export const useCancelSubscription = () => {
 
         const outgoingMsg = encoder.encodeDestructAction(extensionAddress, BigInt(destroyValue));
 
-        await sender.send(outgoingMsg);
+        const boc = await sender.send(outgoingMsg);
 
         await client.invalidateQueries([QueryKey.pro]);
 
-        return true;
+        return boc.toBoc().toString('base64');
     });
 };

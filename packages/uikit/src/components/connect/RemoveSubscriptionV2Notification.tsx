@@ -1,83 +1,81 @@
 import React, { FC, useEffect, useMemo } from 'react';
-import { styled } from 'styled-components';
-import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
-import { Body2, Body3, Label2 } from '../../Text';
-import { Button } from '../../fields/Button';
-import { ErrorBoundary } from '../../shared/ErrorBoundary';
-import { fallbackRenderOver } from '../../Error';
+import styled from 'styled-components';
+import { useTranslation } from '../../hooks/translation';
+import { SpinnerIcon } from '../Icon';
+import { Notification, NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { Body2, Body3, Label2 } from '../Text';
+import { Button } from '../fields/Button';
+import { ConfirmMainButtonProps } from '../transfer/common';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { ListItem, ListItemPayload } from '../List';
+import { useFormatFiat, useRate } from '../../state/rates';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { ErrorBoundary } from '../shared/ErrorBoundary';
+import { fallbackRenderOver } from '../Error';
+import {
+    useCancelSubscription,
+    useEstimateRemoveExtension
+} from '../../hooks/blockchain/subscription';
 import {
     ConfirmView,
     ConfirmViewButtons,
     ConfirmViewButtonsSlot,
     ConfirmViewDetailsSlot,
     ConfirmViewHeadingSlot
-} from '../../transfer/ConfirmView';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import {
-    useCancelSubscription,
-    useEstimateRemoveExtension
-} from '../../../hooks/blockchain/subscription';
-import { ListItem, ListItemPayload } from '../../List';
-import { useTranslation } from '../../../hooks/translation';
-import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
-import { ConfirmMainButtonProps } from '../../transfer/common';
-import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
-import { useFormatFiat, useRate } from '../../../state/rates';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { SpinnerIcon } from '../../Icon';
-import { hexToRGBA } from '../../../libs/css';
-import { useToast } from '../../../hooks/useNotification';
-import { IExtensionActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+} from '../transfer/ConfirmView';
+import { ProSubscriptionHeader } from '../pro/ProSubscriptionHeader';
+import { CryptoCurrency } from '@tonkeeper/core/dist/pro';
+import { useProCompatibleAccountsWallets } from '../../state/wallet';
+import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
+import { useToast } from '../../hooks/useNotification';
+import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { hexToRGBA } from '../../libs/css';
+import { toNano } from '@ton/core';
+import { CancelSubscriptionV2Payload } from '@tonkeeper/core/dist/entries/tonConnect';
 
-interface IProRecurrentNotificationProps {
-    isOpen: boolean;
-    onClose: (success?: boolean) => void;
-    subscription?: IExtensionActiveSubscription;
-}
-
-export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> = props => {
-    const { isOpen, onClose, subscription } = props;
-
+export const RemoveSubscriptionV2Notification: FC<{
+    params: CancelSubscriptionV2Payload | null;
+    handleClose: (boc?: string) => void;
+}> = ({ params, handleClose }) => {
     return (
-        <NotificationStyled
-            isOpen={isOpen}
-            handleClose={() => {
-                onClose(false);
-            }}
-            hideButton
-            backShadow
-        >
-            {() => (
-                <ErrorBoundary
-                    fallbackRender={fallbackRenderOver('Failed to display Pro Confirm modal')}
-                >
-                    {subscription && (
-                        <ProRemoveExtensionNotificationContent
-                            subscription={subscription}
-                            onClose={onClose}
-                        />
-                    )}
-                </ErrorBoundary>
-            )}
-        </NotificationStyled>
+        <>
+            <NotificationStyled
+                isOpen={params !== null}
+                handleClose={() => handleClose()}
+                hideButton
+                backShadow
+            >
+                {() => (
+                    <ErrorBoundary
+                        fallbackRender={fallbackRenderOver('Failed to display Pro Confirm modal')}
+                    >
+                        {!!params?.extensionAddress && (
+                            <ProRemoveSubscriptionV2NotificationContent
+                                params={params}
+                                onClose={handleClose}
+                            />
+                        )}
+                    </ErrorBoundary>
+                )}
+            </NotificationStyled>
+        </>
     );
 };
 
-const ProRemoveExtensionNotificationContent: FC<
-    Required<Omit<IProRecurrentNotificationProps, 'isOpen'>>
-> = ({ onClose, subscription }) => {
-    const {
-        contract: extensionContract,
-        auth,
-        expiresDate,
-        nextChargeDate,
-        destroyValue
-    } = subscription;
+const ProRemoveSubscriptionV2NotificationContent: FC<{
+    params: any;
+    onClose: (boc?: string) => void;
+}> = ({ onClose, params }) => {
+    const { extensionAddress, from } = params;
+    const destroyValue = toNano('0.05').toString();
 
-    const selectedWallet = auth.wallet;
-    const finalExpiresDate = expiresDate ?? nextChargeDate;
+    const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
+
+    const accountWallet = accountsWallets.find(accWallet => accWallet.wallet.id === from);
+
+    const selectedWallet = accountWallet?.wallet;
+    const finalExpiresDate = new Date();
 
     const toast = useToast();
     const { t } = useTranslation();
@@ -111,19 +109,29 @@ const ProRemoveExtensionNotificationContent: FC<
     }, [removeMutation.isSuccess]);
 
     useEffect(() => {
+        if (!selectedWallet) return;
+
         estimateFeeMutation.mutate({
+            destroyValue,
             selectedWallet,
-            extensionContract,
-            destroyValue
+            extensionContract: extensionAddress
         });
     }, [selectedWallet]);
 
     const removeMutate = async () => {
+        if (!selectedWallet) {
+            throw new Error('Selected wallet not found!');
+        }
+
         const boc = await removeMutation.mutateAsync({
+            destroyValue,
             selectedWallet,
-            extensionContract,
-            destroyValue
+            extensionContract: extensionAddress
         });
+
+        setTimeout(() => {
+            onClose(boc);
+        }, 1500);
 
         return !!boc;
     };
@@ -140,7 +148,7 @@ const ProRemoveExtensionNotificationContent: FC<
     return (
         <ConfirmView
             assetAmount={deployReserve}
-            onClose={onClose}
+            onClose={() => onClose()}
             estimation={{ ...estimateFeeMutation }}
             {...removeMutation}
             mutateAsync={removeMutate}
