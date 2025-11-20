@@ -26,7 +26,8 @@ import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { useAtom } from '../../libs/useAtom';
 import { useSwapsConfig } from './useSwapsConfig';
 import { useActiveApi } from '../wallet';
-import { atom } from "@tonkeeper/core/dist/entries/atom";
+import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { scaledUIMultiplierOne } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 
 export type BasicCalculatedTrade = {
     from: AssetAmount<TonAsset>;
@@ -313,7 +314,8 @@ const getAsset = async (api: APIConfig, address: TonAssetAddress): Promise<TonAs
                     address,
                     id: packAssetId(BLOCKCHAIN_NAME.TON, address),
                     image: response.preview,
-                    verification: response.verification
+                    verification: response.verification,
+                    scaledUIMultiplier: scaledUIMultiplierOne
                 } as const)
         );
         swapAssetsCache.set(address, p);

@@ -1,9 +1,5 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
-import {
-    AccountAddress,
-    AccountEvent,
-    JettonSwapActionDexEnum
-} from '@tonkeeper/core/dist/tonApiV2';
+import { AccountAddress, AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -147,7 +143,7 @@ export const ActionDate: FC<{
     );
 };
 
-export const toDexName = (dex: JettonSwapActionDexEnum) => {
+export const toDexName = (dex: string) => {
     switch (dex) {
         case 'dedust':
             return 'DeDust.io';

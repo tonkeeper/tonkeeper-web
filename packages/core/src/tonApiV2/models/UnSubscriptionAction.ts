@@ -45,6 +45,12 @@ export interface UnSubscriptionAction {
      * @memberof UnSubscriptionAction
      */
     beneficiary: AccountAddress;
+    /**
+     * 
+     * @type {AccountAddress}
+     * @memberof UnSubscriptionAction
+     */
+    admin: AccountAddress;
 }
 
 /**
@@ -54,6 +60,7 @@ export function instanceOfUnSubscriptionAction(value: object): value is UnSubscr
     if (!('subscriber' in value) || value['subscriber'] === undefined) return false;
     if (!('subscription' in value) || value['subscription'] === undefined) return false;
     if (!('beneficiary' in value) || value['beneficiary'] === undefined) return false;
+    if (!('admin' in value) || value['admin'] === undefined) return false;
     return true;
 }
 
@@ -70,6 +77,7 @@ export function UnSubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator
         'subscriber': AccountAddressFromJSON(json['subscriber']),
         'subscription': json['subscription'],
         'beneficiary': AccountAddressFromJSON(json['beneficiary']),
+        'admin': AccountAddressFromJSON(json['admin']),
     };
 }
 
@@ -87,6 +95,7 @@ export function UnSubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator
         'subscriber': AccountAddressToJSON(value['subscriber']),
         'subscription': value['subscription'],
         'beneficiary': AccountAddressToJSON(value['beneficiary']),
+        'admin': AccountAddressToJSON(value['admin']),
     };
 }
 

@@ -12,6 +12,7 @@ import { TON_ASSET, TON_USDT_ASSET } from './constants';
 import { AssetAmount } from './asset-amount';
 import { TronAsset } from './tron-asset';
 import { seeIfValidTonAddress } from '../../../utils/common';
+import { parseJettonScaledUIMultiplier, scaledUIMultiplierOne } from './scaled-ui';
 
 export type TonAssetAddress = TonAsset['address'];
 export function isTon(address: TonAssetAddress): address is 'TON' {
@@ -59,7 +60,8 @@ export function extraBalanceToTonAsset(extraBalance: ExtraCurrency): TonAsset {
         address: extraBalance.preview.symbol,
         blockchain: BLOCKCHAIN_NAME.TON,
         image: extraBalance.preview.image,
-        verification: JettonVerificationType.None
+        verification: JettonVerificationType.None,
+        scaledUIMultiplier: scaledUIMultiplierOne
     };
 }
 
@@ -105,7 +107,8 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
         id: packAssetId(BLOCKCHAIN_NAME.TON, address),
         image: jetton.jetton.image,
         noImageCorners: shouldHideTonJettonImageCorners(jetton.jetton.address),
-        verification: jetton.jetton.verification
+        verification: jetton.jetton.verification,
+        scaledUIMultiplier: parseJettonScaledUIMultiplier(jetton.jetton.scaledUi)
     };
 }
 
@@ -119,7 +122,8 @@ export function jettonToTonAssetAmount(jetton: JettonBalance): AssetAmount<TonAs
         id: packAssetId(BLOCKCHAIN_NAME.TON, jetton.jetton.address),
         image: jetton.jetton.image,
         noImageCorners: shouldHideTonJettonImageCorners(jetton.jetton.address),
-        verification: jetton.jetton.verification
+        verification: jetton.jetton.verification,
+        scaledUIMultiplier: parseJettonScaledUIMultiplier(jetton.jetton.scaledUi)
     };
 
     return new AssetAmount({ weiAmount: jetton.balance, asset, image: jetton.jetton.image });
