@@ -13,6 +13,7 @@ import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 import { KeychainDesktop } from './keychain';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
 
 export class CookieDesktop implements CookieService {
     cleanUp = async () => {
@@ -98,5 +99,22 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
             deviceCountryCode,
             storeCountryCode: null
         };
+    }
+
+    autoUpdater = new AutoUpdater();
+}
+
+class AutoUpdater {
+    newVersionAvailable = atom(undefined);
+
+    constructor() {
+        window.backgroundApi.onAutoUpdateAvailable(val => this.newVersionAvailable.next(val));
+        sendBackground({
+            king: 'auto-update-get-has-new-version'
+        }).then((val: string | undefined) => this.newVersionAvailable.next(val));
+    }
+
+    installAndQuit() {
+        sendBackground({ king: 'auto-update-install' });
     }
 }

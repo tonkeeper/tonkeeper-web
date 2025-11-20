@@ -1,7 +1,6 @@
 import { delay, hideSensitiveData } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, app, powerMonitor } from 'electron';
 import log from 'electron-log/main';
-import { updateElectronApp } from 'update-electron-app';
 import { MainWindow } from './electron/mainWindow';
 import {
     setDefaultProtocolClient,
@@ -9,6 +8,7 @@ import {
     setProtocolHandlerWindowsLinux
 } from './electron/protocol';
 import { tonConnectSSE } from './electron/sseEvetns';
+import { AutoUpdateManager } from './electron/autoUpdate';
 
 app.setName('Tonkeeper Pro');
 
@@ -43,14 +43,27 @@ if (process.platform !== 'linux') {
 }
 
 app.on('before-quit', async e => {
-    e.preventDefault();
-    tonConnectSSE.destroy();
-    if (process.platform !== 'linux') {
-        powerMonitor.off('unlock-screen', onUnLock);
+    try {
+        e.preventDefault();
+        tonConnectSSE.destroy();
+        if (process.platform !== 'linux') {
+            powerMonitor.off('unlock-screen', onUnLock);
+        }
+    } catch (e) {
+        console.error(e);
     }
 
     await delay(100);
-    app.exit();
+
+    try {
+        const exited = AutoUpdateManager.quitAndInstallIfFlagged();
+        if (!exited) {
+            app.exit();
+        }
+    } catch (e) {
+        console.error(e);
+        app.exit();
+    }
 });
 
 setDefaultProtocolClient();
@@ -88,8 +101,3 @@ app.on('activate', () => {
         MainWindow.openMainWindow();
     }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
-updateElectronApp({ logger: log });

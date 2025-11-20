@@ -205,6 +205,11 @@ export interface IAppSdk {
     };
 
     getAppCountryInfo(): Promise<AppCountryInfo>;
+
+    autoUpdater?: {
+        newVersionAvailable: ReadonlyAtom<string | undefined>;
+        installAndQuit: () => void;
+    };
 }
 
 export interface IDappBrowser {

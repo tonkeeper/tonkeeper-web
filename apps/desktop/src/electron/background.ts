@@ -7,6 +7,8 @@ import { tonConnectSSE } from './sseEvetns';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 import * as electron from 'electron';
 import BaseWindow = Electron.BaseWindow;
+import { AutoUpdateManager } from './autoUpdate';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 const service = 'tonkeeper.com';
 
@@ -15,6 +17,7 @@ const authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 // eslint-disable-next-line complexity
 export const handleBackgroundMessage = async (
     window: BaseWindow,
+    autoUpdateManager: AutoUpdateManager,
     message: Message
 ): Promise<unknown> => {
     switch (message.king) {
@@ -110,7 +113,13 @@ export const handleBackgroundMessage = async (
         case 'show-confirm-dialog': {
             return electron.dialog.showMessageBoxSync(window, message.options);
         }
+        case 'auto-update-install': {
+            return autoUpdateManager.quitAndInstall();
+        }
+        case 'auto-update-get-has-new-version': {
+            return autoUpdateManager.getNewVersionAvailable();
+        }
         default:
-            throw new Error(`Unknown message: ${JSON.stringify(message)}`);
+            assertUnreachable(message);
     }
 };
