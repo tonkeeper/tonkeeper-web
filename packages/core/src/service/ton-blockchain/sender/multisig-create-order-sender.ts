@@ -90,8 +90,11 @@ export class MultisigCreateOrderSender implements ISender {
     }
 
     private async checkTransactionPossibility() {
-        const requiredBalance = new BigNumber(fromNano(MultisigEncoder.createOrderAmount) + 0.02);
+        const requiredBalance = AssetAmount.fromRelativeAmount({
+            amount: new BigNumber(fromNano(MultisigEncoder.createOrderAmount)).plus(0.02),
+            asset: TON_ASSET
+        });
 
-        return this.assertBalanceEnough(requiredBalance);
+        return this.assertBalanceEnough(requiredBalance.weiAmount);
     }
 }
