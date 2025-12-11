@@ -26,11 +26,15 @@ interface IProps {
     imageSrc?: string;
     className?: string;
     subtitleKey?: string;
+    titleKeyReplaces?: Record<string, string | number>;
+    subtitleKeyReplaces?: Record<string, string | number>;
 }
 
 const ProSubscriptionHeaderContent: FC<IProps> = props => {
     const {
         className,
+        titleKeyReplaces,
+        subtitleKeyReplaces,
         titleKey = 'tonkeeper_pro_subscription',
         subtitleKey = 'pro_unlocks_premium_tools',
         imageSrc = 'https://tonkeeper.com/assets/icon.ico'
@@ -40,8 +44,8 @@ const ProSubscriptionHeaderContent: FC<IProps> = props => {
     return (
         <div className={className}>
             <ProImage src={imageSrc} />
-            <Title>{t(titleKey)}</Title>
-            <Subtitle>{t(subtitleKey)}</Subtitle>
+            <Title>{t(titleKey, titleKeyReplaces)}</Title>
+            <Subtitle>{t(subtitleKey, subtitleKeyReplaces)}</Subtitle>
         </div>
     );
 };

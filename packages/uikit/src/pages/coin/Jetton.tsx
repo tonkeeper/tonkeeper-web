@@ -4,7 +4,6 @@ import {
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import {
@@ -84,7 +83,7 @@ export const MobileAssetHistory: FC<{
 const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, balance }) => {
     const [amount, address] = useMemo(
         () => [
-            formatDecimals(balance.balance, info.metadata.decimals),
+            jettonToTonAssetAmount(balance).relativeAmount.toNumber(),
             Address.parse(balance.jetton.address).toString()
         ],
         [info, balance]

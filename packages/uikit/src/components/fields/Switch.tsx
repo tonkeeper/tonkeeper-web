@@ -25,6 +25,12 @@ const Wrapper = styled.div<{ disabled?: boolean }>`
         css`
             opacity: 0.48;
         `}
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            transform: scale(0.64);
+        `}
 `;
 
 const Label = styled.div`

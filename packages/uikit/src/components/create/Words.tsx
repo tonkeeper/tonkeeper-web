@@ -1,8 +1,7 @@
 import { wordlist } from '@ton/crypto/dist/mnemonic/wordlist';
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
-import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { Body1, Body2, Body2Class, Body3, H2Label2Responsive, Label2 } from '../Text';
@@ -27,6 +26,12 @@ const Block = styled.div`
     & + & {
         margin-top: 2rem;
     }
+`;
+
+const CheckForm = styled.form`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 `;
 
 const BlockSmallGap = styled(Block)`
@@ -91,10 +96,6 @@ const Number1 = styled(Body1)`
     font-size: 15px;
 
     color: ${props => props.theme.textSecondary};
-`;
-
-export const ButtonRow = styled.div`
-    display: flex;
 `;
 
 const WorldsGridStyled = styled(WorldsGrid)`
@@ -334,9 +335,10 @@ const InputBlock = styled.label<{
         ${p =>
             p.theme.displayType === 'full-width' &&
             css`
+                width: 3ch;
                 height: fit-content;
+                text-wrap: nowrap;
                 line-height: normal;
-                width: unset;
                 ${Body2Class};
             `}
     }
@@ -370,27 +372,17 @@ const InputBlock = styled.label<{
 const WordInput: FC<{
     value: string;
     onChange: (value: string) => void;
-    focusNext: () => void;
     test: number;
-    isValid?: boolean;
+    isValid: boolean;
     tabIndex: number;
-}> = ({ value, test, onChange, focusNext, isValid, tabIndex }) => {
-    const [active, setActive] = useState(false);
-    const [touched, setTouched] = useState(false);
+}> = ({ value, test, onChange, isValid, tabIndex }) => {
+    const [isActive, setIsActive] = useState(false);
+    const [isTouched, setIsTouched] = useState(false);
 
-    const valid = touched ? isValid === true : isValid || active;
-
-    const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback(
-        event => {
-            if (event.key === 'Enter') {
-                focusNext();
-            }
-        },
-        [focusNext]
-    );
+    const isInputValid = isTouched ? isValid : isValid || isActive;
 
     return (
-        <InputBlock submitted={touched} active={active} valid={valid}>
+        <InputBlock submitted={isTouched} active={isActive} valid={isInputValid}>
             <Number1>{test}:</Number1>
             <Input
                 tabIndex={tabIndex}
@@ -399,11 +391,10 @@ const WordInput: FC<{
                 spellCheck={false}
                 value={value}
                 onChange={e => onChange(e.target.value.toLocaleLowerCase())}
-                onFocus={() => setActive(true)}
-                onKeyDown={handleKeyDown}
+                onFocus={() => setIsActive(true)}
                 onBlur={() => {
-                    setTouched(true);
-                    setActive(false);
+                    setIsTouched(true);
+                    setIsActive(false);
                 }}
             />
         </InputBlock>
@@ -432,9 +423,11 @@ const formatOrdinals = (lang: string, n: number) => {
     }
 };
 
-const seeIfValid = (value: string, mnemonic: string) => {
-    return value === '' || value.toLowerCase().trim() === mnemonic;
-};
+const compareWords = (word: string, testWord: string) =>
+    word === '' || word.toLowerCase().trim() === testWord;
+
+const getEmptyWordIndex = (words: string[]) => words.findIndex(word => word === '');
+const getInvalidWordIndex = (words: string[]) => words.findIndex(word => !seeIfValidWord(word));
 
 export const Check: FC<{
     mnemonic: string[];
@@ -442,16 +435,15 @@ export const Check: FC<{
     isLoading?: boolean;
 }> = ({ onConfirm, mnemonic, isLoading }) => {
     const { t, i18n } = useTranslation();
-
-    const [one, setOne] = useState('');
-    const [two, setTwo] = useState('');
-    const [three, setThree] = useState('');
+    const formId = useId();
 
     const ref = useRef<HTMLDivElement>(null);
 
-    const [test1, test2, test3] = useMemo(() => {
+    const [words, setWords] = useState(['', '', '']);
+    const positions = useMemo(() => {
         return [getRandomInt(1, 8), getRandomInt(8, 16), getRandomInt(16, 24)];
     }, []);
+    const [test1, test2, test3] = positions;
 
     const description = useMemo(() => {
         return t('check_words_caption')
@@ -460,13 +452,43 @@ export const Check: FC<{
             .replace('%3%', formatOrdinals(i18n.language, test3));
     }, [t, test1, test2, test3]);
 
-    const isValid =
-        one.toLowerCase().trim() === mnemonic[test1 - 1] &&
-        two.toLowerCase().trim() === mnemonic[test2 - 1] &&
-        three.toLowerCase().trim() === mnemonic[test3 - 1];
+    const isValid = useMemo(
+        () => words.every((val, i) => val.toLowerCase().trim() === mnemonic[positions[i] - 1]),
+        [words, mnemonic, positions]
+    );
+
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.key !== 'Enter' || isValid) return;
+
+            const emptyIndex = getEmptyWordIndex(words);
+            if (emptyIndex !== -1) {
+                focusInput(ref.current, emptyIndex);
+
+                return;
+            }
+
+            const invalidIndex = getInvalidWordIndex(words);
+            if (invalidIndex !== -1) {
+                focusInput(ref.current, invalidIndex);
+
+                return;
+            }
+        };
+        window.addEventListener('keydown', handler);
+
+        return () => window.removeEventListener('keydown', handler);
+    }, [words]);
+
+    const handleChange = (changeValue: string, wordIndex: number) =>
+        setWords(prevWordsState =>
+            prevWordsState.map((prevWord, prevIndex) =>
+                prevIndex === wordIndex ? changeValue : prevWord
+            )
+        );
 
     return (
-        <CenterContainer $mobileFitContent>
+        <CheckForm onSubmit={handleSubmit(onConfirm)} id={formId}>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('check_words_title')}</H2Label2Responsive>
@@ -475,30 +497,16 @@ export const Check: FC<{
             </Block>
 
             <BlockSmallGap ref={ref}>
-                <WordInput
-                    tabIndex={1}
-                    test={test1}
-                    value={one}
-                    onChange={setOne}
-                    isValid={seeIfValid(one, mnemonic[test1 - 1])}
-                    focusNext={() => focusInput(ref.current, 1)}
-                />
-                <WordInput
-                    tabIndex={2}
-                    test={test2}
-                    value={two}
-                    onChange={setTwo}
-                    isValid={seeIfValid(two, mnemonic[test2 - 1])}
-                    focusNext={() => focusInput(ref.current, 2)}
-                />
-                <WordInput
-                    tabIndex={3}
-                    test={test3}
-                    value={three}
-                    onChange={setThree}
-                    isValid={seeIfValid(three, mnemonic[test3 - 1])}
-                    focusNext={() => (isValid ? onConfirm() : undefined)}
-                />
+                {words.map((word, wordIndex) => (
+                    <WordInput
+                        key={wordIndex}
+                        tabIndex={wordIndex + 1}
+                        test={positions[wordIndex]}
+                        value={word}
+                        onChange={newValue => handleChange(newValue, wordIndex)}
+                        isValid={compareWords(word, mnemonic[positions[wordIndex] - 1])}
+                    />
+                ))}
             </BlockSmallGap>
             <NotificationFooterPortal>
                 <NotificationFooter>
@@ -506,15 +514,16 @@ export const Check: FC<{
                         tabIndex={4}
                         fullWidth
                         primary
+                        type="submit"
+                        form={formId}
                         loading={isLoading}
                         disabled={!isValid}
-                        onClick={onConfirm}
                     >
                         {t('continue')}
                     </ButtonResponsiveSize>
                 </NotificationFooter>
             </NotificationFooterPortal>
-        </CenterContainer>
+        </CheckForm>
     );
 };
 
@@ -558,12 +567,11 @@ export const ImportWords: FC<{
     onIsDirtyChange?: (isDirty: boolean) => void;
     enableShortMnemonic?: boolean;
 }> = ({ isLoading, onIsDirtyChange, onMnemonic, enableShortMnemonic = true }) => {
-    const [wordsNumber, setWordsNumber] = useState<12 | 24>(24);
     const sdk = useAppSdk();
     const ref = useRef<HTMLDivElement>(null);
-
     const { t } = useTranslation();
 
+    const [wordsNumber, setWordsNumber] = useState<12 | 24>(24);
     const [_mnemonic, setMnemonic] = useState<string[]>(Array(24).fill(''));
 
     const mnemonic = useMemo(() => {
@@ -586,6 +594,9 @@ export const ImportWords: FC<{
                     .replace(/\./g, '') // remove dots
                     .replace(/\s+/g, ' ') // remove double spaces
                     .split(' ');
+
+                if (!values[0]) return;
+
                 if (values.length === 1) {
                     setMnemonic(items => items.map((v, i) => (i === index ? values[0] : v)));
                     focusInput(ref.current, index + 1);
@@ -612,32 +623,36 @@ export const ImportWords: FC<{
         return mnemonic.map(item => item === '' || wordlist.includes(item));
     }, [mnemonic]);
 
-    const notify = () => {
+    const notifyError = () => {
         sdk.topMessage(t('import_wallet_wrong_words_err'));
         sdk.hapticNotification('error');
     };
 
     const onSubmit = async () => {
-        const invalid = mnemonic.findIndex(work => !seeIfValidWord(work));
-        if (invalid !== -1) {
-            focusInput(ref.current, invalid);
-            notify();
+        if (isLoading) return;
+
+        const emptyIndex = getEmptyWordIndex(mnemonic);
+        if (emptyIndex !== -1) {
+            focusInput(ref.current, emptyIndex);
+
+            return;
         }
 
-        const notFilledField = mnemonic.findIndex(word => word === '');
-        if (notFilledField !== -1) {
-            focusInput(ref.current, notFilledField);
-            notify();
+        const invalidIndex = getInvalidWordIndex(mnemonic);
+        if (invalidIndex !== -1) {
+            focusInput(ref.current, invalidIndex);
+            notifyError();
+
+            return;
         }
-        if (sdk.isIOs()) {
-            openIosKeyboard('text');
+
+        const isValid = await validateMnemonicTonOrMAM(mnemonic);
+        if (!isValid) {
+            notifyError();
+            return;
         }
-        const valid = await validateMnemonicTonOrMAM(mnemonic);
-        if (!valid) {
-            notify();
-        } else {
-            onMnemonic(mnemonic);
-        }
+
+        onMnemonic(mnemonic);
     };
 
     const scrollRef = useRef<HTMLFormElement>(null);
@@ -660,14 +675,16 @@ export const ImportWords: FC<{
             {enableShortMnemonic && (
                 <ToggleButtonStyled>
                     <ToggleButtonItem
+                        type="button"
                         active={wordsNumber === 24}
-                        onClick={handleSubmit(() => setWordsNumber(24))}
+                        onClick={() => setWordsNumber(24)}
                     >
                         <Label2>{t('import_wallet_24_words')}</Label2>
                     </ToggleButtonItem>
                     <ToggleButtonItem
+                        type="button"
                         active={wordsNumber === 12}
-                        onClick={handleSubmit(() => setWordsNumber(12))}
+                        onClick={() => setWordsNumber(12)}
                     >
                         <Label2>{t('import_wallet_12_words')}</Label2>
                     </ToggleButtonItem>
@@ -683,19 +700,11 @@ export const ImportWords: FC<{
                             isValid={validations[index]}
                             onChange={newValue => onChange(newValue, index)}
                             tabIndex={index + 1}
-                            focusNext={() => focusInput(ref.current, index + 1)}
                         />
                     ))}
                 </Inputs>
             </Block>
-            <ButtonResponsiveSize
-                fullWidth
-                primary
-                loading={isLoading}
-                onClick={onSubmit}
-                type="submit"
-                marginTop
-            >
+            <ButtonResponsiveSize fullWidth primary loading={isLoading} type="submit" marginTop>
                 {t('continue')}
             </ButtonResponsiveSize>
         </form>

@@ -1,21 +1,36 @@
-import { APIConfig } from '../apis';
 import { RecipientData } from '../send';
 import { TonWalletStandard } from '../wallet';
 import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
-import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
+import {
+    AuthTypes,
+    IosEnvironmentTypes,
+    ProductIds,
+    ProPriceTypes,
+    PurchaseStatuses
+} from './enums';
+import { SubscriptionExtension, SubscriptionSource } from '../../pro';
+import { IExtensionActiveSubscription, SubscriptionStrategy } from './subscription';
+import { Language } from '../language';
+import { TonAsset } from '../crypto/asset/ton-asset';
 
-export interface IProStateWallet {
-    publicKey: string;
-    rawAddress: string;
+interface IProRawPrice {
+    type: ProPriceTypes.RAW;
+    value: AssetAmount<TonAsset>;
 }
+
+interface IProFormattedPrice {
+    type: ProPriceTypes.FORMATTED;
+    value: string;
+}
+
+export type ProPrice = IProRawPrice | IProFormattedPrice;
 
 export interface IDisplayPlan {
     id: string;
+    price: ProPrice;
     displayName: string;
-    displayPrice: string;
-    subscriptionPeriod?: string;
-    formattedDisplayPrice: string;
+    subscriptionPeriod: string;
 }
 
 export interface IProductInfo {
@@ -54,24 +69,30 @@ export interface IConfirmState {
 }
 
 export interface ISubscriptionFormData {
-    wallet?: IProStateWallet;
+    wallet: TonWalletStandard;
     tempToken: string;
-    promoCode?: string;
     selectedPlan: IDisplayPlan;
 }
 
-export interface ICryptoStrategyConfig {
-    api: APIConfig;
+export interface IExtensionStrategyConfig {
+    lang: Language;
+    onDataStore: <R>(key: string, value: R) => Promise<R | null>;
     onProConfirmOpen: (p?: {
-        confirmState: IConfirmState | null;
+        extensionData?: SubscriptionExtension;
         onConfirm?: (success?: boolean) => void;
-        onCancel?: () => void;
+    }) => void;
+    onRemoveExtensionConfirmOpen: (p?: {
+        subscription: IExtensionActiveSubscription;
+        onConfirm?: (success?: boolean) => void;
     }) => void;
 }
 
+export interface ISubscriptionServiceConfig {
+    initialStrategyMap?: Map<SubscriptionSource, SubscriptionStrategy>;
+}
 export interface IWalletAuth {
     type: AuthTypes.WALLET;
-    wallet: IProStateWallet;
+    wallet: TonWalletStandard;
 }
 
 export interface ITokenizedWalletAuth extends IWalletAuth {
@@ -81,11 +102,6 @@ export interface ITokenizedWalletAuth extends IWalletAuth {
 export interface ITelegramAuth {
     type: AuthTypes.TELEGRAM;
 }
-
-export type NormalizedProPlans = {
-    plans: IDisplayPlan[] | undefined;
-    verifiedPromoCode: string | undefined;
-};
 
 export interface ISupportData {
     url: string;
@@ -97,4 +113,10 @@ export interface IUserInfo {
     version?: string;
     user_id?: number;
     tg_id?: number;
+}
+
+export interface ICancelSubscriptionData {
+    wallet: TonWalletStandard;
+    extensionContract: string;
+    expiresDate: Date;
 }

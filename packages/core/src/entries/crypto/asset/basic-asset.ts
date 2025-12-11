@@ -1,5 +1,6 @@
 import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME } from '../../crypto';
+import { ScaledUIMultiplier } from './scaled-ui';
 
 export interface BasicAsset {
     id: string;
@@ -8,6 +9,7 @@ export interface BasicAsset {
     name?: string;
     image?: string;
     noImageCorners?: boolean;
+    scaledUIMultiplier: ScaledUIMultiplier;
 }
 
 export function packAssetId(blockchain: BLOCKCHAIN_NAME, address: string | Address): string {

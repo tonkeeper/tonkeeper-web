@@ -12,7 +12,7 @@ import { useConnectLedgerMutation, useEffectOnLedgerConnectionPageClosed } from 
 import styled from 'styled-components';
 import { Cell } from '@ton/core';
 import { LedgerConnectionSteps } from './ledger/LedgerConnectionSteps';
-import { UserCancelledError } from '../libs/errors/UserCancelledError';
+import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;

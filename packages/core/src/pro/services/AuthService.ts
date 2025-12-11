@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Ok } from '../models/Ok';
 import type { TonConnectProof } from '../models/TonConnectProof';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -28,15 +29,12 @@ export class AuthService {
     /**
      * Authenticate user via TonConnect
      * @param requestBody Data that is expected
-     * @returns any Ok
+     * @returns Ok Ok
      * @throws ApiError
      */
     public static tonConnectAuth(
         requestBody: TonConnectProof,
-    ): CancelablePromise<{
-        ok: boolean;
-        auth_token?: string;
-    }> {
+    ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/auth/proof/check',
@@ -53,15 +51,12 @@ export class AuthService {
     /**
      * Logout user session
      * @param authorization
-     * @returns any Ok
+     * @returns Ok Ok
      * @throws ApiError
      */
     public static logout(
         authorization: string,
-    ): CancelablePromise<{
-        ok: boolean;
-        auth_token?: string;
-    }> {
+    ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/logout',

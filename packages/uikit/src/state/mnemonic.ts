@@ -1,6 +1,6 @@
 import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
-import { sha256_sync, sign } from '@ton/crypto';
+import { keyPairFromSeed, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
     AccountId,
@@ -16,7 +16,11 @@ import {
     Signer,
     TronSigner
 } from '@tonkeeper/core/dist/entries/signer';
-import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    MetaEncryptionSerializedMap,
+    TonWalletStandard,
+    WalletId
+} from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 import {
@@ -26,6 +30,7 @@ import {
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import {
     decryptWalletSecret,
+    mnemonicToEd25519Seed,
     mnemonicToKeypair,
     walletSecretFromString
 } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -36,7 +41,7 @@ import {
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import nacl from 'tweetnacl';
-import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { TxConfirmationCustomError } from '@tonkeeper/core/dist/errors/TxConfirmationCustomError';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
 import { useAppSdk } from '../hooks/appSdk';
 import { useCallback } from 'react';
@@ -46,6 +51,8 @@ import type { Transaction } from 'tronweb/src/types/Transaction';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { signWithSecret } from '@tonkeeper/core/dist/service/sign';
+import { createEncryptionCertificate } from '@tonkeeper/core/dist/service/meta';
+import { serializeMetaKey } from '@tonkeeper/core/dist/utils/metadata';
 
 export const signDataOver = ({
     sdk,
@@ -68,14 +75,21 @@ export const signDataOver = ({
         switch (account.type) {
             case 'ton-only': {
                 throw new TxConfirmationCustomError(
-                    'Signer linked by QR is not support sign data.'
+                    'Signer linked by QR is not support sign data.',
+                    'error_signer_doesnot_support_sign_data'
                 );
             }
             case 'ledger': {
-                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+                throw new TxConfirmationCustomError(
+                    t('ledger_operation_not_supported'),
+                    'ledger_operation_not_supported'
+                );
             }
             case 'keystone': {
-                throw new TxConfirmationCustomError("Can't sign data over Keystone wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't sign data over Keystone wallet",
+                    'error_keystone_doesnot_support_sign_data'
+                );
             }
             case 'testnet':
             case 'mnemonic': {
@@ -103,10 +117,16 @@ export const signDataOver = ({
                 });
             }
             case 'watch-only': {
-                throw new TxConfirmationCustomError("Can't sign data over watch-only wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't sign data over watch-only wallet",
+                    'error_watch_only_doesnot_support_sign_data'
+                );
             }
             case 'ton-multisig': {
-                throw new TxConfirmationCustomError("Can't sign data over multisig wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't sign data over multisig wallet",
+                    'error_multisig_doesnot_support_sign_data'
+                );
             }
             default: {
                 assertUnreachable(account);
@@ -136,11 +156,15 @@ export const signTonConnectOver = ({
         switch (account.type) {
             case 'ton-only': {
                 throw new TxConfirmationCustomError(
-                    'Signer linked by QR is not support sign buffer.'
+                    'Signer linked by QR is not support sign buffer.',
+                    'error_signer_doesnot_support_connect'
                 );
             }
             case 'ledger': {
-                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+                throw new TxConfirmationCustomError(
+                    t('ledger_operation_not_supported'),
+                    'ledger_operation_not_supported'
+                );
             }
             case 'keystone': {
                 const result = await pairKeystoneByNotification(
@@ -183,10 +207,16 @@ export const signTonConnectOver = ({
                 });
             }
             case 'watch-only': {
-                throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't use tonconnect over watch-only wallet",
+                    'error_watch_only_doesnot_support_connection'
+                );
             }
             case 'ton-multisig': {
-                throw new TxConfirmationCustomError("Can't use multisig wallet with this dApp");
+                throw new TxConfirmationCustomError(
+                    "Can't use multisig wallet with this dApp",
+                    'error_multisig_doesnot_support_connection'
+                );
             }
             default: {
                 assertUnreachable(account);
@@ -227,14 +257,15 @@ export const useGetAccountSigner = () => {
     );
 };
 
+interface IGetSignerOptions {
+    walletId?: WalletId;
+    shouldCreateMetaKeys?: boolean;
+}
+
 export const getSigner = async (
     sdk: IAppSdk,
     accountId: AccountId,
-    {
-        walletId
-    }: {
-        walletId?: WalletId;
-    } = {}
+    { walletId, shouldCreateMetaKeys }: IGetSignerOptions = {}
 ): Promise<Signer> => {
     try {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
@@ -331,6 +362,15 @@ export const getSigner = async (
             }
             case 'mam': {
                 const mnemonic = await getMAMWalletMnemonic(sdk, account.id, wallet!.id);
+
+                if (wallet?.rawAddress && shouldCreateMetaKeys) {
+                    await createAndStoreMetaEncryptionKeys(sdk, {
+                        seedPrase: mnemonic,
+                        rawAddress: wallet.rawAddress,
+                        mnemonicType: 'ton'
+                    });
+                }
+
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
                     return sign(message.hash(), keyPair.secretKey);
@@ -344,6 +384,15 @@ export const getSigner = async (
                 if (secret.type !== 'mnemonic') {
                     throw new Error('Unexpected secret type');
                 }
+
+                if (wallet?.rawAddress && shouldCreateMetaKeys) {
+                    await createAndStoreMetaEncryptionKeys(sdk, {
+                        seedPrase: secret.mnemonic,
+                        rawAddress: wallet.rawAddress,
+                        mnemonicType: account.mnemonicType
+                    });
+                }
+
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToKeypair(secret.mnemonic, account.mnemonicType);
                     return sign(message.hash(), keyPair.secretKey);
@@ -774,4 +823,32 @@ export const useGetActiveAccountSecret = () => {
     return useCallback(async () => {
         return getAccountSecret(sdk, accountId);
     }, [sdk, accountId]);
+};
+
+interface ICreateMetaKeysData {
+    seedPrase: string[];
+    rawAddress: string;
+    mnemonicType?: MnemonicType;
+}
+
+export const createAndStoreMetaEncryptionKeys = async (sdk: IAppSdk, data: ICreateMetaKeysData) => {
+    const { seedPrase, rawAddress, mnemonicType } = data;
+
+    const walletMainEd22519Seed = await mnemonicToEd25519Seed(seedPrase, mnemonicType);
+
+    const keyPair = keyPairFromSeed(walletMainEd22519Seed);
+
+    const walletMainPrivateKey = keyPairFromSeed(walletMainEd22519Seed);
+
+    const certificate = createEncryptionCertificate(keyPair, walletMainPrivateKey);
+
+    const metaEncryptionMap =
+        (await sdk.storage.get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)) ?? {};
+
+    metaEncryptionMap[rawAddress] = serializeMetaKey({
+        keyPair,
+        certificate
+    });
+
+    await sdk.storage.set(AppKey.META_ENCRYPTION_MAP, metaEncryptionMap);
 };

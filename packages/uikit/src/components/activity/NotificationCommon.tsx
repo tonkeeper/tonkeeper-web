@@ -1,9 +1,5 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
-import {
-    AccountAddress,
-    AccountEvent,
-    JettonSwapActionDexEnum
-} from '@tonkeeper/core/dist/tonApiV2';
+import { AccountAddress, AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
@@ -13,18 +9,18 @@ import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent } from '../../state/asset';
 import { useFormatFiat, useRate } from '../../state/rates';
-import { ChevronRightIcon, SpinnerIcon } from '../Icon';
+import { ChevronRightIcon, SpinnerIcon, TonkeeperProCardIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
-import { Body1, Body2Class, Body3, H2, Label1, Label2 } from '../Text';
-import { Button } from '../fields/Button';
+import { Body1, Body2Class, Body3, Body3Class, H2, Label1, Label2 } from '../Text';
+import { Button, ButtonFlat } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
 import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
 
 import { SelectDropDown } from '../fields/Select';
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useBatteryBalance, useBatteryUnitTonRate } from '../../state/battery';
+import { useBatteryBalance } from '../../state/battery';
 import {
     isTransactionFeeRefund,
     TransactionFee,
@@ -39,7 +35,11 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
-import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import {
+    closeAllNotifications,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../Notification';
 import { Image } from '../shared/Image';
 import {
     AllChainsSenderOptions,
@@ -54,6 +54,14 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TRON_SENDER_TYPE } from '../../hooks/blockchain/sender/useTronSender';
 import { Skeleton } from '../shared/Skeleton';
 import { Dot } from '../Dot';
+import { Trc20FreeTransfersConfig } from '../../state/tron/tron';
+import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProState } from '../../state/pro';
+import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -135,7 +143,7 @@ export const ActionDate: FC<{
     );
 };
 
-export const toDexName = (dex: JettonSwapActionDexEnum) => {
+export const toDexName = (dex: string) => {
     switch (dex) {
         case 'dedust':
             return 'DeDust.io';
@@ -363,6 +371,10 @@ export const ActionFeeDetails: FC<{
         return <ActionFeeTonAssetDetails extra={fee.extra} />;
     }
 
+    if (fee.type === 'free-transfer') {
+        return <ActionFeeTronFreeProDetails />;
+    }
+
     assertUnreachableSoft(fee);
     return null;
 };
@@ -405,7 +417,7 @@ export const ActionFeeTronAssetDetails: FC<{
         <ListItem hover={false}>
             <ListItemPayload>
                 <Label>{t('transaction_fee')}</Label>
-                <ColumnText right text={fee.extra.stringAssetRelativeAmount} secondary={'TODO'} />
+                <LabelPrimary>{fee.extra.stringAssetRelativeAmount}</LabelPrimary>
             </ListItemPayload>
         </ListItem>
     );
@@ -423,6 +435,19 @@ export const ActionFeeBatteryDetails: FC<{
                 <LabelPrimary>
                     {t('battery_n_battery_charges', { charges: fee.charges })}
                 </LabelPrimary>
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
+export const ActionFeeTronFreeProDetails = () => {
+    const { t } = useTranslation();
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{t('transaction_fee')}</Label>
+                <LabelPrimary>{t('action_fee_details_free_pro_transfer')}</LabelPrimary>
             </ListItemPayload>
         </ListItem>
     );
@@ -520,8 +545,13 @@ export const ActionFeeDetailsUniversal: FC<
 
 const SelectDropDownStyled = styled(SelectDropDown)`
     & .dd-select-container {
+        max-height: unset;
         z-index: 1000;
     }
+`;
+
+const DropDownItemStyled = styled(DropDownItem)<{ $isDisabled: boolean }>`
+    cursor: ${p => (p.$isDisabled ? 'not-allowed' : 'pointer')};
 `;
 
 export const SelectSenderDropdown: FC<
@@ -543,16 +573,20 @@ export const SelectSenderDropdown: FC<
                 <DropDownContent>
                     {availableSendersOptions.map(s => (
                         <>
-                            <DropDownItem
+                            <DropDownItemStyled
                                 onClick={() => {
+                                    if ('isEnoughBalance' in s && !s.isEnoughBalance) {
+                                        return;
+                                    }
                                     onClose();
                                     onSenderTypeChange?.(s.type as TonSenderTypeUserAvailable);
                                 }}
                                 key={s.type}
                                 isSelected={selectedSenderType === s.type}
+                                $isDisabled={'isEnoughBalance' in s && !s.isEnoughBalance}
                             >
                                 <SenderDropdownItem sender={s} />
-                            </DropDownItem>
+                            </DropDownItemStyled>
                             <DropDownItemsDivider />
                         </>
                     ))}
@@ -576,17 +610,26 @@ const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const Body3Accent = styled(Body3)`
-    color: ${p => p.theme.textAccent};
+const ButtonFlatStyled = styled(ButtonFlat)`
+    ${Body3Class};
+    cursor: pointer;
 `;
 
-const RefillText = () => {
+const RefillText: FC<{ onClickRefill: () => void }> = ({ onClickRefill }) => {
     const { t } = useTranslation();
     return (
         <Body3>
             <Body3Secondary>{t('select_fee_payment_method_not_enough_funds')}</Body3Secondary>
             <Dot />
-            <Body3Accent>{t('select_fee_payment_method_refill')}</Body3Accent>
+            <ButtonFlatStyled
+                onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onClickRefill();
+                }}
+            >
+                {t('select_fee_payment_method_refill')}
+            </ButtonFlatStyled>
         </Body3>
     );
 };
@@ -621,6 +664,8 @@ const SenderDropdownItem: FC<{ sender: AllChainsSenderOptions }> = ({ sender }) 
         case TRON_SENDER_TYPE.TRX:
         case TRON_SENDER_TYPE.TON_ASSET:
             return <SenderDropdownItemTronTrxOrTonAsset {...sender} />;
+        case TRON_SENDER_TYPE.FREE_PRO:
+            return <SenderDropdownItemTronFreePro {...sender} />;
         default:
             assertUnreachableSoft(sender);
             return null;
@@ -632,24 +677,78 @@ const SenderDropdownItemTronBattery: FC<{
     fee: TransactionFeeBattery;
 }> = ({ fee, isEnoughBalance }) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
-    const batteryUnitRate = useBatteryUnitTonRate();
-    const { data: tonRate } = useRate(tonAssetAddressToString(TON_ASSET.address));
-    const { fiatAmount } = useFormatFiat(tonRate, batteryUnitRate.multipliedBy(fee.charges));
+    const onClickRefill = () => {
+        try {
+            closeAllNotifications();
+        } catch (e) {
+            console.error(e);
+        }
+        setTimeout(() => {
+            navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
+                disableMobileAnimation: true
+            });
+        }, 150);
+    };
 
     return (
         <>
             <BatteryIcon />
             <SenderText>
                 <Label2>{t('battery_title')}</Label2>
-                {fiatAmount ? (
+                <Body3Secondary>{t('battery_charges', { charges: fee.charges })}</Body3Secondary>
+                {!isEnoughBalance && <RefillText onClickRefill={onClickRefill} />}
+            </SenderText>
+        </>
+    );
+};
+
+const TonkeeperProCardIconStyled = styled(TonkeeperProCardIcon)`
+    margin-right: 12px;
+`;
+
+const SenderDropdownItemTronFreePro: FC<{
+    config: Trc20FreeTransfersConfig;
+}> = ({ config }) => {
+    const { t } = useTranslation();
+
+    const { data: subscription } = useProState();
+    const formatDate = useDateTimeFormat();
+    const { onOpen: onGetPro } = useProFeaturesNotification();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
+
+    const handleProButtonClick = () => {
+        if (isTelegramActiveSubscription(subscription)) {
+            onProAuthOpen();
+        } else {
+            onGetPro();
+        }
+    };
+
+    return (
+        <>
+            <TonkeeperProCardIconStyled size={28} />
+            <SenderText>
+                <Label2>{t('select_fee_payment_method_option_free_pro_title')}</Label2>
+                {config.type === 'inactive' ? (
+                    <ButtonFlatStyled onClick={handleProButtonClick}>
+                        {t('get_tonkeeper_pro')}
+                    </ButtonFlatStyled>
+                ) : config.availableTransfersNumber > 0 ? (
                     <Body3Secondary>
-                        ≈{fiatAmount} ({t('battery_charges', { charges: fee.charges })})
+                        {t('select_fee_payment_method_option_free_pro_subtitle_available')}
                     </Body3Secondary>
                 ) : (
-                    <Skeleton height="14px" marginTop="2px" width="100px" />
+                    <Body3Secondary>
+                        {t('select_fee_payment_method_option_free_pro_subtitle_used', {
+                            date: formatDate(config.rechargeDate, {
+                                month: 'long',
+                                day: 'numeric'
+                            })
+                        })}
+                    </Body3Secondary>
                 )}
-                {!isEnoughBalance && <RefillText />}
             </SenderText>
         </>
     );
@@ -661,6 +760,17 @@ const SenderDropdownItemTronTrxOrTonAsset: FC<{
 }> = ({ fee, isEnoughBalance }) => {
     const { data: assetRate } = useRate(tonAssetAddressToString(fee.extra.asset.address));
     const { fiatAmount } = useFormatFiat(assetRate, fee.extra.relativeAmount);
+    const sdk = useAppSdk();
+
+    const onClickRefill = () => {
+        sdk.uiEvents.emit('receive', {
+            method: 'receive',
+            params: {
+                chain: fee.extra.asset.blockchain,
+                jetton: fee.extra.asset.id
+            }
+        });
+    };
 
     return (
         <>
@@ -669,12 +779,12 @@ const SenderDropdownItemTronTrxOrTonAsset: FC<{
                 <Label2>{fee.extra.asset.symbol}</Label2>
                 {fiatAmount ? (
                     <Body3Secondary>
-                        ≈{fiatAmount} ({fee.extra.stringAssetRelativeAmount})
+                        {fee.extra.stringAssetRelativeAmount} (≈ {fiatAmount})
                     </Body3Secondary>
                 ) : (
                     <Skeleton height="14px" marginTop="2px" width="100px" />
                 )}
-                {!isEnoughBalance && <RefillText />}
+                {!isEnoughBalance && <RefillText onClickRefill={onClickRefill} />}
             </SenderText>
         </>
     );
@@ -689,6 +799,10 @@ const ActionFeeDetailsUniversalValue: FC<{
 
     if (fee.type === 'ton-asset' || fee.type === 'tron-asset' || fee.type === 'ton-asset-relayed') {
         return <ActionFeeDetailsUniversalTokenValue fee={fee} />;
+    }
+
+    if (fee.type === 'free-transfer') {
+        return <ActionFeeDetailsFreeTransferValue />;
     }
 
     assertUnreachableSoft(fee);
@@ -710,6 +824,17 @@ const ActionFeeDetailsUniversalTokenValue: FC<{
             right
             text={fee.extra.stringAssetAbsoluteRelativeAmount}
             secondary={fiatAmountBN ? `≈ ${fiatAmount}` : undefined}
+        />
+    );
+};
+
+const ActionFeeDetailsFreeTransferValue = () => {
+    const { t } = useTranslation();
+    return (
+        <ColumnText
+            right
+            text={t('free')}
+            secondary={t('confirm_view_fee_row_free_pro_subtitle')}
         />
     );
 };
@@ -778,7 +903,7 @@ export const CommonActionDetailsBlock: FC<PropsWithChildren<{ eventId: string; u
                         fullWidth
                         onClick={() => sdk.openPage(url.replace('%s', eventId))}
                     >
-                        {t('nft_view_in_explorer')}
+                        {t('view_transaction')}
                     </Button>
                 </NotificationFooter>
             </NotificationFooterPortal>

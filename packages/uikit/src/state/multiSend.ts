@@ -20,6 +20,7 @@ import { ErrorOption } from 'react-hook-form';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTonRecipientValidator } from '../components/fields/TonRecipientInput';
 import { useActiveApi } from './wallet';
+import { parseJettonScaledUIMultiplier } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 
 export type MultiSendRow = {
     receiver: TonRecipient | null;
@@ -164,7 +165,8 @@ export const useParseCsvListMutation = () => {
                     symbol: response.metadata.symbol,
                     decimals: Number(response.metadata.decimals),
                     id: packAssetId(BLOCKCHAIN_NAME.TON, crypto),
-                    verification: response.verification
+                    verification: response.verification,
+                    scaledUIMultiplier: parseJettonScaledUIMultiplier(response.scaledUi)
                 };
             }
 

@@ -50,6 +50,7 @@ import type {
   SentTronTx,
   Status,
   Transactions,
+  TronAvailableTransfers,
   TronSendRequest,
   TronTransactionsList,
   VerifyPurchasePromo200Response,
@@ -125,6 +126,8 @@ import {
     StatusToJSON,
     TransactionsFromJSON,
     TransactionsToJSON,
+    TronAvailableTransfersFromJSON,
+    TronAvailableTransfersToJSON,
     TronSendRequestFromJSON,
     TronSendRequestToJSON,
     TronTransactionsListFromJSON,
@@ -234,6 +237,10 @@ export interface GetTransactionsRequest {
     offset?: number;
 }
 
+export interface GetTronAvailableTransfersRequest {
+    xProAuth: string;
+}
+
 export interface GetTronTransactionsRequest {
     xTonConnectAuth: string;
     limit?: number;
@@ -280,6 +287,7 @@ export interface SendMessageRequest {
 export interface TronEstimateRequest {
     wallet: string;
     xTonConnectAuth?: string;
+    xProAuth?: string;
     energy?: number;
     bandwidth?: number;
     enableValidation?: boolean;
@@ -288,6 +296,7 @@ export interface TronEstimateRequest {
 export interface TronSendOperationRequest {
     tronSendRequest: TronSendRequest;
     xTonConnectAuth?: string;
+    xProAuth?: string;
     userPublicKey?: string;
 }
 
@@ -595,6 +604,20 @@ export interface DefaultApiInterface {
     getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions>;
 
     /**
+     * Get number of available TRON free transfers for Pro users
+     * @param {string} xProAuth JWT token from Pro service (Bearer token)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronAvailableTransfersRaw(requestParameters: GetTronAvailableTransfersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronAvailableTransfers>>;
+
+    /**
+     * Get number of available TRON free transfers for Pro users
+     */
+    getTronAvailableTransfers(requestParameters: GetTronAvailableTransfersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronAvailableTransfers>;
+
+    /**
      * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -729,6 +752,7 @@ export interface DefaultApiInterface {
      * Estimate cost of sending a tx in Tron network
      * @param {string} wallet 
      * @param {string} [xTonConnectAuth] 
+     * @param {string} [xProAuth] JWT token from Pro service for free charges verification
      * @param {number} [energy] 
      * @param {number} [bandwidth] 
      * @param {boolean} [enableValidation] Enable balance validation for battery charges
@@ -747,6 +771,7 @@ export interface DefaultApiInterface {
      * send TRON tx
      * @param {TronSendRequest} tronSendRequest 
      * @param {string} [xTonConnectAuth] 
+     * @param {string} [xProAuth] JWT token from Pro service for free charges verification
      * @param {string} [userPublicKey] User public key for commission payments (required when instant_fee_tx is provided)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1630,6 +1655,43 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Get number of available TRON free transfers for Pro users
+     */
+    async getTronAvailableTransfersRaw(requestParameters: GetTronAvailableTransfersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronAvailableTransfers>> {
+        if (requestParameters['xProAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xProAuth',
+                'Required parameter "xProAuth" was null or undefined when calling getTronAvailableTransfers().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xProAuth'] != null) {
+            headerParameters['X-Pro-Auth'] = String(requestParameters['xProAuth']);
+        }
+
+        const response = await this.request({
+            path: `/v0/tron/available-transfers`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TronAvailableTransfersFromJSON(jsonValue));
+    }
+
+    /**
+     * Get number of available TRON free transfers for Pro users
+     */
+    async getTronAvailableTransfers(requestParameters: GetTronAvailableTransfersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronAvailableTransfers> {
+        const response = await this.getTronAvailableTransfersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      */
     async getTronConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTronConfig200Response>> {
         const queryParameters: any = {};
@@ -2059,6 +2121,10 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
+        if (requestParameters['xProAuth'] != null) {
+            headerParameters['X-Pro-Auth'] = String(requestParameters['xProAuth']);
+        }
+
         const response = await this.request({
             path: `/v0/tron/estimate`,
             method: 'GET',
@@ -2100,6 +2166,10 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         if (requestParameters['xTonConnectAuth'] != null) {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
+        }
+
+        if (requestParameters['xProAuth'] != null) {
+            headerParameters['X-Pro-Auth'] = String(requestParameters['xProAuth']);
         }
 
         const response = await this.request({

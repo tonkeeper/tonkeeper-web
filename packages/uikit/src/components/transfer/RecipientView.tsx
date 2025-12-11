@@ -31,6 +31,8 @@ import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { useResolveDns } from '../../state/dns';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { Address } from '@ton/core';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -68,8 +70,23 @@ export const seeIfInvalidDns = (value: string) => {
     );
 };
 
-const seeIfValidTonRecipient = (recipient: BaseRecipient | DnsRecipient) => {
-    return 'dns' in recipient || seeIfValidTonAddress(recipient.address);
+const seeIfValidTonRecipient = (recipient: BaseRecipient | DnsRecipient, tonNetwork: Network) => {
+    if ('dns' in recipient && tonNetwork === Network.MAINNET) {
+        return true;
+    }
+
+    try {
+        const parsed = Address.parseFriendly(recipient.address);
+        if (parsed.isTestOnly && tonNetwork === Network.MAINNET) {
+            return false;
+        }
+
+        return true;
+    } catch (_) {
+        //
+    }
+
+    return seeIfValidTonAddress(recipient.address);
 };
 
 const defaultRecipient = { address: '' };
@@ -151,7 +168,7 @@ export const RecipientView: FC<{
         }
 
         let validForBlockchain;
-        if (seeIfValidTonRecipient(recipient)) {
+        if (seeIfValidTonRecipient(recipient, network)) {
             validForBlockchain = BLOCKCHAIN_NAME.TON;
         } else if (seeIfValidTronAddress(recipient.address)) {
             validForBlockchain = BLOCKCHAIN_NAME.TRON;
@@ -165,20 +182,21 @@ export const RecipientView: FC<{
         }
 
         return null;
-    }, [recipient, acceptBlockchains]);
+    }, [recipient, acceptBlockchains, network]);
 
     const isValidAddress = useMemo(() => {
         if (acceptBlockchains && acceptBlockchains.length === 1) {
             return acceptBlockchains[0] === BLOCKCHAIN_NAME.TON
-                ? seeIfValidTonRecipient(recipient)
+                ? seeIfValidTonRecipient(recipient, network)
                 : seeIfValidTronAddress(recipient.address);
         } else {
             return true;
         }
-    }, [acceptBlockchains, recipient]);
+    }, [acceptBlockchains, recipient, network]);
 
     const { data: toAccount, isFetching: isAccountFetching } = useToAccount(
-        isValidForBlockchain === BLOCKCHAIN_NAME.TON && seeIfValidTonRecipient(recipient),
+        isValidForBlockchain === BLOCKCHAIN_NAME.TON &&
+            seeIfValidTonRecipient(recipient, network),
         recipient
     );
 

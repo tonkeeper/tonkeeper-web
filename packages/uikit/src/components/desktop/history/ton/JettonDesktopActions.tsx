@@ -31,7 +31,7 @@ export const swapValue = (
     let assetIn: SwapAsset;
     let assetOut: SwapAsset;
 
-    if (jettonSwap.tonIn) {
+    if (jettonSwap.tonIn !== undefined) {
         assetIn = {
             amount: jettonSwap.tonIn,
             symbol: CryptoCurrency.TON,
@@ -45,7 +45,7 @@ export const swapValue = (
         };
     }
 
-    if (jettonSwap.tonOut) {
+    if (jettonSwap.tonOut !== undefined) {
         assetOut = {
             amount: jettonSwap.tonOut,
             symbol: CryptoCurrency.TON,
@@ -65,15 +65,13 @@ export const swapValue = (
 export const JettonTransferDesktopAction: FC<{
     action: Action;
     isScam: boolean;
-}> = ({ action, isScam: isScamEvent }) => {
+}> = ({ action, isScam }) => {
     const wallet = useActiveWallet();
     const { jettonTransfer } = action;
 
     if (!jettonTransfer) {
         return <ErrorRow />;
     }
-
-    const isScam = isScamEvent || jettonTransfer.jetton.verification === 'blacklist';
 
     if (eqAddresses(wallet.rawAddress, jettonTransfer.sender?.address)) {
         return (
@@ -91,6 +89,8 @@ export const JettonTransferDesktopAction: FC<{
                         decimals={jettonTransfer.jetton.decimals}
                         isFailed={action.status === 'failed'}
                         isNegative
+                        jettonVerification={jettonTransfer.jetton.verification}
+                        isSpam={isScam}
                     />
                 </ActionRow>
             </>
@@ -110,6 +110,7 @@ export const JettonTransferDesktopAction: FC<{
                     symbol={jettonTransfer.jetton.symbol}
                     decimals={jettonTransfer.jetton.decimals}
                     isFailed={action.status === 'failed'}
+                    jettonVerification={jettonTransfer.jetton.verification}
                     isSpam={isScam}
                 />
             </ActionRow>
@@ -196,7 +197,10 @@ export const JettonBurnDesktopAction: FC<{ action: Action }> = ({ action }) => {
     );
 };
 
-export const JettonMintDesktopAction: FC<{ action: Action }> = ({ action }) => {
+export const JettonMintDesktopAction: FC<{ action: Action; isScam: boolean }> = ({
+    action,
+    isScam
+}) => {
     const { t } = useTranslation();
     const { jettonMint } = action;
 
@@ -204,8 +208,6 @@ export const JettonMintDesktopAction: FC<{ action: Action }> = ({ action }) => {
         return <ErrorRow />;
     }
     const isFailed = action.status === 'failed';
-
-    const isScam = jettonMint.jetton.verification === 'blacklist';
 
     return (
         <>
@@ -220,6 +222,7 @@ export const JettonMintDesktopAction: FC<{ action: Action }> = ({ action }) => {
                     symbol={jettonMint.jetton.symbol}
                     decimals={jettonMint.jetton.decimals}
                     isFailed={isFailed}
+                    jettonVerification={jettonMint.jetton.verification}
                     isSpam={isScam}
                 />
             </ActionRow>

@@ -5,13 +5,18 @@ import { mainStorage } from './storageService';
 import { cookieJar } from './cookie';
 import { tonConnectSSE } from './sseEvetns';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
+import * as electron from 'electron';
+import BaseWindow = Electron.BaseWindow;
 
 const service = 'tonkeeper.com';
 
 const authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
 // eslint-disable-next-line complexity
-export const handleBackgroundMessage = async (message: Message): Promise<unknown> => {
+export const handleBackgroundMessage = async (
+    window: BaseWindow,
+    message: Message
+): Promise<unknown> => {
     switch (message.king) {
         case 'storage-set':
             return mainStorage.set(message.key, message.value);
@@ -101,6 +106,9 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
         case 'get-device-country': {
             const locale = app.getLocale();
             return locale.replaceAll('_', '-').split('-')[0] || null;
+        }
+        case 'show-confirm-dialog': {
+            return electron.dialog.showMessageBoxSync(window, message.options);
         }
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);

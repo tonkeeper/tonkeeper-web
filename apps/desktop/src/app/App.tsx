@@ -64,7 +64,7 @@ import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
-import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -81,10 +81,11 @@ import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
-import { DesktopMobileAppBanner } from '@tonkeeper/uikit/dist/components/pro/DesktopMobileAppBanner';
 import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
+import { SecureWalletNotification } from '@tonkeeper/uikit/dist/components/desktop/SecureWalletNotification';
+import { DesktopCancelLegacySubscriptionBanner } from '@tonkeeper/uikit/dist/components/legacy-plugins/DesktopCancelLegacySubscriptionBanner';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -225,6 +226,7 @@ const WalletLayout = styled.div`
 `;
 
 const WalletLayoutBody = styled.div`
+    position: relative;
     flex: 1;
     display: flex;
     max-height: calc(100% - ${desktopHeaderContainerHeight});
@@ -276,6 +278,7 @@ export const Loader: FC = () => {
         storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(serverConfig?.mainnetConfig);
 
     useAppHeight();
 
@@ -305,6 +308,7 @@ export const Loader: FC = () => {
         serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
@@ -313,7 +317,7 @@ export const Loader: FC = () => {
     }
 
     // set api url synchronously
-    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),
@@ -361,11 +365,7 @@ export const Content: FC<{
     useRealtimeUpdatesInvalidation();
 
     if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
@@ -428,6 +428,7 @@ const WalletContent = () => {
                         <MemoryScroll />
                     </Wrapper>
                 </WalletRoutingWrapper>
+                <DesktopCancelLegacySubscriptionBanner />
             </WalletLayoutBody>
         </WalletLayout>
     );
@@ -461,6 +462,7 @@ const BackgroundElements = () => {
             <PairSignerNotification />
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
+            <SecureWalletNotification />
         </>
     );
 };

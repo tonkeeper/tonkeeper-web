@@ -136,11 +136,7 @@ export const MobileContent: FC<{
     const location = useLocation();
 
     if (lock) {
-        return (
-            <FullSizeWrapper standalone={standalone}>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (location.pathname.startsWith(AppRoute.signer)) {

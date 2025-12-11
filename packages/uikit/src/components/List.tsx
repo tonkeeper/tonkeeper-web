@@ -136,6 +136,7 @@ export const ListItemElement = styled.div<{
     ios?: boolean;
     isHover?: boolean;
     isDesktopAdaptive?: boolean;
+    backgroundHighlighted?: boolean;
 }>`
     position: relative;
     display: flex;
@@ -152,9 +153,10 @@ export const ListItemElement = styled.div<{
               `}
 
     ${props => {
-        const background = props.dropDown
-            ? props.theme.backgroundHighlighted
-            : props.theme.backgroundContentTint;
+        const background =
+            props.dropDown || props.backgroundHighlighted
+                ? props.theme.backgroundHighlighted
+                : props.theme.backgroundContentTint;
 
         if (props.ios) {
             return props.hover !== false && props.isHover
@@ -219,7 +221,7 @@ export const GlobalListStyle = createGlobalStyle`
 export const ListItem = forwardRef<
     HTMLDivElement,
     PropsWithChildren<
-        { hover?: boolean; dropDown?: boolean } & Omit<
+        { hover?: boolean; dropDown?: boolean; backgroundHighlighted?: boolean } & Omit<
             React.HTMLProps<HTMLDivElement>,
             'size' | 'children' | 'as' | 'ref'
         >

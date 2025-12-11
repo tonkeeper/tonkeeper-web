@@ -1,0 +1,399 @@
+{
+  "activityActionModal": {
+    "withdrawal_request": "ਅਣ-ਸਟੇਕ ਬੇਨਤੀ"
+  },
+  "activity": {
+    "empty_transaction_caption": "ਆਪਣਾ ਪਹਿਲਾ ਲੈਣ-ਦੇਣ ਕਰੋ!",
+    "empty_transaction_title": "ਤੁਹਾਡਾ ਇਤਿਹਾਸ ਇੱਥੇ ਵੇਖਾਇਆ ਜਾਵੇਗਾ",
+    "failed_transaction": "ਅਸਫਲ",
+    "screen_title": "ਸਰਗਰਮੀ"
+  },
+  "add_edit_favorite": {
+    "address_label": "ਪਤਾ",
+    "add_title": "ਨਵਾਂ ਮਨਪਸੰਦ",
+    "delete": "ਹਟਾਓ",
+    "edit_title": "ਮਨਪਸੰਦ ਸ संपਾਦਨ ਕਰੋ",
+    "name_placeholder": "ਨਾਂ",
+    "save": "ਸੰਭਾਲੋ"
+  },
+  "address_copied": "ਪਤਾ ਕਾਪੀ ਕੀਤਾ ਗਿਆ",
+  "add_wallet": "ਵਾਲਿਟ ਸ਼ਾਮਲ ਕਰੋ",
+  "add_wallet_modal": {
+    "testnet": {
+      "subtitle": "24 ਗੁਪਤ ਰਿਕਵਰੀ ਸ਼ਬਦਾਂ ਨਾਲ ਵਾਲਿਟ ਨੂੰ ਟੈਸਟਨੈਟ ਵਿੱਚ ਆਯਾਤ ਕਰੋ",
+      "title": "ਟੈਸਟਨੈੱਟ ਖਾਤਾ"
+    },
+    "watch_only": {
+      "subtitle": "ਰੀਕਵਰੀ ਵਾਕ ਨਾਲ ਬਿਨਾ ਵਾਲਿਟ ਗਤੀਵਿਧੀ ਦੀ ਨਿਗਰਾਨੀ ਕਰਨ ਲਈ",
+      "title": "ਵਾਚ ਖਾਤਾ"
+    }
+  },
+  "add_watch_only": {
+    "title": "ਖਾਤਾ ਵੇਖੋ"
+  },
+  "approval": {
+    "accepted": "ਦਿੱਖ ਰਿਹਾ",
+    "declined": "ਇਨਕਾਰ ਕੀਤਾ",
+    "details_token": "ਟੋਕਨ ਵੇਰਵੇ",
+    "id_collection": "合集 ਆਈਡੀ",
+    "id_token": "ਟੋਕਨ ਆਈਡੀ",
+    "name": "ਨਾਮ",
+    "not_spam": "ਇਹ ਸਪੈਮ ਨਹੀਂ ਹੈ",
+    "spam": "ਸਪੈਮ",
+    "unverified_token": "ਅਣਪੁਸ਼ਟੀਕ੍ਰਿਤ ਟੋਕਨ"
+  },
+  "balances_setup_wallet": "ਵਾਲਿਟ ਸੈੱਟ ਕਰੋ",
+  "battery": {
+    "other_ways": {
+      "by_crypto": {
+        "title": "{symbol} ਨਾਲ ਰੀਚਾਰਜ ਕਰੋ"
+      },
+      "gift": {
+        "subtitle": "ਦੋਸਤਾਂ ਨਾਲ ਸਾਂਝਾ ਕਰੋ",
+        "title": "ਬੈਟਰੀ ਤੋਹਫਾ"
+      }
+    },
+    "packages": {
+      "disclaimer": "ਇੱਕ ਚਾਰਜ ਔਸਤ ਲੈਣ-ਦੇਣ ਫੀਸ ਨੂੰ ਕਵਰ ਕਰਦਾ ਹੈ। ਕੁਝ ਲੈਣ-ਦੇਣ ਦੀ ਲਾਗਤ ਵੱਧ ਹੋ ਸਕਦੀ ਹੈ।"
+    },
+    "please_wait": "ਬੈਟਰੀ ਕੁਝ ਮਿੰਟਾਂ ਵਿੱਚ ਚਾਰਜ ਹੋ ਜਾਵੇਗੀ",
+    "promocode": {
+      "title": "ਪ੍ਰੋਮੋ ਕੋਡ"
+    },
+    "recharge_by_crypto": {
+      "other": {
+        "subtitle": "ਰਕਮ ਹੱਥੋਂ ਦਰਜ ਕਰੋ",
+        "title": "ਹੋਰ"
+      },
+      "title": "ਰੀਚਾਰਜ"
+    },
+    "title": "Tonkeeper ਬੈਟਰੀ",
+    "transactions": {
+      "description": "ਚੁਣੀਆਂ ਗਈਆਂ ਲੈਣ-ਦੇਣ Tonkeeper ਬੈਟਰੀ ਦੁਆਰਾ ਅਦਾ ਕੀਤੀਆਂ ਜਾਣਗੀਆਂ।",
+      "settings": "ਬੈਟਰੀ ਸੈਟਿੰਗਾਂ",
+      "title": "ਲੈਣ-ਦੇਣ",
+      "types": {
+        "nft": "NFT ਟ੍ਰਾਂਸਫਰ"
+      },
+      "type": {
+        "swap": "ਅਦਲਾ-ਬਦਲੀ",
+        "transfer": "ਟ੍ਰਾਂਸਫਰ"
+      }
+    }
+  },
+  "biometry": {
+    "default": "ਬਾਇਓਮੈਟ੍ਰਿਕਸ",
+    "ios": {
+      "fingerprint": "ਟਚ ਆਈਡੀ"
+    }
+  },
+  "browser": {
+    "actions": {
+      "copy_link": "ਲਿੰਕ ਕਾਪੀ ਕਰੋ",
+      "refresh": "ਤਾਜ਼ਾ ਕਰੋ",
+      "share": "ਸਾਂਝਾ ਕਰੋ"
+    },
+    "apps_all": "ਸਾਰੇ",
+    "connected": "ਜੁੜਿਆ ਹੋਇਆ",
+    "title": "ਬਰਾਉਜ਼ਰ"
+  },
+  "cancel": "ਰੱਦ ਕਰੋ",
+  "check_words_caption": "ਇਹ ਜਾਂਚਣ ਲਈ ਕਿ ਤੁਸੀਂ ਆਪਣਾ ਰਿਕਵਰੀ ਫਰੇਜ਼ ਠੀਕ ਤਰੀਕੇ ਨਾਲ ਲਿਖਿਆ ਹੈ ਜਾਂ ਨਹੀਂ, ਕਿਰਪਾ ਕਰਕੇ %{wordNum1}ਵਾਂ, %{wordNum2}ਵਾਂ ਅਤੇ %{wordNum3}ਵਾਂ ਸ਼ਬਦ ਦਰਜ ਕਰੋ।",
+  "check_words_success": "ਵਧਾਈਆਂ! ਤੁਸੀਂ ਆਪਣਾ ਵੌਲਿਟ ਸੈੱਟ ਕਰ ਲਿਆ ਹੈ",
+  "check_words_title": "ਤੇ ਆਓ ਜਾਂਚ ਕਰੀਏ",
+  "choose_wallets": {
+    "subtitle": "ਉਹ ਵੌਲਿਟ ਚੁਣੋ ਜੋ ਤੁਸੀਂ ਸ਼ਾਮਲ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ।",
+    "title": "ਵਾਲਿਟ ਚੁਣੋ"
+  },
+  "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ",
+  "confirm_sending_fee": "ਫੀਸ",
+  "confirm_sending_submit": "ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਭੇਜੋ",
+  "confirm_sending_title": "ਭੇਜਣ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+  "confirmSendModal": {
+    "wallet": "ਵਾਲਿਟ:"
+  },
+  "continue": "ਜਾਰੀ ਰੱਖੋ",
+  "copied": "ਨਕਲ ਕੀਤਾ ਗਿਆ",
+  "create_pin_current_title": "ਮੌਜੂਦਾ ਪਾਸਕੋഡ ਦਰਜ ਕਰੋ",
+  "create_pin_new_title": "ਨਵਾਂ ਪਾਸਕੋਡ ਬਣਾਓ",
+  "create_pin_repeat_title": "ਪਾਸਕੋਡ ਦੁਬਾਰਾ ਦਰਜ ਕਰੋ",
+  "create_wallet_caption": "ਅਸੀਂ ਤੁਹਾਨੂੰ ਜ਼ੋਰ ਨਾਲ ਸਿਫ਼ਾਰਸ਼ ਕਰਦੇ ਹਾਂ ਕਿ ਤੁਸੀਂ ਪੁਨઃ ਪ੍ਰਾਪਤੀ ਵਾਕਅੰਸ਼ ਨੂੰ ਲਿਖੋ, ਕਿਉਂਕਿ ਇਹ ਤੁਹਾਡਾ ਡਿਵਾਈਸ ਗੁਆ ਚੁੱਕਣ ਦੀ ਸੂਰਤ ਵਿੱਚ ਆਪਣੇ ਵਾ���ਿਟ ਤੱਕ ਪਹੁੰਚ ਅਤੇ ਪੁਨਰ ਪ੍ਰਾਪਤੀ ਕਰਨ ਦਾ ਇਕੋ ਇਕ ਤਰੀਕਾ ਹੈ। ਇਸਨੂੰ ਆਪਣੇ ਆਪ ਨੂੰ ਈਮੇਲ ਰਾਹੀਂ ਨਾ ਭੇਜੋ ਜਾਂ ਸਕਰੀਨਸ਼ਾਟ ਨਾ ਲਵੋ। ਇਸਨੂੰ ਆਫਲਾਈਨ ਰੱਖਣਾ ਹੋਰ ਵੀ ਜ਼ਿਆਦਾ ਸੁਰੱਖਿਅਤ ਹੈ।",
+  "create_wallet_generated": "ਤੁਹਾਡਾ ਬਟੂਆ ਹੁਣੇ ਹੀ ਬਣਾਇਆ ਗਿਆ ਹੈ!",
+  "create_wallet_generating": "ਵਾਲਿਟ ਤਿਆਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+  "create_wallet_title": "ਇੱਕ ਕਲਮ ਅਤੇ ਕਾਗਜ਼ ਦਾ ਇੱਕ ਟੁਕੜਾ ਲਵੋ",
+  "customize": "ਕਸਟਮਾਈਜ਼ ਕਰੋ",
+  "customize_modal": {
+    "subtitle": "ਵਾਲਿਟ ਦਾ ਨਾਮ ਅਤੇ ਆਈਕਨ ਤੁਹਾਡੇ ਡਿਵਾਈਸ 'ਤੇ ਲੋਕਲ ਤੌਰ 'ਤੇ ਸਟੋਰ ਕੀਤੇ ਜਾਂਦੇ ਹਨ।",
+    "title": "ਆਪਣਾ ਵਾਲਟ ਕਸਟਮਾਈਜ਼ ਕਰੋ"
+  },
+  "dns_address_linked": "ਪਤਾ ਜੋੜਿਆ ਗਿਆ",
+  "dns_address_unlinked": "ਪਤਾ ਅਣਜੁੜਿਆ",
+  "dns_current_address": "ਤੁਹਾਡਾ ਮੌਜੂਦਾ ਪਤਾ",
+  "dns_expiration_date": "ਮਿਆਦ ਬੀਤਣ ਦੀ ਤਾਰੀਖ",
+  "dns_renew_toast_success": "ਡੋਮੇਨ ਨਵੀਨਕਰਨ ਹੋ ਗਿਆ ਹੈ",
+  "dns_renew_until_btn": "{untilDate} ਤੱਕ ਨਵੀਨਤਾ ਕਰੋ",
+  "exchange_method_dont_show_again": "ਫਿਰ ਨਾ ਵੇਖਾਓ",
+  "exchange_method_open_warning": "ਤੁਸੀਂ ਇੱਕ ਬਾਹਰੀ ਐਪ ਖੋਲ੍ਹ ਰਹੇ ਹੋ ਜੋ Tonkeeper ਵੱਲੋਂ ਨਹੀਂ ਚਲਾਈ ਜਾਂਦੀ।",
+  "exchange_modal": {
+    "other_ways_to_buy": "ਖ਼ਰੀਦਣ ਦੇ ਹੋਰ ਤਰੀਕੇ"
+  },
+  "exchange_other_ways": "TON ਖਰੀਦਣ ਜਾਂ ਵੇਚਣ ਦੇ ਹੋਰ ਤਰੀਕੇ",
+  "exchange_title": "TON ਖਰੀਦੋ",
+  "import_add_wallet": "ਵਾਲਿਟ ਸ਼ਾਮਲ ਕਰੋ",
+  "import_add_wallet_description": "ਨਵਾਂ ਵਾਲਿਟ ਬਣਾਓ ਜਾਂ ਮੌਜੂਦਾ ਵਾਲਿਟ ਜੋੜੋ।",
+  "import_existing_wallet": "ਮੌਜੂਦਾ ਵਾਲਟ",
+  "import_existing_wallet_description": "24 ਗੁਪਤ ਰੀਕਵਰੀ ਸ਼ਬਦਾਂ ਨਾਲ ਵਾਟੀ ਤਾੜੋ",
+  "import_new_wallet": "ਨਵਾਂ ਵਾਲਿਟ",
+  "import_new_wallet_description": "ਨਵਾਂ ਬਟੂਆ ਬਣਾਓ",
+  "import_signer": "ਸਾਈਨਰ ਨਾਲ ਜੋੜੋ",
+  "import_signer_description": "ਪੂਰੀ ਤਰ੍ਹਾਂ ਆਫ਼ਲਾਈਨ, ਏਅਰ-ਗੈਪਡ, TON ਦੀਆਂ ਸਾਰੀਆਂ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ",
+  "import_wallet_caption": "ਆਪਣੀ ਵੌਲੇਟ ਤੱਕ ਪਹੁੰਚ ਮੁੜ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ, ਉਹ 24 ਗੁਪਤ ਰਿਕਵਰੀ ਸ਼ਬਦ ਦਰਜ ਕਰੋ ਜੋ ਤੁਹਾਨੂੰ ਵੌਲੇਟ ਬਣਾਉਣ ਵੇਲੇ ਦਿੱਤੇ ਗਏ ਸਨ।",
+  "import_wallet_title": "ਆਪਣਾ ਬਹਾਲੀ ਫਰੇਜ਼ ਦਰਜ ਕਰੋ",
+  "import_wallet_wrong_words_err": "ਗਲਤ ਵਾਕ",
+  "info_about_inactive_back": "ਵਾਪਸ",
+  "intro_continue_btn": "ਸ਼ੁਰੂ ਕਰੋ",
+  "intro_item1_caption": "The Open Network ਦੀ ਵਿਲੱਖਣ ਆਰਕੀਟੈਕਚਰ ਦੇ ਚਲਦੇ, TON ਲੈਣ-ਦੇਣ ਸੈਕੰਡਾਂ ਵਿੱਚ ਨਿਪਟਾਏ ਜਾਂਦੇ ਹਨ।",
+  "intro_item1_title": "ਵਿਸ਼ਵ-ਪੱਧਰੀ ਗਤੀ",
+  "intro_item2_caption": "Tonkeeper ਤੁਹਾਡੀਆਂ ਕ੍ਰਿਪਟੋਗ੍ਰਾਫਿਕ ਕੁੰਜੀਆਂ ਤੁਹਾਡੇ ਡਿਵਾਈਸ 'ਤੇ ਸਟੋਰ ਕਰਦਾ ਹੈ। ਸਾਰੇ ਵਪਾਰ ਵਿਖੇਂਦਰੀਕ੍ਰਿਤ ਪਰੋਟੋਕਾਲਾਂ ਰਾਹੀਂ ਕੀਤੇ ਜਾਂਦੇ ਹਨ ਤਾਂ ਜੋ ਤੁਹਾਡਾ ਕ੍ਰਿਪਟੋ ਕਦੇ ਵੀ ਕੇਂਦ੍ਰਿਤ ਐਕਸਚੇਂਜਾਂ ਦੇ ਹੱਥ ਨਹੀਂ ਲੱਗਦਾ।",
+  "intro_item2_title": "ਐਂਡ-ਟੂ-ਐਂਡ ਸੁਰੱਖਿਆ",
+  "intro_title": "ਜੀ ਆਯਾਨੁ\n",
+  "jetton_id": "ਟੋਕਨ ਆਈਡੀ: {jettonAddress}",
+  "jettons_list_title": "ਟੋਕਨ",
+  "later": "ਬਾਅਦ ਵਿੱਚ",
+  "ledger": {
+    "operation_not_supported": "ਇਹ ਕਾਰਵਾਈ ਲੈਜਰ ਵਾਲਿਟਾਂ ਲਈ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਸੇ ਹੋਰ ਵਾਲਿਟ ਦੀ ਚੋਣ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+  },
+  "legal_font_license": "Montserrat ਫ਼ੌਂਟ",
+  "legal_header_title": "ਕਾਨੂੰਨੀ",
+  "legal_licenses_title": "ਲਾਈਸੰਸ",
+  "legal_privacy": "ਪਰਾਈਵੇਸੀ ਨੀਤੀ",
+  "legal_terms": "ਸੇਵਾ ਦੀਆਂ ਸ਼ਰਤਾਂ",
+  "loading": "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ",
+  "migration": {
+    "with_passcode": "ਪਾਸਕੋਡ ਦਾਖਲ ਕਰੋ"
+  },
+  "nft_about_collection": "ਸੰਗ੍ਰਹਿ ਬਾਰੇ",
+  "nft_actions": {
+    "hide_and_report": "ਛੁਪਾਓ ਅਤੇ ਸਪੈਮ ਦੀ ਰਿਪੋਰਟ ਕਰੋ",
+    "hide": {
+      "nft": "NFT ਲੁਕਾਓ"
+    },
+    "view_on_explorer": "Tonviewer 'ਤੇ ਵੇਖੋ"
+  },
+  "nft_collection": "ਸੰਗ੍ਰਹਿ",
+  "nft_contract_address": "ਕਾਂਟ੍ਰੈਕਟ ਦਾ ਪਤਾ",
+  "nft_deploy_collection_title": "NFT ਕਲੇਕਸ਼ਨ ਬਣਾਓ",
+  "nft_details": "ਵੇਰਵੇ",
+  "nft_link_domain_button": "ਡੋਮੇਨ ਜੋੜੋ",
+  "nft_link_username_button": "ਨਾਮ ਲਿੰਕ ਕਰੋ",
+  "nft_more": "ਹੋਰ",
+  "nft_on_sale": "ਵੇਚ ਰਹੇ ਹਨ",
+  "nft_on_sale_text": "NFT ਇਸ ਵੇਲੇ ਮਾਰਕੀਟ ਵਿੱਚ ਵਿਕਰੀ ਲਈ ਹੈ। ਟ੍ਰਾਂਸਫਰ ਲਈ, ਤੁਹਾਨੂੰ ਪਹਿਲਾਂ ਇਸਨੂੰ ਵਿਕਰੀ 'ਚੋਂ ਹਟਾਉਣਾ ਹੋਵੇਗਾ।",
+  "nft_open_in_marketplace": "NFT ਮਾਰਕਿਟ ਤੇ ਵੇਖੋ",
+  "nft_owner_address": "ਮਾਲਕ",
+  "nft_single_nft": "ਇਕਲ NFT",
+  "nft_transfer_nft": "NFT ਟ੍ਰਾਂਸਫਰ ਕਰੋ",
+  "nft_transfer": {
+    "title": "NFT ਟ੍ਰਾਂਸਫਰ"
+  },
+  "nft_transfer_title": "NFT ਟ੍ਰਾਂਸਫਰ ਕਰੋ",
+  "nft_unlink_domain_button": "'{{'address'}}' ਨਾਲ ਜੁੜਿਆ ਹੋਇਆ",
+  "nft_view_in_explorer": "ਐਕਸਪਲੋਰਰ ਵਿੱਚ ਵੇਖੋ",
+  "notifications": {
+    "alert": {
+      "cancel": "ਰੱਦ ਕਰੋ"
+    }
+  },
+  "pairSigner": {
+    "open_signer": "ਇਸ ਡਿਵਾਈਸ 'ਤੇ Signer ਖੋਲ੍ਹੋ"
+  },
+  "paste": "ਚਿਪਕਾਓ",
+  "purchases": {
+    "screen_title": "ਖਰੀਦਦਾਰੀ"
+  },
+  "receiveModal": {
+    "copy": "ਕਾਪੀ ਕਰੋ"
+  },
+  "recovery_phrase": {
+    "copy_button": "ਕਾਪੀ ਕਰੋ"
+  },
+  "reminder_notifications_caption": "ਜਦੋਂ ਤੁਹਾਨੂੰ TON, ਟੋਕਨ ਅਤੇ NFT ਮਿਲਣ, ਤਾਂ ਨੋਟੀਫਿਕੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ।",
+  "reminder_notifications_enable_button": "ਨੋਟਿਫਿਕੇਸ਼ਨ ਚਾਲੂ ਕਰੋ",
+  "reminder_notifications_later_button": "ਬਾਅਦ ਵਿੱਚ",
+  "reminder_notifications_title": "ਤੁਰੰਤ ਨੋਟੀਫਿਕੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ",
+  "scan_qr_title": "QR ਕੋਡ ਸਕੈਨ ਕਰੋ",
+  "secret_words_caption": "ਹੇਠਾਂ ਦਿੱਤੇ ਗਏ ਕਰਮ ਵਿਚ ਇਹ 24 ਸ਼ਬਦ ਲਿਖੋ ਅਤੇ ਉਨ੍ਹਾਂ ਨੂੰ ਇੱਕ ਗੁਪਤ, ਸੁਰੱਖਿਅਤ ਥਾਵਾਂ 'ਚ ਸੰਭਾਲ ਕੇ ਰੱਖੋ।",
+  "secret_words_title": "ਤੁਹਾਡਾ ਰੀਕਵਰੀ ਫ੍ਰੇਜ਼",
+  "security_change_passcode": "ਪਾਸਕੋਡ ਬਦਲੋ",
+  "select_wallet_for_authorization": "ਅਧਿਕਾਰਤਾ ਲਈ ਵਾਲਿਟ ਚੁਣੋ",
+  "send_fee_estimation_error": "ਫੀ ਦੀ ਗਣਨਾ ਕਰਨ ਵਿੱਚ ਅਸਫਲ",
+  "send_publish_tx_error": "ਟ੍ਰਾਂਜੈਕਸ਼ਨ ਭੇਜਣ ਵਿੱਚ ਅਸਫਲ",
+  "send_screen_steps": {
+    "address": {
+      "delete_alert_text": "ਕੀ ਤੁਸੀਂ ਪੱਕਾ «{name}» ਨੂੰ ਆਪਣੀਆਂ ਮਨਪਸੰਦ ਚੀਜ਼ਾਂ ਵਿੱਚੋਂ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
+      "suggest_actions": {
+        "add": "ਮਨਪਸੰਦ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
+        "delete": "ਹਟਾਓ",
+        "hide": "ਲੁਕਾਓ"
+      },
+      "suggests_label": "ਪਸੰਦੀਦਾ ਅਤੇ ਹਾਲੀਆ"
+    },
+    "amount": {
+      "insufficient_balance": "ਪਰਯਾਪਤ ਬਕਾਇਆ ਨਹੀਂ",
+      "max": " ਵੱਧ ਤੋਂ ਵੱਧ",
+      "remaining": "ਉਪਲਬਧ: {amount}"
+    },
+    "comfirm": {
+      "comment_required_text": "ਜਦੋਂ ਭੇਜੋ, ਤੀਕਣੀ ਤੋਂ ਮੈਮੋ ਜਾਂ ਟੈਗ ਸ਼ਾਮਲ ਕਰਨਾ ਯਕੀਨੀ ਬਣਾਓ। ਇਸ ਦੇ ਬਿਨਾਂ, ਤੁਹਾਡਾ ਫੰਡ ਜਮ੍ਹਾਂ ਨਹੀਂ ਹੋਵੇਗਾ ਅਤੇ ਖੋ ਸਕਦਾ ਹੈ।",
+      "title": "ਕਾਰਵਾਈ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "wallet": "ਵਾਲਟ"
+    },
+    "done": {
+      "done_label": "ਮੁਕੰਮਲ",
+      "to": "{name} ਨੂੰ"
+    }
+  },
+  "send_sending_wrong_time_description": "ਆਪਣੇ ਡਿਵਾਈਸ ਦੀਆਂ ਸੈਟਿੰਗਜ਼ ਵਿੱਚ ਆਟੋਮੈਟਿਕ ਸਮਾਂ ਅਤੇ ਤਾਰੀਖ ਚਾਲੂ ਕਰੋ। ਫਿਰ ਆਪਣੇ ਟ੍ਰਾਂਸਫਰ ਦੀ ਫਿਰ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "settings_backup_seed": "ਬੈਕਅੱਪ",
+  "settings_contact_support": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
+  "settings_delete_account": "ਖਾਤਾ ਮਿਟਾਓ",
+  "settings_jettons_list": "ਟੋਕੇਨ",
+  "settings_legal_documents": "ਕਾਨੂੰਨੀ ਦਸਤਾਵੇਜ਼",
+  "settings_network_alert_title": "ਨੈੱਟਵਰਕ ਚੁਣੋ",
+  "settings_news": "Tonkeeper ਖ਼ਬਰਾਂ",
+  "settings_notifications": "ਸੂਚਨਾਵਾਂ",
+  "settings_primary_currency": "ਮੁਦਰਾ",
+  "settings_rate": "Tonkeeper ਦੀ ਦਰਜਾ بندی ਕਰੋ",
+  "settings_recovery_phrase": "ਰੀਕਵਰੀ ਫਰੇਜ਼",
+  "settings_reset": "ਸਾਈਨ ਆਊਟ ਕਰੋ",
+  "settings_reset_alert_title": "\uD83D\uDEA7 \uD83D\uDEA8 ਸਾਇਨ ਆਉਟ ਕਰਨਾ ਹੈ? \uD83D\uDEA8 \uD83D\uDEA7",
+  "settings_reset_alert_title_all": "ਸਾਰੇ ਵਾਲਿਟਾਂ ਤੋਂ ਸਾਈਨ ਆਉਟ ਕਰੋ?",
+  "settings_search_engine": "ਖੋਜੋ",
+  "settings_security": "ਸੁਰੱਖਿਆ",
+  "settings_support": "ਸਹਾਇਤਾ",
+  "settings_title": "ਸੈਟਿੰਗਸ",
+  "settings_version": "ਵਰਜਨ",
+  "settings_wallet_version": "ਸਰਗਰਮ ਪਤਾ",
+  "signer_scan_result": "ਦਸਤਖਤ ਕੀਤੀ ਲੈਣ-ਦੇਣ ਨੂੰ ਸਕੈਨ ਕਰੋ",
+  "signer_scan_tx_description": "ਕਿਰਪਾ ਕਰਕੇ Signer ਖੋਲ੍ਹੋ ਅਤੇ ਲੈਣ-ਦੇਣ ਨੂੰ QR ਕੋਡ ਨਾਲ ਸਕੈਨ ਕਰੋ",
+  "spam_action": "ਸਪੈਮ",
+  "staking": {
+    "deposit": "ਜਮ੍ਹਾਂ",
+    "details": {
+      "pool_address": {
+        "label": "ਪੂਲ ਦਾ ਪਤਾ"
+      }
+    },
+    "withdraw": "ਅਨਸਟੇਕ ਕਰੋ"
+  },
+  "start_screen": {
+    "create_wallet_button": "ਨਵਾਂ ਵਾਲਿਟ ਬਣਾਓ",
+    "import_wallet_button": "ਮੌਜੂਦਾ ਵਾਲਿਟ ਆਯਾਤ ਕਰੋ"
+  },
+  "success": "ਕਾਮਯਾਬੀ!",
+  "suspicious": {
+    "buttons": {
+      "not_spam": "ਇਹ ਸਪੈਮ ਨਹੀਂ ਹੈ",
+      "report": "ਸਪੈਮ ਦੀ ਸ਼ਿਕਾਇਤ ਕਰੋ"
+    },
+    "label": {
+      "full": "ਅਣਪੱਕਾ NFT",
+      "short": "ਪੁਸ਼ਟੀ ਨਹੀਂ ਹੋਈ"
+    },
+    "status_update": {
+      "hidden": {
+        "collection": "ਸੰਗ੍ਰਹਿ ਲੁਕਾਇਆ ਗਿਆ ਹੈ",
+        "nft": "NFT ਲੁਕਾਇਆ ਗਿਆ"
+      },
+      "spam": {
+        "collection": "ਕਲੈਕਸ਼ਨ ਨੂੰ ਸਪੈਮ ਵਜੋਂ ਨਿਸ਼ਾਨਲੱਗਿਆ ਗਿਆ",
+        "nft": "NFT ਨੂੰ ਸਪੈਮ ਵਜੋਂ ਨਿਸ਼ਾਨਬੱਧ ਕੀਤਾ ਗਿਆ"
+      }
+    }
+  },
+  "suspiciousNFTDetails": {
+    "buttons": {
+      "not_spam": "ਏਹ ਸਪੈਮ ਨਹੀਂ ਹੈ",
+      "report": "ਸਪੈਮ ਦੀ ਸ਼ਿਕਾਇਤ ਕਰੋ"
+    },
+    "paragraphs": {
+      "p1": "ਸਪੈਮ ਲਈ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ। ਵੱਡੀ ਪੈਮਾਨੇ ਤੇ ਅਣਚਾਹੇ ਅਤੇ ਅਕਸਰ ਬੇਮਤਲਬ ਸੁਨੇਹੇ ਭੇਜਣ ਲਈ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ।",
+      "p2": "ਠੱਗੀ ਲਈ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ। NFT ਦਾ ਨਾਂ, ਵੇਰਵਾ ਜਾਂ ਚਿੱਤਰ ਵਰਤੋਂਕਾਰਾਂ ਨੂੰ ਧੋਖਾਅ ਵਿੱਚ ਪਾ ਸਕਦੇ ਹਨ।",
+      "p3": "ਅਸੀਂ ਇਸ NFT ਦੇ ਲੇਖਕ ਅਤੇ ਇਸ ਦੀ ਇਤਿਹਾਸ ਬਾਰੇ ਥੋੜ੍ਹਾ ਹੀ ਜਾਣਦੇ ਹਾਂ।"
+    },
+    "subtitle": "NFT ਹੇਠਾਂ ਦਿੱਤੇ ਕਾਰਣਾਂ ਵਿਚੋਂ ਕਿਸੇ ਇੱਕ ਕਾਰਨ ਕਰਕੇ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਹੋ ਸਕਦਾ.",
+    "title": "ਗੈਰ-ਤਸਦੀਕਸ਼ੁਦਾ NFT"
+  },
+  "swap_title": "ਬਦਲੋ",
+  "today": "ਅੱਜ",
+  "tokenDetails": {
+    "tonviewer_button": "Tonviewer 'ਤੇ ਵੇਖੋ"
+  },
+  "tonkeeper_pro": "ਟੋਨਕੀਪਰ ਪ੍ਰੋ",
+  "tonkeeper_pro_description": "Tonkeeper Pro ਦੀ ਜਾਂਚ ਲਈ ਚੰਡ ਇਕ ਵਧੀਆ ਵਾਲਿਟ ਵਿਸ਼ੇਸ਼ਤਾ ਨਾਲ ਆਉਂਦੀ ਹੈ, ਜੋ ਕਿ ਕ੍ਰਿਪਟੋ ਪ੍ਰਬੰਧਨ ਲਈ ਇਕ ਟੂਲਸੈੱਟ ਪੇਸ਼ ਕਰਦੀ ਹੈ।",
+  "ton_login_caption": "{name} ਤੁਹਾਡੇ ਵਾਲਿਟ ਪਤੇ ਤੱਕ ਪਹੁੰਚ ਦੀ ਬੇਨਤੀ ਕਰ ਰਿਹਾ ਹੈ",
+  "ton_login_connect_button": "ਵਾਲਿਟ ਕਨੈਕਟ ਕਰੋ",
+  "ton_login_notice": "ਵਾਲਿਟ ਜੋੜਣ ਤੋਂ ਪਹਿਲਾਂ ਸਰਵਿਸ ਪਤੇ ਦੀ ਜਾਂਚ ਕਰਨਾ ਯਕੀਨੀ ਬਣਾਓ।",
+  "ton_login_success": "ਹੋ ਗਿਆ",
+  "transaction_bid_dns": "ਨਾਮ",
+  "transactionDetails": {
+    "comment": "ਟਿੱਪਣੀ",
+    "operation": "ਓਪਰੇਸ਼ਨ",
+    "recipient": "ਪਰਾਪਤਕਰਤਾ"
+  },
+  "transaction_fee": "ਫੀਸ",
+  "transaction_hash": "ਲੈਣ-ਦੇਣ",
+  "transaction_merchant": "ਵਪਾਰੀ",
+  "transaction_receive_date": "{date} ਨੂੰ ਪ੍ਰਾਪਤ ਹੋਇਆ",
+  "transaction_recipient": "ਪ੍ਰਾਪਤਕਰਤਾ",
+  "transaction_recipient_address": " ਪ੍ਰਾਪਤਕਰਤਾ ਦਾ ਪਤਾ",
+  "transactions": {
+    "burned": "ਸਾੜਿਆ ਗਿਆ",
+    "failed": "ਅਸਫਲ",
+    "nft_purchase": "NFT ਖਰੀਦ",
+    "smartcontract_exec": "ਕੌਂਟ੍ਰੈਕਟ ਕਾਲ ਕਰੋ",
+    "spam": "ਸਪੈਮ",
+    "swap": "ਅਦਲਾ-ਬਦਲੀ",
+    "unknown": "ਅਣਜਾਣ",
+    "unknown_description": "ਕੁਝ ਹੋਇਆ ਪਰ ਅਸੀਂ ਪਛਾਣ ਨਹੀਂ ਸਕੇ"
+  },
+  "transaction_sender": "ਭੇਜਣ ਵਾਲਾ",
+  "transaction_sender_address": "ਭੇਜਣ ਵਾਲੇ ਦਾ ਪਤਾ",
+  "transaction_sent_date": "{date} ਨੂੰ ਭੇਜਿਆ ਗਿਆ",
+  "transaction_type_bid": "ਬੋਲੀ",
+  "transaction_type_contract_deploy": "ਕਰਾਰ ਦੀ ਤੈਅਿਨਾਤੀ",
+  "transaction_type_pending": "ਬਕਾਇਆ",
+  "transaction_type_receive": "ਪ੍ਰਾਪਤ ਹੋਇਆ",
+  "transaction_type_sent": "ਭੇਜਿਆ ਗਿਆ",
+  "transaction_type_subscription": "ਸਬਸਕ੍ਰਾਈਬ ਕੀਤਾ",
+  "transaction_type_unsubscription": "ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਰੱਦ ਕੀਤਾ",
+  "transaction_type_wallet_initialized": "ਵਾਲਿਟ ਸ਼ੁਰੂ ਕੀਤਾ ਗਿਆ",
+  "txActions": {
+    "amount": "ਰਕਮ",
+    "fee": "ਫੀਸ",
+    "refund": "ਵਾਪਸੀ",
+    "signRaw": {
+      "comment": "ਟਿੱਪਣੀ",
+      "recipient": "ਪ੍ਰਾਪਤਕਰਤਾ",
+      "title": "ਲੈਣ-ਦੇਣ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+      "types": {
+        "jettonTransfer": "ਟੋਕਨ ਤਬਾਦਲਾ",
+        "nftItemTransfer": "NFT ਟ੍ਰਾਂਸਫ਼ਰ",
+        "tonTransfer": "TON ਟ੍ਰਾਂਸਫਰ",
+        "unknownTransaction": "ਅਣਜਾਣ ਲੈਣ-ਦੇਣ"
+      }
+    }
+  },
+  "wallet_buy": "ਖਰੀਦੋ",
+  "wallet": {
+    "collectibles_tab_lable": "ਸੰਗ੍ਰਹਿ ਯੋਗ ਚੀਜ਼ਾਂ",
+    "scan_btn": "ਸਕੈਨ ਕਰੋ"
+  },
+  "wallet_receive": " ਪ੍ਰਾਪਤ ਕਰੋ",
+  "wallets": "ਵਾਲਿਟਸ",
+  "wallet_sell": "ਵੇਚੋ",
+  "wallet_send": "ਭੇਜੋ",
+  "wallet_swap": "ਤਬਾਦਲਾ",
+  "wallet_title": "ਬੱਟੂਆ",
+  "yesterday": "ਕੱਲ੍ਹ"
+}

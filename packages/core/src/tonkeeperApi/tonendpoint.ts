@@ -33,7 +33,7 @@ export interface TonendpointConfig {
         disable_dapps: boolean;
         disable_usde: boolean;
         disable_nfts: boolean;
-        disable_rub: boolean;
+        disable_crypto_subscription: boolean;
     };
 
     ton_connect_bridge: string;
@@ -43,6 +43,7 @@ export interface TonendpointConfig {
     tron_api_url: string;
     tonkeeper_api_url: string;
     pro_api_url: string;
+    pro_dev_api_url: string;
 
     aptabaseEndpoint: string;
     aptabaseKey?: string;
@@ -95,6 +96,10 @@ export interface TonendpointConfig {
     '2fa_tg_linked_ttl_seconds': number;
     '2fa_bot_url'?: string;
 
+    /**
+     * It keeps the last release version, e.g. "v1.0.0"
+     */
+    pro_apk_name?: string;
     pro_mobile_app_appstore_link?: string;
     pro_media_base_url?: string;
     pro_landing_url?: string;
@@ -118,7 +123,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
         disable_dapps: false,
         disable_usde: false,
         disable_nfts: false,
-        disable_rub: false
+        disable_crypto_subscription: false
     },
     ton_connect_bridge: 'https://bridge.tonapi.io',
     tonapiV2Endpoint: 'https://keeper.tonapi.io',
@@ -127,6 +132,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
     batteryHost: 'https://battery.tonkeeper.com',
     tonkeeper_api_url: 'https://api.tonkeeper.com',
     pro_api_url: 'https://pro.tonconsole.com',
+    pro_dev_api_url: 'https://dev-pro.tonconsole.com',
     batteryMeanFees: '0.0026',
     batteryReservedAmount: '0.065',
     disable_battery: false,
@@ -232,6 +238,12 @@ export class Tonendpoint {
 
     appsPopular = (): Promise<Recommendations> => {
         return this.GET('/apps/popular');
+    };
+
+    public supportedCurrencies = async (): Promise<{ code: string }[]> => {
+        const response = await fetch(`${this.tonkeeperApiUrl}/currencies?${this.toSearchParams()}`);
+
+        return response.json();
     };
 
     private fetchBoot(network: Network) {

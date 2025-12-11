@@ -51,6 +51,7 @@ import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/u
 import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
 import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { LedgerMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -170,22 +171,32 @@ const useSendNft = (
 
             const sender = await getSender(senderChoice);
 
-            const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
-            const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString()).plus(
-                Math.abs(estimation.event?.extra ?? 0)
-            );
-            const nftTransferMsg = nftEncoder.encodeNftTransfer({
-                nftAddress: nftItem.address,
-                recipientAddress: recipient.toAccount.address,
-                forwardPayload: recipient.comment ? comment(recipient.comment) : null,
-                nftTransferAmountWei,
-                responseAddress:
-                    'excessAddress' in sender && sender.excessAddress
-                        ? sender.excessAddress
-                        : undefined
-            });
-
-            await rawTransactionService.send(sender, zeroFeeEstimation, nftTransferMsg);
+            if (sender instanceof LedgerMessageSender) {
+                await (
+                    await sender.nftTransfer({
+                        to: recipient.toAccount.address,
+                        nftTransferAmount: NFTEncoder.nftTransferBase,
+                        nftAddress: nftItem.address,
+                        comment: recipient.comment
+                    })
+                ).send();
+            } else {
+                const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
+                const nftTransferAmountWei = new BigNumber(
+                    NFTEncoder.nftTransferBase.toString()
+                ).plus(Math.abs(estimation.event?.extra ?? 0));
+                const nftTransferMsg = nftEncoder.encodeNftTransfer({
+                    nftAddress: nftItem.address,
+                    recipientAddress: recipient.toAccount.address,
+                    forwardPayload: recipient.comment ? comment(recipient.comment) : null,
+                    nftTransferAmountWei,
+                    responseAddress:
+                        'excessAddress' in sender && sender.excessAddress
+                            ? sender.excessAddress
+                            : undefined
+                });
+                await rawTransactionService.send(sender, zeroFeeEstimation, nftTransferMsg);
+            }
             track2('send-nft');
         } catch (e) {
             await notifyError(e);

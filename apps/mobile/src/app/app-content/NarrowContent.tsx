@@ -236,15 +236,16 @@ const NarrowContentInitialPages: FC<{
 const NarrowContentAppRouting = () => {
     const location = useLocation();
 
-    const { assets } = useAllChainsAssetsWithPrice();
+    useAllChainsAssetsWithPrice();
+
     const isSplashHidden = useRef(false);
-    const isReady = assets !== undefined;
+
     useEffect(() => {
-        if (isReady && !isSplashHidden.current) {
+        if (!isSplashHidden.current) {
             isSplashHidden.current = true;
             SplashScreen.hide();
         }
-    }, [isReady]);
+    }, []);
 
     const [animated] = useAtom(ionRouterAnimation$);
 

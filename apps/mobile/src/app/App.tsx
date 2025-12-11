@@ -25,7 +25,7 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useAccountsStateQuery,
@@ -50,6 +50,7 @@ import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/Publis
 import { queryClient } from '../libs/query-client';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -143,15 +144,13 @@ export const Providers = () => {
     );
 };
 
-export const App = () => {
-    return (
-        <IonApp>
-            <IonReactRouter>
-                <Providers />
-            </IonReactRouter>
-        </IonApp>
-    );
-};
+export const App = () => (
+    <IonApp>
+        <IonReactRouter>
+            <Providers />
+        </IonReactRouter>
+    </IonApp>
+);
 
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
@@ -198,6 +197,7 @@ export const Loader: FC = () => {
         storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(config?.mainnetConfig);
 
     useAppHeight();
 
@@ -229,6 +229,7 @@ export const Loader: FC = () => {
         config === undefined ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
@@ -237,7 +238,7 @@ export const Loader: FC = () => {
     }
 
     // set api url synchronously
-    setProApiUrl(config.mainnetConfig.pro_api_url);
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(config.mainnetConfig),
@@ -257,11 +258,13 @@ export const Loader: FC = () => {
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} />
-            <CopyNotification />
-            <QrScanner />
-            <ModalsRoot />
-            <SignerPublishNotification />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification />
+                <QrScanner />
+                <ModalsRoot />
+                <SignerPublishNotification />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 };

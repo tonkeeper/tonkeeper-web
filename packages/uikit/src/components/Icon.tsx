@@ -2440,3 +2440,33 @@ export const TonkeeperProOutlineIcon: FC<{ className?: string }> = ({ className 
         </svg>
     );
 };
+
+export const TonkeeperProCardIcon: FC<{ className?: string; size?: number }> = ({
+    className,
+    size = 40
+}) => {
+    return (
+        <svg
+            fill="none"
+            height={size}
+            viewBox="0 0 40 40"
+            width={size}
+            xmlns="http://www.w3.org/2000/svg"
+            className={className}
+        >
+            <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="0" x2="40" y1="0" y2="40">
+                <stop offset="0" stopColor="#292929" />
+                <stop offset="1" stopColor="#1a1a1a" />
+            </linearGradient>
+            <path
+                d="m0 16c0-5.6005 0-8.40079 1.08993-10.53991.95874-1.88162 2.48854-3.41142 4.37016-4.37016 2.13912-1.08993 4.93941-1.08993 10.53991-1.08993h8c5.6005 0 8.4008 0 10.5399 1.08993 1.8816.95874 3.4114 2.48854 4.3702 4.37016 1.0899 2.13912 1.0899 4.93941 1.0899 10.53991v8c0 5.6005 0 8.4008-1.0899 10.5399-.9588 1.8816-2.4886 3.4114-4.3702 4.3702-2.1391 1.0899-4.9394 1.0899-10.5399 1.0899h-8c-5.6005 0-8.40079 0-10.53991-1.0899-1.88162-.9588-3.41142-2.4886-4.37016-4.3702-1.08993-2.1391-1.08993-4.9394-1.08993-10.5399z"
+                fill="url(#a)"
+            />
+            <g fill="#fff">
+                <path d="m20 19.3333 12-5.3333-12 18.6667z" opacity=".5" />
+                <path d="m20 19.3333-12-5.3333 12 18.6667z" opacity=".75" />
+                <path d="m20 19.3327-12-5.3334 12-5.33328 12 5.33328z" />
+            </g>
+        </svg>
+    );
+};

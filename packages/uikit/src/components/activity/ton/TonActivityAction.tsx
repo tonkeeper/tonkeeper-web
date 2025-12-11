@@ -41,6 +41,7 @@ import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
 import { useActiveTonNetwork, useActiveWallet } from '../../../state/wallet';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { scaledUIMultiplierOne } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -275,7 +276,8 @@ export const PurchaseAction: FC<{
             asset: {
                 id: '',
                 decimals: purchase.amount.decimals,
-                symbol: purchase.amount.tokenName
+                symbol: purchase.amount.tokenName,
+                scaledUIMultiplier: scaledUIMultiplierOne
             }
         }).stringAssetRelativeAmount;
     }, [purchase?.amount]);
@@ -389,6 +391,13 @@ export const ActivityAction: FC<{
             return <PurchaseAction action={action} date={date} />;
         case 'ElectionsDepositStake':
         case 'ElectionsRecoverStake':
+        case 'AddExtension':
+        case 'RemoveExtension':
+        case 'SetSignatureAllowedAction':
+        case 'GasRelay':
+        case 'DepositTokenStake':
+        case 'WithdrawTokenStakeRequest':
+        case 'LiquidityDeposit':
             return <SimplePreviewAction action={action} date={date} isScam={isScam} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;

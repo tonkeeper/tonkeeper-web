@@ -3,11 +3,10 @@ import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveConfig, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
 import { SpinnerIcon } from '../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, H3, Label1 } from '../Text';
@@ -61,7 +60,7 @@ export const NftDetails: FC<{ nftItem: NftItem; kind: NFTKind }> = React.memo(({
             <Row>
                 <H3>{t('nft_details')}</H3>
                 <Link onClick={() => sdk.openPage(url.replace('%s', address))}>
-                    {t('nft_view_in_explorer')}
+                    {t('view_transaction')}
                 </Link>
             </Row>
             <ListBlock margin={false}>

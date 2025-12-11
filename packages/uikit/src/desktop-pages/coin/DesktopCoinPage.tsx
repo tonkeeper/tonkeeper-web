@@ -279,19 +279,18 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                 return undefined;
             }
 
-            const amount = jettonBalance.balance;
+            const amount = jettonToTonAssetAmount(jettonBalance);
 
             return {
                 image: jettonBalance.jetton.image,
                 symbol: jettonBalance.jetton.symbol,
-                amount: format(amount, jettonBalance.jetton.decimals),
+                amount: amount.stringRelativeAmount,
                 fiatAmount: formatFiatCurrency(
                     fiat,
                     jettonBalance.price
-                        ? shiftedDecimals(
-                              jettonBalance.balance,
-                              jettonBalance.jetton.decimals
-                          ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
+                        ? amount.relativeAmount.multipliedBy(
+                              toTokenRate(jettonBalance.price, fiat).prices
+                          )
                         : 0
                 ),
                 noImageCorners: jettonToTonAssetAmount(jettonBalance).asset.noImageCorners

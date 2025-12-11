@@ -36,6 +36,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
+import { SecureWalletNotification } from '@tonkeeper/uikit/dist/components/desktop/SecureWalletNotification';
+import { DesktopCancelLegacySubscriptionBanner } from '@tonkeeper/uikit/dist/components/legacy-plugins/DesktopCancelLegacySubscriptionBanner';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -125,11 +127,7 @@ export const WideContent: FC<{
     }, [queryClient]);
 
     if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
@@ -156,6 +154,7 @@ export const WideContent: FC<{
                 </Switch>
             </WideContentStyled>
             <BackgroundElements />
+            <SecureWalletNotification />
             <PullToRefresh onRefresh={onRefresh} />
         </WideLayout>
     );
@@ -193,6 +192,7 @@ const WalletContent = () => {
                         <MemoryScroll />
                     </Wrapper>
                 </WalletRoutingWrapper>
+                <DesktopCancelLegacySubscriptionBanner />
             </WalletLayoutBody>
         </WalletLayout>
     );

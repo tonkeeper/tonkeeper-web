@@ -4,7 +4,8 @@ import {
     IAppSdk,
     BiometryService,
     CookieService,
-    AppCountryInfo
+    AppCountryInfo,
+    ConfirmOptions
 } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
@@ -62,6 +63,23 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
 
         return sendBackground<void>({ king: 'open-page', url });
     };
+
+    async confirm(options: ConfirmOptions): Promise<boolean> {
+        const cancelButton = options.cancelButtonTitle || 'Cancel';
+        const okButton = options.okButtonTitle || 'OK';
+
+        return sendBackground<number>({
+            king: 'show-confirm-dialog',
+            options: {
+                message: options.message,
+                type: options.type,
+                buttons: [cancelButton, okButton],
+                defaultId: options.defaultButton === 'cancel' ? 0 : 1,
+                title: options.title,
+                cancelId: 0
+            }
+        });
+    }
 
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 

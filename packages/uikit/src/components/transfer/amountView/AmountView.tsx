@@ -96,14 +96,16 @@ export const AmountView: FC<{
     );
 
     const { data: tokenRate, isLoading: rateLoading } = useRate(toTokenRateSymbol(amountState));
-    const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(amountState.token);
+    const { data: balance, isLoading: balanceLoading } = useUserAssetBalance(
+        amountState.assetAmount.asset
+    );
 
     const ref = useRef<HTMLInputElement>(null);
     const refBlock = useRef<HTMLLabelElement>(null);
     const refButton = useRef<HTMLDivElement>(null);
 
     useButtonPosition(refButton, refBlock);
-    useAutoFocusOnChange(ref, amountState.token);
+    useAutoFocusOnChange(ref, amountState.assetAmount.asset);
 
     const [fontSize, setFontSize] = useState<InputSize>(defaultSize);
     useLayoutEffect(() => {
@@ -130,7 +132,7 @@ export const AmountView: FC<{
     const onMax = useCallback(() => {
         dispatch({
             kind: 'max',
-            payload: { value: balance.relativeAmount, prices: tokenRate?.prices }
+            payload: { balance, prices: tokenRate?.prices }
         });
     }, [dispatch, balance, tokenRate]);
 
@@ -145,7 +147,7 @@ export const AmountView: FC<{
         [dispatch, jettons]
     );
 
-    const remaining = balance.relativeAmount.minus(amountState.coinValue);
+    const remaining = balance.relativeAmount.minus(amountState.assetAmount.relativeAmount);
     const enoughBalance = remaining.gte(0);
 
     const isValid = useMemo(() => {
@@ -195,7 +197,7 @@ export const AmountView: FC<{
                     {blockchain === BLOCKCHAIN_NAME.TON ? (
                         <AssetSelect
                             info={info}
-                            jetton={legacyTonAssetId(amountState.token as TonAsset)}
+                            jetton={legacyTonAssetId(amountState.assetAmount.asset as TonAsset)}
                             setJetton={onJetton}
                             jettons={jettons ?? { balances: [] }}
                         />
@@ -212,7 +214,9 @@ export const AmountView: FC<{
                         setValue={onInput}
                         inputSize={fontSize}
                     />
-                    <Symbol>{amountState.inFiat ? fiat : amountState.token.symbol}</Symbol>
+                    <Symbol>
+                        {amountState.inFiat ? fiat : amountState.assetAmount.asset.symbol}
+                    </Symbol>
                 </InputBlock>
 
                 <SecondaryAmount amountState={amountState} toggleFiat={toggleFiat} />
@@ -225,9 +229,11 @@ export const AmountView: FC<{
                     <Remaining>
                         {t('send_screen_steps_amount_remaining').replace(
                             '%{amount}',
-                            formatter.format(remaining, { decimals: amountState.token.decimals })
+                            formatter.format(remaining, {
+                                decimals: amountState.assetAmount.asset.decimals
+                            })
                         )}{' '}
-                        {amountState.token.symbol}
+                        {amountState.assetAmount.asset.symbol}
                     </Remaining>
                 ) : (
                     <RemainingInvalid>

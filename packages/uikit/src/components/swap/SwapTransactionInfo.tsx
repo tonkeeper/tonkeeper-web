@@ -141,8 +141,8 @@ export const SwapTransactionInfo = () => {
                             <Body3>
                                 ≈&nbsp;
                                 {
-                                    new AssetAmount({
-                                        weiAmount: trade!.to.weiAmount
+                                    AssetAmount.fromRelativeAmount({
+                                        amount: trade!.to.relativeAmount
                                             .multipliedBy(100 - swapOptions.slippagePercent)
                                             .div(100),
                                         asset: trade!.to.asset

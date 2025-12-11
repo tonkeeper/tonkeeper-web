@@ -8,7 +8,6 @@ import {
     externalMessage,
     userInputAddressIsBounceable,
     getServerTime,
-    getTonkeeperQueryId,
     getTTL,
     getWalletSeqNo,
     tonConnectAddressIsBounceable,
@@ -30,6 +29,7 @@ import { LedgerTransaction } from '../../ledger/connector';
 import { WalletMessageSender } from './wallet-message-sender';
 import { TonConnectEncoder } from '../encoder/ton-connect-encoder';
 import { ISender } from './ISender';
+import { UserCancelledError } from '../../../errors/UserCancelledError';
 
 export class LedgerMessageSender implements ISender {
     constructor(
@@ -115,21 +115,30 @@ export class LedgerMessageSender implements ISender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.sign({
-            to,
-            bounce,
-            amount: value,
-            seqno,
-            timeout: getTTL(timestamp),
-            sendMode: sendMode,
-            stateInit: init,
-            payload: body
-                ? {
-                      type: 'unsafe',
-                      message: body
-                  }
-                : undefined
-        });
+        let transfer: Cell;
+        try {
+            transfer = await this.sign({
+                to,
+                bounce,
+                amount: value,
+                seqno,
+                timeout: getTTL(timestamp),
+                sendMode: sendMode,
+                stateInit: init,
+                payload: body
+                    ? {
+                          type: 'unsafe',
+                          message: body
+                      }
+                    : undefined
+            });
+        } catch (e) {
+            console.error(e);
+            if (e instanceof UserCancelledError) {
+                throw e as Error;
+            }
+            throw new LedgerError(e);
+        }
 
         return this.toSenderObject(externalMessage(contract, seqno, transfer));
     };
@@ -215,7 +224,8 @@ export class LedgerMessageSender implements ISender {
             payload: {
                 knownJetton: null,
                 type: 'jetton-transfer',
-                queryId: getTonkeeperQueryId(),
+                // temporary set to 0 because of ledger app 2.7.0 issue
+                queryId: BigInt(0), // getTonkeeperQueryId(),
                 amount: BigInt(amount.stringWeiAmount),
                 destination: Address.parse(to),
                 responseDestination: Address.parse(this.wallet.rawAddress),
@@ -251,7 +261,8 @@ export class LedgerMessageSender implements ISender {
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             payload: {
                 type: 'nft-transfer',
-                queryId: getTonkeeperQueryId(),
+                // temporary set to 0 because of ledger app 2.7.0 issue
+                queryId: BigInt(0), // getTonkeeperQueryId(),
                 newOwner: Address.parse(to),
                 responseDestination: Address.parse(this.wallet.rawAddress),
                 forwardAmount: NFTEncoder.nftTransferForwardAmount,
@@ -289,16 +300,10 @@ export class LedgerMessageSender implements ISender {
             );
         } catch (e) {
             console.error(e);
-            if (typeof e === 'object' && e && 'name' in e && e.name === 'UserCancelledError') {
+            if (e instanceof UserCancelledError) {
                 throw e as Error;
             }
-            throw new LedgerError(
-                typeof e === 'string'
-                    ? e
-                    : typeof e === 'object' && e && 'message' in e
-                    ? (e.message as string)
-                    : 'Unknown error'
-            );
+            throw new LedgerError(e);
         }
 
         const externalMessages = transferCells.map((cell, index) =>

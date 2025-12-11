@@ -7,6 +7,7 @@ import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { FeatureSlideNames } from '../../enums/pro';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 interface IHeaderOptions {
     removeHeader?: boolean;
@@ -21,16 +22,21 @@ interface IProps {
 }
 
 const ProFeaturesListContent: FC<IProps> = props => {
+    const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
     const { className, headerOptions, features = PRO_FEATURES } = props;
     const { removeHeader, ...restHeaderProps } = headerOptions ?? {};
 
     const { t } = useTranslation();
 
+    const filteredFeatures = features.filter(({ id }) =>
+        id === FeatureSlideNames.FREE_TRC20_TRANSFER ? isTronEnabled : true
+    );
+
     return (
         <div className={className}>
             {!removeHeader && <HeaderStyled {...restHeaderProps} />}
             <ListBlock margin={false} fullWidth>
-                {features.map(({ id, titleKey, descriptionKey, badgeComponent }) => (
+                {filteredFeatures.map(({ id, titleKey, descriptionKey, badgeComponent }) => (
                     <ListItemStyled key={id} hover={false}>
                         <ListItemPayloadStyled>
                             <LocalBadgedTitleStyled
@@ -177,5 +183,10 @@ const PRO_FEATURES: IProFeature[] = [
         id: FeatureSlideNames.SUPPORT,
         titleKey: 'pro_feature_priority_support_title',
         descriptionKey: 'pro_feature_priority_support_description'
+    },
+    {
+        id: FeatureSlideNames.FREE_TRC20_TRANSFER,
+        titleKey: 'pro_feature_free_trc20_transfer_title',
+        descriptionKey: 'pro_feature_free_trc20_transfer_subtitle'
     }
 ];

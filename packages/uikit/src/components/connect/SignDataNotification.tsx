@@ -20,7 +20,7 @@ import {
     signDataResult,
     signDataUint8Array
 } from '@tonkeeper/core/dist/service/tonConnect/signService';
-import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
+import { TxConfirmationCustomError } from '@tonkeeper/core/dist/errors/TxConfirmationCustomError';
 import { useAppSdk } from '../../hooks/appSdk';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { signDataOver } from '../../state/mnemonic';
@@ -39,7 +39,7 @@ const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     return useMutation<SignDataResponse, Error>(async () => {
         const domain = new URL(origin).host;
         if (!domain.includes('.')) {
-            throw new TxConfirmationCustomError('Invalid domain');
+            throw new TxConfirmationCustomError('Invalid domain', 'error_invalid_domain');
         }
 
         const timestamp = await getServerTime(api);
@@ -155,12 +155,14 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                 </>
             );
         case 'cell':
+            const parsedCell = Cell.fromBase64(params.cell).toString();
+
             return (
                 <>
                     <Disclaimer>{t('signDataCellDisclaimer')}</Disclaimer>
                     <Payload>
-                        <SignText>{params.schema}</SignText>
-                        <SignText>{params.cell}</SignText>
+                        <SignText>{parsedCell}</SignText>
+
                         <ButtonRow>
                             <Button
                                 size="small"

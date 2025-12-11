@@ -101,6 +101,12 @@ export interface Subscription {
      * @memberof Subscription
      */
     beneficiary?: AccountAddress;
+    /**
+     * 
+     * @type {AccountAddress}
+     * @memberof Subscription
+     */
+    admin?: AccountAddress;
 }
 
 
@@ -151,6 +157,7 @@ export function SubscriptionFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'metadata': MetadataFromJSON(json['metadata']),
         'address': json['address'] == null ? undefined : json['address'],
         'beneficiary': json['beneficiary'] == null ? undefined : AccountAddressFromJSON(json['beneficiary']),
+        'admin': json['admin'] == null ? undefined : AccountAddressFromJSON(json['admin']),
     };
 }
 
@@ -175,6 +182,7 @@ export function SubscriptionFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'metadata': MetadataToJSON(value['metadata']),
         'address': value['address'],
         'beneficiary': AccountAddressToJSON(value['beneficiary']),
+        'admin': AccountAddressToJSON(value['admin']),
     };
 }
 

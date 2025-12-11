@@ -25,6 +25,7 @@ import { UnknownDesktopAction } from './UnknownAction';
 import { SimplePreviewDesktopAction } from './SimplePreviewDesktopAction';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 import { PurchaseDesktopAction } from './PurchaseDesktopAction';
+import { ExtensionDesktopActions } from './ExtensionDesktopActions';
 
 export const HistoryAction: FC<{
     action: Action;
@@ -52,7 +53,7 @@ export const HistoryAction: FC<{
         case 'JettonBurn':
             return <JettonBurnDesktopAction action={action} />;
         case 'JettonMint':
-            return <JettonMintDesktopAction action={action} />;
+            return <JettonMintDesktopAction action={action} isScam={isScam} />;
         case 'DepositStake':
             return <DepositStakeDesktopAction action={action} />;
         case 'WithdrawStake':
@@ -67,10 +68,18 @@ export const HistoryAction: FC<{
             return <PurchaseDesktopAction action={action} />;
         case 'Unknown':
             return <UnknownDesktopAction action={action} />;
-        case 'ElectionsDepositStake':
-        case 'ElectionsRecoverStake':
         case 'Subscribe':
         case 'UnSubscribe':
+            return <ExtensionDesktopActions action={action} isScam={isScam} />;
+        case 'ElectionsDepositStake':
+        case 'ElectionsRecoverStake':
+        case 'AddExtension':
+        case 'RemoveExtension':
+        case 'SetSignatureAllowedAction':
+        case 'GasRelay':
+        case 'DepositTokenStake':
+        case 'WithdrawTokenStakeRequest':
+        case 'LiquidityDeposit':
             return <SimplePreviewDesktopAction action={action} isScam={isScam} />;
         default: {
             assertUnreachableSoft(action.type);

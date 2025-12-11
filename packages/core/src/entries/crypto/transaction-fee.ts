@@ -8,7 +8,8 @@ export type TonTransactionFee = TransactionFeeTonAsset | TransactionFeeBattery;
 export type TronTransactionFee =
     | TransactionFeeTronAsset
     | TransactionFeeBattery
-    | TransactionFeeTonAssetRelayed;
+    | TransactionFeeTonAssetRelayed
+    | TransactionFeeFreeTransfer;
 
 export type TransactionFeeTonAsset = {
     type: 'ton-asset';
@@ -18,6 +19,10 @@ export type TransactionFeeTonAsset = {
 export type TransactionFeeBattery = {
     type: 'battery';
     charges: number;
+};
+
+export type TransactionFeeFreeTransfer = {
+    type: 'free-transfer';
 };
 
 export type TransactionFeeTronAsset = {

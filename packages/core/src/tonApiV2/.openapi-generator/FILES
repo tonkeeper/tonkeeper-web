@@ -35,6 +35,7 @@ models/Accounts.ts
 models/Action.ts
 models/ActionPhase.ts
 models/ActionSimplePreview.ts
+models/AddExtensionAction.ts
 models/AddressParse200Response.ts
 models/AddressParse200ResponseBounceable.ts
 models/ApyHistory.ts
@@ -104,6 +105,7 @@ models/DecodedMessageExtInMsgDecodedWalletV5.ts
 models/DecodedRawMessage.ts
 models/DecodedRawMessageMessage.ts
 models/DepositStakeAction.ts
+models/DepositTokenStakeAction.ts
 models/DnsExpiring.ts
 models/DnsExpiringItemsInner.ts
 models/DnsRecord.ts
@@ -193,6 +195,7 @@ models/JettonTransferPayload.ts
 models/JettonVerificationType.ts
 models/Jettons.ts
 models/JettonsBalances.ts
+models/LiquidityDepositAction.ts
 models/MarketTonRates.ts
 models/Message.ts
 models/MessageConsequences.ts
@@ -221,19 +224,23 @@ models/PoolImplementation.ts
 models/PoolImplementationType.ts
 models/PoolInfo.ts
 models/Price.ts
+models/Protocol.ts
 models/Purchase.ts
 models/PurchaseAction.ts
 models/RawBlockchainConfig.ts
 models/ReducedBlock.ts
 models/ReducedBlocks.ts
 models/Refund.ts
+models/RemoveExtensionAction.ts
 models/Risk.ts
 models/Sale.ts
+models/ScaledUI.ts
 models/SendBlockchainMessageRequest.ts
 models/SendRawMessage200Response.ts
 models/SendRawMessageRequest.ts
 models/Seqno.ts
 models/ServiceStatus.ts
+models/SetSignatureAllowedAction.ts
 models/SignRawMessage.ts
 models/SignRawParams.ts
 models/SizeLimitsConfig.ts
@@ -267,6 +274,7 @@ models/ValidatorsSet.ts
 models/ValidatorsSetListInner.ts
 models/ValueFlow.ts
 models/ValueFlowJettonsInner.ts
+models/VaultDepositInfo.ts
 models/Wallet.ts
 models/WalletDNS.ts
 models/WalletPlugin.ts
@@ -274,6 +282,7 @@ models/WalletStats.ts
 models/Wallets.ts
 models/WithdrawStakeAction.ts
 models/WithdrawStakeRequestAction.ts
+models/WithdrawTokenStakeRequestAction.ts
 models/WorkchainDescr.ts
 models/index.ts
 runtime.ts

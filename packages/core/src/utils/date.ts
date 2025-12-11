@@ -62,3 +62,60 @@ export function toStructTimeLeft(ms: number): {
         seconds
     };
 }
+
+export type DateSerialized<T> = T extends Date
+    ? { __date: string }
+    : T extends Array<infer U>
+    ? DateSerialized<U>[]
+    : T extends object
+    ? { [K in keyof T]: DateSerialized<T[K]> }
+    : T;
+
+export function serializeDates<T>(obj: T): DateSerialized<T> {
+    const visit = (value: unknown): unknown => {
+        if (value instanceof Date) {
+            return { __date: value.toISOString() };
+        }
+
+        if (Array.isArray(value)) {
+            return value.map(visit);
+        }
+
+        if (value !== null && typeof value === 'object') {
+            return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, visit(v)]));
+        }
+
+        return value;
+    };
+
+    return visit(obj) as DateSerialized<T>;
+}
+
+export function deserializeDates<T>(obj: DateSerialized<T> | null): T | null {
+    const visit = (value: unknown): unknown => {
+        if (value === null || value === undefined) {
+            return value;
+        }
+
+        if (typeof value === 'object') {
+            if (
+                !Array.isArray(value) &&
+                Object.keys(value).length === 1 &&
+                '__date' in value &&
+                typeof value.__date === 'string'
+            ) {
+                return new Date(value.__date);
+            }
+
+            if (Array.isArray(value)) {
+                return value.map(visit);
+            }
+
+            return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, visit(v)]));
+        }
+
+        return value;
+    };
+
+    return obj === null ? null : (visit(obj) as T);
+}

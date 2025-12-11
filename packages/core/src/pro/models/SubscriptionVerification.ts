@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CryptoCurrency } from './CryptoCurrency';
+import type { SubscriptionExtension } from './SubscriptionExtension';
 import type { SubscriptionSource } from './SubscriptionSource';
 export type SubscriptionVerification = {
     valid: boolean;
@@ -16,6 +17,8 @@ export type SubscriptionVerification = {
     used_trial: boolean;
     next_charge?: number;
     auth_token: string;
+    tron_free_transfers: number;
+    project_id?: number;
     source: SubscriptionSource;
     crypto?: {
         amount: string;
@@ -42,6 +45,7 @@ export type SubscriptionVerification = {
         status: SubscriptionVerification.status;
         auto_renew_status: boolean;
     };
+    extension?: SubscriptionExtension;
 };
 export namespace SubscriptionVerification {
     export enum status {

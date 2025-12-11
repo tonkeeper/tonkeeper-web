@@ -1,0 +1,399 @@
+{
+  "activityActionModal": {
+    "withdrawal_request": "Yêu cầu gỡ cọc"
+  },
+  "activity": {
+    "empty_transaction_caption": "Thực hiện giao dịch đầu tiên của bạn!",
+    "empty_transaction_title": "Lịch sử của bạn sẽ được hiển thị tại đây",
+    "failed_transaction": "Thất bại",
+    "screen_title": "Hoạt động"
+  },
+  "add_edit_favorite": {
+    "address_label": "Địa chỉ",
+    "add_title": "Mục yêu thích mới",
+    "delete": "Xóa",
+    "edit_title": "Chỉnh sửa mục ưa thích",
+    "name_placeholder": "Tên",
+    "save": "Lưu"
+  },
+  "address_copied": "Địa chỉ đã được sao chép",
+  "add_wallet": "Thêm ví",
+  "add_wallet_modal": {
+    "testnet": {
+      "subtitle": "Nhập ví bằng 24 từ khôi phục bí mật vào Testnet",
+      "title": "Tài khoản Testnet"
+    },
+    "watch_only": {
+      "subtitle": "Để theo dõi hoạt động ví mà không cần cụm từ khôi phục",
+      "title": "Tài khoản chỉ xem"
+    }
+  },
+  "add_watch_only": {
+    "title": "Tài khoản theo dõi"
+  },
+  "approval": {
+    "accepted": "Hiển thị",
+    "declined": "Đã từ chối",
+    "details_token": "Chi tiết token",
+    "id_collection": "ID bộ sưu tập",
+    "id_token": "ID token",
+    "name": "Tên",
+    "not_spam": "Không phải thư rác",
+    "spam": "Thư rác",
+    "unverified_token": "Mã thông báo chưa xác minh"
+  },
+  "balances_setup_wallet": "Thiết lập ví",
+  "battery": {
+    "other_ways": {
+      "by_crypto": {
+        "title": "Nạp tiền bằng {symbol}"
+      },
+      "gift": {
+        "subtitle": "Chia sẻ với bạn bè",
+        "title": "Quà tặng pin"
+      }
+    },
+    "packages": {
+      "disclaimer": "Một lần nạp đủ để trả phí giao dịch trung bình. Một số giao dịch có thể tốn nhiều hơn."
+    },
+    "please_wait": "Pin sẽ được sạc trong vài phút nữa",
+    "promocode": {
+      "title": "Mã khuyến mãi"
+    },
+    "recharge_by_crypto": {
+      "other": {
+        "subtitle": "Nhập số tiền thủ công",
+        "title": "Khác"
+      },
+      "title": "Nạp lại"
+    },
+    "title": "Pin Tonkeeper",
+    "transactions": {
+      "description": "Các giao dịch được chọn sẽ được thanh toán bằng pin Tonkeeper.",
+      "settings": "Cài đặt pin",
+      "title": "Giao dịch",
+      "types": {
+        "nft": "chuyển NFT"
+      },
+      "type": {
+        "swap": "trao đổi",
+        "transfer": "chuyển khoản"
+      }
+    }
+  },
+  "biometry": {
+    "default": "sinh trắc học",
+    "ios": {
+      "fingerprint": "Touch ID"
+    }
+  },
+  "browser": {
+    "actions": {
+      "copy_link": "Sao chép liên kết",
+      "refresh": "Làm mới",
+      "share": "Chia sẻ"
+    },
+    "apps_all": "Tất cả",
+    "connected": "Đã kết nối",
+    "title": "Trình duyệt"
+  },
+  "cancel": "Hủy",
+  "check_words_caption": "Để kiểm tra xem bạn đã ghi đúng cụm từ khôi phục hay chưa, vui lòng nhập từ thứ %{wordNum1}, %{wordNum2} và %{wordNum3}.",
+  "check_words_success": "Chúc mừng! Bạn đã thiết lập ví của mình",
+  "check_words_title": "Vậy, hãy kiểm tra",
+  "choose_wallets": {
+    "subtitle": "Chọn ví mà bạn muốn thêm.",
+    "title": "Chọn Ví"
+  },
+  "confirm": "Xác nhận",
+  "confirm_sending_fee": "Phí",
+  "confirm_sending_submit": "Xác nhận và gửi",
+  "confirm_sending_title": "Xác nhận gửi",
+  "confirmSendModal": {
+    "wallet": "Ví:"
+  },
+  "continue": "Tiếp tục",
+  "copied": "Đã sao chép",
+  "create_pin_current_title": "Nhập mã mật khẩu hiện tại",
+  "create_pin_new_title": "Tạo mã bảo mật mới",
+  "create_pin_repeat_title": "Nhập lại mã bảo mật",
+  "create_wallet_caption": "Chúng tôi khuyến nghị bạn nên ghi lại cụm từ khôi phục vì đây là cách duy nhất để truy cập và khôi phục ví của bạn trong trường hợp bạn làm mất thiết bị. Đừng gửi cụm từ này cho chính mình qua email hoặc chụp ảnh màn hình. Giữ chúng ngoại tuyến sẽ an toàn hơn.",
+  "create_wallet_generated": "Ví của bạn vừa mới được tạo!",
+  "create_wallet_generating": "Đang tạo ví...",
+  "create_wallet_title": "Lấy một cây bút và một tờ giấy",
+  "customize": "Tùy chỉnh",
+  "customize_modal": {
+    "subtitle": "Tên và biểu tượng ví được lưu trữ cục bộ trên thiết bị của bạn.",
+    "title": "Tùy chỉnh Ví của bạn"
+  },
+  "dns_address_linked": "Địa chỉ đã liên kết",
+  "dns_address_unlinked": "Địa chỉ đã hủy liên kết",
+  "dns_current_address": "Địa chỉ hiện tại của bạn",
+  "dns_expiration_date": "Ngày hết hạn",
+  "dns_renew_toast_success": "Tên miền đã được gia hạn",
+  "dns_renew_until_btn": "Gia hạn đến {untilDate}",
+  "exchange_method_dont_show_again": "Không hiển thị lại",
+  "exchange_method_open_warning": "Bạn đang mở một ứng dụng bên ngoài không do Tonkeeper vận hành.",
+  "exchange_modal": {
+    "other_ways_to_buy": "Các cách mua khác"
+  },
+  "exchange_other_ways": "Các cách khác để mua hoặc bán TON",
+  "exchange_title": "Mua TON",
+  "import_add_wallet": "Thêm ví",
+  "import_add_wallet_description": "Tạo ví mới hoặc thêm ví hiện có.",
+  "import_existing_wallet": "Ví hiện có",
+  "import_existing_wallet_description": "Nhập ví bằng 24 từ khôi phục bí mật",
+  "import_new_wallet": "Ví mới",
+  "import_new_wallet_description": "Tạo ví mới",
+  "import_signer": "Ghép đôi với Người ký",
+  "import_signer_description": "Hoàn toàn ngoại tuyến, cách ly mạng (air-gapped), đầy đủ tất cả các tính năng của TON",
+  "import_wallet_caption": "Để khôi phục quyền truy cập vào ví của bạn, hãy nhập 24 từ khóa khôi phục bí mật đã được cung cấp cho bạn khi bạn tạo ví.",
+  "import_wallet_title": "Nhập cụm từ khôi phục của bạn",
+  "import_wallet_wrong_words_err": "Cụm từ không chính xác",
+  "info_about_inactive_back": "Quay lại",
+  "intro_continue_btn": "Bắt đầu",
+  "intro_item1_caption": "Nhờ kiến trúc độc đáo của The Open Network, các giao dịch TON được xử lý chỉ trong vài giây.",
+  "intro_item1_title": "Tốc độ đẳng cấp thế giới",
+  "intro_item2_caption": "Tonkeeper lưu trữ các khóa mã hóa của bạn trên thiết bị của bạn. Tất cả các giao dịch đều được thực hiện thông qua các giao thức phi tập trung nên tiền điện tử của bạn không bao giờ rơi vào tay các sàn giao dịch tập trung.",
+  "intro_item2_title": "Bảo mật đầu-cuối",
+  "intro_title": "Chào mừng\nđến với ",
+  "jetton_id": "ID mã thông báo: {jettonAddress}",
+  "jettons_list_title": "Token",
+  "later": "Sau này",
+  "ledger": {
+    "operation_not_supported": "Thao tác này không khả dụng cho ví Ledger. Vui lòng chọn ví khác và thử lại."
+  },
+  "legal_font_license": "Phông chữ Montserrat",
+  "legal_header_title": "Pháp lý",
+  "legal_licenses_title": "Giấy phép",
+  "legal_privacy": "Chính sách bảo mật",
+  "legal_terms": "Điều khoản dịch vụ",
+  "loading": "Đang tải",
+  "migration": {
+    "with_passcode": "Nhập mã bảo vệ"
+  },
+  "nft_about_collection": "Về bộ sưu tập",
+  "nft_actions": {
+    "hide_and_report": "Ẩn và báo cáo spam",
+    "hide": {
+      "nft": "Ẩn NFT"
+    },
+    "view_on_explorer": "Xem trên Tonviewer"
+  },
+  "nft_collection": "Bộ sưu tập",
+  "nft_contract_address": "Địa chỉ hợp đồng",
+  "nft_deploy_collection_title": "Tạo bộ sưu tập NFT",
+  "nft_details": "Chi tiết",
+  "nft_link_domain_button": "Liên kết tên miền",
+  "nft_link_username_button": "Liên kết tên",
+  "nft_more": "Thêm",
+  "nft_on_sale": "Đang bán",
+  "nft_on_sale_text": "NFT đang được bán trên thị trường hiện tại. Để chuyển nhượng, bạn cần gỡ nó khỏi mục bán trước tiên.",
+  "nft_open_in_marketplace": "Xem trên Thị trường NFT",
+  "nft_owner_address": "Chủ sở hữu",
+  "nft_single_nft": "NFT đơn lẻ",
+  "nft_transfer_nft": "Chuyển NFT",
+  "nft_transfer": {
+    "title": "Chuyển nhượng NFT"
+  },
+  "nft_transfer_title": "Chuyển NFT",
+  "nft_unlink_domain_button": "Được liên kết với '{{'address'}}'",
+  "nft_view_in_explorer": "Xem trong trình khám phá",
+  "notifications": {
+    "alert": {
+      "cancel": "Hủy"
+    }
+  },
+  "pairSigner": {
+    "open_signer": "Mở Signer trên thiết bị này"
+  },
+  "paste": "Dán",
+  "purchases": {
+    "screen_title": "Mua hàng"
+  },
+  "receiveModal": {
+    "copy": "Sao chép"
+  },
+  "recovery_phrase": {
+    "copy_button": "Sao chép"
+  },
+  "reminder_notifications_caption": "Nhận thông báo khi bạn nhận được TON, token và NFT.",
+  "reminder_notifications_enable_button": "Bật thông báo",
+  "reminder_notifications_later_button": "Sau này",
+  "reminder_notifications_title": "Nhận thông báo tức thì",
+  "scan_qr_title": "Quét mã QR",
+  "secret_words_caption": "Ghi lại 24 từ này theo thứ tự dưới đây và cất giữ chúng ở một nơi bí mật, an toàn.",
+  "secret_words_title": "Cụm từ khôi phục của bạn",
+  "security_change_passcode": "Đổi mã truy cập",
+  "select_wallet_for_authorization": "Chọn Ví để xác thực",
+  "send_fee_estimation_error": "Không thể tính phí",
+  "send_publish_tx_error": "Gửi giao dịch thất bại",
+  "send_screen_steps": {
+    "address": {
+      "delete_alert_text": "Bạn có chắc chắn muốn xóa «{name}» khỏi danh sách yêu thích của mình không?",
+      "suggest_actions": {
+        "add": "Thêm vào mục yêu thích",
+        "delete": "Xóa",
+        "hide": "Ẩn"
+      },
+      "suggests_label": "Yêu thích và gần đây"
+    },
+    "amount": {
+      "insufficient_balance": "Số dư không đủ",
+      "max": "TỐI ĐA",
+      "remaining": "Có sẵn: {amount}"
+    },
+    "comfirm": {
+      "comment_required_text": "Khi gửi, hãy đảm bảo bao gồm ghi chú hoặc mã tag từ sàn giao dịch. Nếu không có, tiền của bạn sẽ không được nạp và có thể bị mất.",
+      "title": "Xác nhận hành động",
+      "wallet": "Ví"
+    },
+    "done": {
+      "done_label": "Hoàn tất",
+      "to": "Tới: {name}"
+    }
+  },
+  "send_sending_wrong_time_description": "Bật tự động cập nhật ngày và giờ trong cài đặt thiết bị của bạn. Sau đó thử chuyển lại.",
+  "settings_backup_seed": "Sao lưu",
+  "settings_contact_support": "Liên hệ với chúng tôi",
+  "settings_delete_account": "Xóa tài khoản",
+  "settings_jettons_list": "Token",
+  "settings_legal_documents": "Tài liệu pháp lý",
+  "settings_network_alert_title": "Chọn mạng",
+  "settings_news": "Tin tức Tonkeeper",
+  "settings_notifications": "Thông báo",
+  "settings_primary_currency": "Tiền tệ",
+  "settings_rate": "Đánh giá Tonkeeper",
+  "settings_recovery_phrase": "Cụm từ khôi phục",
+  "settings_reset": "Đăng xuất",
+  "settings_reset_alert_title": "\uD83D\uDEA7 \uD83D\uDEA8 Đăng xuất? \uD83D\uDEA8 \uD83D\uDEA7",
+  "settings_reset_alert_title_all": "Đăng xuất khỏi tất cả các ví?",
+  "settings_search_engine": "Tìm kiếm",
+  "settings_security": "Bảo mật",
+  "settings_support": "Hỗ trợ",
+  "settings_title": "Cài đặt",
+  "settings_version": "Phiên bản",
+  "settings_wallet_version": "Địa chỉ hoạt động",
+  "signer_scan_result": "Quét giao dịch đã ký",
+  "signer_scan_tx_description": "Vui lòng mở Signer và quét mã QR với giao dịch",
+  "spam_action": "Thư rác",
+  "staking": {
+    "deposit": "Gửi tiền",
+    "details": {
+      "pool_address": {
+        "label": "Địa chỉ pool"
+      }
+    },
+    "withdraw": "Rút tiền"
+  },
+  "start_screen": {
+    "create_wallet_button": "Tạo ví mới",
+    "import_wallet_button": "Nhập ví hiện có"
+  },
+  "success": "Thành công!",
+  "suspicious": {
+    "buttons": {
+      "not_spam": "Không phải thư rác",
+      "report": "Báo cáo spam"
+    },
+    "label": {
+      "full": "NFT chưa được xác minh",
+      "short": "Chưa xác minh"
+    },
+    "status_update": {
+      "hidden": {
+        "collection": "Bộ sưu tập đã ẩn",
+        "nft": "NFT ẩn"
+      },
+      "spam": {
+        "collection": "Bộ sưu tập được đánh dấu là thư rác",
+        "nft": "NFT được đánh dấu là thư rác"
+      }
+    }
+  },
+  "suspiciousNFTDetails": {
+    "buttons": {
+      "not_spam": "Không phải thư rác",
+      "report": "Báo cáo thư rác"
+    },
+    "paragraphs": {
+      "p1": "Được sử dụng để gửi thư rác. Được dùng để gửi các tin nhắn không mong muốn và thường không liên quan trên quy mô lớn.",
+      "p2": "Được sử dụng cho lừa đảo. Tên, mô tả hoặc hình ảnh của NFT có thể khiến người dùng bị lừa dối.",
+      "p3": "Chúng tôi biết rất ít về tác giả và lịch sử của NFT này."
+    },
+    "subtitle": "NFT có thể không an toàn để sử dụng vì một trong những lý do sau.",
+    "title": "NFT chưa được xác minh"
+  },
+  "swap_title": "Hoán đổi",
+  "today": "Hôm nay",
+  "tokenDetails": {
+    "tonviewer_button": "Xem trên Tonviewer"
+  },
+  "tonkeeper_pro": "Tonkeeper Pro",
+  "tonkeeper_pro_description": "Gói đăng ký Tonkeeper Pro đi kèm với tính năng ví mở rộng, cung cấp bộ công cụ quản lý tiền điện tử.",
+  "ton_login_caption": "{name} đang yêu cầu quyền truy cập vào địa chỉ ví của bạn",
+  "ton_login_connect_button": "Kết nối ví",
+  "ton_login_notice": "Hãy chắc chắn kiểm tra địa chỉ dịch vụ trước khi kết nối ví.",
+  "ton_login_success": "Hoàn thành",
+  "transaction_bid_dns": "Tên",
+  "transactionDetails": {
+    "comment": "Bình luận",
+    "operation": "Hoạt động",
+    "recipient": "Người nhận"
+  },
+  "transaction_fee": "Phí",
+  "transaction_hash": "Giao dịch",
+  "transaction_merchant": "Thương nhân",
+  "transaction_receive_date": "Đã nhận vào ngày {date}",
+  "transaction_recipient": "Người nhận",
+  "transaction_recipient_address": "Địa chỉ người nhận",
+  "transactions": {
+    "burned": "Bị đốt cháy",
+    "failed": "Thất bại",
+    "nft_purchase": "Mua NFT",
+    "smartcontract_exec": "Gọi hợp đồng",
+    "spam": "Thư rác",
+    "swap": "Hoán đổi",
+    "unknown": "Không xác định",
+    "unknown_description": "Đã có chuyện xảy ra nhưng chúng tôi không thể nhận ra"
+  },
+  "transaction_sender": "Người gửi",
+  "transaction_sender_address": "Địa chỉ người gửi",
+  "transaction_sent_date": "Đã gửi vào ngày {date}",
+  "transaction_type_bid": "Đấu giá",
+  "transaction_type_contract_deploy": "Triển khai hợp đồng",
+  "transaction_type_pending": "Đang chờ xử lý",
+  "transaction_type_receive": "Đã nhận",
+  "transaction_type_sent": "Đã gửi",
+  "transaction_type_subscription": "Đã đăng ký",
+  "transaction_type_unsubscription": "Đã hủy đăng ký",
+  "transaction_type_wallet_initialized": "Ví đã được khởi tạo",
+  "txActions": {
+    "amount": "Số tiền",
+    "fee": "Phí",
+    "refund": "Hoàn tiền",
+    "signRaw": {
+      "comment": "Bình luận",
+      "recipient": "Người nhận",
+      "title": "Xác nhận giao dịch",
+      "types": {
+        "jettonTransfer": "Chuyển token",
+        "nftItemTransfer": "Chuyển NFT",
+        "tonTransfer": "Chuyển khoản TON",
+        "unknownTransaction": "Giao dịch không xác định"
+      }
+    }
+  },
+  "wallet_buy": "Mua",
+  "wallet": {
+    "collectibles_tab_lable": "Vật phẩm sưu tầm",
+    "scan_btn": "Quét"
+  },
+  "wallet_receive": "Nhận",
+  "wallets": "Ví",
+  "wallet_sell": "Bán",
+  "wallet_send": "Gửi",
+  "wallet_swap": "Hoán đổi",
+  "wallet_title": "Ví",
+  "yesterday": "Hôm qua"
+}

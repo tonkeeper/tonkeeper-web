@@ -70,7 +70,7 @@ export const BatteryCustomAmountInput: FC<{
             {
                 id: 'charge_unit',
                 label: <FlashIconAdaptive />,
-                decimals: 2
+                decimals: 0
             }
         ],
         [asset.symbol, asset.decimals]
@@ -118,7 +118,9 @@ export const BatteryCustomAmountInput: FC<{
             const willGetBatteryUnits = value
                 .div(unitToTokenRate)
                 .minus(shouldReserveAmount.batteryUnits);
-            return willGetBatteryUnits.lt(0) ? new BigNumber(0) : willGetBatteryUnits;
+            return willGetBatteryUnits.lt(0)
+                ? new BigNumber(0)
+                : willGetBatteryUnits.integerValue(BigNumber.ROUND_DOWN);
         }
 
         return value.plus(shouldReserveAmount.batteryUnits).multipliedBy(unitToTokenRate);

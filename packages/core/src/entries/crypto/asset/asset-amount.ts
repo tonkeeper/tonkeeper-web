@@ -4,12 +4,20 @@ import { getDecimalSeparator, getGroupSeparator } from '../../../utils/formattin
 import { Asset } from './asset';
 import { BasicAsset } from './basic-asset';
 import { IAssetAmount } from './i-asset-amount';
+import { toBigInt } from './utils';
+import { ScaledUIMultiplier } from './scaled-ui';
 
-type AssetAmountStruct<T extends BasicAsset> = {
-    asset: T;
-    weiAmount: BigNumber.Value;
-    image?: string;
-};
+type AssetAmountStruct<T extends BasicAsset> =
+    | {
+          asset: T;
+          weiAmount: BigNumber.Value;
+          image?: string;
+      }
+    | {
+          asset: T;
+          relativeAmount: BigNumber.Value;
+          image?: string;
+      };
 
 const formatter = new AmountFormatter({
     getLocaleFormat: () => ({
@@ -28,8 +36,28 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
     }): AssetAmount<T> {
         return new AssetAmount({
             asset,
-            weiAmount: new BigNumber(amount).multipliedBy(10 ** asset.decimals)
+            relativeAmount: amount
         });
+    }
+
+    private static toScalingUIAmount(
+        amount: BigNumber.Value,
+        scaledUIMultiplier: ScaledUIMultiplier | { numerator: string; denominator: string }
+    ): bigint {
+        return (
+            (toBigInt(amount) * toBigInt(scaledUIMultiplier.numerator)) /
+            toBigInt(scaledUIMultiplier.denominator)
+        );
+    }
+
+    private static fromScalingUIAmount(
+        scaledUIAmount: BigNumber.Value,
+        scaledUIMultiplier: ScaledUIMultiplier | { numerator: string; denominator: string }
+    ): bigint {
+        return (
+            (toBigInt(scaledUIAmount) * toBigInt(scaledUIMultiplier.denominator)) /
+            toBigInt(scaledUIMultiplier.numerator)
+        );
     }
 
     public readonly weiAmount: BigNumber;
@@ -60,12 +88,31 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
         return this.weiAmount.toFixed(0);
     }
 
-    constructor({ weiAmount, asset, image }: AssetAmountStruct<T>) {
-        this.weiAmount = new BigNumber(weiAmount);
-        this.asset = asset;
-        this.image = image || asset.image;
+    constructor(params: AssetAmountStruct<T>) {
+        this.asset = params.asset;
+        this.image = params.image || params.asset.image;
 
-        this.relativeAmount = this.weiAmount.div(10 ** this.asset.decimals);
+        if ('weiAmount' in params) {
+            this.weiAmount = new BigNumber(params.weiAmount);
+            this.relativeAmount = new BigNumber(
+                AssetAmount.toScalingUIAmount(
+                    this.weiAmount,
+                    this.asset.scaledUIMultiplier
+                ).toString()
+            ).div(10 ** this.asset.decimals);
+        } else {
+            const decimals = params.asset.decimals;
+            this.relativeAmount = new BigNumber(params.relativeAmount).decimalPlaces(
+                decimals,
+                BigNumber.ROUND_DOWN
+            );
+            this.weiAmount = new BigNumber(
+                AssetAmount.fromScalingUIAmount(
+                    this.relativeAmount.multipliedBy(10 ** decimals),
+                    params.asset.scaledUIMultiplier
+                ).toString()
+            );
+        }
     }
 
     public isEQ(assetAmount: IAssetAmount): boolean {

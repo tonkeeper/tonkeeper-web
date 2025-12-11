@@ -4,6 +4,7 @@ import { TonAsset } from './ton-asset';
 import { TronAsset } from './tron-asset';
 import { Address } from '@ton/core';
 import { JettonVerificationType } from '../../../tonApiV2';
+import { scaledUIMultiplierOne } from './scaled-ui';
 
 const usdtAddress = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
 
@@ -15,7 +16,8 @@ export const TRON_USDT_ASSET: TronAsset = {
     address: usdtAddress,
     blockchain: BLOCKCHAIN_NAME.TRON,
     noImageCorners: true,
-    image: 'https://wallet.tonkeeper.com/img/usdt-trc20.png'
+    image: 'https://wallet.tonkeeper.com/img/usdt-trc20.png',
+    scaledUIMultiplier: scaledUIMultiplierOne
 };
 
 export const TRON_TRX_ASSET: TronAsset = {
@@ -25,7 +27,8 @@ export const TRON_TRX_ASSET: TronAsset = {
     decimals: 6,
     address: 'TRX',
     blockchain: BLOCKCHAIN_NAME.TRON,
-    image: 'https://wallet.tonkeeper.com/img/trx.svg'
+    image: 'https://wallet.tonkeeper.com/img/trx.svg',
+    scaledUIMultiplier: scaledUIMultiplierOne
 };
 
 export const TON_ASSET: TonAsset = {
@@ -36,7 +39,8 @@ export const TON_ASSET: TonAsset = {
     address: 'TON',
     blockchain: BLOCKCHAIN_NAME.TON,
     image: 'https://wallet.tonkeeper.com/img/toncoin.svg',
-    verification: JettonVerificationType.Whitelist
+    verification: JettonVerificationType.Whitelist,
+    scaledUIMultiplier: scaledUIMultiplierOne
 };
 
 export const TON_USDT_ASSET = {
@@ -51,7 +55,8 @@ export const TON_USDT_ASSET = {
     blockchain: BLOCKCHAIN_NAME.TON,
     image: 'https://wallet.tonkeeper.com/img/usdt-ton.png',
     noImageCorners: true,
-    verification: JettonVerificationType.Whitelist
+    verification: JettonVerificationType.Whitelist,
+    scaledUIMultiplier: scaledUIMultiplierOne
 } satisfies TonAsset;
 
 export const KNOWN_TON_ASSETS = {

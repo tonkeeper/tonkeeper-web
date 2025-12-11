@@ -36,6 +36,7 @@ import {
 
 export interface DnsResolveRequest {
     domainName: string;
+    filter?: boolean;
 }
 
 export interface GetAllAuctionsRequest {
@@ -60,6 +61,7 @@ export interface DNSApiInterface {
     /**
      * DNS resolve for domain name
      * @param {string} domainName domain name with .ton or .t.me
+     * @param {boolean} [filter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DNSApiInterface
@@ -132,6 +134,10 @@ export class DNSApi extends runtime.BaseAPI implements DNSApiInterface {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['filter'] != null) {
+            queryParameters['filter'] = requestParameters['filter'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

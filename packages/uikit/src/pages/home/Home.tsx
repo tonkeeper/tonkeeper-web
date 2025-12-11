@@ -12,6 +12,7 @@ import { usePreFetchRates } from '../../state/rates';
 import { useWalletFilteredNftList } from '../../state/nft';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { MobileCancelLegacySubscriptionBanner } from '../../components/legacy-plugins/MobileCancelLegacySubscriptionBanner';
 
 const HomeAssets: FC<{
     assets: AssetAmount[];
@@ -41,6 +42,7 @@ const Home = () => {
 
     return (
         <>
+            <MobileCancelLegacySubscriptionBanner />
             <Balance error={error} isFetching={isLoading} />
             <HomeActions chain={BLOCKCHAIN_NAME.TON} />
             <HomeAssets assets={assets} nfts={nfts} />

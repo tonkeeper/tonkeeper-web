@@ -323,19 +323,6 @@ const signDataRpcRequestSchema = z.object({
 });
 export type SignDataRpcRequest = z.infer<typeof signDataRpcRequestSchema>;
 
-const signDataRequestPayloadTextSchema = z.object({
-    network: tonConnectNetworkSchema.optional(),
-    from: rawAddressSchema.optional(),
-    type: z.literal('text'),
-    text: z.string()
-});
-export type SignDataRequestPayloadText = z.infer<typeof signDataRequestPayloadTextSchema>;
-
-export const sendRequestPayloadSchema = z.union([
-    transactionRequestPayloadSchema,
-    signDataRequestPayloadTextSchema
-]);
-
 const signDataRequestPayloadBinarySchema = z.object({
     network: tonConnectNetworkSchema.optional(),
     from: rawAddressSchema.optional(),
@@ -352,6 +339,21 @@ const signDataRequestPayloadCellSchema = z.object({
     cell: z.string() // base64 string
 });
 export type SignDataRequestPayloadCell = z.infer<typeof signDataRequestPayloadCellSchema>;
+
+const signDataRequestPayloadTextSchema = z.object({
+    network: tonConnectNetworkSchema.optional(),
+    from: rawAddressSchema.optional(),
+    type: z.literal('text'),
+    text: z.string()
+});
+export type SignDataRequestPayloadText = z.infer<typeof signDataRequestPayloadTextSchema>;
+
+export const sendRequestPayloadSchema = z.union([
+    transactionRequestPayloadSchema,
+    signDataRequestPayloadTextSchema,
+    signDataRequestPayloadBinarySchema,
+    signDataRequestPayloadCellSchema
+]);
 
 export const signDataRequestPayloadSchema = z.union([
     signDataRequestPayloadTextSchema,

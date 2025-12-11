@@ -14,6 +14,7 @@ export const isTronSenderOption = (option: AllChainsSenderOptions): option is Tr
         case TRON_SENDER_TYPE.BATTERY:
         case TRON_SENDER_TYPE.TRX:
         case TRON_SENDER_TYPE.TON_ASSET:
+        case TRON_SENDER_TYPE.FREE_PRO:
             return true;
         default:
             assertUnreachableSoft(option);

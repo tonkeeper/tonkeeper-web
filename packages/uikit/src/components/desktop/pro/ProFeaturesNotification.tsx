@@ -7,7 +7,7 @@ import {
     NotificationFooter,
     NotificationFooterPortal
 } from '../../Notification';
-import { Body2, Body3, Label2 } from '../../Text';
+import { Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { handleSubmit } from '../../../libs/form';
 import { useTranslation } from '../../../hooks/translation';
@@ -24,6 +24,9 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { usePrimarySubscriptionSource } from '../../../hooks/usePrimarySubscriptionSource';
+import { useFormattedProPrice } from '../../../hooks/pro/useFormattedProPrice';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -65,7 +68,14 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         onOpen: onTrialModalOpen
     } = useDisclosure();
 
-    const { data: products, isError, isLoading: isProPlanLoading, refetch } = useProPlans();
+    const { primarySource } = usePrimarySubscriptionSource();
+
+    const {
+        data: displayPlans,
+        isError,
+        isLoading: isProPlanLoading,
+        refetch
+    } = useProPlans(primarySource);
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
     const handleProAuth = () => {
@@ -87,7 +97,6 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     };
 
     const { removeButtonsBlock } = onOpenProps ?? {};
-    const displayPlans = products?.plans ?? [];
     const isButtonsBlockVisible = !removeButtonsBlock && !isValidSubscription(subscription);
 
     return (
@@ -103,6 +112,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                     <NotificationFooter>
                         <ButtonsBlockStyled
                             formId={formId}
+                            primarySource={primarySource}
                             isError={isError}
                             isLoading={isProPlanLoading}
                             displayPlans={displayPlans}
@@ -119,6 +129,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
 
 interface IButtonBlock {
     formId: string;
+    primarySource: SubscriptionSource;
     onTrial?: () => void;
     className?: string;
     isError: boolean;
@@ -127,34 +138,42 @@ interface IButtonBlock {
 }
 
 const ButtonsBlock: FC<IButtonBlock> = props => {
-    const { formId, onTrial, className, isError, isLoading, displayPlans } = props;
+    const { formId, onTrial, className, isError, isLoading, displayPlans, primarySource } = props;
+
     const { t } = useTranslation();
 
-    const filteredPlan = displayPlans?.filter(p => p.formattedDisplayPrice !== '-')?.[0];
+    const isIos = primarySource === SubscriptionSource.IOS;
+    const { price, subscriptionPeriod } = displayPlans[0] || {};
 
-    const { formattedDisplayPrice, subscriptionPeriod } = filteredPlan || {};
+    const { displayPrice, fiatEquivalent } = useFormattedProPrice(price);
+
+    const isPrimaryLoading = !isError && (isLoading || (isIos ? !displayPrice : !fiatEquivalent));
 
     return (
         <div className={className}>
-            <SubmitButtonStyled
+            <Button
                 primary
                 fullWidth
                 size="large"
                 type="submit"
                 form={formId}
-                loading={isLoading}
+                loading={isPrimaryLoading}
             >
                 <Label2>
-                    {t(isError ? 'try_again' : 'continue_for')}
-                    {!isError && ` ${formattedDisplayPrice} / ${subscriptionPeriod}`}
+                    {t(isError ? 'try_again' : 'continue_from')}
+                    {!isError &&
+                        ` ${isIos ? displayPrice : fiatEquivalent} / ${t(subscriptionPeriod)}`}
                 </Label2>
-                {!isError && <Body3>{t('restore_subscription')}</Body3>}
-            </SubmitButtonStyled>
+            </Button>
+
+            <Button fullWidth secondary type="submit" form={formId}>
+                <Label2>{t('restore_subscription')}</Label2>
+            </Button>
 
             <HideOnReview>
                 {onTrial && (
                     <Button fullWidth secondary onClick={onTrial}>
-                        <Body2>{t('start_free_trial')}</Body2>
+                        <Label2>{t('start_free_trial')}</Label2>
                     </Button>
                 )}
             </HideOnReview>
@@ -184,12 +203,6 @@ const ButtonsBlockStyled = styled(ButtonsBlock)`
     display: flex;
     flex-direction: column;
     gap: 8px;
-`;
-
-const SubmitButtonStyled = styled(Button)`
-    display: flex;
-    flex-direction: column;
-    gap: 0;
 `;
 
 const CloseButtonStyled = styled.button`

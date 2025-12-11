@@ -25,14 +25,16 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import {
+    AccountWallet,
+    getWalletsFromAccount,
+    IMetaEncryptionData,
     isStandardTonWallet,
+    MetaEncryptionSerializedMap,
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
-    WalletVersion,
-    AccountWallet,
-    getWalletsFromAccount,
-    WalletsTransform
+    WalletsTransform,
+    WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConfig,
@@ -68,13 +70,18 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
+import {
+    createAndStoreMetaEncryptionKeys,
+    getAccountSecret,
+    getPasswordByNotification,
+    useGetActiveAccountSecret
+} from './mnemonic';
 import {
     encryptWalletSecret,
     seeIfMnemonicValid,
     walletSecretToString
 } from '@tonkeeper/core/dist/service/mnemonicService';
-import { useAccountsStateQuery, useAccountsState } from './accounts';
+import { useAccountsState, useAccountsStateQuery } from './accounts';
 import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
 import { useRemoveAccountTwoFAData } from './two-fa';
@@ -91,6 +98,8 @@ import { subject } from '@tonkeeper/core/dist/entries/atom';
 import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { metaEncryptionMapSerializer } from '@tonkeeper/core/dist/utils/metadata';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -121,7 +130,7 @@ export const useActiveWallet = () => {
     return account.activeTonWallet;
 };
 
-export const useAccountWallets = (transform?: WalletsTransform): AccountWallet[] => {
+export const useProCompatibleAccountsWallets = (transform?: WalletsTransform): AccountWallet[] => {
     const accounts = useAccountsState().filter(
         (acc): acc is AccountTonMnemonic | AccountMAM =>
             seeIfMainnnetAccount(acc) && (acc.type === 'mnemonic' || acc.type === 'mam')
@@ -245,6 +254,7 @@ export const useCreateMAMAccountDerivation = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
     const tronApi = useTronApi();
     const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
@@ -298,6 +308,12 @@ export const useCreateMAMAccountDerivation = () => {
         authBattery({
             signer: tonProofSignerByTonMnemonic(tonAccount.mnemonics, 'ton'),
             wallet: tonWallets[0]
+        });
+
+        mutateMetaEncryptionKey({
+            wallet: account.activeTonWallet,
+            account,
+            mnemonic
         });
 
         await storage.updateAccountInState(account);
@@ -580,6 +596,7 @@ export const useCreateAccountMnemonic = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabled = useIsTronEnabledGlobally();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
 
     return useMutation<
         AccountTonMnemonic,
@@ -631,6 +648,12 @@ export const useCreateAccountMnemonic = () => {
                 wallet: account.activeTonWallet
             });
 
+            mutateMetaEncryptionKey({
+                wallet: account.activeTonWallet,
+                account,
+                mnemonic
+            });
+
             return account;
         }
 
@@ -661,6 +684,12 @@ export const useCreateAccountMnemonic = () => {
         authBattery({
             signer: tonProofSignerByTonMnemonic(mnemonic, mnemonicType),
             wallet: account.activeTonWallet
+        });
+
+        mutateMetaEncryptionKey({
+            wallet: account.activeTonWallet,
+            account,
+            mnemonic
         });
 
         return account;
@@ -735,6 +764,7 @@ export const useCreateAccountMAM = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const tronApi = useTronApi();
     const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
@@ -806,6 +836,12 @@ export const useCreateAccountMAM = () => {
 
             authBatteryForAllChildren(account);
 
+            mutateMetaEncryptionKey({
+                wallet: account.activeTonWallet,
+                account,
+                mnemonic
+            });
+
             return { account, childrenMnemonics };
         }
 
@@ -828,6 +864,12 @@ export const useCreateAccountMAM = () => {
         }
 
         authBatteryForAllChildren(account);
+
+        mutateMetaEncryptionKey({
+            wallet: account.activeTonWallet,
+            account,
+            mnemonic
+        });
 
         return { account, childrenMnemonics };
     });
@@ -1355,3 +1397,75 @@ export function getAccountWalletNameAndEmoji(account: Account, walletId?: Wallet
         emoji
     };
 }
+
+export const useMetaEncryptionData = () => {
+    const sdk = useAppSdk();
+
+    return useQuery<Record<string, IMetaEncryptionData> | null, Error>(
+        [QueryKey.metaEncryptionData],
+        async () => {
+            return sdk.storage
+                .get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)
+                .then(metaEncryptionMapSerializer);
+        }
+    );
+};
+
+export const useMutateMetaKeyAndCertificates = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation<
+        void,
+        Error,
+        {
+            wallet: TonWalletStandard;
+            account: Account;
+            mnemonic?: string[];
+        }
+    >(async ({ wallet, account, mnemonic }) => {
+        let seedPrase = mnemonic;
+
+        if (!seedPrase) {
+            const secret = await getAccountSecret(sdk, account.id);
+
+            if (secret.type !== 'mnemonic') {
+                throw new Error('Unable to get a seed phrase!');
+            }
+
+            seedPrase = secret.mnemonic;
+        }
+
+        if (account.type === 'mam') {
+            const limitedDerivations = account.derivations.slice(0, 5);
+
+            const root = await TonKeychainRoot.fromMnemonic(seedPrase, {
+                allowLegacyMnemonic: true
+            });
+
+            await Promise.all(
+                limitedDerivations.map(async derivation => {
+                    const tonAccount = await root.getTonAccount(derivation.index);
+
+                    return createAndStoreMetaEncryptionKeys(sdk, {
+                        seedPrase: tonAccount.mnemonics,
+                        rawAddress: derivation.activeTonWalletId,
+                        mnemonicType: 'ton'
+                    });
+                })
+            );
+        } else {
+            if (account.type !== 'mnemonic') {
+                throw new Error('Incorrect mnemonic type!');
+            }
+
+            await createAndStoreMetaEncryptionKeys(sdk, {
+                seedPrase,
+                rawAddress: wallet.rawAddress,
+                mnemonicType: account.mnemonicType
+            });
+        }
+
+        await client.invalidateQueries({ queryKey: [QueryKey.metaEncryptionData] });
+    });
+};

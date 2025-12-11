@@ -6,6 +6,7 @@ import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 export const TronAssetComponent = forwardRef<
     HTMLDivElement,
@@ -18,6 +19,7 @@ export const TronAssetComponent = forwardRef<
 
     const { data: rate } = useUSDTRate();
     const { fiatPrice, fiatAmount } = useFormatFiat(rate, assetAmount.relativeAmount);
+    const isFullWidth = useIsFullWidthMode();
 
     return (
         <ListItem
@@ -26,6 +28,7 @@ export const TronAssetComponent = forwardRef<
             }
             className={className}
             ref={ref}
+            backgroundHighlighted={isFullWidth}
         >
             <ListItemPayload>
                 <TokenLogo src={assetAmount.image} noRadius={assetAmount.asset.noImageCorners} />

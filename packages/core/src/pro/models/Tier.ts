@@ -10,5 +10,6 @@ export type Tier = {
      * nanoton
      */
     amount: string;
+    period: number;
 };
 

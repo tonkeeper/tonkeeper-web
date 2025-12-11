@@ -11,7 +11,7 @@ import { TonTransferParams } from './service/deeplinkingService';
 import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
 import { UserIdentity, UserIdentityService } from './user-identity';
-import { SubscriptionStrategy } from './entries/pro';
+import { ISubscriptionService } from './entries/pro';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -133,7 +133,7 @@ export interface AppCountryInfo {
 
 export interface IAppSdk {
     storage: IStorage;
-    subscriptionStrategy: SubscriptionStrategy;
+    subscriptionService: ISubscriptionService;
 
     nativeBackButton?: NativeBackButton;
     keychain?: IKeychainService;
@@ -237,6 +237,8 @@ export interface ConfirmOptions {
     message: string;
     okButtonTitle?: string;
     cancelButtonTitle?: string;
+    defaultButton?: 'ok' | 'cancel';
+    type?: 'none' | 'info' | 'error' | 'question' | 'warning';
 }
 
 export interface KeyboardService {
@@ -277,7 +279,7 @@ export abstract class BaseApp implements IAppSdk {
 
     nativeBackButton?: NativeBackButton | undefined;
 
-    subscriptionStrategy!: SubscriptionStrategy;
+    subscriptionService!: ISubscriptionService;
 
     topMessage = (text?: string) => {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });

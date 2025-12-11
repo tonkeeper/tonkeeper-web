@@ -11,7 +11,7 @@ import { useTranslation } from '../../translation';
 import { anyOfKeysParts, QueryKey } from '../../../libs/queryKey';
 import { AccountsApi, Multisig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAccountsStorage } from '../../useStorage';
-import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
+import { TxConfirmationCustomError } from '@tonkeeper/core/dist/errors/TxConfirmationCustomError';
 import {
     LedgerMessageSender,
     WalletMessageSender,
@@ -85,7 +85,10 @@ export const useDeployMultisig = (
             });
 
             if (alreadyDeployed) {
-                throw new TxConfirmationCustomError(t('create_multisig_error_already_deployed'));
+                throw new TxConfirmationCustomError(
+                    t('create_multisig_error_already_deployed'),
+                    'create_multisig_error_already_deployed'
+                );
             }
 
             const signer = await getSigner(sdk, accountAndWallet.account.id, {
