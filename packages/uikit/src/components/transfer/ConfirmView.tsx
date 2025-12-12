@@ -56,7 +56,7 @@ import {
 } from '../../hooks/blockchain/sender/sender-type';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
 import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
-import { useGlobalPreferences } from '../../state/global-preferences';
+import { useGlobalPreferencesQuery } from '../../state/global-preferences';
 import { BlindSignConfirmNotification } from '../modals/BlindSignConfirmNotification';
 import { Button } from '../fields/Button';
 
@@ -383,7 +383,7 @@ export const ConfirmViewButtons: FC<{
         handleSubmit
     } = useConfirmViewContext();
     const { t } = useTranslation();
-    const preferences = useGlobalPreferences();
+    const { data: preferences } = useGlobalPreferencesQuery();
     const [showBlindSignWarning, setShowBlindSignWarning] = useState(false);
 
     const isValid = !isLoading && !estimationLoading;
@@ -441,7 +441,7 @@ export const ConfirmViewButtons: FC<{
         const errorText = getDisplayErrorText(error, t('send_fee_estimation_error'));
 
         // If blind sign is enabled, show warning button instead of error
-        if (preferences.blindSignEnabled) {
+        if (preferences?.blindSignEnabled) {
             return (
                 <>
                     <ResultErrorButtonStyled>

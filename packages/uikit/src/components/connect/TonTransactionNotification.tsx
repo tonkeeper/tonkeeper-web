@@ -42,6 +42,8 @@ import { ActionFeeDetailsUniversal, SelectSenderDropdown } from '../activity/Not
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
+import { useGlobalPreferencesQuery } from '../../state/global-preferences';
+import { BlindSignConfirmNotification } from '../modals/BlindSignConfirmNotification';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -175,6 +177,8 @@ const TonTransactionContent: FC<{
     const sdk = useAppSdk();
 
     const { t } = useTranslation();
+    const { data: preferences } = useGlobalPreferencesQuery();
+    const [showBlindSignWarning, setShowBlindSignWarning] = useState(false);
 
     const { data: availableSendersChoices, isLoading: isChoicesLoading } =
         useTonConnectAvailableSendersChoices(params);
@@ -241,6 +245,19 @@ const TonTransactionContent: FC<{
         }
     };
 
+    const handleBlindSignClick = useCallback(() => {
+        setShowBlindSignWarning(true);
+    }, []);
+
+    const handleBlindSignConfirm = useCallback(async () => {
+        setShowBlindSignWarning(false);
+        await onSubmit();
+    }, [onSubmit]);
+
+    const handleBlindSignClose = useCallback(() => {
+        setShowBlindSignWarning(false);
+    }, []);
+
     if (isEstimating) {
         return <NotificationSkeleton handleClose={handleClose} />;
     }
@@ -287,6 +304,36 @@ const TonTransactionContent: FC<{
                             <CheckmarkCircleIcon />
                             <Label2>{t('ton_login_success')}</Label2>
                         </ResultButton>
+                    ) : isError && preferences?.blindSignEnabled ? (
+                        <>
+                            <ButtonRowStyled>
+                                <Button
+                                    size="large"
+                                    type="button"
+                                    loading={isLoading}
+                                    disabled={isLoading}
+                                    onClick={() => handleClose()}
+                                >
+                                    {t('notifications_alert_cancel')}
+                                </Button>
+                                <Button
+                                    size="large"
+                                    type="button"
+                                    warn
+                                    loading={isLoading}
+                                    disabled={isLoading}
+                                    onClick={handleBlindSignClick}
+                                >
+                                    {t('blind_sign_send_anyway')}
+                                </Button>
+                            </ButtonRowStyled>
+                            <BlindSignConfirmNotification
+                                isOpen={showBlindSignWarning}
+                                onClose={handleBlindSignClose}
+                                onConfirm={handleBlindSignConfirm}
+                                isLoading={isLoading}
+                            />
+                        </>
                     ) : (
                         <ButtonRowStyled>
                             <Button
