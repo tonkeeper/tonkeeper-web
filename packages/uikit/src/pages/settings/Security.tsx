@@ -40,6 +40,8 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { MobileProChangePinNotification } from '../../components/mobile-pro/pin/MobileProChangePin';
 import { ChevronRightIcon } from '../../components/Icon';
 import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { useGlobalPreferences, useMutateGlobalPreferences } from '../../state/global-preferences';
+import { BlindSignEnableNotification } from '../../components/modals/BlindSignConfirmNotification';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -95,6 +97,53 @@ const TouchIdSwitch = () => {
                 </ListItemPayload>
             </ListItem>
         </ListBlockDesktopAdaptive>
+    );
+};
+
+const BlindSignSwitch = () => {
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+    const preferences = useGlobalPreferences();
+    const { mutateAsync } = useMutateGlobalPreferences();
+    const [showWarning, setShowWarning] = useState(false);
+
+    const handleToggle = async (value: boolean) => {
+        if (value) {
+            // Show warning when enabling
+            setShowWarning(true);
+        } else {
+            // Disable without warning
+            await mutateAsync({ blindSignEnabled: false });
+        }
+    };
+
+    const handleConfirmEnable = async () => {
+        try {
+            await mutateAsync({ blindSignEnabled: true });
+            setShowWarning(false);
+            sdk.hapticNotification('success');
+        } catch (e) {
+            console.error('Failed to enable blind sign:', e);
+            sdk.hapticNotification('error');
+        }
+    };
+
+    return (
+        <>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false}>
+                    <ListItemPayload>
+                        <Label1Capitalised>{t('blind_sign_title')}</Label1Capitalised>
+                        <Switch checked={preferences.blindSignEnabled} onChange={handleToggle} />
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+            <BlindSignEnableNotification
+                isOpen={showWarning}
+                onClose={() => setShowWarning(false)}
+                onConfirm={handleConfirmEnable}
+            />
+        </>
     );
 };
 
@@ -298,6 +347,7 @@ export const SecuritySettings = () => {
                 </ForTargetEnv>
                 <LockSwitch />
                 <TouchIdSwitch />
+                <BlindSignSwitch />
                 <Password />
             </DesktopWrapper>
         );
@@ -309,6 +359,7 @@ export const SecuritySettings = () => {
             <InnerBody>
                 <LockSwitch />
                 <TouchIdSwitch />
+                <BlindSignSwitch />
                 <Password />
                 <ShowPhrases />
             </InnerBody>
