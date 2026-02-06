@@ -1,3 +1,19 @@
+/**
+ * TON wallet fee estimation.
+ *
+ * Sections:
+ *  1. Types & Constants
+ *  2. estimateWalletFee (main entry point)
+ *  3. Basic fee formulas (gas, storage, forward, action)
+ *  4. Wallet gas parameters
+ *  5. Cell stats utilities
+ *  6. OutMsg processing
+ *  7. V5R1 message parser
+ *  8. Patricia trie internals
+ *  9. V5R1 extension gas (add / remove)
+ * 10. V4R2 plugin stubs
+ */
+
 import { Address, Cell } from '@ton/core';
 
 import { TonWalletVersion, assertUnreachable } from './compat';
@@ -82,31 +98,6 @@ export interface FeeConfig {
     masterchain: WorkchainConfig;
 }
 
-// ============================================================================
-// Internal Constants
-// ============================================================================
-
-/** ceil(x / 2^16) */
-const shr16ceil = (x: bigint): bigint => (x + 0xffffn) >> 16n;
-
-/** Gas cost for first cell read (transforming Cell → Slice) */
-const TVM_CELL_READ_GAS = 100n;
-
-/** Gas cost for cell write (Builder → Cell) */
-const TVM_CELL_WRITE_GAS = 500n;
-
-/** Gas cost for cell reload (re-reading already loaded cell) */
-const TVM_CELL_RELOAD_GAS = 25n;
-
-/** V5R1 extension action overhead (parsing action, checking existence, etc.) */
-const V5R1_EXTENSION_OVERHEAD = 1388n;
-
-const ZERO_STATS: CellStats = { bits: 0n, cells: 0n };
-
-/** V5R1 action tags */
-const V5R1_ACTION_ADD_EXTENSION = 0x02;
-const V5R1_ACTION_REMOVE_EXTENSION = 0x03;
-
 export interface V5R1ExtensionAction {
     type: 'addExtension' | 'removeExtension';
     address: Address;
@@ -117,249 +108,6 @@ export interface V4R2PluginAction {
     type: 'installPlugin' | 'removePlugin';
     address: Address;
 }
-
-// ============================================================================
-// Basic Fee Calculation Functions
-// ============================================================================
-
-/** fwdFee = lumpPrice + ceil((bitPrice * bits + cellPrice * cells) / 2^16) */
-export function computeForwardFee(fwd: MsgForwardPrices, bits: bigint, cells: bigint): bigint {
-    return fwd.lumpPrice + shr16ceil(fwd.bitPrice * bits + fwd.cellPrice * cells);
-}
-
-/** Import fee uses same formula as forward fee */
-export const computeImportFee = computeForwardFee;
-
-/** actionFee = floor(fwdFee * firstFrac / 2^16) — stays with sender, included in total_fees */
-export function computeActionFee(fwd: MsgForwardPrices, fwdFee: bigint): bigint {
-    return (fwdFee * fwd.firstFrac) >> 16n;
-}
-
-/** gasFee = floor(gasUsed * gasPrice / 2^16) */
-export function computeGasFee(config: WorkchainConfig, gasUsed: bigint): bigint {
-    return (gasUsed * config.gasPrice) >> 16n;
-}
-
-/** storageFee = ceil((bits * bitPrice + cells * cellPrice) * timeDelta / 2^16) */
-export function computeStorageFee(
-    config: WorkchainConfig,
-    storageUsed: CellStats,
-    timeDelta: bigint
-): bigint {
-    if (timeDelta <= 0n) return 0n;
-    const used =
-        storageUsed.bits * config.storageBitPrice + storageUsed.cells * config.storageCellPrice;
-    return shr16ceil(used * timeDelta);
-}
-
-// ============================================================================
-// Wallet Gas Calculation
-// ============================================================================
-
-export function getWalletGasParams(version: TonWalletVersion): {
-    baseGas: bigint;
-    gasPerMsg: bigint;
-} {
-    switch (version) {
-        case TonWalletVersion.V5R1:
-            return { baseGas: 4222n, gasPerMsg: 717n };
-        case TonWalletVersion.V4R2:
-            return { baseGas: 2666n, gasPerMsg: 642n };
-        case TonWalletVersion.V3R2:
-            return { baseGas: 2352n, gasPerMsg: 642n };
-        case TonWalletVersion.V3R1:
-            return { baseGas: 2275n, gasPerMsg: 642n };
-        default:
-            return assertUnreachable(version);
-    }
-}
-
-export function computeWalletGasUsed(version: TonWalletVersion, outMsgsCount: bigint): bigint {
-    const { baseGas, gasPerMsg } = getWalletGasParams(version);
-    return baseGas + gasPerMsg * outMsgsCount;
-}
-
-// ============================================================================
-// Cell Stats Utilities
-// ============================================================================
-
-function sumStats(a: CellStats, b: CellStats): CellStats {
-    return { bits: a.bits + b.bits, cells: a.cells + b.cells };
-}
-
-/** Count unique cells (TON deduplicates by hash) */
-export function countUniqueCellStats(cell: Cell, visited = new Set<string>()): CellStats {
-    const hash = cell.hash().toString('hex');
-    if (visited.has(hash)) return ZERO_STATS;
-    visited.add(hash);
-
-    return cell.refs
-        .map(ref => countUniqueCellStats(ref, visited))
-        .reduce(sumStats, { bits: BigInt(cell.bits.length), cells: 1n });
-}
-
-/** Sum stats of refs only (excludes root cell) */
-export function sumRefsStats(cell: Cell): CellStats {
-    const visited = new Set<string>();
-    return cell.refs.map(ref => countUniqueCellStats(ref, visited)).reduce(sumStats, ZERO_STATS);
-}
-
-// ============================================================================
-// OutMsg Workchain Parser
-// ============================================================================
-
-/**
- * Parse destination workchain from outMsg.
- * Internal message: int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
- *                   src:MsgAddressInt dest:MsgAddressInt ...
- *
- * Note: src can be addr_none (00) in pre-send messages (TVM fills it on send_raw_message)
- */
-function parseOutMsgDestWorkchain(outMsg: Cell): WorkchainId {
-    const slice = outMsg.beginParse();
-    const prefix = slice.loadUint(1);
-    if (prefix !== 0) {
-        // External message (ext_out_msg_info$11) - use basechain
-        return 0;
-    }
-    // int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
-    slice.loadBits(3); // ihr_disabled, bounce, bounced
-    slice.loadMaybeAddress(); // src (can be addr_none before send)
-    const dest = slice.loadAddress(); // dest (must be real address)
-    if (dest.workChain !== -1 && dest.workChain !== 0) {
-        throw new Error('Invalid destination workchain');
-    }
-
-    return dest.workChain;
-}
-
-/**
- * Compute action fee for outMsgs, checking destination workchain for each.
- * Forward prices differ for masterchain (-1) vs basechain (0).
- */
-function computeActionFeeForOutMsgs(config: FeeConfig, outMsgs: Cell[]): bigint {
-    return outMsgs.reduce((acc, msg) => {
-        const destWorkchain = parseOutMsgDestWorkchain(msg);
-
-        if (destWorkchain === -1) {
-            console.warn('Destination workchain is masterchain, not tested yet!!!');
-        }
-
-        const fwd = destWorkchain === -1 ? config.masterchain.fwd : config.basechain.fwd;
-        const { bits, cells } = sumRefsStats(msg);
-        const fwdFee = computeForwardFee(fwd, bits, cells);
-        return acc + computeActionFee(fwd, fwdFee);
-    }, 0n);
-}
-
-/**
- * Compute forward fee remaining for outMsgs.
- * fwdFeeRemaining = fwdFee - actionFee ≈ 2/3 of forward fee.
- * This amount is deducted from the outMsg value during delivery.
- */
-export function computeFwdFeeRemaining(config: FeeConfig, outMsgs: Cell[]): bigint {
-    return outMsgs.reduce((acc, msg) => {
-        const destWorkchain = parseOutMsgDestWorkchain(msg);
-
-        if (destWorkchain === -1) {
-            console.warn('Destination workchain is masterchain, not tested yet!!!');
-        }
-
-        const fwd = destWorkchain === -1 ? config.masterchain.fwd : config.basechain.fwd;
-        const { bits, cells } = sumRefsStats(msg);
-        const fwdFee = computeForwardFee(fwd, bits, cells);
-        const actionFee = computeActionFee(fwd, fwdFee);
-        return acc + (fwdFee - actionFee);
-    }, 0n);
-}
-
-// ============================================================================
-// V5R1 Message Parser
-// ============================================================================
-
-/**
- * Parse V5R1 extension action from external message.
- * Returns action type and address, or null if not an extension action.
- */
-export function parseV5R1ExtensionAction(inMsg: Cell): V5R1ExtensionAction | null {
-    try {
-        const msgSlice = inMsg.beginParse();
-
-        // External-in message structure (TL-B):
-        // ext_in_msg_info$10 src:MsgAddressExt dest:MsgAddressInt import_fee:Grams
-        // init:(Maybe (Either StateInit ^StateInit))
-        // body:(Either X ^X)
-        msgSlice.loadUint(2); // 10 = external-in
-        msgSlice.loadUint(2); // src: addr_none$00
-        msgSlice.loadAddress(); // dest: wallet address
-        msgSlice.loadCoins(); // import_fee (usually 0)
-
-        // Skip StateInit if present: Maybe (Either StateInit ^StateInit)
-        if (msgSlice.loadBit()) {
-            // Either: 0 = inline StateInit, 1 = ref
-            if (msgSlice.loadBit()) {
-                msgSlice.loadRef(); // ^StateInit
-            } else {
-                // Inline StateInit - skip all fields
-                // fixed_prefix_length: Maybe (## 5)
-                if (msgSlice.loadBit()) msgSlice.loadUint(5);
-                // special: Maybe TickTock (tick:Bool tock:Bool)
-                if (msgSlice.loadBit()) msgSlice.loadBits(2);
-                msgSlice.loadMaybeRef(); // code: Maybe ^Cell
-                msgSlice.loadMaybeRef(); // data: Maybe ^Cell
-                msgSlice.loadMaybeRef(); // library: Maybe ^Cell
-            }
-        }
-
-        // Body: Either X ^X (0 = inline, 1 = ref)
-        const bodySlice = msgSlice.loadBit() ? msgSlice.loadRef().beginParse() : msgSlice;
-
-        // V5R1 external signed request body structure:
-        // opcode(32) + wallet_id(32) + valid_until(32) + seqno(32) + actions + signature(512)
-        //
-        // Actions structure (storeOutListExtendedV5R1):
-        // - MaybeRef: basic out_actions (sendMsg list), null if empty
-        // - 1 bit: has_extended_actions
-        // - if has_extended: tag(8) + payload INLINE, then refs for more
-        // - signature at the END (512 bits)
-        const opcode = bodySlice.loadUint(32);
-        if (opcode !== 0x7369676e) {
-            // Not an external signed request (0x7369676e = "sign")
-            return null;
-        }
-
-        bodySlice.loadUint(32); // wallet_id
-        bodySlice.loadUint(32); // valid_until
-        bodySlice.loadUint(32); // seqno
-
-        // MaybeRef: basic actions (sendMsg list)
-        if (bodySlice.loadBit()) {
-            bodySlice.loadRef(); // skip out_list
-        }
-
-        // has_extended_actions bit
-        if (!bodySlice.loadBit()) {
-            return null; // no extended actions
-        }
-
-        // Extended action is stored INLINE: tag(8 bits) + address
-        const actionTag = bodySlice.loadUint(8);
-
-        if (actionTag === V5R1_ACTION_ADD_EXTENSION) {
-            return { type: 'addExtension', address: bodySlice.loadAddress() };
-        } else if (actionTag === V5R1_ACTION_REMOVE_EXTENSION) {
-            return { type: 'removeExtension', address: bodySlice.loadAddress() };
-        }
-
-        return null;
-    } catch {
-        return null;
-    }
-}
-
-// ============================================================================
-// Main Wallet Fee Estimator
-// ============================================================================
 
 interface EstimateWalletFeeBaseParams {
     walletVersion: TonWalletVersion;
@@ -403,6 +151,10 @@ export type EstimateWalletFeeParams =
     | EstimateTransferFeeParams
     | EstimateExtensionFeeParams
     | EstimatePluginFeeParams;
+
+// ============================================================================
+// Main Entry Point
+// ============================================================================
 
 /**
  * Estimate wallet transaction fee.
@@ -520,56 +272,317 @@ export function estimateWalletFee(
 }
 
 // ============================================================================
-// V5R1 Extension Gas Calculation
+// Internal Constants
+// ============================================================================
+
+const ZERO_STATS: CellStats = { bits: 0n, cells: 0n };
+
+/** ceil(x / 2^16) */
+const shr16ceil = (x: bigint): bigint => (x + 0xffffn) >> 16n;
+
+/** Gas cost for first cell read (transforming Cell → Slice) */
+const TVM_CELL_READ_GAS = 100n;
+/** Gas cost for cell write (Builder → Cell) */
+const TVM_CELL_WRITE_GAS = 500n;
+/** Gas cost for cell reload (re-reading already loaded cell) */
+const TVM_CELL_RELOAD_GAS = 25n;
+
+/**
+ * V5R1 extension action overheads — empirically derived from emulation.
+ *
+ * EXTENSION_OVERHEAD / REMOVE_EXTENSION_OVERHEAD:
+ *   Gas for parsing action tag, checking dict existence, etc.
+ *   ADD is higher because it also creates fork + leaf cells.
+ *
+ * REMOVE_EDGE_MERGE_GAS:
+ *   +75 gas (3 × cell_reload = 3 × 25) when edge merging occurs.
+ *   In TVM cell_builder_add_slice_bool, when sibling is FORK:
+ *   - size_refs() = 2 → prefetch_ref called twice
+ *   Applies to two cases:
+ *   - siblingIsFork: load FORK sibling + prefetch its 2 child refs
+ *   - rootCollapse (2→1): merge remaining leaf with former root
+ *
+ *   Verified against blockchain:
+ *   - DELETE from 9 ext (sibling = LEAF): gas = 7690 (no merge)
+ *   - DELETE from 8 ext (sibling = FORK): gas = 7765 (+75)
+ *   - DELETE from 2 ext (root collapse): gas = 6565 (+75)
+ */
+const V5R1_EXTENSION_OVERHEAD = 1388n;
+const V5R1_REMOVE_EXTENSION_OVERHEAD = 1068n;
+const V5R1_REMOVE_EDGE_MERGE_GAS = TVM_CELL_RELOAD_GAS * 3n;
+
+/** V5R1 action tags */
+const V5R1_ACTION_ADD_EXTENSION = 0x02;
+const V5R1_ACTION_REMOVE_EXTENSION = 0x03;
+
+// ============================================================================
+// Basic Fee Calculation Functions
+// ============================================================================
+
+/** fwdFee = lumpPrice + ceil((bitPrice * bits + cellPrice * cells) / 2^16) */
+export function computeForwardFee(fwd: MsgForwardPrices, bits: bigint, cells: bigint): bigint {
+    return fwd.lumpPrice + shr16ceil(fwd.bitPrice * bits + fwd.cellPrice * cells);
+}
+
+/** Import fee uses same formula as forward fee */
+export const computeImportFee = computeForwardFee;
+
+/** actionFee = floor(fwdFee * firstFrac / 2^16) — stays with sender, included in total_fees */
+export function computeActionFee(fwd: MsgForwardPrices, fwdFee: bigint): bigint {
+    return (fwdFee * fwd.firstFrac) >> 16n;
+}
+
+/** gasFee = floor(gasUsed * gasPrice / 2^16) */
+export function computeGasFee(config: WorkchainConfig, gasUsed: bigint): bigint {
+    return (gasUsed * config.gasPrice) >> 16n;
+}
+
+/** storageFee = ceil((bits * bitPrice + cells * cellPrice) * timeDelta / 2^16) */
+export function computeStorageFee(
+    config: WorkchainConfig,
+    storageUsed: CellStats,
+    timeDelta: bigint
+): bigint {
+    if (timeDelta <= 0n) return 0n;
+    const used =
+        storageUsed.bits * config.storageBitPrice + storageUsed.cells * config.storageCellPrice;
+    return shr16ceil(used * timeDelta);
+}
+
+// ============================================================================
+// Wallet Gas Calculation
+// ============================================================================
+
+export function walletGasParams(version: TonWalletVersion): {
+    baseGas: bigint;
+    gasPerMsg: bigint;
+} {
+    switch (version) {
+        case TonWalletVersion.V5R1:
+            return { baseGas: 4222n, gasPerMsg: 717n };
+        case TonWalletVersion.V4R2:
+            return { baseGas: 2666n, gasPerMsg: 642n };
+        case TonWalletVersion.V3R2:
+            return { baseGas: 2352n, gasPerMsg: 642n };
+        case TonWalletVersion.V3R1:
+            return { baseGas: 2275n, gasPerMsg: 642n };
+        default:
+            return assertUnreachable(version);
+    }
+}
+
+export function computeWalletGasUsed(version: TonWalletVersion, outMsgsCount: bigint): bigint {
+    const { baseGas, gasPerMsg } = walletGasParams(version);
+    return baseGas + gasPerMsg * outMsgsCount;
+}
+
+// ============================================================================
+// Cell Stats Utilities
+// ============================================================================
+
+function sumStats(a: CellStats, b: CellStats): CellStats {
+    return { bits: a.bits + b.bits, cells: a.cells + b.cells };
+}
+
+/** Count unique cells (TON deduplicates by hash) */
+export function countUniqueCellStats(cell: Cell, visited = new Set<string>()): CellStats {
+    const hash = cell.hash().toString('hex');
+    if (visited.has(hash)) return ZERO_STATS;
+    visited.add(hash);
+
+    return cell.refs
+        .map(ref => countUniqueCellStats(ref, visited))
+        .reduce(sumStats, { bits: BigInt(cell.bits.length), cells: 1n });
+}
+
+/** Sum stats of refs only (excludes root cell) */
+export function sumRefsStats(cell: Cell): CellStats {
+    const visited = new Set<string>();
+    return cell.refs.map(ref => countUniqueCellStats(ref, visited)).reduce(sumStats, ZERO_STATS);
+}
+
+// ============================================================================
+// OutMsg Workchain Parser
 // ============================================================================
 
 /**
- * Compute gas for V5R1 AddExtension action.
+ * Parse destination workchain from outMsg.
+ * Internal message: int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+ *                   src:MsgAddressInt dest:MsgAddressInt ...
  *
- * Based on TVM dict_set implementation (crypto/vm/dict.cpp):
- * - Each cell traversed during insertion costs 100 gas (cell load)
- * - Each cell created costs 500 gas (cell create)
- * - For new key insertion: cellCreates = cellLoads + 2
- *
- * Formula:
- *   gas = baseGas + overhead + cellLoads×100 + (cellLoads+2)×500
- *       = 5610 + 100×L + 500×L + 1000
- *       = 6610 + 600×cellLoads
- *
- * @param cellLoads - number of cells traversed from root to insertion point
+ * Note: src can be addr_none (00) in pre-send messages (TVM fills it on send_raw_message)
  */
-export function computeAddExtensionGas(cellLoads: bigint): bigint {
-    const { baseGas } = getWalletGasParams(TonWalletVersion.V5R1);
-    // baseGas(4222) + overhead(1388) + cellLoads×100 + (cellLoads+2)×500
-    // = 5610 + 100×L + 500×L + 1000 = 6610 + 600×L
-    return (
-        baseGas +
-        V5R1_EXTENSION_OVERHEAD +
-        1000n +
-        cellLoads * (TVM_CELL_READ_GAS + TVM_CELL_WRITE_GAS)
-    );
+function parseOutMsgDestWorkchain(outMsg: Cell): WorkchainId {
+    const slice = outMsg.beginParse();
+    const prefix = slice.loadUint(1);
+    if (prefix !== 0) {
+        // External message (ext_out_msg_info$11) - use basechain
+        return 0;
+    }
+    // int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+    slice.loadBits(3); // ihr_disabled, bounce, bounced
+    slice.loadMaybeAddress(); // src (can be addr_none before send)
+    const dest = slice.loadAddress(); // dest (must be real address)
+    if (dest.workChain !== -1 && dest.workChain !== 0) {
+        throw new Error('Invalid destination workchain');
+    }
+
+    return dest.workChain;
 }
 
 /**
- * Compute gas for adding first extension (empty dict → 1 extension).
- * Special case: no trie traversal, just create one cell.
- * Returns 6110 gas units.
+ * Compute action fee for outMsgs, checking destination workchain for each.
+ * Forward prices differ for masterchain (-1) vs basechain (0).
  */
-export function computeAddFirstExtensionGas(): bigint {
-    const { baseGas } = getWalletGasParams(TonWalletVersion.V5R1);
-    return baseGas + V5R1_EXTENSION_OVERHEAD + TVM_CELL_WRITE_GAS;
+function computeActionFeeForOutMsgs(config: FeeConfig, outMsgs: Cell[]): bigint {
+    return outMsgs.reduce((acc, msg) => {
+        const destWorkchain = parseOutMsgDestWorkchain(msg);
+
+        if (destWorkchain === -1) {
+            console.warn(
+                'Masterchain destination: fee calculation covers this path but lacks blockchain-verified tests. ' +
+                    'Please add masterchain transaction fixtures to fees.spec.ts'
+            );
+        }
+
+        const fwd = destWorkchain === -1 ? config.masterchain.fwd : config.basechain.fwd;
+        const { bits, cells } = sumRefsStats(msg);
+        const fwdFee = computeForwardFee(fwd, bits, cells);
+        return acc + computeActionFee(fwd, fwdFee);
+    }, 0n);
+}
+
+/**
+ * Compute forward fee remaining for outMsgs.
+ * fwdFeeRemaining = fwdFee - actionFee ≈ 2/3 of forward fee.
+ * This amount is deducted from the outMsg value during delivery.
+ */
+export function computeFwdFeeRemaining(config: FeeConfig, outMsgs: Cell[]): bigint {
+    return outMsgs.reduce((acc, msg) => {
+        const destWorkchain = parseOutMsgDestWorkchain(msg);
+
+        if (destWorkchain === -1) {
+            console.warn(
+                'Masterchain destination: fee calculation covers this path but lacks blockchain-verified tests. ' +
+                    'Please add masterchain transaction fixtures to fees.spec.ts'
+            );
+        }
+
+        const fwd = destWorkchain === -1 ? config.masterchain.fwd : config.basechain.fwd;
+        const { bits, cells } = sumRefsStats(msg);
+        const fwdFee = computeForwardFee(fwd, bits, cells);
+        const actionFee = computeActionFee(fwd, fwdFee);
+        return acc + (fwdFee - actionFee);
+    }, 0n);
+}
+
+// ============================================================================
+// V5R1 Message Parser
+// ============================================================================
+
+/**
+ * Parse V5R1 extension action from external message.
+ * Returns action type and address, or null if not an extension action.
+ */
+export function parseV5R1ExtensionAction(inMsg: Cell): V5R1ExtensionAction | null {
+    try {
+        const msgSlice = inMsg.beginParse();
+
+        // External-in message structure (TL-B):
+        // ext_in_msg_info$10 src:MsgAddressExt dest:MsgAddressInt import_fee:Grams
+        // init:(Maybe (Either StateInit ^StateInit))
+        // body:(Either X ^X)
+        msgSlice.loadUint(2); // 10 = external-in
+        msgSlice.loadUint(2); // src: addr_none$00
+        msgSlice.loadAddress(); // dest: wallet address
+        msgSlice.loadCoins(); // import_fee (usually 0)
+
+        // Skip StateInit if present: Maybe (Either StateInit ^StateInit)
+        if (msgSlice.loadBit()) {
+            // Either: 0 = inline StateInit, 1 = ref
+            if (msgSlice.loadBit()) {
+                msgSlice.loadRef(); // ^StateInit
+            } else {
+                // Inline StateInit - skip all fields
+                // fixed_prefix_length: Maybe (## 5)
+                if (msgSlice.loadBit()) msgSlice.loadUint(5);
+                // special: Maybe TickTock (tick:Bool tock:Bool)
+                if (msgSlice.loadBit()) msgSlice.loadBits(2);
+                msgSlice.loadMaybeRef(); // code: Maybe ^Cell
+                msgSlice.loadMaybeRef(); // data: Maybe ^Cell
+                msgSlice.loadMaybeRef(); // library: Maybe ^Cell
+            }
+        }
+
+        // Body: Either X ^X (0 = inline, 1 = ref)
+        const bodySlice = msgSlice.loadBit() ? msgSlice.loadRef().beginParse() : msgSlice;
+
+        // V5R1 external signed request body structure:
+        // opcode(32) + wallet_id(32) + valid_until(32) + seqno(32) + actions + signature(512)
+        //
+        // Actions structure (storeOutListExtendedV5R1):
+        // - MaybeRef: basic out_actions (sendMsg list), null if empty
+        // - 1 bit: has_extended_actions
+        // - if has_extended: tag(8) + payload INLINE, then refs for more
+        // - signature at the END (512 bits)
+        const opcode = bodySlice.loadUint(32);
+        if (opcode !== 0x7369676e) {
+            // Not an external signed request (0x7369676e = "sign")
+            return null;
+        }
+
+        bodySlice.loadUint(32); // wallet_id
+        bodySlice.loadUint(32); // valid_until
+        bodySlice.loadUint(32); // seqno
+
+        // MaybeRef: basic actions (sendMsg list)
+        if (bodySlice.loadBit()) {
+            bodySlice.loadRef(); // skip out_list
+        }
+
+        // has_extended_actions bit
+        if (!bodySlice.loadBit()) {
+            return null; // no extended actions
+        }
+
+        // Extended action is stored INLINE: tag(8 bits) + address
+        const actionTag = bodySlice.loadUint(8);
+
+        if (actionTag === V5R1_ACTION_ADD_EXTENSION) {
+            return { type: 'addExtension', address: bodySlice.loadAddress() };
+        } else if (actionTag === V5R1_ACTION_REMOVE_EXTENSION) {
+            return { type: 'removeExtension', address: bodySlice.loadAddress() };
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
 }
 
 // ============================================================================
 // Patricia Trie for Extension Gas Calculation
 // ============================================================================
 
-interface TrieNode {
-    type: 'leaf' | 'fork';
-    key?: string;
-    labelLength?: number;
+interface LeafNode {
+    type: 'leaf';
+    key: string;
+}
+
+interface ForkNode {
+    type: 'fork';
+    labelLength: number;
     left?: TrieNode;
     right?: TrieNode;
+}
+
+type TrieNode = LeafNode | ForkNode;
+
+function hexToBinary(hex: string): string {
+    return hex
+        .split('')
+        .map(c => parseInt(c, 16).toString(2).padStart(4, '0'))
+        .join('');
 }
 
 function commonPrefixLength(a: string, b: string): number {
@@ -600,7 +613,7 @@ function buildTrie(keys: string[]): TrieNode | null {
 
 function getAllKeys(node: TrieNode | undefined): string[] {
     if (!node) return [];
-    if (node.type === 'leaf') return [node.key!];
+    if (node.type === 'leaf') return [node.key];
     return [...getAllKeys(node.left), ...getAllKeys(node.right)];
 }
 
@@ -627,7 +640,7 @@ function countCellLoads(node: TrieNode | undefined, key: string, pos = 0): numbe
 
     // Fork node - check if label matches
     const nodeKeys = getAllKeys(node);
-    const labelBits = node.labelLength! - pos; // bits in this node's label
+    const labelBits = node.labelLength - pos; // bits in this node's label
     const nodePrefix = nodeKeys[0].slice(pos, node.labelLength);
     const keySlice = key.slice(pos, node.labelLength);
 
@@ -641,10 +654,108 @@ function countCellLoads(node: TrieNode | undefined, key: string, pos = 0): numbe
     }
 
     // Label matches (or pure fork with labelBits=0) - continue to child
-    const nextBit = key[node.labelLength!];
+    const nextBit = key[node.labelLength];
     const child = nextBit === '0' ? node.left : node.right;
 
-    return loads + countCellLoads(child, key, node.labelLength! + 1);
+    return loads + countCellLoads(child, key, node.labelLength + 1);
+}
+
+/**
+ * Find sibling node after removing a key from trie.
+ * Returns { cellLoads, siblingIsFork } or null if key not found.
+ *
+ * The sibling is the other branch of the parent fork after deletion.
+ * When we delete a leaf, its parent fork merges with the sibling.
+ */
+function findDeleteInfo(
+    node: TrieNode | undefined,
+    key: string,
+    pos = 0
+): { cellLoads: number; siblingIsFork: boolean } | null {
+    if (!node) return null;
+
+    // Count cell load for this node
+    const loads = 1;
+
+    if (node.type === 'leaf') {
+        // Found the leaf to delete - but no sibling info here
+        // (sibling is determined by parent, which we track below)
+        return node.key === key ? { cellLoads: loads, siblingIsFork: false } : null;
+    }
+
+    // Fork node - check if label matches
+    const nodeKeys = getAllKeys(node);
+    const labelBits = node.labelLength - pos;
+    const nodePrefix = nodeKeys[0].slice(pos, node.labelLength);
+    const keySlice = key.slice(pos, node.labelLength);
+
+    // Check common prefix length
+    let pfxLen = 0;
+    while (pfxLen < labelBits && nodePrefix[pfxLen] === keySlice[pfxLen]) pfxLen++;
+
+    if (pfxLen < labelBits) {
+        // Mismatch - key not in trie
+        return null;
+    }
+
+    // Label matches - continue to child
+    const nextBit = key[node.labelLength];
+    const child = nextBit === '0' ? node.left : node.right;
+    const sibling = nextBit === '0' ? node.right : node.left;
+
+    const childResult = findDeleteInfo(child, key, node.labelLength + 1);
+    if (!childResult) return null;
+
+    // If child is the leaf being deleted, determine sibling type
+    if (child?.type === 'leaf' && child.key === key) {
+        // Sibling will be merged with parent fork
+        const siblingIsFork = sibling?.type === 'fork';
+        return { cellLoads: loads + childResult.cellLoads, siblingIsFork };
+    }
+
+    // Propagate from deeper in the tree
+    return { cellLoads: loads + childResult.cellLoads, siblingIsFork: childResult.siblingIsFork };
+}
+
+// ============================================================================
+// V5R1 Extension Gas Calculation: Add
+// ============================================================================
+
+/**
+ * Compute gas for V5R1 AddExtension action.
+ *
+ * Based on TVM dict_set implementation (crypto/vm/dict.cpp):
+ * - Each cell traversed during insertion costs 100 gas (cell load)
+ * - Each cell created costs 500 gas (cell create)
+ * - For new key insertion: cellCreates = cellLoads + 2
+ *
+ * Formula:
+ *   gas = baseGas + overhead + cellLoads×100 + (cellLoads+2)×500
+ *       = 5610 + 100×L + 500×L + 1000
+ *       = 6610 + 600×cellLoads
+ *
+ * @param cellLoads - number of cells traversed from root to insertion point
+ */
+export function computeAddExtensionGas(cellLoads: bigint): bigint {
+    const { baseGas } = walletGasParams(TonWalletVersion.V5R1);
+    // baseGas(4222) + overhead(1388) + cellLoads×100 + (cellLoads+2)×500
+    // = 5610 + 100×L + 500×L + 1000 = 6610 + 600×L
+    return (
+        baseGas +
+        V5R1_EXTENSION_OVERHEAD +
+        1000n +
+        cellLoads * (TVM_CELL_READ_GAS + TVM_CELL_WRITE_GAS)
+    );
+}
+
+/**
+ * Compute gas for adding first extension (empty dict → 1 extension).
+ * Special case: no trie traversal, just create one cell.
+ * Returns 6110 gas units.
+ */
+export function computeAddFirstExtensionGas(): bigint {
+    const { baseGas } = walletGasParams(TonWalletVersion.V5R1);
+    return baseGas + V5R1_EXTENSION_OVERHEAD + TVM_CELL_WRITE_GAS;
 }
 
 /**
@@ -669,13 +780,6 @@ export function computeAddExtensionGasFromExtensions(
         return computeAddFirstExtensionGas();
     }
 
-    function hexToBinary(hex: string): string {
-        return hex
-            .split('')
-            .map(c => parseInt(c, 16).toString(2).padStart(4, '0'))
-            .join('');
-    }
-
     const binaryKeys = existingExtensionHashes.map(hexToBinary);
     const trie = buildTrie(binaryKeys);
 
@@ -686,35 +790,8 @@ export function computeAddExtensionGasFromExtensions(
 }
 
 // ============================================================================
-// Remove Extension Gas Calculation
+// V5R1 Extension Gas Calculation: Remove
 // ============================================================================
-
-/**
- * V5R1 remove extension overhead (smaller than ADD because no new cells created).
- *
- * Empirically derived from emulation:
- * - ADD overhead: 1388 + 1000 (fork + leaf creation) = 2388
- * - REMOVE overhead: 1068 (no new cells, may merge existing)
- */
-const V5R1_REMOVE_EXTENSION_OVERHEAD = 1068n;
-
-/**
- * Extra gas when merging with FORK sibling (has 2 child refs).
- *
- * In TVM cell_builder_add_slice_bool, when sibling is FORK:
- * - size_refs() = 2 → prefetch_ref called twice
- * - Each prefetch_ref may add ~37.5 gas overhead
- *
- * The +75 gas equals 3 × cell_reload (3 × 25 = 75) for edge merge operations:
- * - siblingIsFork case: load FORK sibling + prefetch its 2 child refs
- * - rootCollapse (2→1) case: merge remaining leaf with former root
- *
- * Verified against blockchain:
- * - DELETE from 9 ext (sibling = LEAF): gas = 7690 (no merge)
- * - DELETE from 8 ext (sibling = FORK): gas = 7765 (+75 for FORK handling)
- * - DELETE from 2 ext (root collapse): gas = 6565 (+75 for root merge)
- */
-const V5R1_REMOVE_EDGE_MERGE_GAS = TVM_CELL_RELOAD_GAS * 3n;
 
 /**
  * Compute gas for V5R1 RemoveExtension action.
@@ -743,7 +820,7 @@ const V5R1_REMOVE_EDGE_MERGE_GAS = TVM_CELL_RELOAD_GAS * 3n;
  * @param needsMergeGas - true if edge merge required (siblingIsFork OR rootCollapse)
  */
 export function computeRemoveExtensionGas(cellLoads: bigint, needsMergeGas = false): bigint {
-    const { baseGas } = getWalletGasParams(TonWalletVersion.V5R1);
+    const { baseGas } = walletGasParams(TonWalletVersion.V5R1);
     // baseGas(4222) + removeOverhead(1068) + cellLoads×(100 + 500) + mergeExtra
     // = 5290 + 600×cellLoads + (needsMergeGas ? 75 : 0)
     return (
@@ -775,63 +852,6 @@ export function computeRemoveLastExtensionGas(): bigint {
 }
 
 /**
- * Find sibling node after removing a key from trie.
- * Returns { type: 'leaf' | 'fork', cellLoads } or null if key not found.
- *
- * The sibling is the other branch of the parent fork after deletion.
- * When we delete a leaf, its parent fork merges with the sibling.
- */
-function findDeleteInfo(
-    node: TrieNode | undefined,
-    key: string,
-    pos = 0
-): { cellLoads: number; siblingIsFork: boolean } | null {
-    if (!node) return null;
-
-    // Count cell load for this node
-    const loads = 1;
-
-    if (node.type === 'leaf') {
-        // Found the leaf to delete - but no sibling info here
-        // (sibling is determined by parent, which we track below)
-        return node.key === key ? { cellLoads: loads, siblingIsFork: false } : null;
-    }
-
-    // Fork node - check if label matches
-    const nodeKeys = getAllKeys(node);
-    const labelBits = node.labelLength! - pos;
-    const nodePrefix = nodeKeys[0].slice(pos, node.labelLength);
-    const keySlice = key.slice(pos, node.labelLength);
-
-    // Check common prefix length
-    let pfxLen = 0;
-    while (pfxLen < labelBits && nodePrefix[pfxLen] === keySlice[pfxLen]) pfxLen++;
-
-    if (pfxLen < labelBits) {
-        // Mismatch - key not in trie
-        return null;
-    }
-
-    // Label matches - continue to child
-    const nextBit = key[node.labelLength!];
-    const child = nextBit === '0' ? node.left : node.right;
-    const sibling = nextBit === '0' ? node.right : node.left;
-
-    const childResult = findDeleteInfo(child, key, node.labelLength! + 1);
-    if (!childResult) return null;
-
-    // If child is the leaf being deleted, determine sibling type
-    if (child?.type === 'leaf' && child.key === key) {
-        // Sibling will be merged with parent fork
-        const siblingIsFork = sibling?.type === 'fork';
-        return { cellLoads: loads + childResult.cellLoads, siblingIsFork };
-    }
-
-    // Propagate from deeper in the tree
-    return { cellLoads: loads + childResult.cellLoads, siblingIsFork: childResult.siblingIsFork };
-}
-
-/**
  * Compute gas for V5R1 RemoveExtension action from existing extensions.
  *
  * The +75 gas penalty (3 × cell_reload = 3 × 25) applies when edge merging is needed:
@@ -851,13 +871,6 @@ export function computeRemoveExtensionGasFromExtensions(
 ): bigint {
     if (existingExtensionHashes.length <= 1) {
         return computeRemoveLastExtensionGas();
-    }
-
-    function hexToBinary(hex: string): string {
-        return hex
-            .split('')
-            .map(c => parseInt(c, 16).toString(2).padStart(4, '0'))
-            .join('');
     }
 
     const binaryKeys = existingExtensionHashes.map(hexToBinary);
