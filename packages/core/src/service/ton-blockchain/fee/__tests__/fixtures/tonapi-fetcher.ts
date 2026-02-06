@@ -3,17 +3,9 @@
  * Used in tests when FETCH_REAL_FEES=1 environment variable is set.
  */
 
-const TONAPI_BASE_URL = 'https://tonapi.io/v2';
+import { ExpectedFees } from './utils';
 
-export interface ExpectedFees {
-    gasUsed: bigint;
-    gasFee: bigint;
-    actionFee: bigint;
-    storageFee: bigint;
-    importFee: bigint;
-    fwdFeeRemaining: bigint;
-    walletFee: bigint;
-}
+const TONAPI_BASE_URL = 'https://tonapi.io/v2';
 
 // tonapi transaction response types (partial)
 interface TonApiComputePhase {

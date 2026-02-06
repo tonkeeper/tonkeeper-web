@@ -16,6 +16,16 @@ import { fileURLToPath } from 'url';
 import { assertUnreachable, TonWalletVersion, FeeBlockchainConfig } from '../../compat';
 import { CellStats } from '../../fees';
 
+export interface ExpectedFees {
+    gasUsed: bigint;
+    gasFee: bigint;
+    actionFee: bigint;
+    storageFee: bigint;
+    importFee: bigint;
+    fwdFeeRemaining: bigint;
+    walletFee: bigint;
+}
+
 export type FixtureTag =
     | 'simple-transfer'
     | 'deploy-transfer'
@@ -40,15 +50,7 @@ export type WalletFeeTestCase = {
         timeDelta: bigint;
         existingExtensions?: string[]; // only for extension tests
     };
-    expected: {
-        gasUsed: bigint;
-        gasFee: bigint;
-        actionFee: bigint;
-        storageFee: bigint;
-        importFee: bigint;
-        fwdFeeRemaining: bigint;
-        walletFee: bigint;
-    };
+    expected: ExpectedFees;
     blockchainConfig: FeeBlockchainConfig;
 };
 
