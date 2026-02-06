@@ -35,6 +35,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V3R1
     // ============================================================
 
+    // https://tonviewer.com/transaction/9b431557cc90d4fee34fe8b3afa5cc68baf0afac76d8a603f04bc6eccb0328a3
     {
         name: 'V3R1 - Simple TON Transfer',
         tag: 'simple-transfer',
@@ -61,6 +62,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/56d703d5a575c1ebebc1ca4c4d53a0fe153868f1819e90dce5454aaa60f85cbe
     {
         name: 'V3R1 - Deploy + Transfer',
         tag: 'deploy-transfer',
@@ -87,6 +89,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/a4dc775cbbfc14c46679159a8e9fac6d65439e25fa68dcceb91c0e3de9948943
     {
         name: 'V3R1 - Multi-message Transfer',
         tag: 'multi-transfer',
@@ -117,6 +120,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V3R2
     // ============================================================
 
+    // https://tonviewer.com/transaction/2fa6487aaf22906418d98a8e20cb0c8fa1fb78c4d31661fb3ebc504ab5c9f9f7
     {
         name: 'V3R2 - Simple TON Transfer',
         tag: 'simple-transfer',
@@ -143,6 +147,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/a3c4513865506e14d8eb05e0c2e508827125d615384bbb1f91b19c2147088c99
     {
         name: 'V3R2 - Deploy + Transfer',
         tag: 'deploy-transfer',
@@ -169,6 +174,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/9758ce7b17d25f6f520d5c8be139de10abecd187fe16484263a0e5ae7fa1a298
     {
         name: 'V3R2 - Multi-message Transfer',
         tag: 'multi-transfer',
@@ -199,6 +205,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V4R2
     // ============================================================
 
+    // https://tonviewer.com/transaction/da87f551960c619ce4a00737d84c3ac087d311e30b3d0f0a481b6c528f639a11
     {
         name: 'V4R2 - Simple TON Transfer',
         tag: 'simple-transfer',
@@ -225,6 +232,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/9cef3b6ed79a0026f702997011dfae56ed1e542869be96433b2a2ee95e10dbc6
     {
         name: 'V4R2 - Deploy + Transfer',
         tag: 'deploy-transfer',
@@ -251,6 +259,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/f746a4a6347a56ad128bcd8e17831bbbd9776b0522c764e4c672512fa053196d
     {
         name: 'V4R2 - Multi-message Transfer',
         tag: 'multi-transfer',
@@ -281,6 +290,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V5R1
     // ============================================================
 
+    // https://tonviewer.com/transaction/8612717faece81bf6a2c7b44c9b4609b71e06ae7d0c1aa356e6cd8f30c801056
     {
         name: 'V5R1 - Simple TON Transfer',
         tag: 'simple-transfer',
@@ -307,6 +317,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/8b399b6f07adfff9ebbc993f3e31955d28d01a0eca4e95927d221f793e01d5bb
     {
         name: 'V5R1 - Deploy + Transfer',
         tag: 'deploy-transfer',
@@ -333,6 +344,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/9043311ef14e365b6a856a48d8126527363ef565c7aaa310948dcbfc691c526a
     {
         name: 'V5R1 - Multi-message Transfer',
         tag: 'multi-transfer',
@@ -359,6 +371,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/9fc34b1f3bbea2afb2077224258c875b66fe468219d13eed32318aa3d72d2d2f
     {
         name: 'V5R1 - Send All Transfer',
         tag: 'send-all',
@@ -389,6 +402,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V5R1 Jetton
     // ============================================================
 
+    // https://tonviewer.com/transaction/4f148ce4f6ea7673dd7dce81e2f0cd23ca5e2e5baa68fa36ba0c689f324ce3ab
     {
         name: 'V5R1 - Deploy + Jetton Transfer',
         tag: 'jetton-deploy-transfer',
@@ -415,6 +429,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/e1087deb86086b1e8496ab968f99a5530170ed631a534c4d8256329cf454dd70
     {
         name: 'V5R1 - Simple Jetton Transfer',
         tag: 'jetton-transfer',
@@ -445,6 +460,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V5R1 Dedup & Exotic
     // ============================================================
 
+    // https://tonviewer.com/transaction/0339b0c0720456038ecfcaedc19f287341cd2df5ee0891321540070da554d054
     {
         name: 'V5R1 - Dedup Within Msg',
         tag: 'dedup-within-msg',
@@ -471,6 +487,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/139b5f7210fc0a86b54f447d0d060b1d843c1f52bf925057a7011461219a72c4
     {
         name: 'V5R1 - Dedup Cross Msg',
         tag: 'dedup-cross-msg',
@@ -497,6 +514,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/743d84f69adba2e65532d233a4ba93881bb6ffc1ea3fa476474fb4b49df32ec3
     {
         name: 'V5R1 - Library Cell Body',
         tag: 'library-body',
@@ -527,6 +545,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V5R1 Add Extension
     // ============================================================
 
+    // https://tonviewer.com/transaction/0a1803894b487e63180e914013d3adcc227452c5ad9b646770bad745a8881f2a
     {
         name: 'V5R1 - Add First Extension',
         tag: 'add-extension',
@@ -554,6 +573,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/30575e1ea9c73215b623c560562bf26fbd9ca5e32a4b35e3449b5763bba05c11
     {
         name: 'V5R1 - Add Second Extension',
         tag: 'add-extension',
@@ -581,6 +601,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/c4fec1044bce37f1969b8fc8fb4c25b52655439230d02d8bf70d6eee384ad729
     {
         name: 'V5R1 - Add Eighth Extension',
         tag: 'add-extension',
@@ -608,6 +629,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/6a16454aa6945d25787191caf686bf5df5bd2f9f581771ac1dc9adcc88315331
     {
         name: 'V5R1 - Add Ninth Extension',
         tag: 'add-extension',
@@ -639,6 +661,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
     // V5R1 Remove Extension
     // ============================================================
 
+    // https://tonviewer.com/transaction/7e06fd2ade80900e47bd38db060b9533d09bb9d28a8798fefc52457ec5d508e5
     {
         name: 'V5R1 - Remove Ext (LEAF sibling)',
         tag: 'remove-extension',
@@ -676,6 +699,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/e169d1236176c803883fe6bd2e5b8e482b51fafa428655fb7a47faafccbccb2b
     {
         name: 'V5R1 - Remove Ext (FORK sibling)',
         tag: 'remove-extension',
@@ -703,6 +727,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/4862b0d85ded1db98571493e2d0af72cec7fd5e86fcb4b29c2cbe8ee690caf47
     {
         name: 'V5R1 - Remove Ext (2→1)',
         tag: 'remove-extension',
@@ -730,6 +755,7 @@ export const FEE_TEST_CASES: WalletFeeTestCase[] = [
         blockchainConfig: BLOCKCHAIN_CONFIG_2024_12
     },
 
+    // https://tonviewer.com/transaction/9302d3bf88762bac10f62ea02e838eb6bd8f6c5330978143cc7edd24205d56e4
     {
         name: 'V5R1 - Remove Ext (1→0)',
         tag: 'remove-extension',

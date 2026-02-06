@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Cell } from '@ton/core';
 import { beforeAll, describe, expect, it } from 'vitest';
 
@@ -9,7 +10,7 @@ import {
     computeActionFee,
     computeAddExtensionGas,
     computeAddExtensionGasFromExtensions,
-    computeAddFirstExtensionGas,
+
     computeForwardFee,
     computeGasFee,
     computeImportFee,
@@ -332,124 +333,87 @@ describe('8. Blockchain-verified Transactions', () => {
  * All extension operations verified against real blockchain transactions.
  */
 describe('7. V5R1 Extension Gas', () => {
+    // ---- ADD Extension ----
+
+    // Full staircase 0→1→...→8 verified against real transactions.
+    // Gas is non-monotonic due to Patricia trie rebalancing (e.g. 4→5 < 3→4).
+    const addExtFromExtCases = [
+        // https://tonviewer.com/transaction/3eb607af0ee02aa773c9e840c817e62e2addc0871a6d6bdcd30e95784840a95e
+        { existing: [], add: EXT.E1, gas: 6110n },
+        // https://tonviewer.com/transaction/185a5fd6fe0a996786b7acd4b2a5ff3b69df8475be91118d4ba726d90c4bc8f3
+        { existing: [EXT.E1], add: EXT.E2, gas: 7210n },
+        // https://tonviewer.com/transaction/d505f6df24065a837fe0e3916b4dffdadf4de45f20b784a6862c58b7609c9828
+        { existing: [EXT.E1, EXT.E2], add: EXT.E3, gas: 7810n },
+        // https://tonviewer.com/transaction/e89c1640cd32335a123caa6737ac3767447f8818ff911bad03a3ba3555361565
+        { existing: [EXT.E1, EXT.E2, EXT.E3], add: EXT.E4, gas: 8410n },
+        // https://tonviewer.com/transaction/bdfdae4d4ddd87f0e45ee2249701e01538ec4d28a711e44b7debd2ba0c680f7b
+        { existing: [EXT.E1, EXT.E2, EXT.E3, EXT.E4], add: EXT.E5, gas: 7810n },
+        // https://tonviewer.com/transaction/ca13fd5b2d0321128b265a7b4e1155ca142a08f8cc01523370385b05ab978e69
+        { existing: [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5], add: EXT.E6, gas: 8410n },
+        // https://tonviewer.com/transaction/2e63cf4af8192d34f963656c632715ab66689a862d6f78e703360d3352adf07d
+        { existing: [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5, EXT.E6], add: EXT.E7, gas: 9010n },
+        // https://tonviewer.com/transaction/a24db9110975efc27875b5786240384e96e58b29bf5497fefc84b8914f20a8a0
+        { existing: [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5, EXT.E6, EXT.E7], add: EXT.E8, gas: 7810n }
+    ];
+
     describe('computeAddExtensionGasFromExtensions', () => {
-        // TX: 3eb607af0ee02aa773c9e840c817e62e2addc0871a6d6bdcd30e95784840a95e
-        it('0→1: empty dict → 6110', () => {
-            expect(computeAddExtensionGasFromExtensions([], EXT.E1)).toBe(6110n);
-        });
-
-        // TX: 185a5fd6fe0a996786b7acd4b2a5ff3b69df8475be91118d4ba726d90c4bc8f3
-        it('1→2: 1 ext → 7210', () => {
-            expect(computeAddExtensionGasFromExtensions([EXT.E1], EXT.E2)).toBe(7210n);
-        });
-
-        // TX: d505f6df24065a837fe0e3916b4dffdadf4de45f20b784a6862c58b7609c9828
-        it('2→3: 2 ext → 7810', () => {
-            expect(computeAddExtensionGasFromExtensions([EXT.E1, EXT.E2], EXT.E3)).toBe(7810n);
-        });
-
-        // TX: e89c1640cd32335a123caa6737ac3767447f8818ff911bad03a3ba3555361565
-        it('3→4: 3 ext → 8410', () => {
-            expect(computeAddExtensionGasFromExtensions([EXT.E1, EXT.E2, EXT.E3], EXT.E4)).toBe(
-                8410n
-            );
-        });
-
-        // TX: bdfdae4d4ddd87f0e45ee2249701e01538ec4d28a711e44b7debd2ba0c680f7b
-        it('4→5: 4 ext → 7810', () => {
-            expect(
-                computeAddExtensionGasFromExtensions([EXT.E1, EXT.E2, EXT.E3, EXT.E4], EXT.E5)
-            ).toBe(7810n);
-        });
-
-        // TX: ca13fd5b2d0321128b265a7b4e1155ca142a08f8cc01523370385b05ab978e69
-        it('5→6: 5 ext → 8410', () => {
-            expect(
-                computeAddExtensionGasFromExtensions(
-                    [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5],
-                    EXT.E6
-                )
-            ).toBe(8410n);
-        });
-
-        // TX: 2e63cf4af8192d34f963656c632715ab66689a862d6f78e703360d3352adf07d
-        it('6→7: 6 ext → 9010', () => {
-            expect(
-                computeAddExtensionGasFromExtensions(
-                    [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5, EXT.E6],
-                    EXT.E7
-                )
-            ).toBe(9010n);
-        });
-
-        // TX: a24db9110975efc27875b5786240384e96e58b29bf5497fefc84b8914f20a8a0
-        it('7→8: 7 ext → 7810', () => {
-            expect(
-                computeAddExtensionGasFromExtensions(
-                    [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5, EXT.E6, EXT.E7],
-                    EXT.E8
-                )
-            ).toBe(7810n);
-        });
+        for (const c of addExtFromExtCases) {
+            it(`${c.existing.length}→${c.existing.length + 1}: gas=${c.gas}`, () => {
+                expect(computeAddExtensionGasFromExtensions(c.existing, c.add)).toBe(c.gas);
+            });
+        }
     });
 
-    describe('computeAddFirstExtensionGas', () => {
-        it('returns 6110 for empty dict → 1 extension', () => {
-            expect(computeAddFirstExtensionGas()).toBe(6110n);
-        });
-    });
+    // Formula: 6610 + 600 × cellLoads
+    const addExtCases = [
+        { cellLoads: 1n, gas: 7210n },
+        { cellLoads: 2n, gas: 7810n },
+        { cellLoads: 3n, gas: 8410n },
+        { cellLoads: 4n, gas: 9010n }
+    ];
 
-    describe('computeAddExtensionGas (formula: 6610 + 600×cellLoads)', () => {
-        it('cellLoads=1 → 7210', () => {
-            expect(computeAddExtensionGas(1n)).toBe(7210n);
-        });
-
-        it('cellLoads=2 → 7810', () => {
-            expect(computeAddExtensionGas(2n)).toBe(7810n);
-        });
-
-        it('cellLoads=3 → 8410', () => {
-            expect(computeAddExtensionGas(3n)).toBe(8410n);
-        });
-
-        it('cellLoads=4 → 9010', () => {
-            expect(computeAddExtensionGas(4n)).toBe(9010n);
-        });
+    describe('computeAddExtensionGas (6610 + 600×cellLoads)', () => {
+        for (const c of addExtCases) {
+            it(`cellLoads=${c.cellLoads} → ${c.gas}`, () => {
+                expect(computeAddExtensionGas(c.cellLoads)).toBe(c.gas);
+            });
+        }
     });
 
     // ---- REMOVE Extension ----
 
     describe('computeRemoveLastExtensionGas', () => {
-        it('returns 5865 for 1→0 (5290 + 600 - 25)', () => {
+        it('1→0: 5290 + 600 - 25 = 5865', () => {
             expect(computeRemoveLastExtensionGas()).toBe(5865n);
         });
     });
 
-    describe('computeRemoveExtensionGas (formula: 5290 + 600×cellLoads ± merge)', () => {
-        it('cellLoads=1, no merge → 5890', () => {
-            expect(computeRemoveExtensionGas(1n, false)).toBe(5890n);
-        });
+    // Formula: 5290 + 600 × cellLoads + (needsMerge ? 75 : 0)
+    const removeExtCases = [
+        { cellLoads: 1n, merge: false, gas: 5890n },
+        { cellLoads: 1n, merge: true, gas: 5965n },
+        { cellLoads: 2n, merge: false, gas: 6490n },
+        { cellLoads: 4n, merge: false, gas: 7690n }
+    ];
 
-        it('cellLoads=1, with merge (+75) → 5965', () => {
-            expect(computeRemoveExtensionGas(1n, true)).toBe(5965n);
-        });
-
-        it('cellLoads=2, no merge → 6490', () => {
-            expect(computeRemoveExtensionGas(2n, false)).toBe(6490n);
-        });
-
-        it('cellLoads=4, no merge → 7690', () => {
-            expect(computeRemoveExtensionGas(4n, false)).toBe(7690n);
-        });
+    describe('computeRemoveExtensionGas (5290 + 600×cellLoads ± merge)', () => {
+        for (const c of removeExtCases) {
+            it(`cellLoads=${c.cellLoads}, merge=${c.merge} → ${c.gas}`, () => {
+                expect(computeRemoveExtensionGas(c.cellLoads, c.merge)).toBe(c.gas);
+            });
+        }
     });
 
-    describe('computeRemoveExtensionGasFromExtensions', () => {
-        it('1→0: last extension → 5865', () => {
-            expect(computeRemoveExtensionGasFromExtensions([EXT.E1], EXT.E1)).toBe(5865n);
-        });
+    const removeExtFromExtCases = [
+        { existing: [EXT.E1], remove: EXT.E1, gas: 5865n, label: '1→0: last extension' },
+        { existing: [EXT.E1, EXT.E2], remove: EXT.E2, gas: 6565n, label: '2→1: root collapse (+75)' }
+    ];
 
-        it('2→1: root collapse (+75) → 6565', () => {
-            expect(computeRemoveExtensionGasFromExtensions([EXT.E1, EXT.E2], EXT.E2)).toBe(6565n);
-        });
+    describe('computeRemoveExtensionGasFromExtensions', () => {
+        for (const c of removeExtFromExtCases) {
+            it(`${c.label} → ${c.gas}`, () => {
+                expect(computeRemoveExtensionGasFromExtensions(c.existing, c.remove)).toBe(c.gas);
+            });
+        }
     });
 });
