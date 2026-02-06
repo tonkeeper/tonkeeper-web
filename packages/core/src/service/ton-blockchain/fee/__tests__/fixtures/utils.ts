@@ -16,7 +16,22 @@ import { fileURLToPath } from 'url';
 import { assertUnreachable, TonWalletVersion, FeeBlockchainConfig } from '../../compat';
 import { CellStats } from '../../fees';
 
+export type FixtureTag =
+    | 'simple-transfer'
+    | 'deploy-transfer'
+    | 'multi-transfer'
+    | 'send-all'
+    | 'jetton-transfer'
+    | 'jetton-deploy-transfer'
+    | 'dedup-within-msg'
+    | 'dedup-cross-msg'
+    | 'library-body'
+    | 'add-extension'
+    | 'remove-extension';
+
 export type WalletFeeTestCase = {
+    name: string;
+    tag: FixtureTag;
     txHash: string;
     input: {
         inMsgBoc: string; // base64 encoded BOC

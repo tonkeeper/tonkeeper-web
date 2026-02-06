@@ -3,33 +3,8 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import { BLOCKCHAIN_CONFIG_2024_12 } from './fixtures/blockchain-config';
 import { fetchExpectedFees, shouldFetchRealFees, ExpectedFees } from './fixtures/tonapi-fetcher';
+import { FEE_TEST_CASES, EXT } from './fixtures/test-cases';
 import { WalletFeeTestCase, parseWalletOutMsgCells } from './fixtures/utils';
-import { V3R1_DEPLOY_TRANSFER } from './fixtures/v3r1-deploy-transfer';
-import { V3R1_MULTI_TRANSFER } from './fixtures/v3r1-multi-transfer';
-import { V3R1_SIMPLE_TRANSFER } from './fixtures/v3r1-simple-transfer';
-import { V3R2_DEPLOY_TRANSFER } from './fixtures/v3r2-deploy-transfer';
-import { V3R2_MULTI_TRANSFER } from './fixtures/v3r2-multi-transfer';
-import { V3R2_SIMPLE_TRANSFER } from './fixtures/v3r2-simple-transfer';
-import { V4R2_DEPLOY_TRANSFER } from './fixtures/v4r2-deploy-transfer';
-import { V4R2_MULTI_TRANSFER } from './fixtures/v4r2-multi-transfer';
-import { V4R2_SIMPLE_TRANSFER } from './fixtures/v4r2-simple-transfer';
-import { V5R1_DEDUP_CROSS_MSG } from './fixtures/v5r1-dedup-cross-msg';
-import { V5R1_DEDUP_WITHIN_MSG } from './fixtures/v5r1-dedup-within-msg';
-import { V5R1_DEPLOY_TRANSFER } from './fixtures/v5r1-deploy-transfer';
-import { V5R1_EXTENSION_ADD_EIGHTH } from './fixtures/v5r1-extension-add-eighth';
-import { V5R1_EXTENSION_ADD_FIRST } from './fixtures/v5r1-extension-add-first';
-import { V5R1_EXTENSION_ADD_NINTH } from './fixtures/v5r1-extension-add-ninth';
-import { V5R1_EXTENSION_ADD_SECOND } from './fixtures/v5r1-extension-add-second';
-import { V5R1_JETTON_DEPLOY_TRANSFER } from './fixtures/v5r1-jetton-deploy-transfer';
-import { V5R1_JETTON_SIMPLE_TRANSFER } from './fixtures/v5r1-jetton-simple-transfer';
-import { V5R1_LIBRARY_BODY } from './fixtures/v5r1-library-body';
-import { V5R1_MULTI_TRANSFER } from './fixtures/v5r1-multi-transfer';
-import { V5R1_REMOVE_EXT_FORK_SIBLING } from './fixtures/v5r1-remove-ext-fork-sibling';
-import { V5R1_REMOVE_EXT_LAST } from './fixtures/v5r1-remove-ext-last';
-import { V5R1_REMOVE_EXT_LEAF_SIBLING } from './fixtures/v5r1-remove-ext-leaf-sibling';
-import { V5R1_REMOVE_EXT_PRELAST } from './fixtures/v5r1-remove-ext-prelast';
-import { V5R1_SEND_ALL_TRANSFER } from './fixtures/v5r1-send-all-transfer';
-import { V5R1_SIMPLE_TRANSFER } from './fixtures/v5r1-simple-transfer';
 import {
     computeActionFee,
     computeAddExtensionGas,
@@ -338,91 +313,9 @@ function createFeeTests(name: string, fixture: WalletFeeTestCase) {
  * Each fixture contains a real transaction hash and expected fee values.
  */
 describe('8. Blockchain-verified Transactions', () => {
-    // V3R1 - deploy + transfer (seqno=0, StateInit included)
-    createFeeTests('V3R1 - Deploy + Transfer', V3R1_DEPLOY_TRANSFER);
-
-    // V3R1 - simple transfer (seqno>0, no StateInit)
-    createFeeTests('V3R1 - Simple TON Transfer', V3R1_SIMPLE_TRANSFER);
-
-    // V3R1 - multi-message transfer (3 messages)
-    // Validates gas formula: gasUsed = baseGas + gasPerMsg * outMsgsCount
-    createFeeTests('V3R1 - Multi-message Transfer', V3R1_MULTI_TRANSFER);
-
-    // V3R2 - deploy + transfer (seqno=0, StateInit included)
-    createFeeTests('V3R2 - Deploy + Transfer', V3R2_DEPLOY_TRANSFER);
-
-    // V3R2 - multi-message transfer (3 messages)
-    // Validates gas formula: gasUsed = baseGas + gasPerMsg * outMsgsCount
-    createFeeTests('V3R2 - Multi-message Transfer', V3R2_MULTI_TRANSFER);
-
-    // V3R2 - simple transfer (seqno>0, no StateInit)
-    createFeeTests('V3R2 - Simple TON Transfer', V3R2_SIMPLE_TRANSFER);
-
-    // V4R2 - deploy + transfer (seqno=0, StateInit included)
-    createFeeTests('V4R2 - Deploy + Transfer', V4R2_DEPLOY_TRANSFER);
-
-    // V4R2 - multi-message transfer (3 messages)
-    // Validates gas formula: gasUsed = baseGas + gasPerMsg * outMsgsCount
-    createFeeTests('V4R2 - Multi-message Transfer', V4R2_MULTI_TRANSFER);
-
-    // V4R2 - verified against real transaction
-    // https://tonviewer.com/transaction/319cf6b07dd0207d48c5e4b3afe7f48228fd1fe9ff9d403987ab20c09881ceb1
-    createFeeTests('V4R2 - Simple TON Transfer', V4R2_SIMPLE_TRANSFER);
-
-    // V5R1 - deploy + transfer (seqno=0, StateInit included)
-    createFeeTests('V5R1 - Deploy + Transfer', V5R1_DEPLOY_TRANSFER);
-
-    // V5R1 - verified against real transaction
-    // https://tonviewer.com/transaction/fea78ce4af53ea89cfaacde7359d10a43f23b4a90ce9b451516b8cddb41ba3b7
-    createFeeTests('V5R1 - Simple TON Transfer', V5R1_SIMPLE_TRANSFER);
-
-    // V5R1 - send all balance (mode 130)
-    // Verifies that sendMode doesn't affect gas calculation
-    createFeeTests('V5R1 - Send All Transfer', V5R1_SEND_ALL_TRANSFER);
-
-    // V5R1 - multi-message transfer (3 messages)
-    // Validates gas formula: gasUsed = baseGas + gasPerMsg * outMsgsCount
-    createFeeTests('V5R1 - Multi-message Transfer', V5R1_MULTI_TRANSFER);
-
-    // V5R1 - deploy + jetton transfer (POSASYVAET)
-    createFeeTests('V5R1 - Deploy + Jetton Transfer', V5R1_JETTON_DEPLOY_TRANSFER);
-
-    // V5R1 - simple jetton transfer (USDT)
-    createFeeTests('V5R1 - Simple Jetton Transfer', V5R1_JETTON_SIMPLE_TRANSFER);
-
-    // V5R1 - cell deduplication test 3.1 (duplicate refs within single message)
-    createFeeTests('V5R1 - Dedup Within Msg', V5R1_DEDUP_WITHIN_MSG);
-
-    // V5R1 - cell deduplication test 3.2 (3 messages with same body)
-    createFeeTests('V5R1 - Dedup Cross Msg', V5R1_DEDUP_CROSS_MSG);
-
-    // V5R1 - library cell test 3.3 (exotic cell in message body)
-    // CAVEAT: Verifies fee calculation counts 264 bits, but does NOT prove
-    // TVM recognizes it as valid library cell (never loaded/dereferenced)
-    createFeeTests('V5R1 - Library Cell Body', V5R1_LIBRARY_BODY);
-
-    // V5R1 - extension test 5.1 (add first extension)
-    // Key difference: outMsgs=[] → actionFee=0, gasUsed differs (dict operations)
-    createFeeTests('V5R1 - Add First Extension', V5R1_EXTENSION_ADD_FIRST);
-
-    // V5R1 - extension test 5.2 (add second extension)
-    // Tests Patricia trie insertion: cellLoads=1, gasUsed=7210
-    createFeeTests('V5R1 - Add Second Extension', V5R1_EXTENSION_ADD_SECOND);
-
-    // V5R1 - extension test 5.3 (add eighth extension)
-    // Tests Patricia trie with new prefix branch: pathDepth=1, subtree>1
-    createFeeTests('V5R1 - Add Eighth Extension', V5R1_EXTENSION_ADD_EIGHTH);
-
-    // V5R1 - extension test 5.4 (add ninth extension)
-    // Tests deep fork: 00000005 vs 00000004 differ at bit 254
-    createFeeTests('V5R1 - Add Ninth Extension', V5R1_EXTENSION_ADD_NINTH);
-
-    // V5R1 - REMOVE extension tests
-    // Formula: 5290 + 600×cellLoads + (siblingIsFork || rootCollapse ? 75 : 0)
-    createFeeTests('V5R1 - Remove Ext (LEAF sibling)', V5R1_REMOVE_EXT_LEAF_SIBLING);
-    createFeeTests('V5R1 - Remove Ext (FORK sibling)', V5R1_REMOVE_EXT_FORK_SIBLING);
-    createFeeTests('V5R1 - Remove Ext (2→1)', V5R1_REMOVE_EXT_PRELAST);
-    createFeeTests('V5R1 - Remove Ext (1→0)', V5R1_REMOVE_EXT_LAST);
+    for (const fixture of FEE_TEST_CASES) {
+        createFeeTests(fixture.name, fixture);
+    }
 });
 
 // ============================================================================
@@ -439,48 +332,43 @@ describe('8. Blockchain-verified Transactions', () => {
  * All extension operations verified against real blockchain transactions.
  */
 describe('7. V5R1 Extension Gas', () => {
-    // Extension hashes in order they were added to the wallet
-    const EXT_1 = '613fbe5785a63a981b59e3255f8d94749deadba81d5658d806c6333a1e6a0526';
-    const EXT_2 = 'ba6ede4924bdc9ecbd4582c10bfacf1dfdf3e4f1bde5796819e45ff6ea0f8522';
-    const EXT_3 = '4758697a8b9cadbecfe0f102132435465768798a9bacbdcedff0011223344556';
-    const EXT_4 = '5f708192a3b4c5d6e7f8091a2b3c4d5e6f8091a2b3c4d5e6f708192a3b4c5d6e';
-    const EXT_5 = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01';
-    const EXT_6 = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff02';
-    const EXT_7 = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff03';
-    const EXT_8 = '0000000000000000000000000000000000000000000000000000000000000004';
-
     describe('computeAddExtensionGasFromExtensions', () => {
         // TX: 3eb607af0ee02aa773c9e840c817e62e2addc0871a6d6bdcd30e95784840a95e
         it('0→1: empty dict → 6110', () => {
-            expect(computeAddExtensionGasFromExtensions([], EXT_1)).toBe(6110n);
+            expect(computeAddExtensionGasFromExtensions([], EXT.E1)).toBe(6110n);
         });
 
         // TX: 185a5fd6fe0a996786b7acd4b2a5ff3b69df8475be91118d4ba726d90c4bc8f3
         it('1→2: 1 ext → 7210', () => {
-            expect(computeAddExtensionGasFromExtensions([EXT_1], EXT_2)).toBe(7210n);
+            expect(computeAddExtensionGasFromExtensions([EXT.E1], EXT.E2)).toBe(7210n);
         });
 
         // TX: d505f6df24065a837fe0e3916b4dffdadf4de45f20b784a6862c58b7609c9828
         it('2→3: 2 ext → 7810', () => {
-            expect(computeAddExtensionGasFromExtensions([EXT_1, EXT_2], EXT_3)).toBe(7810n);
+            expect(computeAddExtensionGasFromExtensions([EXT.E1, EXT.E2], EXT.E3)).toBe(7810n);
         });
 
         // TX: e89c1640cd32335a123caa6737ac3767447f8818ff911bad03a3ba3555361565
         it('3→4: 3 ext → 8410', () => {
-            expect(computeAddExtensionGasFromExtensions([EXT_1, EXT_2, EXT_3], EXT_4)).toBe(8410n);
+            expect(computeAddExtensionGasFromExtensions([EXT.E1, EXT.E2, EXT.E3], EXT.E4)).toBe(
+                8410n
+            );
         });
 
         // TX: bdfdae4d4ddd87f0e45ee2249701e01538ec4d28a711e44b7debd2ba0c680f7b
         it('4→5: 4 ext → 7810', () => {
-            expect(computeAddExtensionGasFromExtensions([EXT_1, EXT_2, EXT_3, EXT_4], EXT_5)).toBe(
-                7810n
-            );
+            expect(
+                computeAddExtensionGasFromExtensions([EXT.E1, EXT.E2, EXT.E3, EXT.E4], EXT.E5)
+            ).toBe(7810n);
         });
 
         // TX: ca13fd5b2d0321128b265a7b4e1155ca142a08f8cc01523370385b05ab978e69
         it('5→6: 5 ext → 8410', () => {
             expect(
-                computeAddExtensionGasFromExtensions([EXT_1, EXT_2, EXT_3, EXT_4, EXT_5], EXT_6)
+                computeAddExtensionGasFromExtensions(
+                    [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5],
+                    EXT.E6
+                )
             ).toBe(8410n);
         });
 
@@ -488,8 +376,8 @@ describe('7. V5R1 Extension Gas', () => {
         it('6→7: 6 ext → 9010', () => {
             expect(
                 computeAddExtensionGasFromExtensions(
-                    [EXT_1, EXT_2, EXT_3, EXT_4, EXT_5, EXT_6],
-                    EXT_7
+                    [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5, EXT.E6],
+                    EXT.E7
                 )
             ).toBe(9010n);
         });
@@ -498,8 +386,8 @@ describe('7. V5R1 Extension Gas', () => {
         it('7→8: 7 ext → 7810', () => {
             expect(
                 computeAddExtensionGasFromExtensions(
-                    [EXT_1, EXT_2, EXT_3, EXT_4, EXT_5, EXT_6, EXT_7],
-                    EXT_8
+                    [EXT.E1, EXT.E2, EXT.E3, EXT.E4, EXT.E5, EXT.E6, EXT.E7],
+                    EXT.E8
                 )
             ).toBe(7810n);
         });
@@ -557,11 +445,11 @@ describe('7. V5R1 Extension Gas', () => {
 
     describe('computeRemoveExtensionGasFromExtensions', () => {
         it('1→0: last extension → 5865', () => {
-            expect(computeRemoveExtensionGasFromExtensions([EXT_1], EXT_1)).toBe(5865n);
+            expect(computeRemoveExtensionGasFromExtensions([EXT.E1], EXT.E1)).toBe(5865n);
         });
 
         it('2→1: root collapse (+75) → 6565', () => {
-            expect(computeRemoveExtensionGasFromExtensions([EXT_1, EXT_2], EXT_2)).toBe(6565n);
+            expect(computeRemoveExtensionGasFromExtensions([EXT.E1, EXT.E2], EXT.E2)).toBe(6565n);
         });
     });
 });
