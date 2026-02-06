@@ -311,6 +311,7 @@ describe('7. V5R1 Extension Gas', () => {
 describe('8. Blockchain-verified Transactions', () => {
     async function loadExpected(fixture: WalletFeeTestCase): Promise<ExpectedFees> {
         if (shouldFetchRealFees()) {
+            // eslint-disable-next-line no-console
             console.log(`Fetching tx: ${fixture.txHash}`);
             return fetchExpectedFees(fixture.txHash);
         }

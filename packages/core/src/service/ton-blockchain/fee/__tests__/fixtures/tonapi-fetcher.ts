@@ -46,11 +46,13 @@ export async function fetchExpectedFees(txHash: string): Promise<ExpectedFees> {
         const response = await fetch(url);
 
         if (response.ok) {
-            return await response.json().then(parseFees);
+            const data = await response.json();
+            return parseFees(data);
         }
 
         if (response.status === 429 && attempt < maxRetries) {
             const delay = baseDelay * Math.pow(2, attempt);
+            // eslint-disable-next-line no-console
             console.log(`Rate limited, retrying in ${delay}ms...`);
             await sleep(delay);
             continue;
@@ -160,7 +162,9 @@ export function formatVerifyResult(result: VerifyResult): string {
 
     const format = (name: string, pred: bigint, act: bigint, diff: bigint): string => {
         const diffStr = diff === 0n ? '0' : diff > 0n ? `+${diff}` : `${diff}`;
-        return `${name.padEnd(15)} | ${String(pred).padStart(9)} | ${String(act).padStart(9)} | ${diffStr}`;
+        return `${name.padEnd(15)} | ${String(pred).padStart(9)} | ${String(act).padStart(
+            9
+        )} | ${diffStr}`;
     };
 
     // Reconstruct predicted from actual - diff

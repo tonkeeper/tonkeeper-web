@@ -9,7 +9,6 @@
 export { assertUnreachable } from '../../../utils/types';
 
 /**
- * TonWalletVersion mirrors the multiplatform enum exactly.
  * The web repo uses WalletVersion (numeric enum) from entries/wallet.ts,
  * but this module uses the string enum for algorithm compatibility.
  */
