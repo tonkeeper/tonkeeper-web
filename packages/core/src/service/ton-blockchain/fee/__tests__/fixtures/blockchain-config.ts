@@ -1,34 +1,37 @@
+/* eslint-disable prettier/prettier */
 /**
- * TON blockchain configuration snapshots for testing.
- * Structure matches BlockchainConfig from @ton-api/client.
+ * TON blockchain configuration snapshot for testing (mainnet, December 2024).
  *
- * Config keys:
- * - 18: storage_prices
- * - 20/21: gas_limits_prices (masterchain/basechain)
- * - 24/25: msg_forward_prices (masterchain/basechain)
+ * Values sourced from https://tonviewer.com/config
+ * TL-B definitions: https://github.com/ton-blockchain/ton/blob/master/crypto/block/block.tlb
+ *
+ * ConfigParam 18: StoragePrices (bit_price_ps / mc_bit_price_ps, cell_price_ps / mc_cell_price_ps)
+ * ConfigParam 20/21: GasLimitsPrices.gas_price (masterchain / basechain)
+ * ConfigParam 24/25: MsgForwardPrices (masterchain / basechain)
  */
-import { FeeBlockchainConfig } from '../../compat';
+import { FeeConfig } from '../../fees';
 
-export const BLOCKCHAIN_CONFIG_2024_12: FeeBlockchainConfig = {
-    '18': {
-        storagePrices: [
-            {
-                bitPricePs: 1,
-                cellPricePs: 500
-            }
-        ]
-    },
-    '21': {
-        gasLimitsPrices: {
-            gasPrice: 26_214_400
+export const BLOCKCHAIN_CONFIG_2024_12: FeeConfig = {
+    basechain: {
+        gasPrice: 26_214_400n,          // ConfigParam 21
+        storageBitPrice: 1n,            // ConfigParam 18: bit_price_ps
+        storageCellPrice: 500n,         // ConfigParam 18: cell_price_ps
+        fwd: {                          // ConfigParam 25
+            lumpPrice: 400_000n,
+            bitPrice: 26_214_400n,
+            cellPrice: 2_621_440_000n,
+            firstFrac: 21_845n
         }
     },
-    '25': {
-        msgForwardPrices: {
-            lumpPrice: 400_000,
-            bitPrice: 26_214_400,
-            cellPrice: 2_621_440_000,
-            firstFrac: 21845
+    masterchain: {
+        gasPrice: 655_360_000n,         // ConfigParam 20
+        storageBitPrice: 1_000n,        // ConfigParam 18: mc_bit_price_ps
+        storageCellPrice: 500_000n,     // ConfigParam 18: mc_cell_price_ps
+        fwd: {                          // ConfigParam 24
+            lumpPrice: 10_000_000n,
+            bitPrice: 655_360_000n,
+            cellPrice: 65_536_000_000n,
+            firstFrac: 21_845n
         }
     }
-} as const;
+};

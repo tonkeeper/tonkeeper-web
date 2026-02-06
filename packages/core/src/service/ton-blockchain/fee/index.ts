@@ -1,7 +1,6 @@
 export {
     UNINIT_ACCOUNT_STORAGE,
     estimateWalletFee,
-    extractFeeConfig,
     computeForwardFee,
     computeImportFee,
     computeActionFee,
@@ -22,8 +21,10 @@ export {
 } from './fees';
 
 export type {
+    MsgForwardPrices,
+    WorkchainConfig,
+    FeeConfig,
     WalletFeeEstimation,
-    FeeConfigParams,
     CellStats,
     WorkchainId,
     EstimateTransferFeeParams,
@@ -35,4 +36,3 @@ export type {
 } from './fees';
 
 export { TonWalletVersion } from './compat';
-export type { FeeBlockchainConfig } from './compat';

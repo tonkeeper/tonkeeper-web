@@ -1,6 +1,6 @@
 import { Address, Cell } from '@ton/core';
 
-import { TonWalletVersion, FeeBlockchainConfig, assertUnreachable } from './compat';
+import { TonWalletVersion, assertUnreachable } from './compat';
 
 // ============================================================================
 // Types
@@ -41,14 +41,45 @@ export interface WalletFeeEstimation {
     walletFee: bigint;
 }
 
-export interface FeeConfigParams {
-    msgFwdBitPrice: bigint; // config 24/25
-    msgFwdCellPrice: bigint; // config 24/25
-    msgFwdLumpPrice: bigint; // config 24/25
-    msgFwdFirstFrac: bigint; // config 24/25
-    gasPrice: bigint; // config 20/21
-    storageBitPrice: bigint; // config 18
-    storageCellPrice: bigint; // config 18
+/**
+ * block.tlb: MsgForwardPrices#ea — message forwarding fee parameters.
+ * ConfigParam 24 (masterchain) / 25 (basechain).
+ * @see https://github.com/ton-blockchain/ton/blob/master/crypto/block/block.tlb
+ * @see https://docs.ton.org/v3/documentation/network/configs/blockchain-configs#param-24
+ */
+export interface MsgForwardPrices {
+    /** lump_price:uint64 — base forwarding fee */
+    lumpPrice: bigint;
+    /** bit_price:uint64 — per-bit forwarding fee */
+    bitPrice: bigint;
+    /** cell_price:uint64 — per-cell forwarding fee */
+    cellPrice: bigint;
+    /** first_frac:uint16 — fraction kept as action fee (out of 2^16) */
+    firstFrac: bigint;
+}
+
+/**
+ * Fee parameters for a single workchain.
+ * @see https://docs.ton.org/v3/documentation/network/configs/blockchain-configs
+ */
+export interface WorkchainConfig {
+    /** GasLimitsPrices.gas_price — nanotons per 2^16 gas units.
+     *  ConfigParam 20 (masterchain) / 21 (basechain) */
+    gasPrice: bigint;
+    /** StoragePrices.bit_price_ps — nanotons per bit per 2^16 seconds.
+     *  ConfigParam 18: bit_price_ps (basechain) / mc_bit_price_ps (masterchain) */
+    storageBitPrice: bigint;
+    /** StoragePrices.cell_price_ps — nanotons per cell per 2^16 seconds.
+     *  ConfigParam 18: cell_price_ps (basechain) / mc_cell_price_ps (masterchain) */
+    storageCellPrice: bigint;
+    /** MsgForwardPrices for this workchain */
+    fwd: MsgForwardPrices;
+}
+
+/** Complete fee configuration for both workchains. */
+export interface FeeConfig {
+    basechain: WorkchainConfig;
+    masterchain: WorkchainConfig;
 }
 
 // ============================================================================
@@ -88,61 +119,30 @@ export interface V4R2PluginAction {
 }
 
 // ============================================================================
-// Fee Config Extraction
-// ============================================================================
-
-// eslint-disable-next-line complexity
-export function extractFeeConfig(
-    config: FeeBlockchainConfig,
-    workchain: WorkchainId = 0
-): FeeConfigParams {
-    const storageConfigKey = '18';
-    const fwdConfigKey = workchain === -1 ? '24' : '25'; // masterchain / basechain
-    const gasConfigKey = workchain === -1 ? '20' : '21'; // masterchain / basechain
-
-    const msgForwardPrices = config[fwdConfigKey]?.msgForwardPrices;
-    const gasPrices = config[gasConfigKey]?.gasLimitsPrices;
-    const storagePrices = config[storageConfigKey]?.storagePrices?.[0];
-
-    return {
-        msgFwdBitPrice: BigInt(msgForwardPrices?.bitPrice ?? 26214400),
-        msgFwdCellPrice: BigInt(msgForwardPrices?.cellPrice ?? 2621440000),
-        msgFwdLumpPrice: BigInt(msgForwardPrices?.lumpPrice ?? 400000),
-        msgFwdFirstFrac: BigInt(msgForwardPrices?.firstFrac ?? 21845),
-        gasPrice: BigInt(gasPrices?.gasPrice ?? 26214400),
-        storageBitPrice: BigInt(storagePrices?.bitPricePs ?? 1),
-        storageCellPrice: BigInt(storagePrices?.cellPricePs ?? 500)
-    };
-}
-
-// ============================================================================
 // Basic Fee Calculation Functions
 // ============================================================================
 
 /** fwdFee = lumpPrice + ceil((bitPrice * bits + cellPrice * cells) / 2^16) */
-export function computeForwardFee(config: FeeConfigParams, bits: bigint, cells: bigint): bigint {
-    return (
-        config.msgFwdLumpPrice +
-        shr16ceil(config.msgFwdBitPrice * bits + config.msgFwdCellPrice * cells)
-    );
+export function computeForwardFee(fwd: MsgForwardPrices, bits: bigint, cells: bigint): bigint {
+    return fwd.lumpPrice + shr16ceil(fwd.bitPrice * bits + fwd.cellPrice * cells);
 }
 
 /** Import fee uses same formula as forward fee */
 export const computeImportFee = computeForwardFee;
 
 /** actionFee = floor(fwdFee * firstFrac / 2^16) — stays with sender, included in total_fees */
-export function computeActionFee(config: FeeConfigParams, fwdFee: bigint): bigint {
-    return (fwdFee * config.msgFwdFirstFrac) >> 16n;
+export function computeActionFee(fwd: MsgForwardPrices, fwdFee: bigint): bigint {
+    return (fwdFee * fwd.firstFrac) >> 16n;
 }
 
 /** gasFee = floor(gasUsed * gasPrice / 2^16) */
-export function computeGasFee(config: FeeConfigParams, gasUsed: bigint): bigint {
+export function computeGasFee(config: WorkchainConfig, gasUsed: bigint): bigint {
     return (gasUsed * config.gasPrice) >> 16n;
 }
 
 /** storageFee = ceil((bits * bitPrice + cells * cellPrice) * timeDelta / 2^16) */
 export function computeStorageFee(
-    config: FeeConfigParams,
+    config: WorkchainConfig,
     storageUsed: CellStats,
     timeDelta: bigint
 ): bigint {
@@ -237,7 +237,7 @@ function parseOutMsgDestWorkchain(outMsg: Cell): WorkchainId {
  * Compute action fee for outMsgs, checking destination workchain for each.
  * Forward prices differ for masterchain (-1) vs basechain (0).
  */
-function computeActionFeeForOutMsgs(config: FeeBlockchainConfig, outMsgs: Cell[]): bigint {
+function computeActionFeeForOutMsgs(config: FeeConfig, outMsgs: Cell[]): bigint {
     return outMsgs.reduce((acc, msg) => {
         const destWorkchain = parseOutMsgDestWorkchain(msg);
 
@@ -245,10 +245,10 @@ function computeActionFeeForOutMsgs(config: FeeBlockchainConfig, outMsgs: Cell[]
             console.warn('Destination workchain is masterchain, not tested yet!!!');
         }
 
-        const fwdConfig = extractFeeConfig(config, destWorkchain);
+        const fwd = destWorkchain === -1 ? config.masterchain.fwd : config.basechain.fwd;
         const { bits, cells } = sumRefsStats(msg);
-        const fwdFee = computeForwardFee(fwdConfig, bits, cells);
-        return acc + computeActionFee(fwdConfig, fwdFee);
+        const fwdFee = computeForwardFee(fwd, bits, cells);
+        return acc + computeActionFee(fwd, fwdFee);
     }, 0n);
 }
 
@@ -257,7 +257,7 @@ function computeActionFeeForOutMsgs(config: FeeBlockchainConfig, outMsgs: Cell[]
  * fwdFeeRemaining = fwdFee - actionFee ≈ 2/3 of forward fee.
  * This amount is deducted from the outMsg value during delivery.
  */
-export function computeFwdFeeRemaining(config: FeeBlockchainConfig, outMsgs: Cell[]): bigint {
+export function computeFwdFeeRemaining(config: FeeConfig, outMsgs: Cell[]): bigint {
     return outMsgs.reduce((acc, msg) => {
         const destWorkchain = parseOutMsgDestWorkchain(msg);
 
@@ -265,10 +265,10 @@ export function computeFwdFeeRemaining(config: FeeBlockchainConfig, outMsgs: Cel
             console.warn('Destination workchain is masterchain, not tested yet!!!');
         }
 
-        const fwdConfig = extractFeeConfig(config, destWorkchain);
+        const fwd = destWorkchain === -1 ? config.masterchain.fwd : config.basechain.fwd;
         const { bits, cells } = sumRefsStats(msg);
-        const fwdFee = computeForwardFee(fwdConfig, bits, cells);
-        const actionFee = computeActionFee(fwdConfig, fwdFee);
+        const fwdFee = computeForwardFee(fwd, bits, cells);
+        const actionFee = computeActionFee(fwd, fwdFee);
         return acc + (fwdFee - actionFee);
     }, 0n);
 }
@@ -363,6 +363,8 @@ export function parseV5R1ExtensionAction(inMsg: Cell): V5R1ExtensionAction | nul
 
 interface EstimateWalletFeeBaseParams {
     walletVersion: TonWalletVersion;
+    /** Workchain of the wallet. Defaults to 0 (basechain). */
+    walletWorkchain?: WorkchainId;
     inMsg: Cell;
     timeDelta: bigint;
     /**
@@ -412,23 +414,24 @@ export type EstimateWalletFeeParams =
  * @returns WalletFeeEstimation with all fee components including fwdFeeRemaining
  */
 export function estimateWalletFee(
-    config: FeeBlockchainConfig,
+    config: FeeConfig,
     params: EstimateWalletFeeParams
 ): WalletFeeEstimation {
     const { walletVersion, inMsg, timeDelta, storageUsed } = params;
+    const walletWorkchain: WorkchainId = params.walletWorkchain ?? 0;
 
-    // Gas & storage fees use basechain config (wallet is always in workchain 0)
-    const baseConfig = extractFeeConfig(config, 0);
+    // Source workchain config (gas, storage, import fee)
+    const workchainConfig = walletWorkchain === -1 ? config.masterchain : config.basechain;
 
     // Common fees
     const { bits: msgBits, cells: msgCells } = sumRefsStats(inMsg);
-    const importFee = computeImportFee(baseConfig, msgBits, msgCells);
-    const storageFee = computeStorageFee(baseConfig, storageUsed, timeDelta);
+    const importFee = computeImportFee(workchainConfig.fwd, msgBits, msgCells);
+    const storageFee = computeStorageFee(workchainConfig, storageUsed, timeDelta);
 
     // === Transfer mode ===
     if ('outMsgs' in params && params.outMsgs) {
         const gasUsed = computeWalletGasUsed(walletVersion, BigInt(params.outMsgs.length));
-        const gasFee = computeGasFee(baseConfig, gasUsed);
+        const gasFee = computeGasFee(workchainConfig, gasUsed);
 
         // Action fee checks destination workchain for each outMsg
         const actionFee = computeActionFeeForOutMsgs(config, params.outMsgs);
@@ -454,7 +457,7 @@ export function estimateWalletFee(
                 params.existingExtensions,
                 newExtensionHash
             );
-            const gasFee = computeGasFee(baseConfig, gasUsed);
+            const gasFee = computeGasFee(workchainConfig, gasUsed);
             const actionFee = 0n;
             const fwdFeeRemaining = 0n;
             const walletFee = gasFee + actionFee + importFee + storageFee + fwdFeeRemaining;
@@ -467,7 +470,7 @@ export function estimateWalletFee(
                 params.existingExtensions,
                 removeExtensionHash
             );
-            const gasFee = computeGasFee(baseConfig, gasUsed);
+            const gasFee = computeGasFee(workchainConfig, gasUsed);
             const actionFee = 0n;
             const fwdFeeRemaining = 0n;
             const walletFee = gasFee + actionFee + importFee + storageFee + fwdFeeRemaining;
@@ -492,7 +495,7 @@ export function estimateWalletFee(
                 params.existingPlugins,
                 newPluginHash
             );
-            const gasFee = computeGasFee(baseConfig, gasUsed);
+            const gasFee = computeGasFee(workchainConfig, gasUsed);
             const actionFee = 0n;
             const fwdFeeRemaining = 0n;
             const walletFee = gasFee + actionFee + importFee + storageFee + fwdFeeRemaining;
@@ -505,7 +508,7 @@ export function estimateWalletFee(
                 params.existingPlugins,
                 removePluginHash
             );
-            const gasFee = computeGasFee(baseConfig, gasUsed);
+            const gasFee = computeGasFee(workchainConfig, gasUsed);
             const actionFee = 0n;
             const fwdFeeRemaining = 0n;
             const walletFee = gasFee + actionFee + importFee + storageFee + fwdFeeRemaining;

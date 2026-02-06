@@ -19,8 +19,7 @@ import {
     computeStorageFee,
     computeWalletGasUsed,
     estimateWalletFee,
-    EstimateWalletFeeParams,
-    extractFeeConfig
+    EstimateWalletFeeParams
 } from '../fees';
 import { TonWalletVersion } from '../compat';
 
@@ -36,8 +35,8 @@ import { TonWalletVersion } from '../compat';
  *   FETCH_REAL_FEES=1 yarn workspace @tonkeeper/core exec vitest run fees.spec.ts  # fetch from blockchain
  */
 
-// Get basechain config for unit tests
-const unitTestConfig = extractFeeConfig(BLOCKCHAIN_CONFIG_2024_12, 0);
+// Basechain config for unit tests
+const baseConfig = BLOCKCHAIN_CONFIG_2024_12.basechain;
 
 // ============================================================================
 // 1. computeGasFee
@@ -45,20 +44,21 @@ const unitTestConfig = extractFeeConfig(BLOCKCHAIN_CONFIG_2024_12, 0);
 
 describe('1. computeGasFee (formula: floor(gasUsed × gasPrice / 2^16))', () => {
     it('returns 0 for gasUsed = 0', () => {
-        expect(computeGasFee(unitTestConfig, 0n)).toBe(0n);
+        expect(computeGasFee(baseConfig, 0n)).toBe(0n);
     });
 
     it('calculates gas fee: gasUsed=4939 → 1_975_600', () => {
-        expect(computeGasFee(unitTestConfig, 4939n)).toBe(1_975_600n);
+        expect(computeGasFee(baseConfig, 4939n)).toBe(1_975_600n);
     });
 
     describe('floor rounding (gasPrice=1 → result = gasUsed / 2^16, truncated)', () => {
-        const config = { ...unitTestConfig, gasPrice: 1n };
+        // Override gasPrice to 1 so gasFee = gasUsed >> 16, isolating rounding behavior
+        const roundingConfig = { ...baseConfig, gasPrice: 1n };
 
-        it('rounds 0.0000... down to 0', () => expect(computeGasFee(config, 1n)).toBe(0n));
-        it('rounds 0.9999... down to 0', () => expect(computeGasFee(config, 65535n)).toBe(0n));
-        it('keeps exact 1.0           ', () => expect(computeGasFee(config, 65536n)).toBe(1n));
-        it('rounds 1.0000... down to 1', () => expect(computeGasFee(config, 65537n)).toBe(1n));
+        it('rounds 0.0000... down to 0', () => expect(computeGasFee(roundingConfig, 1n)).toBe(0n));
+        it('rounds 0.9999... down to 0', () => expect(computeGasFee(roundingConfig, 65535n)).toBe(0n));
+        it('keeps exact 1.0           ', () => expect(computeGasFee(roundingConfig, 65536n)).toBe(1n));
+        it('rounds 1.0000... down to 1', () => expect(computeGasFee(roundingConfig, 65537n)).toBe(1n));
     });
 });
 
@@ -68,26 +68,26 @@ describe('1. computeGasFee (formula: floor(gasUsed × gasPrice / 2^16))', () => 
 
 describe('2. computeStorageFee (formula: ceil((bits×bitPrice + cells×cellPrice) × timeDelta / 2^16))', () => {
     it('returns 0 for timeDelta = 0', () => {
-        expect(computeStorageFee(unitTestConfig, { bits: 100n, cells: 1n }, 0n)).toBe(0n);
+        expect(computeStorageFee(baseConfig, { bits: 100n, cells: 1n }, 0n)).toBe(0n);
     });
 
     it('returns 0 for negative timeDelta', () => {
-        expect(computeStorageFee(unitTestConfig, { bits: 100n, cells: 1n }, -100n)).toBe(0n);
+        expect(computeStorageFee(baseConfig, { bits: 100n, cells: 1n }, -100n)).toBe(0n);
     });
 
     it('calculates for V5R1 wallet (5012 bits, 22 cells, timeDelta=54358)', () => {
         // used = 5012×1 + 22×500 = 16012
         // ceil(16012 × 54358 / 2^16) = ceil(870340696 / 65536) = 13281
-        expect(computeStorageFee(unitTestConfig, { bits: 5012n, cells: 22n }, 54358n)).toBe(13281n);
+        expect(computeStorageFee(baseConfig, { bits: 5012n, cells: 22n }, 54358n)).toBe(13281n);
     });
 
     // bitPrice=1, cellPrice=500 → used = 1×1 + 0×500 = 1, so result = timeDelta / 2^16
     describe('ceil rounding (used=1 → result = timeDelta / 2^16, rounded up)', () => {
         const s = { bits: 1n, cells: 0n };
 
-        it('rounds 0.0000... up to 1', () => expect(computeStorageFee(unitTestConfig, s, 1n)).toBe(1n));
-        it('keeps exact 1.0          ', () => expect(computeStorageFee(unitTestConfig, s, 65536n)).toBe(1n));
-        it('rounds 1.0000... up to 2 ', () => expect(computeStorageFee(unitTestConfig, s, 65537n)).toBe(2n));
+        it('rounds 0.0000... up to 1', () => expect(computeStorageFee(baseConfig, s, 1n)).toBe(1n));
+        it('keeps exact 1.0          ', () => expect(computeStorageFee(baseConfig, s, 65536n)).toBe(1n));
+        it('rounds 1.0000... up to 2 ', () => expect(computeStorageFee(baseConfig, s, 65537n)).toBe(2n));
     });
 });
 
@@ -99,31 +99,32 @@ describe('3. computeForwardFee (formula: lumpPrice + ceil((bitPrice×bits + cell
     // lumpPrice = 400000, bitPrice = 26214400, cellPrice = 2621440000
 
     it('returns lumpPrice for bits=0, cells=0', () => {
-        expect(computeForwardFee(unitTestConfig, 0n, 0n)).toBe(400_000n);
+        expect(computeForwardFee(baseConfig.fwd, 0n, 0n)).toBe(400_000n);
     });
 
     it('calculates for bits > 0, cells = 0', () => {
         // ceil(26214400 × 667 / 2^16) + 400000 = 266800 + 400000 = 666800
-        expect(computeForwardFee(unitTestConfig, 667n, 0n)).toBe(666_800n);
+        expect(computeForwardFee(baseConfig.fwd, 667n, 0n)).toBe(666_800n);
     });
 
     it('calculates for bits = 0, cells > 0', () => {
         // ceil(2621440000 × 1 / 2^16) + 400000 = 40000 + 400000 = 440000
-        expect(computeForwardFee(unitTestConfig, 0n, 1n)).toBe(440_000n);
+        expect(computeForwardFee(baseConfig.fwd, 0n, 1n)).toBe(440_000n);
     });
 
     it('calculates for bits > 0, cells > 0', () => {
         // ceil((26214400×667 + 2621440000×1) / 2^16) + 400000 = 306800 + 400000 = 706800
-        expect(computeForwardFee(unitTestConfig, 667n, 1n)).toBe(706_800n);
+        expect(computeForwardFee(baseConfig.fwd, 667n, 1n)).toBe(706_800n);
     });
 
     // lumpPrice=0, bitPrice=1, cellPrice=0 → result = ceil(bits / 2^16)
     describe('ceil rounding (bitPrice=1, lump=0, cell=0 → result = bits / 2^16, rounded up)', () => {
-        const config = { ...unitTestConfig, msgFwdBitPrice: 1n, msgFwdCellPrice: 0n, msgFwdLumpPrice: 0n };
+        // Override prices so fwdFee = ceil(bits / 2^16), isolating rounding behavior
+        const roundingFwd = { ...baseConfig.fwd, bitPrice: 1n, cellPrice: 0n, lumpPrice: 0n };
 
-        it('rounds 0.0000... up to 1', () => expect(computeForwardFee(config, 1n, 0n)).toBe(1n));
-        it('keeps exact 1.0          ', () => expect(computeForwardFee(config, 65536n, 0n)).toBe(1n));
-        it('rounds 1.0000... up to 2 ', () => expect(computeForwardFee(config, 65537n, 0n)).toBe(2n));
+        it('rounds 0.0000... up to 1', () => expect(computeForwardFee(roundingFwd, 1n, 0n)).toBe(1n));
+        it('keeps exact 1.0          ', () => expect(computeForwardFee(roundingFwd, 65536n, 0n)).toBe(1n));
+        it('rounds 1.0000... up to 2 ', () => expect(computeForwardFee(roundingFwd, 65537n, 0n)).toBe(2n));
     });
 });
 
@@ -138,7 +139,7 @@ describe('4. computeImportFee', () => {
      */
 
     it('calculates import fee: bits=667, cells=1 → 706800', () => {
-        expect(computeImportFee(unitTestConfig, 667n, 1n)).toBe(706800n);
+        expect(computeImportFee(baseConfig.fwd, 667n, 1n)).toBe(706800n);
     });
 });
 
@@ -150,22 +151,23 @@ describe('5. computeActionFee (formula: floor(fwdFee × firstFrac / 2^16) ≈ 1/
     // firstFrac = 21845, so multiplier ≈ 21845/65536 ≈ 0.33333
 
     it('returns 0 for fwdFee = 0', () => {
-        expect(computeActionFee(unitTestConfig, 0n)).toBe(0n);
+        expect(computeActionFee(baseConfig.fwd, 0n)).toBe(0n);
     });
 
     it('returns ~1/3 of forward fee', () => {
         // 666672 × 21845 >> 16 = 222220
-        expect(computeActionFee(unitTestConfig, 666672n)).toBe(222220n);
+        expect(computeActionFee(baseConfig.fwd, 666672n)).toBe(222220n);
     });
 
     // firstFrac=1 → result = fwdFee / 2^16
     describe('floor rounding (firstFrac=1 → result = fwdFee / 2^16, truncated)', () => {
-        const config = { ...unitTestConfig, msgFwdFirstFrac: 1n };
+        // Override firstFrac to 1 so actionFee = fwdFee >> 16, isolating rounding behavior
+        const roundingFwd = { ...baseConfig.fwd, firstFrac: 1n };
 
-        it('rounds 0.0000... down to 0', () => expect(computeActionFee(config, 1n)).toBe(0n));
-        it('rounds 0.9999... down to 0', () => expect(computeActionFee(config, 65535n)).toBe(0n));
-        it('keeps exact 1.0           ', () => expect(computeActionFee(config, 65536n)).toBe(1n));
-        it('rounds 1.0000... down to 1', () => expect(computeActionFee(config, 65537n)).toBe(1n));
+        it('rounds 0.0000... down to 0', () => expect(computeActionFee(roundingFwd, 1n)).toBe(0n));
+        it('rounds 0.9999... down to 0', () => expect(computeActionFee(roundingFwd, 65535n)).toBe(0n));
+        it('keeps exact 1.0           ', () => expect(computeActionFee(roundingFwd, 65536n)).toBe(1n));
+        it('rounds 1.0000... down to 1', () => expect(computeActionFee(roundingFwd, 65537n)).toBe(1n));
     });
 });
 

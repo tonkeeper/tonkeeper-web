@@ -13,8 +13,8 @@ import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-import { assertUnreachable, TonWalletVersion, FeeBlockchainConfig } from '../../compat';
-import { CellStats } from '../../fees';
+import { assertUnreachable, TonWalletVersion } from '../../compat';
+import { CellStats, FeeConfig } from '../../fees';
 
 export interface ExpectedFees {
     gasUsed: bigint;
@@ -51,7 +51,7 @@ export type WalletFeeTestCase = {
         existingExtensions?: string[]; // only for extension tests
     };
     expected: ExpectedFees;
-    blockchainConfig: FeeBlockchainConfig;
+    blockchainConfig: FeeConfig;
 };
 
 export function normalizeHash(message: Message, normalizeExternal: boolean): Buffer {
