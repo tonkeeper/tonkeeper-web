@@ -9,6 +9,7 @@ export const Tooltip = styled.div<{ placement: 'top' | 'bottom' }>`
     right: 0;
     transition: all 0.15s ease-in-out;
     opacity: 0;
+    pointer-events: none;
     position: absolute;
     background-color: ${p => p.theme.backgroundContentTint};
     padding: 8px 12px;

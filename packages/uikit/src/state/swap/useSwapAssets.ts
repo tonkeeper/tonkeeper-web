@@ -23,6 +23,7 @@ import { QueryKey } from '../../libs/queryKey';
 import { useAssets } from '../home';
 import { patchedTokenImage, useJettonList } from '../jetton';
 import { useRate } from '../rates';
+import { fetchSwapAssets } from '@tonkeeper/core/dist/swapsApi';
 import { useSwapsConfig } from './useSwapsConfig';
 import { useActiveApi } from '../wallet';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
@@ -35,7 +36,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 
 export function useAllSwapAssets() {
-    const { swapService } = useSwapsConfig();
+    const { baseUrl } = useSwapsConfig();
     const { data: customAssets } = useUserCustomSwapAssets();
     const enabledUSDe = useIsFeatureEnabled(FLAGGED_FEATURE.ETHENA);
 
@@ -43,7 +44,7 @@ export function useAllSwapAssets() {
         queryKey: [QueryKey.swapAllAssets, customAssets, enabledUSDe],
         queryFn: async () => {
             try {
-                const assets = await swapService.swapAssets();
+                const assets = await fetchSwapAssets(baseUrl);
                 const fetchedAssets = assets
                     .map(asset => {
                         const address =

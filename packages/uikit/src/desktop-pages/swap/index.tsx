@@ -4,7 +4,6 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { SwapMainForm } from '../../components/swap/SwapMainForm';
-import { SwapProviders } from '../../components/swap/SwapProviders';
 import { css, styled } from 'styled-components';
 import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -12,13 +11,10 @@ import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
 import { fallbackRenderOver } from '../../components/Error';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
-import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
+import { useSwapStreamEffect } from '../../state/swap/useSwapStreamEffect';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
-import { NotForTargetEnv } from '../../components/shared/TargetEnv';
-import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
-import { QueryKey } from '../../libs/queryKey';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
@@ -45,13 +41,9 @@ const HeaderButtons = styled.div`
 
 const ContentWrapper = styled.div`
     padding: 0 1rem;
-    display: flex;
-    gap: 0.5rem;
-    max-width: 900px;
-    margin: 0 auto;
 
     > * {
-        width: ${p => (p.theme.proDisplayType === 'desktop' ? 'calc(50% - 4px)' : '100%')};
+        max-width: 450px;
     }
 `;
 
@@ -60,6 +52,8 @@ const DesktopSwapPageContent = () => {
     const { isSwapsEnabled } = useSwapsConfig();
     const sdk = useAppSdk();
     const swapLink = useStonfiSwapLink(swapFromAsset$.value.address, swapToAsset$.value.address);
+
+    useSwapStreamEffect();
 
     if (!isSwapsEnabled) {
         sdk.openPage(swapLink);
@@ -74,19 +68,12 @@ const DesktopSwapPageContent = () => {
                     right={
                         <HeaderButtons>
                             <SwapRefreshButton />
-                            <SwapSettingsButton />
                         </HeaderButtons>
                     }
                 />
             </DesktopViewHeader>
-            <PullToRefresh invalidate={QueryKey.swapCalculate} />
             <ContentWrapper>
                 <SwapMainForm />
-                <NotForTargetEnv env="mobile">
-                    <div>
-                        <SwapProviders />
-                    </div>
-                </NotForTargetEnv>
             </ContentWrapper>
         </SwapPageWrapper>
     );

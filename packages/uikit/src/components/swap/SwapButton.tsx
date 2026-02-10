@@ -1,16 +1,15 @@
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC } from 'react';
 import { useTranslation } from '../../hooks/translation';
-import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
+import { useSwapConfirmation } from '../../state/swap/useSwapStreamEffect';
 import {
     useIsSwapFormNotCompleted,
     useMaxSwapValue,
-    useSelectedSwap,
     useSwapFromAmount,
     useSwapFromAsset,
-    useSwapPriceImpact
+    useSwapPriceImpact,
+    MAX_PRICE_IMPACT
 } from '../../state/swap/useSwapForm';
-import { useSwapOptions } from '../../state/swap/useSwapOptions';
 import { Button } from '../fields/Button';
 
 export const SwapButton: FC<{
@@ -22,11 +21,9 @@ export const SwapButton: FC<{
     const [swapAmount] = useSwapFromAmount();
     const [fromAsset] = useSwapFromAsset();
     const { data: max } = useMaxSwapValue();
-    const { isFetching, data: calculatedSwaps } = useCalculatedSwap();
-    const [selectedSwap] = useSelectedSwap();
+    const { confirmation, isFetching, error } = useSwapConfirmation();
 
     const priceImpact = useSwapPriceImpact();
-    const { data: swapOptions } = useSwapOptions();
 
     const isNotCompleted = useIsSwapFormNotCompleted();
 
@@ -38,7 +35,7 @@ export const SwapButton: FC<{
         );
     }
 
-    if (!isFetching && calculatedSwaps?.every(s => !s.trade)) {
+    if (!isFetching && !confirmation && error) {
         return (
             <Button size={size} disabled>
                 {t('swap_trade_is_not_available')}
@@ -46,7 +43,7 @@ export const SwapButton: FC<{
         );
     }
 
-    if ((isFetching && !selectedSwap?.trade) || !max || priceImpact === undefined || !swapOptions) {
+    if ((isFetching && !confirmation) || !max || priceImpact === undefined) {
         return (
             <Button size={size} secondary loading={true}>
                 {t('continue')}
@@ -54,7 +51,7 @@ export const SwapButton: FC<{
         );
     }
 
-    if (!selectedSwap || !selectedSwap.trade) {
+    if (!confirmation) {
         return (
             <Button size={size} secondary disabled>
                 {t('swap_trade_is_not_available')}
@@ -62,7 +59,19 @@ export const SwapButton: FC<{
         );
     }
 
-    const isNotEnoughFunds = swapAmount?.gt(shiftedDecimals(max!, fromAsset.decimals));
+    const isExpired =
+        confirmation.tradeStartDeadline &&
+        Number(confirmation.tradeStartDeadline) < Date.now() / 1000;
+
+    if (isExpired) {
+        return (
+            <Button size={size} secondary disabled>
+                {t('swap_trade_is_not_available')}
+            </Button>
+        );
+    }
+
+    const isNotEnoughFunds = swapAmount?.gt(shiftedDecimals(max, fromAsset.decimals));
 
     if (isNotEnoughFunds) {
         return (
@@ -72,7 +81,7 @@ export const SwapButton: FC<{
         );
     }
 
-    const priceImpactTooHigh = priceImpact?.gt(swapOptions.maxPriceImpact);
+    const priceImpactTooHigh = priceImpact?.gt(MAX_PRICE_IMPACT);
     if (priceImpactTooHigh) {
         return (
             <Button size={size} secondary disabled>

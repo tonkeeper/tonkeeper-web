@@ -7,16 +7,16 @@ import { Skeleton } from '../shared/Skeleton';
 import {
     priceImpactStatus,
     useIsSwapFormNotCompleted,
-    useSelectedSwap,
-    useSwapPriceImpact
+    useSwapPriceImpact,
+    useSwapToAsset
 } from '../../state/swap/useSwapForm';
-import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
+import { useSwapConfirmation } from '../../state/swap/useSwapStreamEffect';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { useSwapOptions } from '../../state/swap/useSwapOptions';
 import { useTranslation } from '../../hooks/translation';
 import { Accordion } from '../shared/Accordion';
 import { TooltipHost, Tooltip } from '../shared/Tooltip';
+import BigNumber from 'bignumber.js';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 const TxInfoContainer = styled.div``;
 
@@ -75,21 +75,33 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
 export const SwapTransactionInfo = () => {
     const { t } = useTranslation();
     const [isOpened, setIsOpened] = useState(false);
-    const { isFetching } = useCalculatedSwap();
-    const [swap] = useSelectedSwap();
+    const { confirmation, isFetching } = useSwapConfirmation();
     const priceImpact = useSwapPriceImpact();
-    const { data: swapOptions } = useSwapOptions();
     const isNotCompleted = useIsSwapFormNotCompleted();
+    const [toAsset] = useSwapToAsset();
 
-    const trade = swap?.trade;
-
-    if ((!isFetching && !trade) || isNotCompleted) {
+    if ((!isFetching && !confirmation) || isNotCompleted) {
         return null;
     }
 
     const onToggleAccordion = () => {
         setIsOpened(v => !v);
     };
+
+    const slippagePercent = confirmation ? confirmation.slippage / 100 : undefined;
+
+    const minimumReceived = confirmation
+        ? shiftedDecimals(
+              new BigNumber(confirmation.askUnits).multipliedBy(1 - confirmation.slippage / 10000),
+              toAsset.decimals
+          )
+              .decimalPlaces(toAsset.decimals)
+              .toString()
+        : undefined;
+
+    const gasBudgetTon = confirmation
+        ? shiftedDecimals(new BigNumber(confirmation.gasBudget), 9).decimalPlaces(4).toString()
+        : undefined;
 
     return (
         <TxInfoContainer>
@@ -107,7 +119,7 @@ export const SwapTransactionInfo = () => {
                     </TooltipHost>
                     <Tooltip placement="top">{t('swap_price_impact_tooltip')}</Tooltip>
                     <InfoRowRight>
-                        {priceImpact === undefined || !trade ? (
+                        {priceImpact === undefined || !confirmation ? (
                             <InfoSkeleton />
                         ) : (
                             <PriceImpact status={priceImpactStatus(priceImpact)}>
@@ -135,19 +147,11 @@ export const SwapTransactionInfo = () => {
                     </TooltipHost>
                     <Tooltip placement="top">{t('swap_minimum_received_tooltip')}</Tooltip>
                     <InfoRowRight>
-                        {!trade || !swapOptions ? (
+                        {!confirmation ? (
                             <InfoSkeleton />
                         ) : (
                             <Body3>
-                                ≈&nbsp;
-                                {
-                                    AssetAmount.fromRelativeAmount({
-                                        amount: trade!.to.relativeAmount
-                                            .multipliedBy(100 - swapOptions.slippagePercent)
-                                            .div(100),
-                                        asset: trade!.to.asset
-                                    }).stringAssetRelativeAmount
-                                }
+                                ≈&nbsp;{minimumReceived} {toAsset.symbol}
                             </Body3>
                         )}
                     </InfoRowRight>
@@ -159,11 +163,7 @@ export const SwapTransactionInfo = () => {
                     </TooltipHost>
                     <Tooltip placement="top">{t('swap_slippage_tooltip')}</Tooltip>
                     <InfoRowRight>
-                        {!trade || !swapOptions ? (
-                            <InfoSkeleton />
-                        ) : (
-                            <Body3>{swapOptions.slippagePercent}%</Body3>
-                        )}
+                        {!confirmation ? <InfoSkeleton /> : <Body3>{slippagePercent}%</Body3>}
                     </InfoRowRight>
                 </InfoRow>
                 <InfoRow>
@@ -173,20 +173,20 @@ export const SwapTransactionInfo = () => {
                     </TooltipHost>
                     <Tooltip placement="top">{t('swap_blockchain_fee_tooltip')}</Tooltip>
                     <InfoRowRight>
-                        {!trade ? (
+                        {!confirmation ? (
                             <InfoSkeleton />
                         ) : (
-                            <Body3>≈&nbsp;{trade!.blockchainFee.stringAssetRelativeAmount}</Body3>
+                            <Body3>≈&nbsp;{gasBudgetTon} TON</Body3>
                         )}
                     </InfoRowRight>
                 </InfoRow>
                 <InfoRow>
                     <InfoRowLabel>{t('swap_route')}</InfoRowLabel>
                     <InfoRowRight>
-                        {!trade ? (
+                        {!confirmation ? (
                             <InfoSkeleton />
                         ) : (
-                            <Body3>{trade!.path.map(ta => ta.symbol).join(' → ')}</Body3>
+                            <Body3>{confirmation.resolverName}</Body3>
                         )}
                     </InfoRowRight>
                 </InfoRow>
