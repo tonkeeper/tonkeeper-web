@@ -5,15 +5,13 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import BigNumber from 'bignumber.js';
 import { useAtom } from '../../libs/useAtom';
-import { useQuery } from '@tanstack/react-query';
-import { QueryKey } from '../../libs/queryKey';
 import { useAssetWeiBalance } from '../home';
-import { CalculatedSwap } from './useCalculatedSwap';
 import { useRate } from '../rates';
-import { useSwapsConfig } from './useSwapsConfig';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { swapConfirmation$ } from './useSwapStreamEffect';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 export const swapFromAsset$ = atom<TonAsset>(TON_ASSET);
 export const swapToAsset$ = atom<TonAsset>(TON_USDT_ASSET);
@@ -59,63 +57,34 @@ export const useSwapFromAmount = () => {
     return useAtom(swapAmount$);
 };
 
+// TODO: This is a rough estimate. Should be dynamically calculated from gasBudget returned by the SSE stream.
+const TON_RESERVE_NANOTONS = '500000000'; // 0.5 TON
+
 export const useMaxSwapValue = () => {
-    const TON_GAS_SAFETY_NANO_CONST = 1000000;
-    const { data: swapGas, isError } = useSwapGasConfig();
     const [fromAsset] = useSwapFromAsset();
     const balance = useAssetWeiBalance(fromAsset);
 
-    return useQuery({
-        queryKey: [QueryKey.swapMaxValue, swapGas, fromAsset.id, balance?.toFixed(0)],
-        queryFn: async () => {
-            if (isError) {
-                return balance;
-            }
-            if (!balance || !swapGas) {
-                return undefined;
-            }
-
-            if (fromAsset.id === TON_ASSET.id) {
-                const dedustGas = new BigNumber(swapGas.dedust.tonToJetton);
-                const stonfiGas = new BigNumber(swapGas.stonfi.tonToJetton);
-
-                const balanceWithoutFee = balance
-                    .minus(BigNumber.max(dedustGas, stonfiGas))
-                    .minus(TON_GAS_SAFETY_NANO_CONST);
-                if (balanceWithoutFee.lt(0)) {
-                    return new BigNumber(0);
-                }
-
-                return balanceWithoutFee;
-            } else {
-                return balance;
-            }
-        },
-        enabled: (!!swapGas || isError) && balance !== undefined
-    });
-};
-
-export const useSwapGasConfig = () => {
-    const { swapService } = useSwapsConfig();
-
-    return useQuery({
-        queryKey: [QueryKey.swapGasConfig],
-        queryFn: async () => {
-            return swapService.swapGas();
+    return useMemo(() => {
+        if (balance === undefined) {
+            return { data: undefined, isLoading: true };
         }
-    });
-};
 
-export const selectedSwap$ = atom<CalculatedSwap | undefined>(undefined);
+        if (fromAsset.id === TON_ASSET.id) {
+            const balanceWithoutReserve = balance.minus(new BigNumber(TON_RESERVE_NANOTONS));
+            return {
+                data: balanceWithoutReserve.lt(0) ? new BigNumber(0) : balanceWithoutReserve,
+                isLoading: false
+            };
+        }
 
-export const useSelectedSwap = () => {
-    return useAtom(selectedSwap$);
+        return { data: balance, isLoading: false };
+    }, [fromAsset.id, balance]);
 };
 
 export const useSwapPriceImpact = () => {
     const [fromAsset] = useSwapFromAsset();
     const [toAsset] = useSwapToAsset();
-    const [selectedSwap] = useSelectedSwap();
+    const [confirmation] = useAtom(swapConfirmation$);
 
     const { data: fromAssetRate, isLoading: fromAssetRateLoading } = useRate(
         tonAssetAddressToString(fromAsset.address)
@@ -124,8 +93,7 @@ export const useSwapPriceImpact = () => {
         tonAssetAddressToString(toAsset.address)
     );
 
-    const trade = selectedSwap?.trade;
-    if (!trade || toAssetRateLoading || fromAssetRateLoading) {
+    if (!confirmation || toAssetRateLoading || fromAssetRateLoading) {
         return undefined;
     }
 
@@ -133,8 +101,11 @@ export const useSwapPriceImpact = () => {
         return null;
     }
 
-    const fromFiat = new BigNumber(trade.from.relativeAmount).multipliedBy(fromAssetRate.prices);
-    const toFiat = new BigNumber(trade.to.relativeAmount).multipliedBy(toAssetRate.prices);
+    const fromRelative = shiftedDecimals(new BigNumber(confirmation.bidUnits), fromAsset.decimals);
+    const toRelative = shiftedDecimals(new BigNumber(confirmation.askUnits), toAsset.decimals);
+
+    const fromFiat = fromRelative.multipliedBy(fromAssetRate.prices);
+    const toFiat = toRelative.multipliedBy(toAssetRate.prices);
 
     if (fromFiat.isEqualTo(toFiat)) {
         return new BigNumber(0);
@@ -142,6 +113,8 @@ export const useSwapPriceImpact = () => {
 
     return fromFiat.minus(toFiat).dividedBy(fromFiat);
 };
+
+export const MAX_PRICE_IMPACT = 0.3;
 
 export const priceImpactStatus = (priceImpact: BigNumber | null) => {
     if (!priceImpact) return 'unknown';

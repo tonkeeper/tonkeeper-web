@@ -5,11 +5,13 @@ import { Body3 } from '../Text';
 import { css, styled } from 'styled-components';
 import {
     priceImpactStatus,
-    useSelectedSwap,
-    useSwapPriceImpact
+    useSwapFromAsset,
+    useSwapPriceImpact,
+    useSwapToAsset
 } from '../../state/swap/useSwapForm';
-import { useCalculatedSwap } from '../../state/swap/useCalculatedSwap';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { useSwapConfirmation } from '../../state/swap/useSwapStreamEffect';
+import BigNumber from 'bignumber.js';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 const Body3Styled = styled(Body3)<{ impact: 'unknown' | 'low' | 'medium' | 'high' }>`
     display: flex;
@@ -55,12 +57,13 @@ const WarnIcon = () => {
 
 export const SwapRate: FC = () => {
     const [measureUnit, setMeasureUnit] = useState<'from' | 'to'>('from');
-    const [selectedSwap] = useSelectedSwap();
-    const { isFetching } = useCalculatedSwap();
+    const { confirmation, isFetching } = useSwapConfirmation();
+    const [fromAsset] = useSwapFromAsset();
+    const [toAsset] = useSwapToAsset();
     const priceImpact = useSwapPriceImpact();
 
-    const isLoading = (isFetching && !selectedSwap?.trade) || priceImpact === undefined;
-    const isHidden = !isFetching && !selectedSwap?.trade;
+    const isLoading = (isFetching && !confirmation) || priceImpact === undefined;
+    const isHidden = !isFetching && !confirmation;
 
     if (isHidden) {
         return null;
@@ -70,29 +73,34 @@ export const SwapRate: FC = () => {
         return <Skeleton width="100px" height="12px" margin="2px 0" />;
     }
 
-    const trade = selectedSwap!.trade!;
-    const leftPart = measureUnit === 'from' ? trade.from : trade.to;
-    const rightPart = measureUnit === 'from' ? trade.to : trade.from;
-
-    if (leftPart.relativeAmount.isZero()) {
+    if (!confirmation) {
         return null;
     }
 
-    const rightPartAmount = rightPart.relativeAmount.div(leftPart.relativeAmount);
-    const rightPartAssetAmount = AssetAmount.fromRelativeAmount({
-        amount: rightPartAmount,
-        asset: rightPart.asset
-    });
+    const bidRelative = shiftedDecimals(new BigNumber(confirmation.bidUnits), fromAsset.decimals);
+    const askRelative = shiftedDecimals(new BigNumber(confirmation.askUnits), toAsset.decimals);
+
+    if (bidRelative.isZero()) {
+        return null;
+    }
 
     const impact = priceImpactStatus(priceImpact);
+
+    let rateText: string;
+    if (measureUnit === 'from') {
+        const rate = askRelative.div(bidRelative).decimalPlaces(toAsset.decimals);
+        rateText = `1 ${fromAsset.symbol} ≈ ${rate.toString()} ${toAsset.symbol}`;
+    } else {
+        const rate = bidRelative.div(askRelative).decimalPlaces(fromAsset.decimals);
+        rateText = `1 ${toAsset.symbol} ≈ ${rate.toString()} ${fromAsset.symbol}`;
+    }
 
     return (
         <Body3Styled
             impact={impact}
             onClick={() => setMeasureUnit(s => (s === 'from' ? 'to' : 'from'))}
         >
-            1&nbsp;{leftPart.asset.symbol}&nbsp;≈&nbsp;
-            {rightPartAssetAmount.stringAssetRelativeAmount}
+            {rateText}
             {(impact === 'medium' || impact === 'high') && <WarnIcon />}
         </Body3Styled>
     );

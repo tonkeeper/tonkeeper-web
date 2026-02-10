@@ -4,8 +4,8 @@ import { styled } from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
 import { fallbackRenderOver } from '../../components/Error';
-import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
+import { useSwapStreamEffect } from '../../state/swap/useSwapStreamEffect';
 import { useTranslation } from '../../hooks/translation';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
@@ -55,7 +55,6 @@ const NotificationHeader = () => {
         <NotificationHeaderContainer>
             <HeaderButtons>
                 <SwapRefreshButton />
-                <SwapSettingsButton />
             </HeaderButtons>
             <HeaderLabel>{t('wallet_swap')}</HeaderLabel>
         </NotificationHeaderContainer>
@@ -68,6 +67,8 @@ const SwapPageWrapper = styled.div`
 `;
 
 const NotificationContent = () => {
+    useSwapStreamEffect();
+
     return (
         <SwapPageWrapper>
             <SwapMainForm />
