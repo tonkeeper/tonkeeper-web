@@ -7,15 +7,6 @@ import {
 import { useBatteryBalance } from '../battery';
 import type { SwapConfirmation } from '@tonkeeper/core/dist/swapsApi';
 
-function hexToBase64(hex: string): string {
-    const bytes = new Uint8Array((hex.match(/.{1,2}/g) || []).map(byte => parseInt(byte, 16)));
-    let binary = '';
-    for (let i = 0; i < bytes.length; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-}
-
 export function useSwapToTonConnectParams(options: { forceCalculateBattery?: boolean } = {}) {
     const { data: batteryBalance } = useBatteryBalance();
     const { data: activeWalletConfig } = useActiveTonWalletConfig();
@@ -25,7 +16,7 @@ export function useSwapToTonConnectParams(options: { forceCalculateBattery?: boo
             const messages = confirmation.messages.map(msg => ({
                 address: msg.targetAddress,
                 amount: msg.sendAmount,
-                payload: hexToBase64(msg.payload)
+                payload: Buffer.from(msg.payload, 'hex').toString('base64')
             }));
 
             const validUntil = confirmation.tradeStartDeadline
