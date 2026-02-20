@@ -1,10 +1,8 @@
-import { Label2 } from '../../components/Text';
 import { SwapMainForm } from '../../components/swap/SwapMainForm';
 import { styled } from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
 import { fallbackRenderOver } from '../../components/Error';
-import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { useSwapStreamEffect } from '../../state/swap/useSwapStreamEffect';
 import { useTranslation } from '../../hooks/translation';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
@@ -13,6 +11,7 @@ import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 
 const SwapMobileNotification = () => {
     const [isOpen, setIsOpen] = useSwapMobileNotification();
+    const { t } = useTranslation();
 
     return (
         <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
@@ -20,44 +19,12 @@ const SwapMobileNotification = () => {
                 <Notification
                     isOpen={isOpen}
                     handleClose={() => setIsOpen(false)}
-                    title={<NotificationHeader />}
+                    title={t('wallet_swap')}
                 >
                     {() => <NotificationContent />}
                 </Notification>
             </ErrorBoundary>
         </IfFeatureEnabled>
-    );
-};
-
-const NotificationHeaderContainer = styled.div`
-    position: relative;
-`;
-
-const HeaderButtons = styled.div`
-    display: flex;
-`;
-
-const HeaderLabel = styled(Label2)`
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 5rem;
-    right: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-`;
-
-const NotificationHeader = () => {
-    const { t } = useTranslation();
-    return (
-        <NotificationHeaderContainer>
-            <HeaderButtons>
-                <SwapRefreshButton />
-            </HeaderButtons>
-            <HeaderLabel>{t('wallet_swap')}</HeaderLabel>
-        </NotificationHeaderContainer>
     );
 };
 

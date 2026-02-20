@@ -10,7 +10,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
 import { fallbackRenderOver } from '../../components/Error';
-import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { useSwapStreamEffect } from '../../state/swap/useSwapStreamEffect';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
@@ -29,22 +28,10 @@ const SwapPageWrapper = styled(DesktopViewPageLayout)`
         `}
 `;
 
-const HeaderButtons = styled.div`
-    margin-left: auto;
-    display: flex;
-
-    > * {
-        color: ${p => p.theme.iconSecondary};
-        padding: 10px;
-    }
-`;
-
 const ContentWrapper = styled.div`
     padding: 0 1rem;
-
-    > * {
-        max-width: 450px;
-    }
+    max-width: 450px;
+    margin: 0 auto;
 `;
 
 const DesktopSwapPageContent = () => {
@@ -63,14 +50,7 @@ const DesktopSwapPageContent = () => {
     return (
         <SwapPageWrapper mobileContentPaddingTop>
             <DesktopViewHeader>
-                <DesktopViewHeaderContent
-                    title={t('wallet_swap')}
-                    right={
-                        <HeaderButtons>
-                            <SwapRefreshButton />
-                        </HeaderButtons>
-                    }
-                />
+                <DesktopViewHeaderContent title={t('wallet_swap')} />
             </DesktopViewHeader>
             <ContentWrapper>
                 <SwapMainForm />
