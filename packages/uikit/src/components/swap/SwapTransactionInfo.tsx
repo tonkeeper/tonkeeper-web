@@ -181,7 +181,7 @@ export const SwapTransactionInfo = () => {
                     </InfoRowRight>
                 </InfoRow>
                 <InfoRow>
-                    <InfoRowLabel>{t('swap_route')}</InfoRowLabel>
+                    <InfoRowLabel>{t('swap_provider')}</InfoRowLabel>
                     <InfoRowRight>
                         {!confirmation ? (
                             <InfoSkeleton />
