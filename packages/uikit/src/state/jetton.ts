@@ -34,7 +34,8 @@ export const useJettonInfo = (jettonAddress: string) => {
                 accountId: jettonAddress
             });
             return result;
-        }
+        },
+        { enabled: !!jettonAddress }
     );
 };
 
@@ -136,7 +137,7 @@ export const useJettonList = () => {
     };
 };
 
-export const useJettonBalance = (jettonAddress: string) => {
+export const useJettonBalance = (jettonAddress: string | undefined) => {
     const wallet = useActiveWallet();
     const api = useActiveApi();
     return useQuery<JettonBalance, Error>(
@@ -144,12 +145,13 @@ export const useJettonBalance = (jettonAddress: string) => {
         async () => {
             const result = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
                 accountId: wallet.rawAddress,
-                jettonId: jettonAddress,
+                jettonId: jettonAddress!,
                 supportedExtensions: ['custom_payload']
             });
             patchTokensImages([result]);
             return result;
-        }
+        },
+        { enabled: !!jettonAddress }
     );
 };
 

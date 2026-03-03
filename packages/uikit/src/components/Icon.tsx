@@ -1206,6 +1206,27 @@ export const SwapIcon: FC<{ className?: string; color?: string }> = ({ className
     );
 };
 
+export const StakingIcon: FC<{ className?: string; color?: string }> = ({ className, color }) => {
+    const theme = useTheme();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            color={theme[color || 'iconSecondary']}
+            className={className}
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M10 13.7501V4.06066L7.78027 6.28039C7.48738 6.57328 7.01262 6.57328 6.71973 6.28039C6.42683 5.9875 6.42683 5.51274 6.71973 5.21984L10.2197 1.71984L10.2764 1.66809C10.571 1.42778 11.0057 1.44524 11.2803 1.71984L14.7803 5.21984C15.0732 5.51274 15.0732 5.9875 14.7803 6.28039C14.4874 6.57328 14.0126 6.57328 13.7197 6.28039L11.5 4.06066V13.7501C11.5 14.1643 11.1642 14.5001 10.75 14.5001C10.3358 14.5001 10 14.1643 10 13.7501ZM1 13.7501V10.7501C1 10.3359 1.33579 10.0001 1.75 10.0001C2.16421 10.0001 2.5 10.3359 2.5 10.7501V13.7501C2.5 14.1643 2.16421 14.5001 1.75 14.5001C1.33579 14.5001 1 14.1643 1 13.7501ZM5.5 8.75012V13.7501C5.5 14.1643 5.83579 14.5001 6.25 14.5001C6.66421 14.5001 7 14.1643 7 13.7501V8.75012C7 8.3359 6.66421 8.00012 6.25 8.00012C5.83579 8.00012 5.5 8.3359 5.5 8.75012Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+};
+
 export const GlobeIcon: FC<{ className?: string }> = ({ className }) => {
     const theme = useTheme();
     return (
