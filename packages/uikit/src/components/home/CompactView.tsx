@@ -2,15 +2,15 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC } from 'react';
 import { NftsList } from '../nft/Nfts';
 import { JettonList } from './Jettons';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { PortfolioBalance } from '../../state/portfolio/usePortfolioBalances';
 
 export const CompactView: FC<{
-    assets: AssetAmount[];
+    balances: PortfolioBalance[];
     nfts: NFT[];
-}> = ({ assets, nfts }) => {
+}> = ({ balances, nfts }) => {
     return (
         <>
-            <JettonList assets={assets} />
+            <JettonList balances={balances} />
             <NftsList nfts={nfts} />
         </>
     );

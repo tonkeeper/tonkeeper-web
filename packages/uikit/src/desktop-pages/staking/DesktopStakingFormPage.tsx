@@ -12,9 +12,14 @@ import {
 import { StakingForm } from '../../components/staking/StakingForm';
 import { StakingPageWrapper, ContentWrapper } from './StakingLayout';
 
-export const DesktopStakingFormPage = () => {
+interface DesktopStakingFormPageProps {
+    poolAddress?: string;
+}
+
+export const DesktopStakingFormPage = ({ poolAddress }: DesktopStakingFormPageProps) => {
     const { t } = useTranslation();
-    const { address } = useParams();
+    const { address: routeAddress } = useParams() as { address?: string };
+    const address = poolAddress ?? routeAddress;
     const { data: pools } = useStakingPools();
     const { data: poolFromInfo } = usePoolInfo(address);
     const [, setSelectedPool] = useAtom(stakingSelectedPool$);

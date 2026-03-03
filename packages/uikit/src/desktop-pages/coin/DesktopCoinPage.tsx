@@ -4,7 +4,14 @@ import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, RefCallback, useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, StakingIcon, SwapIcon } from '../../components/Icon';
+import {
+    ArrowDownIcon,
+    ArrowUpIcon,
+    LinkOutIcon,
+    PlusIcon,
+    StakingIcon,
+    SwapIcon
+} from '../../components/Icon';
 import { Body2, Body3, Label2, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
@@ -28,7 +35,7 @@ import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useAtom } from '../../libs/useAtom';
-import { stakingSelectedPool$, useIsStakingJetton } from '../../state/staking/useStakingPools';
+import { stakingSelectedPool$ } from '../../state/staking/useStakingPools';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -58,6 +65,7 @@ import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Image } from '../../components/shared/Image';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { TronFeeBanner } from '../../components/jettons/TronFeeBanner';
+import { usePortfolioStakingPoolByJetton } from '../../state/portfolio/usePortfolioBalances';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -137,7 +145,9 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
         navigate(AppRoute.swap, { replace: false });
     };
 
-    const stakingPool = useIsStakingJetton(token === CryptoCurrency.TON ? undefined : token);
+    const { data: stakingPool } = usePortfolioStakingPoolByJetton(
+        token === CryptoCurrency.TON ? undefined : token
+    );
 
     const onStake = () => {
         if (stakingPool) {

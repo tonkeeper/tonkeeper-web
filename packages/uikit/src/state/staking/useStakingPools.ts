@@ -1,10 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import {
-    PoolImplementationType,
-    PoolInfo,
-    StakingApi
-} from '@tonkeeper/core/dist/tonApiV2';
+import { PoolImplementationType, PoolInfo, StakingApi } from '@tonkeeper/core/dist/tonApiV2';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { QueryKey } from '../../libs/queryKey';
@@ -23,7 +19,8 @@ export const useStakingPools = () => {
         [wallet.rawAddress, QueryKey.staking, 'pools', network],
         async () => {
             const response = await new StakingApi(api.tonApiV2).getStakingPools({
-                availableFor: wallet.rawAddress
+                availableFor: wallet.rawAddress,
+                includeUnverified: false
             });
 
             return response.pools;
@@ -37,9 +34,15 @@ export const useStakingPools = () => {
 
 export const useTonstakersPool = (): PoolInfo | undefined => {
     const { data: pools } = useStakingPools();
-    return useMemo(() => pools?.find(
-        p => p.implementation === PoolImplementationType.LiquidTf && p.name.toLowerCase().includes('tonstakers')
-    ), [pools]);
+    return useMemo(
+        () =>
+            pools?.find(
+                p =>
+                    p.implementation === PoolImplementationType.LiquidTf &&
+                    p.name.toLowerCase().includes('tonstakers')
+            ),
+        [pools]
+    );
 };
 
 export const useIsStakingJetton = (
