@@ -42,6 +42,7 @@ import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/p
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
+import { DesktopStakingPage } from '@tonkeeper/uikit/dist/desktop-pages/staking';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -423,6 +424,7 @@ const WalletContent = () => {
                                 component={DesktopWalletSettingsRouting}
                             />
                             <Route path={AppRoute.swap} component={DesktopSwapPage} />
+                            <Route path={AppRoute.staking} component={DesktopStakingPage} />
                             <Route path="*" component={DesktopTokens} />
                         </Switch>
                         <MemoryScroll />
