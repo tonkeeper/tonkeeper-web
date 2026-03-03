@@ -91,7 +91,9 @@ export enum QueryKey {
     trc20TrxDefaultFee = 'trc20TrxDefaultFee',
     trc20FreeTransfersConfig = 'trc20FreeTransfersConfig',
 
-    legacyPlugins = 'legacyPlugins'
+    legacyPlugins = 'legacyPlugins',
+
+    staking = 'staking'
 }
 
 export enum JettonKey {

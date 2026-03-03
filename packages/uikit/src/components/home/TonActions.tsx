@@ -7,6 +7,7 @@ import { ActionsRow } from './Actions';
 import { BuyAction } from './BuyAction';
 import { ReceiveAction } from './ReceiveAction';
 import { SwapAction } from './SwapAction';
+import { StakeAction } from './StakeAction';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../ios/HideOnReview';
 import { IfFeatureEnabled } from '../shared/IfFeatureEnabled';
@@ -24,6 +25,11 @@ export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = () => {
             <HideOnReview>
                 <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                     {!isTestnet && !isReadOnly && <SwapAction fromAsset={TON_ASSET} />}
+                </IfFeatureEnabled>
+            </HideOnReview>
+            <HideOnReview>
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
+                    {!isTestnet && !isReadOnly && <StakeAction />}
                 </IfFeatureEnabled>
             </HideOnReview>
             {/* <SellAction sell={sell} /> */}

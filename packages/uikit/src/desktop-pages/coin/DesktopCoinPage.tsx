@@ -4,7 +4,7 @@ import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, RefCallback, useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
+import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, StakingIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Body3, Label2, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
@@ -20,13 +20,15 @@ import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { AppRoute } from '../../libs/routes';
+import { AppRoute, StakingRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
+import { useAtom } from '../../libs/useAtom';
+import { stakingSelectedPool$, useIsStakingJetton } from '../../state/staking/useStakingPools';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -127,11 +129,28 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
             : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
 
     const [_, setSwapFromAsset] = useSwapFromAsset();
+    const [_pool, setSelectedPool] = useAtom(stakingSelectedPool$);
     const navigate = useNavigate();
 
     const onSwap = () => {
         setSwapFromAsset(swapAsset!);
         navigate(AppRoute.swap, { replace: false });
+    };
+
+    const stakingPool = useIsStakingJetton(token === CryptoCurrency.TON ? undefined : token);
+
+    const onStake = () => {
+        if (stakingPool) {
+            setSelectedPool(stakingPool);
+            navigate(AppRoute.staking + StakingRoute.stake + '/' + stakingPool.address);
+        }
+    };
+
+    const onUnstake = () => {
+        if (stakingPool) {
+            setSelectedPool(stakingPool);
+            navigate(AppRoute.staking + StakingRoute.unstake + '/' + stakingPool.address);
+        }
     };
 
     const sdk = useAppSdk();
@@ -187,6 +206,21 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                             </ButtonStyled>
                         )}
                     </IfFeatureEnabled>
+                </IfFeatureEnabled>
+
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
+                    {stakingPool && !isReadOnly && network !== Network.TESTNET && (
+                        <>
+                            <ButtonStyled size="small" onClick={onStake}>
+                                <StakingIcon />
+                                {t('staking_deposit')}
+                            </ButtonStyled>
+                            <ButtonStyled size="small" onClick={onUnstake}>
+                                <StakingIcon />
+                                {t('staking_withdraw')}
+                            </ButtonStyled>
+                        </>
+                    )}
                 </IfFeatureEnabled>
 
                 <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>

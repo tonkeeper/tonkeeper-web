@@ -12,6 +12,7 @@ export enum AppRoute {
     signer = '/signer',
     publish = '/publish',
     swap = '/swap',
+    staking = '/staking',
     multisigOrders = '/multisig-orders',
     multisigWallets = '/multisig-wallets',
     home = '/',
@@ -76,6 +77,13 @@ export enum WalletSettingsRoute {
     chains = '/chains',
     twoFa = '/two-fa',
     notification = '/notification'
+}
+
+export enum StakingRoute {
+    pools = '/pools',
+    pool = '/pool',
+    stake = '/stake',
+    unstake = '/unstake'
 }
 
 export enum BrowserRoute {
