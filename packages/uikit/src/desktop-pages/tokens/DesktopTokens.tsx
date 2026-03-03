@@ -1,6 +1,9 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { fallbackRenderOver } from '../../components/Error';
 import { Body2 } from '../../components/Text';
@@ -10,18 +13,23 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
-import { AnyChainAsset, TonAsset } from '../../components/home/Jettons';
+import { AnyChainAsset, StakingPositionAsset, TonAsset } from '../../components/home/Jettons';
 import { useTranslation } from '../../hooks/translation';
-import { allChainsAssetsKeys, useAllChainsAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
+import {
+    getPortfolioBalanceId,
+    portfolioBalancesKeys,
+    PortfolioBalance,
+    PortfolioTokenBalance,
+    usePortfolioBalancesForList
+} from '../../state/portfolio/usePortfolioBalances';
 
 export const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -48,6 +56,10 @@ const TonAssetStyled = styled(TonAsset)`
 `;
 
 const AnyChainAssetStyled = styled(AnyChainAsset)`
+    ${DesktopAssetStylesOverride}
+`;
+
+const StakingPositionAssetStyled = styled(StakingPositionAsset)`
     ${DesktopAssetStylesOverride}
 `;
 
@@ -104,13 +116,19 @@ const DividerInner = styled(Divider)`
 `;
 
 const DesktopTokensPayload = () => {
-    const { assets: allAssets } = useAllChainsAssets() ?? [];
-    const [tonAssetAmount, assets] = useMemo(() => {
+    const { data: balances } = usePortfolioBalancesForList();
+    const [tonTokenBalance, listBalances] = useMemo(() => {
         return [
-            allAssets?.find(item => item.asset.id === TON_ASSET.id),
-            allAssets?.filter(item => item.asset.id !== TON_ASSET.id)
+            balances?.find(
+                (item): item is PortfolioTokenBalance =>
+                    item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id
+            ),
+            balances?.filter(
+                item => !(item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id)
+            )
         ];
-    }, [allAssets]);
+    }, [balances]);
+    const tonAssetAmount = tonTokenBalance?.assetAmount;
     const { t } = useTranslation();
     const { data: distribution } = useAssetsDistribution();
     const { data: uiPreferences } = useUserUIPreferences();
@@ -139,10 +157,10 @@ const DesktopTokensPayload = () => {
     const virtualScrollPaddingBase = itemSize;
 
     const rowVirtualizer = useVirtualizer({
-        count: assets?.length ?? 0,
+        count: listBalances?.length ?? 0,
         getScrollElement: () => containerRef.current,
         estimateSize: () => itemSize,
-        getItemKey: index => assets![index].asset.id,
+        getItemKey: index => getPortfolioBalanceId(listBalances![index]),
         paddingStart:
             canShowChart && showChart
                 ? chartSize + virtualScrollPaddingBase
@@ -162,14 +180,20 @@ const DesktopTokensPayload = () => {
                 return rowVirtualizer.scrollToOffset(containerRef.current!.scrollHeight);
             }
 
-            const index = assets!.findIndex(item => item.asset.address === address);
-            if (index !== undefined) {
+            const index = listBalances!.findIndex(item => {
+                if (item.kind !== 'token') return false;
+
+                const asset = item.assetAmount.asset;
+                if (!isTonAsset(asset)) return false;
+                return tonAssetAddressToString(asset.address) === address;
+            });
+            if (index !== -1) {
                 rowVirtualizer.scrollToOffset(
                     (tonRef.current?.offsetTop ?? 0) + (index + 1) * itemSize
                 );
             }
         },
-        [assets, rowVirtualizer, rowVirtualizer.elementsCache, env]
+        [listBalances, rowVirtualizer, rowVirtualizer.elementsCache, env]
     );
 
     /**
@@ -206,13 +230,13 @@ const DesktopTokensPayload = () => {
                     }
                 />
             </DesktopViewHeader>
-            <PullToRefresh invalidate={allChainsAssetsKeys} />
+            <PullToRefresh invalidate={portfolioBalancesKeys} />
             <TokensPageBody
                 style={{
                     height: `${rowVirtualizer.getTotalSize()}px`
                 }}
             >
-                {tonAssetAmount && assets && distribution && uiPreferences && (
+                {tonAssetAmount && listBalances && distribution && uiPreferences && (
                     <>
                         {canShowChart && showChart && (
                             <ErrorBoundary
@@ -244,7 +268,9 @@ const DesktopTokensPayload = () => {
                                         'Failed to display tokens list'
                                     )}
                                 >
-                                    <AnyChainAssetStyled balance={assets[virtualRow.index]} />
+                                    <PortfolioBalanceRow
+                                        balance={listBalances[virtualRow.index]}
+                                    />
                                     <DividerInner />
                                 </ErrorBoundary>
                             </div>
@@ -254,6 +280,13 @@ const DesktopTokensPayload = () => {
             </TokensPageBody>
         </DesktopViewPageLayout>
     );
+};
+
+const PortfolioBalanceRow: FC<{ balance: PortfolioBalance }> = ({ balance }) => {
+    if (balance.kind === 'token') {
+        return <AnyChainAssetStyled tokenBalance={balance} />;
+    }
+    return <StakingPositionAssetStyled stakingPosition={balance} />;
 };
 
 export const DesktopTokens = () => {

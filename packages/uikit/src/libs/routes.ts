@@ -80,7 +80,6 @@ export enum WalletSettingsRoute {
 }
 
 export enum StakingRoute {
-    pools = '/pools',
     pool = '/pool',
     stake = '/stake',
     unstake = '/unstake'

@@ -6,8 +6,8 @@ import { useTranslation } from '../../hooks/translation';
 import { Label1 } from '../Text';
 import { NftsList } from '../nft/Nfts';
 import { JettonList } from './Jettons';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { PortfolioBalance } from '../../state/portfolio/usePortfolioBalances';
 
 const TabsBlock = styled.div`
     display: flex;
@@ -93,9 +93,9 @@ const Tabs: FC<{ tab: HomeTabs; onTab: (value: HomeTabs) => void }> = ({ tab, on
 const collectibles = 'collectibles';
 
 export const TabsView: FC<{
-    assets: AssetAmount[];
+    balances: PortfolioBalance[];
     nfts: NFT[];
-}> = ({ assets, nfts }) => {
+}> = ({ balances, nfts }) => {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -127,7 +127,7 @@ export const TabsView: FC<{
             {tab === HomeTabs.COLLECTIBLES ? (
                 <NftsList nfts={nfts} />
             ) : (
-                <JettonList assets={assets} />
+                <JettonList balances={balances} />
             )}
         </>
     );

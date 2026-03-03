@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
-import { useStakingPositions } from './useStakingPosition';
-import { useTonstakersPool } from './useStakingPools';
-import { useJettonBalance } from '../jetton';
+import { usePortfolioBalances } from '../portfolio/usePortfolioBalances';
 
 export type StakingEntryPoint =
     | { view: 'stake-form'; poolAddress: string }
@@ -10,34 +8,37 @@ export type StakingEntryPoint =
     | { view: 'pools-list' };
 
 export const useStakingEntryPoint = (): StakingEntryPoint | undefined => {
-    const { data: positions } = useStakingPositions();
-    const tonstakersPool = useTonstakersPool();
-    const { data: tsTonBalance, isLoading: isTsTonLoading } = useJettonBalance(
-        tonstakersPool?.liquidJettonMaster
-    );
+    const { data: portfolio, isStakingReady } = usePortfolioBalances();
 
     return useMemo(() => {
-        if (positions === undefined || !tonstakersPool) return undefined;
-        if (tonstakersPool.liquidJettonMaster && isTsTonLoading) return undefined;
+        if (!portfolio || !isStakingReady) return undefined;
 
-        const activeNominatorPositions = positions.filter(
-            p => p.amount > 0 || p.pendingDeposit > 0 || p.pendingWithdraw > 0 || p.readyWithdraw > 0
+        if (!portfolio.tonstakersPool) return { view: 'pools-list' };
+
+        const tonstakersPool = portfolio.tonstakersPool;
+
+        const hasTonstakersLiquid = portfolio.tokenBalances.some(
+            token =>
+                token.stakingPool &&
+                eqAddresses(token.stakingPool.address, tonstakersPool.address) &&
+                token.assetAmount.weiAmount.gt(0)
         );
 
-        const hasTonstakersLiquid = tsTonBalance && BigInt(tsTonBalance.balance) > BigInt(0);
-
-        const hasNonTonstakersPositions = activeNominatorPositions.some(
-            p => !eqAddresses(p.pool, tonstakersPool.address)
+        const hasNonTonstakersPositions = portfolio.stakingPositions.some(
+            position => !eqAddresses(position.pool.address, tonstakersPool.address)
         );
 
-        if (!hasTonstakersLiquid && activeNominatorPositions.length === 0) {
+        if (!hasTonstakersLiquid && portfolio.stakingPositions.length === 0) {
             return { view: 'stake-form', poolAddress: tonstakersPool.address };
         }
 
-        if (!hasNonTonstakersPositions && (hasTonstakersLiquid || activeNominatorPositions.length > 0)) {
+        if (
+            !hasNonTonstakersPositions &&
+            (hasTonstakersLiquid || portfolio.stakingPositions.length > 0)
+        ) {
             return { view: 'pool-detail', poolAddress: tonstakersPool.address };
         }
 
         return { view: 'pools-list' };
-    }, [positions, tonstakersPool, tsTonBalance, isTsTonLoading]);
+    }, [portfolio, isStakingReady]);
 };
