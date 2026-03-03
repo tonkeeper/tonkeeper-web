@@ -54,3 +54,10 @@ Thumbs.db
 
 
 package-lock.json
+
+# ralphex
+.ralphex*
+.mcp.json
+.playwright*
+.playwright-mcp*
+.obsidian

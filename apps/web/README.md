@@ -1,46 +1,28 @@
-# Getting Started with Create React App
+# @tonkeeper/web
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Tonkeeper Web — browser-based wallet on The Open Network.
 
-## Available Scripts
+## Scripts
 
-In the project directory, you can run:
+```bash
+yarn start          # run Vite dev server (http://localhost:5173)
+yarn build          # production build
+yarn preview        # preview production build
+```
 
-### `npm start`
+## Local HTTPS proxy (macOS only)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Some browser APIs (Clipboard, Credential Management) and Safari require HTTPS even on localhost. OAuth callback testing requires the real `wallet.tonkeeper.com` domain.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+`yarn dev:https` launches an interactive menu to toggle local HTTPS proxies:
 
-### `npm test`
+| Domain | Purpose |
+|---|---|
+| `wallet.tonkeeper.local` | Day-to-day local HTTPS development |
+| `wallet.tonkeeper.com` | OAuth callback testing (overrides the real domain!) |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Under the hood it generates trusted certificates via `mkcert` (stored in `.ssl/`, git-ignored), writes nginx reverse-proxy configs (`:443` → `localhost:5173`), and adds `/etc/hosts` entries.
 
-### `npm run build`
+**Prerequisites:** `brew install nginx mkcert && mkcert -install`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+> The script is macOS-specific (Homebrew, `dscacheutil`, `mDNSResponder`). Linux/Windows users can set up a similar proxy manually.

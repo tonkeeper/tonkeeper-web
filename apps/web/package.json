@@ -38,6 +38,7 @@
     "scripts": {
         "locales": "ts-node ./task/locales",
         "start": "yarn locales && vite dev",
+        "dev:https": "./dev.sh",
         "preview": "vite preview",
         "build": "tsc && vite build && yarn locales",
         "build:web": "yarn build"

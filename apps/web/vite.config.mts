@@ -20,7 +20,7 @@ export default defineConfig({
     server: {
         // Required for local development to test Telegram OAuth callbacks.
         // Vite rejects requests with Host header different from localhost by default.
-        allowedHosts: ['wallet.tonkeeper.com']
+        allowedHosts: ['wallet.tonkeeper.com', 'wallet.tonkeeper.local']
     },
     resolve: {
         alias: {

@@ -17,6 +17,7 @@ import {
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
+    StakingIcon,
     SwapIcon
 } from '../../Icon';
 import { Body3, Label2 } from '../../Text';
@@ -156,6 +157,7 @@ export const WalletAsideMenu = () => {
                     </NavLink>
                 </IfFeatureEnabled>
                 <SwapItem />
+                <StakingItem />
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
                     <NavLink
@@ -208,6 +210,29 @@ const SwapItem = () => {
                         <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
                             <SwapIconStyled />
                             <Label2>{t('wallet_swap')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+            )}
+        </IfFeatureEnabled>
+    );
+};
+
+const StakingItem = () => {
+    const isReadOnly = useIsActiveWalletWatchOnly();
+    const { t } = useTranslation();
+    const isTestnet = useActiveTonNetwork() === Network.TESTNET;
+    const hideBrowser = useHideBrowserAfterNavigation();
+    const isBrowserOpened = useIsBrowserOpened();
+
+    return (
+        <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
+            {!isReadOnly && !isTestnet && (
+                <NavLink to={AppRoute.staking} disableMobileAnimation onClick={hideBrowser}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
+                            <StakingIcon />
+                            <Label2>{t('staking_title')}</Label2>
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>

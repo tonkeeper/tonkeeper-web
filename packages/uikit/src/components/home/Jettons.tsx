@@ -3,7 +3,7 @@ import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, forwardRef, useMemo } from 'react';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute } from '../../libs/routes';
+import { AppRoute, StakingRoute } from '../../libs/routes';
 import { toTokenRate, useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
@@ -21,6 +21,7 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { useIsStakingJetton } from '../../state/staking/useStakingPools';
 
 export interface TonAssetData {
     info: Account;
@@ -101,6 +102,9 @@ export const JettonAsset = forwardRef<
 
     const { data: jettonBalances } = useJettonList();
 
+    const jettonAddress = tonAssetAddressToString((balance.asset as TonAssetType).address);
+    const stakingPool = useIsStakingJetton(jettonAddress);
+
     const rate = useMemo(() => {
         const jetton = jettonBalances?.balances.find(j =>
             eqAddresses(j.jetton.address, balance.asset.address)
@@ -120,17 +124,22 @@ export const JettonAsset = forwardRef<
 
     return (
         <ListItem
-            onClick={() =>
-                navigate(
-                    AppRoute.coins +
-                        `/${encodeURIComponent(
-                            tonAssetAddressToString((balance.asset as TonAssetType).address)
-                        )}`,
-                    {
-                        replace: false
-                    }
-                )
-            }
+            onClick={() => {
+                if (stakingPool) {
+                    navigate(
+                        AppRoute.staking + StakingRoute.pool + '/' + stakingPool.address,
+                        { replace: false }
+                    );
+                } else {
+                    navigate(
+                        AppRoute.coins +
+                            `/${encodeURIComponent(
+                                tonAssetAddressToString((balance.asset as TonAssetType).address)
+                            )}`,
+                        { replace: false }
+                    );
+                }
+            }}
             className={className}
             ref={ref}
             backgroundHighlighted={isFullWidth}
@@ -138,13 +147,13 @@ export const JettonAsset = forwardRef<
             <ListItemPayload>
                 <TokenLogo src={balance.asset.image} noRadius={balance.asset.noImageCorners} />
                 <TokenLayout
-                    name={balance.asset.name ?? t('Unknown_COIN')}
-                    verification={verification}
-                    symbol={balance.asset.symbol}
+                    name={stakingPool ? t('staking_staked') : (balance.asset.name ?? t('Unknown_COIN'))}
+                    verification={stakingPool ? undefined : verification}
+                    symbol={stakingPool ? undefined : balance.asset.symbol}
                     balance={balance.stringRelativeAmount}
-                    secondary={fiatPrice}
-                    fiatAmount={fiatAmount}
-                    rate={rate}
+                    secondary={stakingPool ? stakingPool.name : fiatPrice}
+                    fiatAmount={stakingPool ? undefined : fiatAmount}
+                    rate={stakingPool ? undefined : rate}
                 />
             </ListItemPayload>
         </ListItem>
