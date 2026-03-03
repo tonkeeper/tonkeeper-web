@@ -9,15 +9,13 @@ import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { AppRoute, StakingRoute } from '../../libs/routes';
 import { useFormatFiat, useRate } from '../../state/rates';
-import { useJettonInfo } from '../../state/jetton';
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent
 } from '../../components/desktop/DesktopViewLayout';
-import { useStakedPoolsWithInfo } from '../../state/staking/usePoolInfo';
-import { useTonstakersPool } from '../../state/staking/useStakingPools';
-import { useStakingPositions } from '../../state/staking/useStakingPosition';
+import { usePortfolioBalances } from '../../state/portfolio/usePortfolioBalances';
+import { StakingPoolIcon } from '../../components/staking/StakingPoolIcon';
 import { StakingPageWrapper } from './StakingLayout';
 
 const PoolList = styled.div`
@@ -51,13 +49,6 @@ const PoolIconWrapper = styled.div`
     align-items: center;
     padding: 8px 0 8px 16px;
     flex-shrink: 0;
-`;
-
-const PoolIconImg = styled.img`
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
 `;
 
 const PoolCenter = styled.div`
@@ -138,20 +129,6 @@ const StakeButton = styled.button`
     }
 `;
 
-const PoolIconInitial = styled.div`
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: ${p => p.theme.backgroundContentTint};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 16px;
-    font-weight: 510;
-    color: ${p => p.theme.textSecondary};
-`;
-
 interface PoolListRowProps {
     pool: PoolInfo;
     position: AccountStakingInfo | undefined;
@@ -161,12 +138,7 @@ interface PoolListRowProps {
 
 const PoolListRow: FC<PoolListRowProps> = ({ pool, position, onClick, onStake }) => {
     const { t } = useTranslation();
-    const { data: jettonInfo } = useJettonInfo(pool.liquidJettonMaster ?? '');
     const { data: tonRate } = useRate(CryptoCurrency.TON);
-
-    const iconUrl = pool.liquidJettonMaster
-        ? (jettonInfo?.metadata?.image ?? jettonInfo?.preview)
-        : undefined;
 
     const hasActivePosition =
         (position?.amount ?? 0) > 0 ||
@@ -195,14 +167,10 @@ const PoolListRow: FC<PoolListRowProps> = ({ pool, position, onClick, onStake })
         onStake();
     };
 
-    const poolIcon = iconUrl
-        ? <PoolIconImg src={iconUrl} alt={pool.name} />
-        : <PoolIconInitial>{pool.name.charAt(0).toUpperCase()}</PoolIconInitial>;
-
     return (
         <PoolRow onClick={onClick}>
             <PoolIconWrapper>
-                {poolIcon}
+                <StakingPoolIcon pool={pool} size={40} variant="provider" />
             </PoolIconWrapper>
             <PoolCenter>
                 <PoolInfoRow>
@@ -225,7 +193,8 @@ const PoolListRow: FC<PoolListRowProps> = ({ pool, position, onClick, onStake })
                     <PoolInfoLeft>
                         <PoolSecondaryText>
                             {t('staking_pools_apy', { apy: pool.apy.toFixed(2) })}
-                            {!hasActivePosition && ` · ${t('staking_pools_min_deposit', { minDeposit: minStakeTON })}`}
+                            {!hasActivePosition &&
+                                ` · ${t('staking_pools_min_deposit', { minDeposit: minStakeTON })}`}
                         </PoolSecondaryText>
                     </PoolInfoLeft>
                     {hasActivePosition && fiatAmount && (
@@ -252,30 +221,21 @@ export const DesktopStakingPoolsPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const tonstakersPool = useTonstakersPool();
-    const { data: stakedPoolsWithInfo, isLoading: isStakedLoading } = useStakedPoolsWithInfo();
-    const { data: positions } = useStakingPositions();
+    const { data: portfolio, isStakingLoading } = usePortfolioBalances();
+    const tonstakersPool = portfolio?.tonstakersPool;
 
     const poolRows = useMemo(() => {
         const rows: Array<{ pool: PoolInfo; position: AccountStakingInfo | undefined }> = [];
 
-        if (tonstakersPool) {
-            const tonstakersPosition = positions?.find(p =>
-                eqAddresses(p.pool, tonstakersPool.address)
+        if (tonstakersPool && portfolio) {
+            const tonstakersPosition = portfolio.stakingPositions.find(p =>
+                eqAddresses(p.pool.address, tonstakersPool.address)
             );
-            rows.push({ pool: tonstakersPool, position: tonstakersPosition });
+            rows.push({ pool: tonstakersPool, position: tonstakersPosition?.position });
         }
 
-        if (stakedPoolsWithInfo) {
-            for (const { pool, position } of stakedPoolsWithInfo) {
-                const isActive =
-                    position.amount > 0 ||
-                    position.pendingDeposit > 0 ||
-                    position.pendingWithdraw > 0 ||
-                    position.readyWithdraw > 0;
-
-                if (!isActive) continue;
-
+        if (portfolio) {
+            for (const { pool, position } of portfolio.stakingPositions) {
                 const isTonstakers =
                     tonstakersPool && eqAddresses(pool.address, tonstakersPool.address);
                 if (isTonstakers) continue;
@@ -285,7 +245,7 @@ export const DesktopStakingPoolsPage = () => {
         }
 
         return rows;
-    }, [tonstakersPool, stakedPoolsWithInfo, positions]);
+    }, [portfolio, tonstakersPool]);
 
     const handlePoolClick = (poolAddress: string) => {
         navigate(AppRoute.staking + StakingRoute.pool + '/' + poolAddress);
@@ -295,7 +255,7 @@ export const DesktopStakingPoolsPage = () => {
         navigate(AppRoute.staking + StakingRoute.stake + '/' + poolAddress);
     };
 
-    const isLoading = isStakedLoading && !tonstakersPool;
+    const isLoading = isStakingLoading && !tonstakersPool;
 
     return (
         <StakingPageWrapper mobileContentPaddingTop>

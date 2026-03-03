@@ -3,7 +3,11 @@ import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayou
 
 export const StakingPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;
-    ${p => p.theme.proDisplayType === 'desktop' && css`min-width: 480px;`}
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            min-width: 480px;
+        `}
 `;
 
 export const ContentWrapper = styled.div`

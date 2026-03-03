@@ -4,8 +4,8 @@ import { styled } from 'styled-components';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { useTranslation } from '../../hooks/translation';
-import { useJettonInfo } from '../../state/jetton';
 import { Body2, Body3 } from '../Text';
+import { StakingPoolIcon } from './StakingPoolIcon';
 
 const PoolCard = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -17,21 +17,6 @@ const PoolCard = styled.div`
     gap: 12px;
     flex: 1;
     min-width: 0;
-`;
-
-const PoolIcon = styled.img`
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
-    flex-shrink: 0;
-`;
-
-const PoolIconFallback = styled.div`
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
-    flex-shrink: 0;
-    background: ${p => p.theme.backgroundContentTint};
 `;
 
 const PoolTextWrapper = styled.div`
@@ -58,8 +43,6 @@ export interface StakingPoolSelectorProps {
 
 export const StakingPoolSelector: FC<StakingPoolSelectorProps> = ({ pool }) => {
     const { t } = useTranslation();
-    const { data: jettonInfo } = useJettonInfo(pool?.liquidJettonMaster ?? '');
-    const iconUrl = jettonInfo?.metadata?.image ?? jettonInfo?.preview;
 
     if (!pool) {
         return null;
@@ -70,11 +53,7 @@ export const StakingPoolSelector: FC<StakingPoolSelectorProps> = ({ pool }) => {
 
     return (
         <PoolCard>
-            {iconUrl ? (
-                <PoolIcon src={iconUrl} alt={pool.name} />
-            ) : (
-                <PoolIconFallback />
-            )}
+            <StakingPoolIcon pool={pool} size={24} variant="provider" />
             <PoolTextWrapper>
                 <PoolName>{pool.name}</PoolName>
                 <PoolDetail>

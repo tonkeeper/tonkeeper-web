@@ -17,6 +17,7 @@ import {
     DesktopViewHeader,
     DesktopViewHeaderContent
 } from '../../components/desktop/DesktopViewLayout';
+import { StakingPoolIcon } from '../../components/staking/StakingPoolIcon';
 import { StakingPageWrapper } from './StakingLayout';
 
 const ContentArea = styled.div`
@@ -38,29 +39,6 @@ const PoolIconWrapper = styled.div`
     width: 56px;
     height: 56px;
 `;
-
-const PoolIconImg = styled.img`
-    width: 56px;
-    height: 56px;
-    border-radius: 30px;
-    object-fit: cover;
-    background: ${p => p.theme.backgroundContent};
-`;
-
-const PoolIconFallback = styled.div`
-    width: 56px;
-    height: 56px;
-    border-radius: 30px;
-    background: ${p => p.theme.backgroundContentTint};
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    font-weight: 510;
-    color: ${p => p.theme.textSecondary};
-`;
-
 
 const AmountSection = styled.div`
     display: flex;
@@ -232,9 +210,7 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
     const { data: jettonRate } = useRate(jettonMaster);
 
     const iconUrl =
-        jettonBalance?.jetton?.image ??
-        jettonInfo?.metadata?.image ??
-        jettonInfo?.preview;
+        jettonBalance?.jetton?.image ?? jettonInfo?.metadata?.image ?? jettonInfo?.preview;
 
     const symbol = jettonBalance?.jetton?.symbol ?? jettonInfo?.metadata?.symbol ?? 'tsTON';
 
@@ -246,9 +222,7 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
 
     const { fiatAmount } = useFormatFiat(jettonRate, tokenAmount);
 
-    const priceUsd = jettonRate?.prices
-        ? `${jettonRate.prices.toFixed(4)} $`
-        : undefined;
+    const priceUsd = jettonRate?.prices ? `${jettonRate.prices.toFixed(4)} $` : undefined;
 
     const diff24h = jettonRate?.diff24h;
     const isNegative = diff24h ? diff24h.startsWith('-') : false;
@@ -279,10 +253,17 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
     );
 };
 
-export const DesktopStakingPoolDetailPage = () => {
+interface DesktopStakingPoolDetailPageProps {
+    poolAddress?: string;
+}
+
+export const DesktopStakingPoolDetailPage = ({
+    poolAddress
+}: DesktopStakingPoolDetailPageProps) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { address } = useParams() as { address: string };
+    const { address: routeAddress } = useParams() as { address?: string };
+    const address = poolAddress ?? routeAddress;
 
     const { data: pool } = usePoolInfo(address);
     const { data: position } = useStakingPosition(address);
@@ -294,16 +275,11 @@ export const DesktopStakingPoolDetailPage = () => {
     const { data: poolIconJettonInfo } = useJettonInfo(
         isLiquid ? pool?.liquidJettonMaster ?? '' : ''
     );
-    const poolIconUrl = isLiquid
-        ? (poolIconJettonInfo?.metadata?.image ?? poolIconJettonInfo?.preview)
-        : undefined;
 
     const { data: liquidJettonBalance } = useJettonBalance(
         isLiquid ? pool?.liquidJettonMaster : undefined
     );
-    const { data: liquidJettonRate } = useRate(
-        pool?.liquidJettonMaster ?? CryptoCurrency.TON
-    );
+    const { data: liquidJettonRate } = useRate(pool?.liquidJettonMaster ?? CryptoCurrency.TON);
 
     const stakedAmount = useMemo((): BigNumber | undefined => {
         if (isLiquid && liquidJettonBalance) {
@@ -325,11 +301,11 @@ export const DesktopStakingPoolDetailPage = () => {
         ? `${stakedAmount.toFixed(2, BigNumber.ROUND_DOWN)} TON`
         : '— TON';
 
-    const minStakeTON = pool
-        ? shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0)
-        : '—';
+    const minStakeTON = pool ? shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0) : '—';
 
-    const apyStr = pool ? t('staking_pool_detail', { apy: pool.apy.toFixed(2), minDeposit: minStakeTON }) : '';
+    const apyStr = pool
+        ? t('staking_pool_detail', { apy: pool.apy.toFixed(2), minDeposit: minStakeTON })
+        : '';
 
     const pendingWithdraw = position?.pendingWithdraw ?? 0;
     const pendingDeposit = position?.pendingDeposit ?? 0;
@@ -349,16 +325,17 @@ export const DesktopStakingPoolDetailPage = () => {
 
     const liquidDesc = useMemo(() => {
         if (!isLiquid || !pool) return '';
-        const symbol =
-            poolIconJettonInfo?.metadata?.symbol ?? 'tsTON';
+        const symbol = poolIconJettonInfo?.metadata?.symbol ?? 'tsTON';
         return t('staking_pool_liquid_desc', { pool: pool.name, token: symbol, tokenName: symbol });
     }, [isLiquid, pool, poolIconJettonInfo, t]);
 
     const handleStake = () => {
+        if (!address) return;
         navigate(AppRoute.staking + StakingRoute.stake + '/' + address);
     };
 
     const handleUnstake = () => {
+        if (!address) return;
         navigate(AppRoute.staking + StakingRoute.unstake + '/' + address);
     };
 
@@ -376,13 +353,7 @@ export const DesktopStakingPoolDetailPage = () => {
             <ContentArea>
                 <HeaderSection>
                     <PoolIconWrapper>
-                        {poolIconUrl ? (
-                            <PoolIconImg src={poolIconUrl} alt={pool?.name} />
-                        ) : (
-                            <PoolIconFallback>
-                                {pool?.name?.charAt(0)?.toUpperCase()}
-                            </PoolIconFallback>
-                        )}
+                        <StakingPoolIcon pool={pool} size={56} />
                     </PoolIconWrapper>
                     <AmountSection>
                         <AmountText>{displayAmount}</AmountText>
@@ -390,9 +361,7 @@ export const DesktopStakingPoolDetailPage = () => {
                     </AmountSection>
                 </HeaderSection>
                 <ButtonsRow>
-                    <ActionButton onClick={handleStake}>
-                        {t('staking_action_stake')}
-                    </ActionButton>
+                    <ActionButton onClick={handleStake}>{t('staking_action_stake')}</ActionButton>
                     <ActionButton onClick={handleUnstake}>
                         {t('staking_action_unstake')}
                     </ActionButton>
@@ -413,12 +382,22 @@ export const DesktopStakingPoolDetailPage = () => {
                         <InfoRow>
                             {pendingDeposit > 0 && (
                                 <InfoLeft>
-                                    {t('staking_pending_deposit', { amount: shiftedDecimals(pendingDeposit).toFixed(2, BigNumber.ROUND_DOWN) })}
+                                    {t('staking_pending_deposit', {
+                                        amount: shiftedDecimals(pendingDeposit).toFixed(
+                                            2,
+                                            BigNumber.ROUND_DOWN
+                                        )
+                                    })}
                                 </InfoLeft>
                             )}
                             {readyWithdraw > 0 && (
                                 <InfoRight>
-                                    {t('staking_ready_withdraw', { amount: shiftedDecimals(readyWithdraw).toFixed(2, BigNumber.ROUND_DOWN) })}
+                                    {t('staking_ready_withdraw', {
+                                        amount: shiftedDecimals(readyWithdraw).toFixed(
+                                            2,
+                                            BigNumber.ROUND_DOWN
+                                        )
+                                    })}
                                 </InfoRight>
                             )}
                         </InfoRow>
@@ -431,9 +410,7 @@ export const DesktopStakingPoolDetailPage = () => {
                             jettonMaster={pool.liquidJettonMaster}
                             onClick={handleTokenClick}
                         />
-                        {liquidDesc && (
-                            <DescriptionText>{liquidDesc}</DescriptionText>
-                        )}
+                        {liquidDesc && <DescriptionText>{liquidDesc}</DescriptionText>}
                     </>
                 )}
                 {countdown && (

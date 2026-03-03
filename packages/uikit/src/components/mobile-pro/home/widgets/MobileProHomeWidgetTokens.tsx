@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import { AnyChainAsset, TonAsset } from '../../../home/Jettons';
-import { useAllChainsAssetsWithPrice } from '../../../../state/home';
+import { AnyChainAsset, StakingPositionAsset, TonAsset } from '../../../home/Jettons';
 import React, { FC, useMemo } from 'react';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { SkeletonImage, SkeletonText } from '../../../shared/Skeleton';
@@ -13,6 +12,12 @@ import { formatFiatCurrency } from '../../../../hooks/balance';
 import { useUserFiat } from '../../../../state/fiat';
 import { useNavigate } from '../../../../hooks/router/useNavigate';
 import { AppRoute } from '../../../../libs/routes';
+import {
+    getPortfolioBalanceId,
+    PortfolioBalance,
+    PortfolioTokenBalance,
+    usePortfolioBalancesForList
+} from '../../../../state/portfolio/usePortfolioBalances';
 
 const Wrapper = styled.div`
     overflow: hidden;
@@ -39,6 +44,15 @@ const AnyChainAssetStyled = styled(AnyChainAsset)`
 
     .coin-label {
         background: ${props => props.theme.backgroundContentAttention} !important;
+    }
+`;
+
+const StakingPositionAssetStyled = styled(StakingPositionAsset)`
+    border-radius: 0;
+
+    & > * {
+        border-top: none !important;
+        padding: 8px 16px 8px 0 !important;
     }
 `;
 
@@ -70,34 +84,54 @@ const SkeletonRow = () => {
 };
 
 export const MobileProHomeWidgetTokens: FC<{ className?: string }> = ({ className }) => {
-    const { assets: allAssets } = useAllChainsAssetsWithPrice() ?? [];
+    const { data: balances } = usePortfolioBalancesForList();
 
-    const [tonAssetAmount, assets, notIncluded] = useMemo(() => {
-        if (!allAssets) {
+    const [tonAssetAmount, displayBalances, notIncluded] = useMemo(() => {
+        if (!balances) {
             return [undefined, undefined, undefined];
         }
-        const ton = allAssets.find(item => item.assetAmount.asset.id === TON_ASSET.id)?.assetAmount;
-        const jettons = allAssets.filter(item => item.assetAmount.asset.id !== TON_ASSET.id);
+        const tonBalance = balances.find(
+            (item): item is PortfolioTokenBalance =>
+                item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id
+        )?.assetAmount;
+        const restBalances = balances.filter(
+            item => !(item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id)
+        );
 
-        if (!jettons.length) {
-            return [ton, [], undefined];
+        if (!restBalances.length) {
+            return [tonBalance, [], undefined];
         }
 
-        let jettonsToDisplay = jettons.filter(j => j.isPinned);
-        if (jettonsToDisplay.length < 1) {
-            jettonsToDisplay = jettons.slice(0, 1);
+        const stakingPositions = restBalances.filter(
+            (item): item is Extract<PortfolioBalance, { kind: 'staking-position' }> =>
+                item.kind === 'staking-position'
+        );
+        const tokenBalances = restBalances.filter(
+            (item): item is PortfolioTokenBalance => item.kind === 'token'
+        );
+
+        let tokenBalancesToDisplay = tokenBalances.filter(token => token.isPinned);
+        if (tokenBalancesToDisplay.length < 1) {
+            tokenBalancesToDisplay = tokenBalances.slice(0, 1);
         }
 
-        if (
-            jettonsToDisplay.length === jettons.length ||
-            jettonsToDisplay.length + 1 === jettons.length
-        ) {
-            return [ton, jettons, undefined];
+        const nextDisplayBalances = [...stakingPositions, ...tokenBalancesToDisplay];
+        if (nextDisplayBalances.length < 1) {
+            return [tonBalance, restBalances.slice(0, 1), undefined];
         }
 
-        const notIncludedJettons = jettons.slice(jettonsToDisplay.length, jettons.length);
+        const displayedTokenIds = new Set(
+            tokenBalancesToDisplay.map(token => token.assetAmount.asset.id)
+        );
+        const notIncludedTokens = tokenBalances.filter(
+            token => !displayedTokenIds.has(token.assetAmount.asset.id)
+        );
 
-        const notIncludedBalance = notIncludedJettons.reduce(
+        if (notIncludedTokens.length <= 1) {
+            return [tonBalance, nextDisplayBalances, undefined];
+        }
+
+        const notIncludedBalance = notIncludedTokens.reduce(
             (acc, item) =>
                 !item.price
                     ? acc
@@ -106,28 +140,29 @@ export const MobileProHomeWidgetTokens: FC<{ className?: string }> = ({ classNam
         );
 
         return [
-            ton,
-            jettonsToDisplay,
+            tonBalance,
+            nextDisplayBalances,
             {
-                assets: notIncludedJettons.slice(0, 4).map(j => j.assetAmount),
+                assets: notIncludedTokens.slice(0, 4).map(token => token.assetAmount),
                 balance: notIncludedBalance
             }
         ];
-    }, [allAssets]);
+    }, [balances]);
 
     return (
         <Wrapper className={className}>
-            {tonAssetAmount && assets ? (
+            {tonAssetAmount && displayBalances ? (
                 <>
                     <TonAssetStyled balance={tonAssetAmount} />
-                    {assets.map(asset => (
-                        <>
+                    {displayBalances.map(item => (
+                        <React.Fragment key={getPortfolioBalanceId(item)}>
                             <Divider />
-                            <AnyChainAssetStyled
-                                balance={asset.assetAmount}
-                                key={asset.assetAmount.asset.id}
-                            />
-                        </>
+                            {item.kind === 'token' ? (
+                                <AnyChainAssetStyled tokenBalance={item} />
+                            ) : (
+                                <StakingPositionAssetStyled stakingPosition={item} />
+                            )}
+                        </React.Fragment>
                     ))}
                     {!!notIncluded && (
                         <>
