@@ -46,9 +46,8 @@ export function subscribeToOmnistonStream(params: {
     };
 
     const onError = () => {
-        if (eventSource.readyState === EventSource.CLOSED) {
-            params.onError(new Error('SSE connection closed'));
-        }
+        close();
+        params.onError(new Error('SSE connection closed'));
     };
 
     eventSource.addEventListener('message', onMessage);
