@@ -17,17 +17,9 @@ import { useRate } from '../rates';
 import { useStakedPoolsWithInfo } from '../staking/usePoolInfo';
 import { useStakingPools } from '../staking/useStakingPools';
 import { useStakingPositions } from '../staking/useStakingPosition';
+import { hasStakingPositionActivity } from '../staking/poolStakeState';
 import { QueryKey } from '../../libs/queryKey';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
-
-const isActivePosition = (position: AccountStakingInfo) => {
-    return (
-        position.amount > 0 ||
-        position.pendingDeposit > 0 ||
-        position.pendingWithdraw > 0 ||
-        position.readyWithdraw > 0
-    );
-};
 
 const isTonstakersPool = (pool: PoolInfo) => {
     return (
@@ -169,7 +161,7 @@ export const usePortfolioBalances = () => {
         });
 
         const stakingPositions: PortfolioStakingPosition[] = positions
-            .filter(isActivePosition)
+            .filter(hasStakingPositionActivity)
             .map(position => {
                 const pool = findPoolByPositionAddress(position.pool);
                 if (!pool) return undefined;

@@ -2,7 +2,9 @@ import BigNumber from 'bignumber.js';
 import { FC, useMemo } from 'react';
 import { styled } from 'styled-components';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
+import { formatDisplayAmount } from '../../libs/formatDisplayAmount';
 import { useRate, useFormatFiat } from '../../state/rates';
 import { useTonBalance } from '../../state/wallet';
 import { Body2, Body2Class, Body3 } from '../Text';
@@ -114,6 +116,7 @@ export const GAS_RESERVE_TON = 1;
 
 export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChange }) => {
     const { t } = useTranslation();
+    const { fiat } = useAppContext();
     const { data: balance } = useTonBalance();
     const { data: rate } = useRate(CryptoCurrency.TON);
 
@@ -147,7 +150,30 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
         }
     };
 
-    const fiatDisplay = fiatAmount ? `≈${fiatAmount}` : '0 USD';
+    const fiatDisplay = useMemo(() => {
+        const formatted = fiatAmount
+            ? fiatAmount
+            : formatDisplayAmount({
+                  kind: 'fiat',
+                  amount: 0,
+                  currency: fiat,
+                  profile: 'default'
+              });
+        return `≈${formatted}`;
+    }, [fiatAmount, fiat]);
+
+    const balanceDisplay = useMemo(() => {
+        if (!balanceTON) {
+            return '0';
+        }
+
+        return formatDisplayAmount({
+            kind: 'token',
+            amount: balanceTON,
+            unit: 'TON',
+            withUnit: false
+        });
+    }, [balanceTON]);
 
     return (
         <FieldContainer>
@@ -174,7 +200,7 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
                 ) : (
                     <>
                         <BalanceLabel>
-                            {t('staking_balance_label')}: {balanceTON?.toFixed(2) ?? '0'}
+                            {t('staking_balance_label')}: {balanceDisplay}
                         </BalanceLabel>
                         <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
                     </>

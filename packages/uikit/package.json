@@ -10,7 +10,8 @@
         "build-storybook": "build-storybook",
         "build": "rm -fr dist && tsc",
         "start": "tsc -w",
-        "build:pkg": "yarn build"
+        "build:pkg": "yarn build",
+        "test": "vitest run"
     },
     "license": "ISC",
     "dependencies": {
@@ -55,6 +56,7 @@
         "@types/react-transition-group": "^4.4.5",
         "@types/styled-components": "^5.1.34",
         "@types/uuid": "^9.0.1",
-        "typescript": "^4.9.4"
+        "typescript": "^4.9.4",
+        "vitest": "^3.2.4"
     }
 }
