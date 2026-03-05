@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
 import { useAppContext } from '../hooks/appContext';
-import { formatFiatCurrency } from '../hooks/balance';
+import { formatFiatCurrency, formatFiatCurrencySignificant } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
 import { useActiveApi } from './wallet';
 import {
@@ -126,16 +126,25 @@ export const useUSDTRate = () => {
     );
 };
 
-export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount?: BigNumber.Value) => {
+export const useFormatFiat = (
+    rate: TokenRate | undefined,
+    tokenAmount?: BigNumber.Value,
+    options?: { significantDigits?: number }
+) => {
     const { fiat } = useAppContext();
 
     const [fiatPrice, fiatAmount] = useMemo(() => {
         if (!rate || !tokenAmount) return [undefined, undefined] as const;
+
+        const fiatValue = new BigNumber(rate.prices).multipliedBy(tokenAmount);
+
         return [
             formatFiatCurrency(fiat, rate.prices),
-            formatFiatCurrency(fiat, new BigNumber(rate.prices).multipliedBy(tokenAmount))
+            options?.significantDigits
+                ? formatFiatCurrencySignificant(fiat, fiatValue, options.significantDigits)
+                : formatFiatCurrency(fiat, fiatValue)
         ] as const;
-    }, [rate, fiat, tokenAmount]);
+    }, [rate, fiat, tokenAmount, options?.significantDigits]);
     return {
         fiatPrice,
         fiatAmount

@@ -8,13 +8,22 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { AppRoute, StakingRoute } from '../../libs/routes';
+import { formatTokenAmount } from '../../libs/formatTokenAmount';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent
 } from '../../components/desktop/DesktopViewLayout';
-import { usePortfolioBalances } from '../../state/portfolio/usePortfolioBalances';
+import {
+    PortfolioTokenBalance,
+    usePortfolioBalances
+} from '../../state/portfolio/usePortfolioBalances';
+import {
+    getStakingPoolTonAmount,
+    hasActiveStakeForPool,
+    StakingPoolLiquidTokenBalance
+} from '../../state/staking/poolStakeState';
 import { StakingPoolIcon } from '../../components/staking/StakingPoolIcon';
 import { StakingPageWrapper } from './StakingLayout';
 
@@ -132,33 +141,56 @@ const StakeButton = styled.button`
 interface PoolListRowProps {
     pool: PoolInfo;
     position: AccountStakingInfo | undefined;
+    stakingTokenBalance?: PortfolioTokenBalance;
     onClick: () => void;
     onStake: () => void;
 }
 
-const PoolListRow: FC<PoolListRowProps> = ({ pool, position, onClick, onStake }) => {
+const PoolListRow: FC<PoolListRowProps> = ({
+    pool,
+    position,
+    stakingTokenBalance,
+    onClick,
+    onStake
+}) => {
     const { t } = useTranslation();
     const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const tonPrice = useMemo(() => {
+        return tonRate?.prices !== undefined ? new BigNumber(tonRate.prices) : undefined;
+    }, [tonRate?.prices]);
 
-    const hasActivePosition =
-        (position?.amount ?? 0) > 0 ||
-        (position?.pendingDeposit ?? 0) > 0 ||
-        (position?.pendingWithdraw ?? 0) > 0 ||
-        (position?.readyWithdraw ?? 0) > 0;
+    const liquidTokenBalance = useMemo<StakingPoolLiquidTokenBalance | undefined>(() => {
+        if (!stakingTokenBalance) {
+            return undefined;
+        }
+
+        return {
+            weiAmount: stakingTokenBalance.assetAmount.weiAmount,
+            relativeAmount: stakingTokenBalance.assetAmount.relativeAmount,
+            price: stakingTokenBalance.price
+        };
+    }, [stakingTokenBalance]);
+
+    const hasActivePosition = useMemo(() => {
+        return hasActiveStakeForPool({ position, liquidTokenBalance });
+    }, [position, liquidTokenBalance]);
 
     const tonAmount = useMemo(() => {
-        return shiftedDecimals(position?.amount ?? 0);
-    }, [position?.amount]);
+        return getStakingPoolTonAmount({ position, liquidTokenBalance, tonPrice });
+    }, [position, liquidTokenBalance, tonPrice]);
 
-    const { fiatAmount } = useFormatFiat(tonRate, tonAmount);
+    const { fiatAmount } = useFormatFiat(tonRate, tonAmount, { significantDigits: 3 });
 
     const hasPendingWithdraw = (position?.pendingWithdraw ?? 0) > 0;
     const pendingAmount = useMemo(() => {
-        if (!hasPendingWithdraw) return '';
-        return shiftedDecimals(position!.pendingWithdraw).toFixed(2, BigNumber.ROUND_DOWN);
-    }, [hasPendingWithdraw, position]);
+        return formatTokenAmount(shiftedDecimals(position?.pendingWithdraw ?? 0), 'TON', {
+            withUnit: false
+        });
+    }, [position?.pendingWithdraw]);
 
-    const displayAmount = tonAmount.toFixed(2, BigNumber.ROUND_DOWN);
+    const displayAmount = useMemo(() => {
+        return formatTokenAmount(tonAmount, 'TON');
+    }, [tonAmount]);
 
     const minStakeTON = shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0);
 
@@ -179,7 +211,7 @@ const PoolListRow: FC<PoolListRowProps> = ({ pool, position, onClick, onStake })
                     </PoolInfoLeft>
                     {hasActivePosition ? (
                         <PoolInfoRight>
-                            <PoolAmountLabel>{displayAmount} TON</PoolAmountLabel>
+                            <PoolAmountLabel>{displayAmount}</PoolAmountLabel>
                         </PoolInfoRight>
                     ) : (
                         <PoolInfoRight>
@@ -225,22 +257,55 @@ export const DesktopStakingPoolsPage = () => {
     const tonstakersPool = portfolio?.tonstakersPool;
 
     const poolRows = useMemo(() => {
-        const rows: Array<{ pool: PoolInfo; position: AccountStakingInfo | undefined }> = [];
+        const rows: Array<{
+            pool: PoolInfo;
+            position: AccountStakingInfo | undefined;
+            stakingTokenBalance?: PortfolioTokenBalance;
+        }> = [];
 
-        if (tonstakersPool && portfolio) {
-            const tonstakersPosition = portfolio.stakingPositions.find(p =>
-                eqAddresses(p.pool.address, tonstakersPool.address)
-            );
-            rows.push({ pool: tonstakersPool, position: tonstakersPosition?.position });
+        if (!portfolio) {
+            return rows;
         }
 
-        if (portfolio) {
-            for (const { pool, position } of portfolio.stakingPositions) {
-                const isTonstakers =
-                    tonstakersPool && eqAddresses(pool.address, tonstakersPool.address);
-                if (isTonstakers) continue;
+        const upsertRow = (
+            pool: PoolInfo,
+            patch: Partial<{
+                position: AccountStakingInfo | undefined;
+                stakingTokenBalance?: PortfolioTokenBalance;
+            }>
+        ) => {
+            const existingIndex = rows.findIndex(row =>
+                eqAddresses(row.pool.address, pool.address)
+            );
+            if (existingIndex === -1) {
+                rows.push({
+                    pool,
+                    position: patch.position,
+                    stakingTokenBalance: patch.stakingTokenBalance
+                });
+                return;
+            }
 
-                rows.push({ pool, position });
+            rows[existingIndex] = { ...rows[existingIndex], ...patch };
+        };
+
+        for (const { pool, position } of portfolio.stakingPositions) {
+            upsertRow(pool, { position });
+        }
+
+        for (const token of portfolio.tokenBalances) {
+            if (!token.stakingPool) continue;
+            upsertRow(token.stakingPool, { stakingTokenBalance: token });
+        }
+
+        if (tonstakersPool) {
+            upsertRow(tonstakersPool, {});
+            const tonstakersIndex = rows.findIndex(row =>
+                eqAddresses(row.pool.address, tonstakersPool.address)
+            );
+            if (tonstakersIndex > 0) {
+                const [tonstakersRow] = rows.splice(tonstakersIndex, 1);
+                rows.unshift(tonstakersRow);
             }
         }
 
@@ -266,11 +331,12 @@ export const DesktopStakingPoolsPage = () => {
                 <div />
             ) : (
                 <PoolList>
-                    {poolRows.map(({ pool, position }) => (
+                    {poolRows.map(({ pool, position, stakingTokenBalance }) => (
                         <PoolListRow
                             key={pool.address}
                             pool={pool}
                             position={position}
+                            stakingTokenBalance={stakingTokenBalance}
                             onClick={() => handlePoolClick(pool.address)}
                             onStake={() => handleStakeClick(pool.address)}
                         />

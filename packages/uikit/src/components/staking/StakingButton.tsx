@@ -16,7 +16,14 @@ export interface StakingButtonProps {
     encodeError?: boolean;
 }
 
-export const StakingButton: FC<StakingButtonProps> = ({ onClick, isLoading, amount, pool, poolError, encodeError }) => {
+export const StakingButton: FC<StakingButtonProps> = ({
+    onClick,
+    isLoading,
+    amount,
+    pool,
+    poolError,
+    encodeError
+}) => {
     const { t } = useTranslation();
     const { data: balance } = useTonBalance();
 

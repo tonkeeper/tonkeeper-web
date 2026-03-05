@@ -54,10 +54,7 @@ export interface StakingEarningsInfoProps {
     amount: string;
 }
 
-export const StakingEarningsInfo: FC<StakingEarningsInfoProps> = ({
-    pool,
-    amount
-}) => {
+export const StakingEarningsInfo: FC<StakingEarningsInfoProps> = ({ pool, amount }) => {
     const { t } = useTranslation();
     const { data: tsTonBalance } = useJettonBalance(pool?.liquidJettonMaster);
 
