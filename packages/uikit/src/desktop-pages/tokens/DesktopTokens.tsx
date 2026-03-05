@@ -268,9 +268,7 @@ const DesktopTokensPayload = () => {
                                         'Failed to display tokens list'
                                     )}
                                 >
-                                    <PortfolioBalanceRow
-                                        balance={listBalances[virtualRow.index]}
-                                    />
+                                    <PortfolioBalanceRow balance={listBalances[virtualRow.index]} />
                                     <DividerInner />
                                 </ErrorBoundary>
                             </div>

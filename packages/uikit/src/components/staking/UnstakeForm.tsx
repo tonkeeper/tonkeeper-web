@@ -7,8 +7,10 @@ import { FC, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 import { AppRoute } from '../../libs/routes';
 import { useAtom } from '../../libs/useAtom';
+import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { formatDisplayAmount } from '../../libs/formatDisplayAmount';
 import { useRate, useFormatFiat } from '../../state/rates';
 import { useJettonBalance } from '../../state/jetton';
 import { useTonBalance } from '../../state/wallet';
@@ -150,6 +152,7 @@ const CycleInfoText = styled(Body3)`
 
 export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
+    const { fiat } = useAppContext();
     const [amount, setAmount] = useState('');
     const [modalParams, setModalParams] = useState<TonConnectTransactionPayload | null>(null);
     const [selectedPool] = useAtom(stakingSelectedPool$);
@@ -160,7 +163,9 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
     const pool = selectedPool ?? pools?.[0];
     const isLiquid = !!pool?.liquidJettonMaster;
 
-    const { data: tsTonBalance, isLoading: isTsTonLoading } = useJettonBalance(isLiquid ? pool?.liquidJettonMaster : undefined);
+    const { data: tsTonBalance, isLoading: isTsTonLoading } = useJettonBalance(
+        isLiquid ? pool?.liquidJettonMaster : undefined
+    );
     const { data: position } = useStakingPosition(isLiquid ? undefined : pool?.address);
     const { data: tonBalance } = useTonBalance();
 
@@ -175,7 +180,7 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
         return undefined;
     }, [isLiquid, tsTonBalance, position]);
 
-    const tokenSymbol = isLiquid ? (tsTonBalance?.jetton?.symbol ?? 'tsTON') : 'TON';
+    const tokenSymbol = isLiquid ? tsTonBalance?.jetton?.symbol ?? 'tsTON' : 'TON';
     const isBalanceLoading = isLiquid ? isTsTonLoading : !position;
 
     const amountBN = useMemo(() => {
@@ -184,7 +189,9 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
         return bn.isNaN() ? undefined : bn;
     }, [amount]);
 
-    const rateToken = isLiquid ? pool?.liquidJettonMaster ?? CryptoCurrency.TON : CryptoCurrency.TON;
+    const rateToken = isLiquid
+        ? pool?.liquidJettonMaster ?? CryptoCurrency.TON
+        : CryptoCurrency.TON;
     const { data: rate } = useRate(rateToken);
     const { fiatAmount } = useFormatFiat(rate, amountBN);
 
@@ -203,7 +210,15 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
     };
 
     const onConfirm = async () => {
-        if (!pool || !unstakableAmount || !amount || !amountBN || amountBN.isZero() || amountBN.isNegative()) return;
+        if (
+            !pool ||
+            !unstakableAmount ||
+            !amount ||
+            !amountBN ||
+            amountBN.isZero() ||
+            amountBN.isNegative()
+        )
+            return;
         const amountNano = toNano(amountBN.toFixed(9));
         try {
             const params = await encode({ pool, amount: amountNano });
@@ -273,7 +288,30 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
         );
     };
 
-    const fiatDisplay = fiatAmount ? `≈${fiatAmount}` : '0 USD';
+    const fiatDisplay = useMemo(() => {
+        const formatted = fiatAmount
+            ? fiatAmount
+            : formatDisplayAmount({
+                  kind: 'fiat',
+                  amount: 0,
+                  currency: fiat,
+                  profile: 'default'
+              });
+        return `≈${formatted}`;
+    }, [fiatAmount, fiat]);
+
+    const unstakableDisplay = useMemo(() => {
+        if (!unstakableAmount) {
+            return '0';
+        }
+
+        return formatDisplayAmount({
+            kind: 'token',
+            amount: unstakableAmount,
+            unit: tokenSymbol,
+            withUnit: false
+        });
+    }, [unstakableAmount, tokenSymbol]);
 
     return (
         <MainFormWrapper className={className}>
@@ -298,17 +336,13 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
                     </InputBorderedBox>
                     <FieldFooter>
                         {isInsufficient ? (
-                            <ErrorText>
-                                {t('staking_insufficient_balance')}
-                            </ErrorText>
+                            <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
                         ) : (
                             <>
                                 <BalanceLabel>
-                                    {t('staking_available_label')}: {unstakableAmount?.toFixed(2) ?? '0'}
+                                    {t('staking_available_label')}: {unstakableDisplay}
                                 </BalanceLabel>
-                                <MaxButton onClick={onMaxClick}>
-                                    {t('staking_max')}
-                                </MaxButton>
+                                <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
                             </>
                         )}
                     </FieldFooter>

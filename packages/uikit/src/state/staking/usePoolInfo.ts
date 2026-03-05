@@ -43,7 +43,7 @@ export const useStakedPoolsWithInfo = () => {
         [wallet.rawAddress, QueryKey.staking, 'staked-pools-with-info', network, positionsKey],
         async () => {
             const entries = await Promise.all(
-                positions!.map(async (position) => {
+                positions!.map(async position => {
                     const cachedPool = pools!.find(p => eqAddresses(p.address, position.pool));
                     if (cachedPool) {
                         return { position, pool: cachedPool };

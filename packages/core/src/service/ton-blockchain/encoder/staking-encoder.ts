@@ -11,10 +11,7 @@ const STAKE_FEE_RES = toNano('1');
 const UNSTAKE_FEE_RES = toNano('1.05');
 
 export class StakingEncoder {
-    constructor(
-        private readonly api: APIConfig,
-        private readonly walletAddress: string
-    ) {}
+    constructor(private readonly api: APIConfig, private readonly walletAddress: string) {}
 
     encodeDeposit = (params: {
         poolAddress: string;
