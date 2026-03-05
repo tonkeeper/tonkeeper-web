@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { FC, useMemo } from 'react';
 import { styled } from 'styled-components';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { STAKE_GAS_RESERVE_TON } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/staking-encoder';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { formatter, formatFiatCurrency } from '../../hooks/balance';
@@ -112,7 +113,7 @@ export interface StakingAmountInputProps {
     onChange: (value: string) => void;
 }
 
-export const GAS_RESERVE_TON = 1;
+export const GAS_RESERVE_TON = STAKE_GAS_RESERVE_TON;
 
 export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChange }) => {
     const { t } = useTranslation();

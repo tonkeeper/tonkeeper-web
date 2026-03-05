@@ -1,9 +1,11 @@
 import BigNumber from 'bignumber.js';
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useTranslation } from '../../hooks/translation';
+import { useDateFormat } from '../../hooks/dateFormat';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useParams } from '../../hooks/router/useParams';
 import { AppRoute, StakingRoute } from '../../libs/routes';
@@ -13,6 +15,7 @@ import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { usePoolInfo } from '../../state/staking/usePoolInfo';
 import { useStakingPosition } from '../../state/staking/useStakingPosition';
 import { useStakingCycleCountdown } from '../../state/staking/useStakingCycleCountdown';
+import { useEncodeStakingUnstake } from '../../state/staking/useEncodeStaking';
 import {
     getStakingPoolTonAmount,
     StakingPoolLiquidTokenBalance
@@ -22,6 +25,7 @@ import {
     DesktopViewHeader,
     DesktopViewHeaderContent
 } from '../../components/desktop/DesktopViewLayout';
+import { TonTransactionNotification } from '../../components/connect/TonTransactionNotification';
 import { StakingPoolIcon } from '../../components/staking/StakingPoolIcon';
 import { StakingPageWrapper } from './StakingLayout';
 
@@ -89,6 +93,11 @@ const ActionButton = styled.button`
 
     &:hover {
         opacity: 0.88;
+    }
+
+    &:disabled {
+        opacity: 0.56;
+        cursor: default;
     }
 `;
 
@@ -299,10 +308,18 @@ export const DesktopStakingPoolDetailPage = ({
     const { address: routeAddress } = useParams() as { address?: string };
     const address = poolAddress ?? routeAddress;
 
-    const { data: pool } = usePoolInfo(address);
+    const { data: pool, isError: isPoolError } = usePoolInfo(address);
     const { data: position } = useStakingPosition(address);
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const countdown = useStakingCycleCountdown(pool);
+
+    const [claimModalParams, setClaimModalParams] = useState<TonConnectTransactionPayload | null>(
+        null
+    );
+    const {
+        mutateAsync: encodeClaim,
+        isLoading: isClaimEncoding
+    } = useEncodeStakingUnstake();
 
     const isLiquid = !!pool?.liquidJettonMaster;
 
@@ -365,17 +382,18 @@ export const DesktopStakingPoolDetailPage = ({
     const pendingDeposit = position?.pendingDeposit ?? 0;
     const readyWithdraw = position?.readyWithdraw ?? 0;
 
+    const cycleEndDate = pool && pendingWithdraw > 0 ? pool.cycleEnd * 1000 : undefined;
+    const dateOptions = useMemo<Intl.DateTimeFormatOptions>(
+        () => ({ month: 'long', day: 'numeric', year: 'numeric', hour: undefined, minute: undefined }),
+        []
+    );
+    const formattedCycleDate = useDateFormat(cycleEndDate, dateOptions);
+
     const withdrawDateStr = useMemo(() => {
-        if (pendingWithdraw <= 0 || !pool) return '';
+        if (pendingWithdraw <= 0 || !formattedCycleDate) return '';
         const amount = formatter.formatDisplay(shiftedDecimals(pendingWithdraw));
-        const date = new Date(pool.cycleEnd * 1000);
-        const dateStr = date.toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-        });
-        return t('staking_pool_withdraw_date', { amount, date: dateStr });
-    }, [pendingWithdraw, pool, t]);
+        return t('staking_pool_withdraw_date', { amount, date: formattedCycleDate });
+    }, [pendingWithdraw, formattedCycleDate, t]);
 
     const liquidDesc = useMemo(() => {
         if (!isLiquid || !pool) return '';
@@ -399,6 +417,37 @@ export const DesktopStakingPoolDetailPage = ({
         }
     };
 
+    const canClaim = readyWithdraw > 0 && !isLiquid && pool;
+
+    const handleClaim = async () => {
+        if (!pool) return;
+        try {
+            const params = await encodeClaim({ pool, amount: 0n, isSendAll: true });
+            setClaimModalParams(params);
+        } catch {
+            // encode mutation tracks error state via React Query
+        }
+    };
+
+    const onCloseClaimModal = (_result?: { boc: string }) => {
+        setClaimModalParams(null);
+    };
+
+    if (isPoolError) {
+        return (
+            <StakingPageWrapper mobileContentPaddingTop>
+                <DesktopViewHeader backButton borderBottom>
+                    <DesktopViewHeaderContent title="" />
+                </DesktopViewHeader>
+                <ContentArea>
+                    <InfoRow>
+                        <InfoLeft>{t('error_occurred')}</InfoLeft>
+                    </InfoRow>
+                </ContentArea>
+            </StakingPageWrapper>
+        );
+    }
+
     return (
         <StakingPageWrapper mobileContentPaddingTop>
             <DesktopViewHeader backButton borderBottom>
@@ -419,6 +468,14 @@ export const DesktopStakingPoolDetailPage = ({
                     <ActionButton onClick={handleUnstake}>
                         {t('staking_action_unstake')}
                     </ActionButton>
+                    {canClaim && (
+                        <ActionButton
+                            onClick={handleClaim}
+                            disabled={isClaimEncoding || !!claimModalParams}
+                        >
+                            {t('staking_claim')}
+                        </ActionButton>
+                    )}
                 </ButtonsRow>
                 <Divider />
                 <InfoRow>
@@ -450,6 +507,11 @@ export const DesktopStakingPoolDetailPage = ({
                     </InfoRow>
                 )}
             </ContentArea>
+            <TonTransactionNotification
+                handleClose={onCloseClaimModal}
+                params={claimModalParams}
+                waitInvalidation
+            />
         </StakingPageWrapper>
     );
 };

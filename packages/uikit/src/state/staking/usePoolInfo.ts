@@ -4,6 +4,7 @@ import { AccountStakingInfo, PoolInfo, StakingApi } from '@tonkeeper/core/dist/t
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveApi, useActiveWallet, useActiveTonNetwork } from '../wallet';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
 import { useStakingPools } from './useStakingPools';
 import { useStakingPositions } from './useStakingPosition';
 
@@ -11,6 +12,7 @@ export const usePoolInfo = (poolAddress: string | undefined) => {
     const wallet = useActiveWallet();
     const api = useActiveApi();
     const network = useActiveTonNetwork();
+    const isEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.STAKING);
 
     return useQuery<PoolInfo, Error>(
         [wallet.rawAddress, QueryKey.staking, 'pool-info', poolAddress, network],
@@ -22,7 +24,7 @@ export const usePoolInfo = (poolAddress: string | undefined) => {
         },
         {
             staleTime: 60_000,
-            enabled: !!poolAddress
+            enabled: isEnabled && !!poolAddress
         }
     );
 };
@@ -35,7 +37,7 @@ export const useStakedPoolsWithInfo = () => {
     const { data: pools } = useStakingPools();
 
     const positionsKey = useMemo(
-        () => positions?.map(p => `${p.pool}:${p.amount}`).join(','),
+        () => positions?.map(p => p.pool).join(','),
         [positions]
     );
 

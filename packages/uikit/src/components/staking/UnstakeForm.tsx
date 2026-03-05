@@ -3,7 +3,13 @@ import { toNano } from '@ton/core';
 import { jettonToTonAssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { FC, useMemo, useState } from 'react';
+import {
+    UNSTAKE_LIQUID_GAS_TON,
+    UNSTAKE_WHALES_GAS_TON,
+    UNSTAKE_TF_GAS_TON
+} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/staking-encoder';
+import { PoolImplementationType } from '@tonkeeper/core/dist/tonApiV2';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 import { AppRoute } from '../../libs/routes';
 import { useAtom } from '../../libs/useAtom';
@@ -163,6 +169,14 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
 
     const pool = selectedPool ?? pools?.[0];
     const isLiquid = !!pool?.liquidJettonMaster;
+    const isTfPool = pool?.implementation === PoolImplementationType.Tf;
+    const isWhalesPool = pool?.implementation === PoolImplementationType.Whales;
+
+    const unstakeFee = isWhalesPool
+        ? UNSTAKE_WHALES_GAS_TON
+        : isTfPool
+        ? UNSTAKE_TF_GAS_TON
+        : UNSTAKE_LIQUID_GAS_TON;
 
     const { data: tsTonBalance, isLoading: isTsTonLoading } = useJettonBalance(
         isLiquid ? pool?.liquidJettonMaster : undefined
@@ -180,6 +194,12 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
         }
         return undefined;
     }, [isLiquid, tsTonBalance, position]);
+
+    useEffect(() => {
+        if (isTfPool && unstakableAmount !== undefined) {
+            setAmount(unstakableAmount.toFixed(9, BigNumber.ROUND_DOWN));
+        }
+    }, [isTfPool, unstakableAmount]);
 
     const tokenSymbol = isLiquid ? tsTonBalance?.jetton?.symbol ?? 'tsTON' : 'TON';
     const isBalanceLoading = isLiquid ? isTsTonLoading : !position;
@@ -221,8 +241,9 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
         )
             return;
         const amountNano = toNano(amountBN.toFixed(9));
+        const isSendAll = isWhalesPool && amountBN.eq(unstakableAmount);
         try {
-            const params = await encode({ pool, amount: amountNano });
+            const params = await encode({ pool, amount: amountNano, isSendAll });
             setModalParams(params);
         } catch {
             // encode mutation tracks error state via React Query
@@ -237,7 +258,7 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
     };
 
     const tonBalanceBN = tonBalance?.relativeAmount;
-    const hasFeeTON = tonBalanceBN !== undefined && tonBalanceBN.gte(1.05);
+    const hasFeeTON = tonBalanceBN !== undefined && tonBalanceBN.gte(unstakeFee);
 
     const renderButton = () => {
         if (!amountBN || amountBN.isZero() || amountBN.isNegative()) {
@@ -318,6 +339,7 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
                                 inputMode="decimal"
                                 $isErrored={isInsufficient}
                                 $width={Math.max(1, (amount || '0').length)}
+                                disabled={isTfPool}
                             />
                             <TokenLabel>{tokenSymbol}</TokenLabel>
                         </InputLeft>
@@ -326,6 +348,8 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
                     <FieldFooter>
                         {isInsufficient ? (
                             <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                        ) : isTfPool ? (
+                            <BalanceLabel>{t('staking_tf_full_withdrawal_only')}</BalanceLabel>
                         ) : (
                             <>
                                 <BalanceLabel>
