@@ -324,6 +324,8 @@
     "subtitle": "NFT 可能因以下原因之一而不安全。",
     "title": "未验证的NFT"
   },
+  "swap_exchange_in": "兑换",
+  "swap_expired_refresh": "兑换已过期。刷新报价",
   "swap_price_impact_description": "由于交易规模导致的市场价格与预估价格之间的差异。",
   "swap_price_impact_ignore_variant": "忽略",
   "swap_slippage_tolerance": "滑点容差",

@@ -324,6 +324,8 @@
     "subtitle": "NFT aşağıdaki nedenlerden biri nedeniyle güvenli olmayabilir.",
     "title": "Doğrulanmamış NFT"
   },
+  "swap_exchange_in": "Takas giriş",
+  "swap_expired_refresh": "Takas süresi doldu. Fiyat teklifini yenile",
   "swap_price_impact_description": "İşlem büyüklüğü nedeniyle piyasa fiyatı ile tahmini fiyat arasındaki fark.",
   "swap_price_impact_ignore_variant": "Yoksay",
   "swap_slippage_tolerance": "Kayma Toleransı",

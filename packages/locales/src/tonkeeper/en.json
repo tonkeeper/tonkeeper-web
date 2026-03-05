@@ -324,6 +324,8 @@
     "subtitle": "NFT may not be safe to use for one of the following reasons.",
     "title": "Unverified NFT"
   },
+  "swap_exchange_in": "Exchange in",
+  "swap_expired_refresh": "Swap expired. Refresh the quote",
   "swap_price_impact_description": "The difference between the market price and estimated price due to trade size.",
   "swap_price_impact_ignore_variant": "Ignore",
   "swap_slippage_tolerance": "Slippage Tolerance",
