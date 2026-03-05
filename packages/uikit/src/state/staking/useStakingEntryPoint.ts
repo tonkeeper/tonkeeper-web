@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { usePortfolioBalances } from '../portfolio/usePortfolioBalances';
+import { usePromotedStakingPool } from './usePromotedStakingPool';
 
 export type StakingEntryPoint =
     | { view: 'stake-form'; poolAddress: string }
@@ -9,36 +10,35 @@ export type StakingEntryPoint =
 
 export const useStakingEntryPoint = (): StakingEntryPoint | undefined => {
     const { data: portfolio, isStakingReady } = usePortfolioBalances();
+    const promotedPool = usePromotedStakingPool();
 
     return useMemo(() => {
         if (!portfolio || !isStakingReady) return undefined;
 
-        if (!portfolio.tonstakersPool) return { view: 'pools-list' };
+        if (!promotedPool) return { view: 'pools-list' };
 
-        const tonstakersPool = portfolio.tonstakersPool;
-
-        const hasTonstakersLiquid = portfolio.tokenBalances.some(
+        const hasPromotedLiquid = portfolio.tokenBalances.some(
             token =>
                 token.stakingPool &&
-                eqAddresses(token.stakingPool.address, tonstakersPool.address) &&
+                eqAddresses(token.stakingPool.address, promotedPool.address) &&
                 token.assetAmount.weiAmount.gt(0)
         );
 
-        const hasNonTonstakersPositions = portfolio.stakingPositions.some(
-            position => !eqAddresses(position.pool.address, tonstakersPool.address)
+        const hasNonPromotedPositions = portfolio.stakingPositions.some(
+            position => !eqAddresses(position.pool.address, promotedPool.address)
         );
 
-        if (!hasTonstakersLiquid && portfolio.stakingPositions.length === 0) {
-            return { view: 'stake-form', poolAddress: tonstakersPool.address };
+        if (!hasPromotedLiquid && portfolio.stakingPositions.length === 0) {
+            return { view: 'stake-form', poolAddress: promotedPool.address };
         }
 
         if (
-            !hasNonTonstakersPositions &&
-            (hasTonstakersLiquid || portfolio.stakingPositions.length > 0)
+            !hasNonPromotedPositions &&
+            (hasPromotedLiquid || portfolio.stakingPositions.length > 0)
         ) {
-            return { view: 'pool-detail', poolAddress: tonstakersPool.address };
+            return { view: 'pool-detail', poolAddress: promotedPool.address };
         }
 
         return { view: 'pools-list' };
-    }, [portfolio, isStakingReady]);
+    }, [portfolio, isStakingReady, promotedPool]);
 };
