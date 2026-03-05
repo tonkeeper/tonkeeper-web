@@ -193,9 +193,6 @@ export const usePortfolioBalances = () => {
     ]);
 
     const tokenError = allAssetsQuery.error;
-    const stakingError = isStakingEnabled
-        ? stakingPoolsQuery.error ?? stakingPositionsQuery.error ?? stakedPoolsWithInfoQuery.error
-        : undefined;
 
     const poolsReady =
         !isStakingEnabled || stakingPoolsQuery.data !== undefined || !!stakingPoolsQuery.error;
@@ -213,9 +210,7 @@ export const usePortfolioBalances = () => {
 
     return {
         data,
-        error: tokenError,
         tokenError,
-        stakingError,
         isLoading,
         isStakingLoading,
         isStakingReady
