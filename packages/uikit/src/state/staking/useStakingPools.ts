@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { PoolImplementationType, PoolInfo, StakingApi } from '@tonkeeper/core/dist/tonApiV2';
+import { PoolInfo, StakingApi } from '@tonkeeper/core/dist/tonApiV2';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { QueryKey } from '../../libs/queryKey';
@@ -29,19 +29,6 @@ export const useStakingPools = () => {
             staleTime: 60_000,
             enabled: isEnabled
         }
-    );
-};
-
-export const useTonstakersPool = (): PoolInfo | undefined => {
-    const { data: pools } = useStakingPools();
-    return useMemo(
-        () =>
-            pools?.find(
-                p =>
-                    p.implementation === PoolImplementationType.LiquidTf &&
-                    p.name.toLowerCase().includes('tonstakers')
-            ),
-        [pools]
     );
 };
 

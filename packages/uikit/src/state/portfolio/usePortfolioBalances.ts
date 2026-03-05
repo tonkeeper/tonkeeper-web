@@ -2,11 +2,7 @@ import { useMemo } from 'react';
 import BigNumber from 'bignumber.js';
 import { Address } from '@ton/core';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import {
-    AccountStakingInfo,
-    PoolImplementationType,
-    PoolInfo
-} from '@tonkeeper/core/dist/tonApiV2';
+import { AccountStakingInfo, PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
@@ -20,13 +16,6 @@ import { useStakingPositions } from '../staking/useStakingPosition';
 import { hasStakingPositionActivity } from '../staking/poolStakeState';
 import { QueryKey } from '../../libs/queryKey';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
-
-const isTonstakersPool = (pool: PoolInfo) => {
-    return (
-        pool.implementation === PoolImplementationType.LiquidTf &&
-        pool.name.toLowerCase().includes('tonstakers')
-    );
-};
 
 export interface PortfolioTokenBalance {
     kind: 'token';
@@ -49,7 +38,6 @@ export interface PortfolioBalancesData {
     stakingPositions: PortfolioStakingPosition[];
     nonLiquidStakingPositions: PortfolioStakingPosition[];
     balancesForList: PortfolioBalance[];
-    tonstakersPool?: PoolInfo;
 }
 
 export const portfolioBalancesKeys = [...allChainsAssetsKeys, QueryKey.staking];
@@ -119,8 +107,6 @@ export const usePortfolioBalances = () => {
             return undefined;
         }
         const tonPrice = tonRate?.prices !== undefined ? new BigNumber(tonRate.prices) : undefined;
-
-        const tonstakersPool = pools.find(isTonstakersPool);
 
         const poolsFromPositions =
             stakedPoolsWithInfoQuery.data?.reduce((acc, item) => {
@@ -205,8 +191,7 @@ export const usePortfolioBalances = () => {
             tokenBalances,
             stakingPositions,
             nonLiquidStakingPositions,
-            balancesForList,
-            tonstakersPool
+            balancesForList
         };
     }, [
         allAssetsQuery.assets,
@@ -304,28 +289,6 @@ export const usePortfolioStakingPoolByJetton = (jettonMasterAddress: string | un
             );
         })?.stakingPool;
     }, [jettonMasterAddress, portfolio.data]);
-
-    return {
-        ...portfolio,
-        data
-    };
-};
-
-export const useHasTonstakersLiquidToken = () => {
-    const portfolio = usePortfolioBalances();
-
-    const data = useMemo(() => {
-        const portfolioData = portfolio.data;
-        const tonstakersPool = portfolioData?.tonstakersPool;
-        if (!portfolioData || !tonstakersPool) return false;
-
-        return portfolioData.tokenBalances.some(
-            token =>
-                token.stakingPool &&
-                eqAddresses(token.stakingPool.address, tonstakersPool.address) &&
-                token.assetAmount.weiAmount.gt(0)
-        );
-    }, [portfolio.data]);
 
     return {
         ...portfolio,
