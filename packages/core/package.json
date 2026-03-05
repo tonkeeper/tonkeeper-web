@@ -13,12 +13,14 @@
         "generate:batteryApi": "rm -fr ./src/batteryApi && docker build --no-cache --build-arg GITHUB_TOKEN=GHSAT0AAAAAACJYQUODBULKMUQJQTJ7E7ES2H3LZ7A -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
         "generate:2faApi": "rm -fr src/2faApi && docker build -f resource/Dockerfile.2faApi . -t 2faapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local 2faapi",
         "build:pkg": "yarn build",
-        "build:analytics": "ts-node --project ./tsconfig.task.json ./task/build-analytics.ts"
+        "build:analytics": "ts-node --project ./tsconfig.task.json ./task/build-analytics.ts",
+        "test": "vitest run"
     },
     "devDependencies": {
         "@types/aes-js": "^3.1.4",
         "@types/punycode": "^2",
-        "typescript": "^4.9.4"
+        "typescript": "^4.9.4",
+        "vitest": "^3.2.4"
     },
     "dependencies": {
         "@keystonehq/keystone-sdk": "0.7.2",

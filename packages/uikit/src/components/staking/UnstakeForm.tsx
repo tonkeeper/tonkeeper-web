@@ -10,7 +10,7 @@ import { useAtom } from '../../libs/useAtom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
-import { formatDisplayAmount } from '../../libs/formatDisplayAmount';
+import { formatter, formatFiatCurrency } from '../../hooks/balance';
 import { useRate, useFormatFiat } from '../../state/rates';
 import { useJettonBalance } from '../../state/jetton';
 import { useTonBalance } from '../../state/wallet';
@@ -289,14 +289,7 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
     };
 
     const fiatDisplay = useMemo(() => {
-        const formatted = fiatAmount
-            ? fiatAmount
-            : formatDisplayAmount({
-                  kind: 'fiat',
-                  amount: 0,
-                  currency: fiat,
-                  profile: 'default'
-              });
+        const formatted = fiatAmount ? fiatAmount : formatFiatCurrency(fiat, 0);
         return `≈${formatted}`;
     }, [fiatAmount, fiat]);
 
@@ -305,13 +298,8 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
             return '0';
         }
 
-        return formatDisplayAmount({
-            kind: 'token',
-            amount: unstakableAmount,
-            unit: tokenSymbol,
-            withUnit: false
-        });
-    }, [unstakableAmount, tokenSymbol]);
+        return formatter.formatDisplay(unstakableAmount);
+    }, [unstakableAmount]);
 
     return (
         <MainFormWrapper className={className}>

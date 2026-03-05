@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
 import { useAppContext } from '../hooks/appContext';
-import { formatFiatCurrency, formatFiatCurrencySignificant } from '../hooks/balance';
+import { formatFiatCurrency } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
 import { useActiveApi } from './wallet';
 import {
@@ -126,11 +126,7 @@ export const useUSDTRate = () => {
     );
 };
 
-export const useFormatFiat = (
-    rate: TokenRate | undefined,
-    tokenAmount?: BigNumber.Value,
-    options?: { significantDigits?: number }
-) => {
+export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount?: BigNumber.Value) => {
     const { fiat } = useAppContext();
 
     const [fiatPrice, fiatAmount] = useMemo(() => {
@@ -140,11 +136,9 @@ export const useFormatFiat = (
 
         return [
             formatFiatCurrency(fiat, rate.prices),
-            options?.significantDigits
-                ? formatFiatCurrencySignificant(fiat, fiatValue, options.significantDigits)
-                : formatFiatCurrency(fiat, fiatValue)
+            formatFiatCurrency(fiat, fiatValue)
         ] as const;
-    }, [rate, fiat, tokenAmount, options?.significantDigits]);
+    }, [rate, fiat, tokenAmount]);
     return {
         fiatPrice,
         fiatAmount

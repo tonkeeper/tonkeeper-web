@@ -18,7 +18,12 @@ type AmountFormatOptions = {
     ignoreZeroTruncate?: boolean;
 };
 
-type AmountNumber = string | number | BigNumber;
+type DisplayFormatOptions = {
+    unit?: string;
+    currency?: FiatCurrency;
+};
+
+type AmountNumber = string | number | BigNumber | BigNumber.Value;
 
 export class AmountFormatter {
     private getDefaultDecimals: (bn: BigNumber) => number;
@@ -104,5 +109,55 @@ export class AmountFormatter {
             BigNumber.ROUND_DOWN,
             formatConf
         );
+    }
+
+    private normalize(bn: BigNumber): BigNumber {
+        if (bn.gte(1000)) return bn.integerValue(BigNumber.ROUND_DOWN);
+        if (bn.gte(1)) return bn.decimalPlaces(2, BigNumber.ROUND_DOWN);
+        if (bn.gt(0)) return bn.precision(3, BigNumber.ROUND_DOWN);
+        return new BigNumber(0);
+    }
+
+    private trimTrailingZeroes(value: string): string {
+        if (!value.includes('.')) return value;
+        const trimmed = value.replace(/\.?0+$/g, '');
+        return trimmed === '' ? '0' : trimmed;
+    }
+
+    private groupIntegerPart(value: string, groupSeparator: string): string {
+        return value.replace(/\B(?=(\d{3})+(?!\d))/g, groupSeparator);
+    }
+
+    public formatDisplay(amount: AmountNumber = 0, options: DisplayFormatOptions = {}): string {
+        const bn = this.toBN(amount);
+        const { decimalSeparator, groupingSeparator } = this.getLocaleFormat();
+
+        if (!bn.isFinite()) {
+            const zero = '0';
+            if (options.unit) return `${zero} ${options.unit}`;
+            if (options.currency) return this.wrapCurrency(zero, options.currency);
+            return zero;
+        }
+
+        const normalized = this.normalize(bn.abs());
+        const plain = this.trimTrailingZeroes(normalized.toFixed());
+        const [intPart, decPart = ''] = plain.split('.');
+
+        const groupedInt = this.groupIntegerPart(intPart, groupingSeparator);
+        let formatted = decPart ? `${groupedInt}${decimalSeparator}${decPart}` : groupedInt;
+
+        if (bn.isNegative() && !normalized.isZero()) {
+            formatted = `-${formatted}`;
+        }
+
+        if (options.unit) return `${formatted} ${options.unit}`;
+        if (options.currency) return this.wrapCurrency(formatted, options.currency);
+        return formatted;
+    }
+
+    private wrapCurrency(value: string, currency: FiatCurrency): string {
+        const conf = FiatCurrencySymbolsConfig[currency];
+        if (!conf) return `${value} ${currency}`;
+        return conf.side === 'start' ? `${conf.symbol} ${value}` : `${value} ${conf.symbol}`;
     }
 }

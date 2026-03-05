@@ -7,7 +7,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useParams } from '../../hooks/router/useParams';
 import { AppRoute, StakingRoute } from '../../libs/routes';
-import { formatTokenAmount } from '../../libs/formatTokenAmount';
+import { formatter, formatTokenDisplay } from '../../hooks/balance';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { usePoolInfo } from '../../state/staking/usePoolInfo';
@@ -225,9 +225,7 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
         return new BigNumber(jettonBalance.balance).div(new BigNumber(10).pow(decimals));
     }, [jettonBalance]);
 
-    const { fiatPrice, fiatAmount } = useFormatFiat(jettonRate, tokenAmount, {
-        significantDigits: 3
-    });
+    const { fiatPrice, fiatAmount } = useFormatFiat(jettonRate, tokenAmount);
 
     const diff24h = jettonRate?.diff24h;
     const isNegative = diff24h ? diff24h.startsWith('-') : false;
@@ -241,9 +239,7 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
                 <TokenInfoRow>
                     <TokenNameLabel>{symbol}</TokenNameLabel>
                     <TokenAmountLabel>
-                        {tokenAmount
-                            ? formatTokenAmount(tokenAmount, symbol, { withUnit: false })
-                            : '—'}
+                        {tokenAmount ? formatter.formatDisplay(tokenAmount) : '—'}
                     </TokenAmountLabel>
                 </TokenInfoRow>
                 <TokenInfoRow>
@@ -257,6 +253,37 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
                 </TokenInfoRow>
             </TokenCenter>
         </TokenRow>
+    );
+};
+
+const PendingOperationsSection: FC<{
+    pendingDeposit: number;
+    readyWithdraw: number;
+}> = ({ pendingDeposit, readyWithdraw }) => {
+    const { t } = useTranslation();
+
+    if (pendingDeposit <= 0 && readyWithdraw <= 0) return null;
+
+    return (
+        <>
+            <Divider />
+            <InfoRow>
+                {pendingDeposit > 0 && (
+                    <InfoLeft>
+                        {t('staking_pending_deposit', {
+                            amount: formatter.formatDisplay(shiftedDecimals(pendingDeposit))
+                        })}
+                    </InfoLeft>
+                )}
+                {readyWithdraw > 0 && (
+                    <InfoRight>
+                        {t('staking_ready_withdraw', {
+                            amount: formatter.formatDisplay(shiftedDecimals(readyWithdraw))
+                        })}
+                    </InfoRight>
+                )}
+            </InfoRow>
+        </>
     );
 };
 
@@ -324,9 +351,9 @@ export const DesktopStakingPoolDetailPage = ({
         return getStakingPoolTonAmount({ position, liquidTokenBalance, tonPrice });
     }, [isLiquid, liquidTokenBalance, canResolveLiquidTonAmount, position, tonPrice]);
 
-    const { fiatAmount } = useFormatFiat(tonRate, stakedAmount, { significantDigits: 3 });
+    const { fiatAmount } = useFormatFiat(tonRate, stakedAmount);
 
-    const displayAmount = stakedAmount ? formatTokenAmount(stakedAmount, 'TON') : '— TON';
+    const displayAmount = stakedAmount ? formatTokenDisplay(stakedAmount, 'TON') : '— TON';
 
     const minStakeTON = pool ? shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0) : '—';
 
@@ -340,9 +367,7 @@ export const DesktopStakingPoolDetailPage = ({
 
     const withdrawDateStr = useMemo(() => {
         if (pendingWithdraw <= 0 || !pool) return '';
-        const amount = formatTokenAmount(shiftedDecimals(pendingWithdraw), 'TON', {
-            withUnit: false
-        });
+        const amount = formatter.formatDisplay(shiftedDecimals(pendingWithdraw));
         const date = new Date(pool.cycleEnd * 1000);
         const dateStr = date.toLocaleDateString('en-US', {
             month: 'long',
@@ -405,35 +430,10 @@ export const DesktopStakingPoolDetailPage = ({
                         </InfoRight>
                     )}
                 </InfoRow>
-                {(pendingDeposit > 0 || readyWithdraw > 0) && (
-                    <>
-                        <Divider />
-                        <InfoRow>
-                            {pendingDeposit > 0 && (
-                                <InfoLeft>
-                                    {t('staking_pending_deposit', {
-                                        amount: formatTokenAmount(
-                                            shiftedDecimals(pendingDeposit),
-                                            'TON',
-                                            { withUnit: false }
-                                        )
-                                    })}
-                                </InfoLeft>
-                            )}
-                            {readyWithdraw > 0 && (
-                                <InfoRight>
-                                    {t('staking_ready_withdraw', {
-                                        amount: formatTokenAmount(
-                                            shiftedDecimals(readyWithdraw),
-                                            'TON',
-                                            { withUnit: false }
-                                        )
-                                    })}
-                                </InfoRight>
-                            )}
-                        </InfoRow>
-                    </>
-                )}
+                <PendingOperationsSection
+                    pendingDeposit={pendingDeposit}
+                    readyWithdraw={readyWithdraw}
+                />
                 {isLiquid && pool?.liquidJettonMaster && (
                     <>
                         <Divider />
