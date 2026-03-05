@@ -22,6 +22,9 @@ const TokenIcon = styled(Image)`
 
 const OverlappingTokenIcon = styled(TokenIcon)`
     margin-left: -8px;
+    filter: drop-shadow(-3px 0 0 ${p => p.theme.backgroundPage})
+        drop-shadow(0 3px 0 ${p => p.theme.backgroundPage})
+        drop-shadow(0 -3px 0 ${p => p.theme.backgroundPage});
 `;
 
 const ActionLabel = styled(Body1)`
