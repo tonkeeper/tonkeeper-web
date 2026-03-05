@@ -1,13 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { PoolInfo, StakingApi } from '@tonkeeper/core/dist/tonApiV2';
-import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveApi, useActiveWallet, useActiveTonNetwork } from '../wallet';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
-
-export const stakingSelectedPool$ = atom<PoolInfo | undefined>(undefined);
 
 export const useStakingPools = () => {
     const wallet = useActiveWallet();
@@ -32,7 +29,7 @@ export const useStakingPools = () => {
     );
 };
 
-export const useIsStakingJetton = (
+export const useStakingPoolByJetton = (
     jettonMasterAddress: string | undefined
 ): PoolInfo | undefined => {
     const { data: pools } = useStakingPools();

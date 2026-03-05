@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { useTranslation } from '../../hooks/translation';
 import { useParams } from '../../hooks/router/useParams';
-import { stakingSelectedPool$, useStakingPools } from '../../state/staking/useStakingPools';
+import { stakingSelectedPool$ } from '../../state/staking/stakingAtoms';
+import { useStakingPools } from '../../state/staking/useStakingPools';
 import { usePoolInfo } from '../../state/staking/usePoolInfo';
 import { useAtom } from '../../libs/useAtom';
 import {

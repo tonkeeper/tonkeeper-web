@@ -35,7 +35,7 @@ import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useAtom } from '../../libs/useAtom';
-import { stakingSelectedPool$ } from '../../state/staking/useStakingPools';
+import { stakingSelectedPool$ } from '../../state/staking/stakingAtoms';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -65,7 +65,7 @@ import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Image } from '../../components/shared/Image';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { TronFeeBanner } from '../../components/jettons/TronFeeBanner';
-import { useIsStakingJetton } from '../../state/staking/useStakingPools';
+import { useStakingPoolByJetton } from '../../state/staking/useStakingPools';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -145,7 +145,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
         navigate(AppRoute.swap, { replace: false });
     };
 
-    const stakingPool = useIsStakingJetton(token === CryptoCurrency.TON ? undefined : token);
+    const stakingPool = useStakingPoolByJetton(token === CryptoCurrency.TON ? undefined : token);
 
     const onStake = () => {
         if (stakingPool) {
