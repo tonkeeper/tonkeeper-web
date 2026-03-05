@@ -36,7 +36,6 @@ export type PortfolioBalance = PortfolioTokenBalance | PortfolioStakingPosition;
 export interface PortfolioBalancesData {
     tokenBalances: PortfolioTokenBalance[];
     stakingPositions: PortfolioStakingPosition[];
-    nonLiquidStakingPositions: PortfolioStakingPosition[];
     balancesForList: PortfolioBalance[];
 }
 
@@ -108,21 +107,13 @@ export const usePortfolioBalances = () => {
         }
         const tonPrice = tonRate?.prices !== undefined ? new BigNumber(tonRate.prices) : undefined;
 
-        const poolsFromPositions =
-            stakedPoolsWithInfoQuery.data?.reduce((acc, item) => {
-                acc.set(item.pool.address, item.pool);
-                return acc;
-            }, new Map<string, PoolInfo>()) ?? new Map<string, PoolInfo>();
-
         const findPoolByPositionAddress = (poolAddress: string): PoolInfo | undefined => {
-            const fromPools = pools.find(pool => eqAddresses(pool.address, poolAddress));
-            if (fromPools) return fromPools;
-
-            for (const [address, pool] of poolsFromPositions) {
-                if (eqAddresses(address, poolAddress)) return pool;
-            }
-
-            return undefined;
+            return (
+                pools.find(pool => eqAddresses(pool.address, poolAddress)) ??
+                stakedPoolsWithInfoQuery.data?.find(item =>
+                    eqAddresses(item.pool.address, poolAddress)
+                )?.pool
+            );
         };
 
         const tokenBalances: PortfolioTokenBalance[] = allAssets.map(asset => {
@@ -190,7 +181,6 @@ export const usePortfolioBalances = () => {
         return {
             tokenBalances,
             stakingPositions,
-            nonLiquidStakingPositions,
             balancesForList
         };
     }, [
@@ -232,81 +222,7 @@ export const usePortfolioBalances = () => {
     };
 };
 
-export const usePortfolioTokenBalances = () => {
-    const portfolio = usePortfolioBalances();
-
-    const data = useMemo(() => {
-        return portfolio.data?.tokenBalances;
-    }, [portfolio.data]);
-
-    return {
-        ...portfolio,
-        data
-    };
-};
-
-export const usePortfolioStakingPositions = () => {
-    const portfolio = usePortfolioBalances();
-
-    const data = useMemo(() => {
-        return portfolio.data?.stakingPositions;
-    }, [portfolio.data]);
-
-    return {
-        ...portfolio,
-        data
-    };
-};
-
 export const usePortfolioBalancesForList = () => {
     const portfolio = usePortfolioBalances();
-
-    const data = useMemo(() => {
-        return portfolio.data?.balancesForList;
-    }, [portfolio.data]);
-
-    return {
-        ...portfolio,
-        data
-    };
-};
-
-export const usePortfolioStakingPoolByJetton = (jettonMasterAddress: string | undefined) => {
-    const portfolio = usePortfolioBalances();
-
-    const data = useMemo(() => {
-        if (!jettonMasterAddress || !portfolio.data) {
-            return undefined;
-        }
-
-        return portfolio.data.tokenBalances.find(balance => {
-            if (!balance.stakingPool) return false;
-            const asset = balance.assetAmount.asset;
-            return (
-                isTonAsset(asset) &&
-                Address.isAddress(asset.address) &&
-                eqAddresses(asset.address, jettonMasterAddress)
-            );
-        })?.stakingPool;
-    }, [jettonMasterAddress, portfolio.data]);
-
-    return {
-        ...portfolio,
-        data
-    };
-};
-
-export const usePortfolioTonBalance = () => {
-    const portfolio = usePortfolioBalances();
-
-    const data = useMemo(() => {
-        return portfolio.data?.tokenBalances.find(
-            balance => balance.assetAmount.asset.id === TON_ASSET.id
-        );
-    }, [portfolio.data]);
-
-    return {
-        ...portfolio,
-        data
-    };
+    return { ...portfolio, data: portfolio.data?.balancesForList };
 };
