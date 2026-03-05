@@ -9,7 +9,7 @@ import type { SwapConfirmation } from '@tonkeeper/core/dist/swapsApi';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useAtom } from '../../libs/useAtom';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { useIsSwapFormNotCompleted } from './useSwapForm';
+import { useIsSwapFormNotCompleted, useMaxSwapValue } from './useSwapForm';
 
 export const swapConfirmation$ = atom<SwapConfirmation | null>(null);
 const swapIsFetching$ = atom(false);
@@ -34,6 +34,7 @@ export function useSwapStreamEffect() {
     const [toAsset] = useSwapToAsset();
     const [fromAmountRelative] = useSwapFromAmount();
     const isNotCompleted = useIsSwapFormNotCompleted();
+    const { data: maxBalance } = useMaxSwapValue();
     const closeRef = useRef<(() => void) | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [, setConfirmation] = useAtom(swapConfirmation$);
@@ -54,6 +55,13 @@ export function useSwapStreamEffect() {
         }
 
         const fromAmountWei = unShiftedDecimals(fromAmountRelative, fromAsset.decimals);
+
+        if (maxBalance !== undefined && fromAmountWei.gt(maxBalance)) {
+            setConfirmation(null);
+            setIsFetching(false);
+            setError(null);
+            return;
+        }
 
         setIsFetching(true);
         setError(null);
@@ -89,6 +97,7 @@ export function useSwapStreamEffect() {
         toAsset,
         fromAmountRelative,
         isNotCompleted,
+        maxBalance,
         wallet.rawAddress,
         setConfirmation,
         setIsFetching,
