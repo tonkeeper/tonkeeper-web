@@ -8,7 +8,7 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { AppRoute, StakingRoute } from '../../libs/routes';
-import { formatTokenAmount } from '../../libs/formatTokenAmount';
+import { formatter, formatTokenDisplay } from '../../hooks/balance';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { Body3, Label2 } from '../../components/Text';
 import {
@@ -179,17 +179,15 @@ const PoolListRow: FC<PoolListRowProps> = ({
         return getStakingPoolTonAmount({ position, liquidTokenBalance, tonPrice });
     }, [position, liquidTokenBalance, tonPrice]);
 
-    const { fiatAmount } = useFormatFiat(tonRate, tonAmount, { significantDigits: 3 });
+    const { fiatAmount } = useFormatFiat(tonRate, tonAmount);
 
     const hasPendingWithdraw = (position?.pendingWithdraw ?? 0) > 0;
     const pendingAmount = useMemo(() => {
-        return formatTokenAmount(shiftedDecimals(position?.pendingWithdraw ?? 0), 'TON', {
-            withUnit: false
-        });
+        return formatter.formatDisplay(shiftedDecimals(position?.pendingWithdraw ?? 0));
     }, [position?.pendingWithdraw]);
 
     const displayAmount = useMemo(() => {
-        return formatTokenAmount(tonAmount, 'TON');
+        return formatTokenDisplay(tonAmount, 'TON');
     }, [tonAmount]);
 
     const minStakeTON = shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0);
