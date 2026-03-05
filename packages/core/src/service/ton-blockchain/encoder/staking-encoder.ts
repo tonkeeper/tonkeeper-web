@@ -6,9 +6,15 @@ import { getTonkeeperQueryId } from '../utils';
 
 const DEPOSIT_OP = 0x47d54391;
 const BURN_OP = 0x595f07bc;
+const WHALES_WITHDRAW_OP = 0xda803efd;
 
-const STAKE_FEE_RES = toNano('1');
-const UNSTAKE_FEE_RES = toNano('1.05');
+export const STAKE_GAS_RESERVE_TON = 1;
+export const UNSTAKE_LIQUID_GAS_TON = 1.05;
+export const UNSTAKE_WHALES_GAS_TON = 0.2;
+export const UNSTAKE_TF_GAS_TON = 1;
+
+const STAKE_FEE_RES = toNano(STAKE_GAS_RESERVE_TON.toString());
+const UNSTAKE_FEE_RES = toNano(UNSTAKE_LIQUID_GAS_TON.toString());
 
 export class StakingEncoder {
     constructor(private readonly api: APIConfig, private readonly walletAddress: string) {}
@@ -65,6 +71,44 @@ export class StakingEncoder {
                 {
                     address: Address.parse(jettonWalletAddress).toString({ bounceable: true }),
                     amount: UNSTAKE_FEE_RES.toString(),
+                    payload: body.toBoc().toString('base64')
+                }
+            ]
+        };
+    };
+
+    encodeWhalesWithdraw = (params: {
+        poolAddress: string;
+        amount: bigint;
+    }): TonConnectTransactionPayload => {
+        const body = beginCell()
+            .storeUint(WHALES_WITHDRAW_OP, 32)
+            .storeUint(getTonkeeperQueryId(), 64)
+            .storeCoins(toNano('0.1'))
+            .storeCoins(params.amount)
+            .endCell();
+
+        return {
+            valid_until: Math.floor((Date.now() + 10 * 60 * 1000) / 1000),
+            messages: [
+                {
+                    address: Address.parse(params.poolAddress).toString({ bounceable: true }),
+                    amount: toNano(UNSTAKE_WHALES_GAS_TON.toString()).toString(),
+                    payload: body.toBoc().toString('base64')
+                }
+            ]
+        };
+    };
+
+    encodeTfWithdraw = (params: { poolAddress: string }): TonConnectTransactionPayload => {
+        const body = beginCell().storeUint(0, 32).storeBuffer(Buffer.from('w')).endCell();
+
+        return {
+            valid_until: Math.floor((Date.now() + 10 * 60 * 1000) / 1000),
+            messages: [
+                {
+                    address: Address.parse(params.poolAddress).toString({ bounceable: true }),
+                    amount: toNano(UNSTAKE_TF_GAS_TON.toString()).toString(),
                     payload: body.toBoc().toString('base64')
                 }
             ]
