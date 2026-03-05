@@ -14,6 +14,7 @@ export function subscribeToOmnistonStream(params: {
     toAsset: string;
     fromAmount: string;
     userAddress: string;
+    slippageBps?: number;
     onQuote: (confirmation: SwapConfirmation) => void;
     onError: (error: Error) => void;
     signal?: AbortSignal;
@@ -23,6 +24,9 @@ export function subscribeToOmnistonStream(params: {
     url.searchParams.set('toAsset', params.toAsset);
     url.searchParams.set('fromAmount', params.fromAmount);
     url.searchParams.set('userAddress', params.userAddress);
+    if (params.slippageBps !== undefined) {
+        url.searchParams.set('slippage', String(params.slippageBps));
+    }
 
     const eventSource = new EventSource(url.toString());
 

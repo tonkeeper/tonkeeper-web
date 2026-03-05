@@ -324,6 +324,11 @@
     "subtitle": "NFT potrebbe non essere sicuro da utilizzare per uno dei seguenti motivi.",
     "title": "NFT non verificato"
   },
+  "swap_price_impact_description": "La differenza tra il prezzo di mercato e il prezzo stimato dovuta alla dimensione dello scambio.",
+  "swap_price_impact_ignore_variant": "Ignora",
+  "swap_slippage_tolerance": "Tolleranza di Slippage",
+  "swap_slippage_tolerance_description": "L'importo di variazione sfavorevole del prezzo prima che lo scambio venga annullato.",
+  "swap_slippage_tolerance_placeholder_custom": "Personalizzato",
   "swap_title": "Swap",
   "today": "Oggi",
   "tokenDetails": {

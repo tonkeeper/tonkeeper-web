@@ -324,6 +324,11 @@
     "subtitle": "NFT ist möglicherweise aus einem der folgenden Gründe nicht sicher zu verwenden.",
     "title": "Unverifiziertes NFT"
   },
+  "swap_price_impact_description": "Die Differenz zwischen dem Marktpreis und dem geschätzten Preis aufgrund der Handelsgröße.",
+  "swap_price_impact_ignore_variant": "Ignorieren",
+  "swap_slippage_tolerance": "Slippage-Toleranz",
+  "swap_slippage_tolerance_description": "Der Betrag, um den sich der Preis ungünstig ändern kann, bevor die Transaktion rückgängig gemacht wird.",
+  "swap_slippage_tolerance_placeholder_custom": "Benutzerdefiniert",
   "swap_title": "Tauschen",
   "today": "Heute",
   "tokenDetails": {

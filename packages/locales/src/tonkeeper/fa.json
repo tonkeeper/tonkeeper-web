@@ -324,6 +324,11 @@
     "subtitle": "NFT ممکن است به یکی از دلایل زیر امن نباشد.",
     "title": "NFT تاییدنشده"
   },
+  "swap_price_impact_description": "تفاوت بین قیمت بازار و قیمت تخمینی به دلیل حجم معامله.",
+  "swap_price_impact_ignore_variant": "نادیده گرفتن",
+  "swap_slippage_tolerance": "تلورانس لغزش",
+  "swap_slippage_tolerance_description": "مقداری که قیمت می‌تواند قبل از لغو معامله به صورت نامطلوب تغییر کند.",
+  "swap_slippage_tolerance_placeholder_custom": "سفارشی",
   "swap_title": "مبادله",
   "today": "امروز",
   "tokenDetails": {

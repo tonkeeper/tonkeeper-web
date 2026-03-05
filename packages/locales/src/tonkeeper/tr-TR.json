@@ -324,6 +324,11 @@
     "subtitle": "NFT aşağıdaki nedenlerden biri nedeniyle güvenli olmayabilir.",
     "title": "Doğrulanmamış NFT"
   },
+  "swap_price_impact_description": "İşlem büyüklüğü nedeniyle piyasa fiyatı ile tahmini fiyat arasındaki fark.",
+  "swap_price_impact_ignore_variant": "Yoksay",
+  "swap_slippage_tolerance": "Kayma Toleransı",
+  "swap_slippage_tolerance_description": "İşlem geri alınmadan önce fiyatın olumsuz yönde değişebileceği miktar.",
+  "swap_slippage_tolerance_placeholder_custom": "Özel",
   "swap_title": "Takas",
   "today": "Bugün",
   "tokenDetails": {

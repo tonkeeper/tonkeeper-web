@@ -9,6 +9,7 @@ import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
+import { SwapSettingsButton } from '../../components/swap/SwapSettingsButton';
 import { fallbackRenderOver } from '../../components/Error';
 import { useSwapStreamEffect } from '../../state/swap/useSwapStreamEffect';
 import { useTranslation } from '../../hooks/translation';
@@ -50,7 +51,14 @@ const DesktopSwapPageContent = () => {
     return (
         <SwapPageWrapper mobileContentPaddingTop>
             <DesktopViewHeader>
-                <DesktopViewHeaderContent title={t('wallet_swap')} />
+                <DesktopViewHeaderContent
+                    title={t('wallet_swap')}
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <SwapSettingsButton />
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
             </DesktopViewHeader>
             <ContentWrapper>
                 <SwapMainForm />
