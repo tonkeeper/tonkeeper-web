@@ -4,7 +4,7 @@ import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Image } from '../shared/Image';
 import { getStakingPoolProvider } from '../../state/staking/poolBranding';
-import { STAKING_PROVIDER_ICONS } from './StakingProviderIcons';
+import { STAKING_PROVIDER_ICON_URLS } from './StakingProviderIcons';
 
 const TON_BLUE = '#0098EA';
 const BADGE_TO_BASE_RATIO = 24 / 64;
@@ -42,32 +42,18 @@ const Badge = styled.div<{ $size: number }>`
     box-sizing: border-box;
 `;
 
-const BadgeFallback = styled.div`
+const Fallback = styled.div`
     width: 100%;
     height: 100%;
     border-radius: ${p => p.theme.cornerFull};
     background: ${TON_BLUE};
 `;
 
-const ProviderIconFrame = styled.div`
+const ProviderIcon = styled(Image)`
     width: 100%;
     height: 100%;
     border-radius: ${p => p.theme.cornerFull};
-    overflow: hidden;
-    box-sizing: border-box;
-
-    > svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
-`;
-
-const ProviderIconFallback = styled.div`
-    width: 100%;
-    height: 100%;
-    border-radius: ${p => p.theme.cornerFull};
-    background: ${TON_BLUE};
+    display: block;
 `;
 
 export const StakingPoolIcon: FC<{
@@ -78,17 +64,17 @@ export const StakingPoolIcon: FC<{
 }> = ({ pool, size, className, variant = 'composite' }) => {
     const badgeSize = Math.max(8, Math.round(size * BADGE_TO_BASE_RATIO));
     const provider = getStakingPoolProvider(pool);
-    const ProviderIconComponent = provider ? STAKING_PROVIDER_ICONS[provider] : undefined;
+    const providerIconUrl = provider ? STAKING_PROVIDER_ICON_URLS[provider] : undefined;
 
     if (variant === 'provider') {
         return (
             <Root $size={size} className={className}>
-                {ProviderIconComponent ? (
-                    <ProviderIconFrame>
-                        <ProviderIconComponent aria-hidden focusable="false" />
-                    </ProviderIconFrame>
+                {providerIconUrl ? (
+                    <ProviderIcon src={providerIconUrl}>
+                        <Fallback />
+                    </ProviderIcon>
                 ) : (
-                    <ProviderIconFallback />
+                    <Fallback />
                 )}
             </Root>
         );
@@ -100,12 +86,12 @@ export const StakingPoolIcon: FC<{
                 <BaseIconFallback />
             </BaseIcon>
             <Badge $size={badgeSize}>
-                {ProviderIconComponent ? (
-                    <ProviderIconFrame>
-                        <ProviderIconComponent aria-hidden focusable="false" />
-                    </ProviderIconFrame>
+                {providerIconUrl ? (
+                    <ProviderIcon src={providerIconUrl}>
+                        <Fallback />
+                    </ProviderIcon>
                 ) : (
-                    <BadgeFallback />
+                    <Fallback />
                 )}
             </Badge>
         </Root>
