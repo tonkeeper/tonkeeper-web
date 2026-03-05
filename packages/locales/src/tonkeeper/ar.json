@@ -324,6 +324,11 @@
     "subtitle": "قد يكون الـNFT غير آمن للاستخدام بسبب أحد الأسباب التالية.",
     "title": "لم يتم التحقق منه NFT"
   },
+  "swap_price_impact_description": "الفرق بين سعر السوق والسعر المقدر بسبب حجم الصفقة.",
+  "swap_price_impact_ignore_variant": "تجاهل",
+  "swap_slippage_tolerance": "تحمل الانزلاق السعري",
+  "swap_slippage_tolerance_description": "المبلغ الذي يمكن أن يتغير به السعر بشكل غير مناسب قبل إلغاء الصفقة.",
+  "swap_slippage_tolerance_placeholder_custom": "مخصص",
   "swap_title": "مبادلة",
   "today": "اليوم",
   "tokenDetails": {

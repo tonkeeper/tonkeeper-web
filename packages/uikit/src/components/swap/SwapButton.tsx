@@ -8,7 +8,7 @@ import {
     useSwapFromAmount,
     useSwapFromAsset,
     useSwapPriceImpact,
-    MAX_PRICE_IMPACT
+    useMaxPriceImpact
 } from '../../state/swap/useSwapForm';
 import { Button } from '../fields/Button';
 
@@ -24,6 +24,7 @@ export const SwapButton: FC<{
     const { confirmation, isFetching, error } = useSwapConfirmation();
 
     const priceImpact = useSwapPriceImpact();
+    const maxPriceImpact = useMaxPriceImpact();
 
     const isNotCompleted = useIsSwapFormNotCompleted();
 
@@ -35,7 +36,8 @@ export const SwapButton: FC<{
         );
     }
 
-    const isNotEnoughFunds = max !== undefined && swapAmount?.gt(shiftedDecimals(max, fromAsset.decimals));
+    const isNotEnoughFunds =
+        max !== undefined && swapAmount?.gt(shiftedDecimals(max, fromAsset.decimals));
 
     if (isNotEnoughFunds) {
         return (
@@ -81,7 +83,7 @@ export const SwapButton: FC<{
         );
     }
 
-    const priceImpactTooHigh = priceImpact?.gt(MAX_PRICE_IMPACT);
+    const priceImpactTooHigh = maxPriceImpact !== Infinity && priceImpact?.gt(maxPriceImpact);
     if (priceImpactTooHigh) {
         return (
             <Button size={size} secondary disabled>

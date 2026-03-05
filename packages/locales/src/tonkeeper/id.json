@@ -324,6 +324,11 @@
     "subtitle": "NFT mungkin tidak aman digunakan karena salah satu dari alasan berikut.",
     "title": "NFT yang belum diverifikasi"
   },
+  "swap_price_impact_description": "Perbedaan antara harga pasar dan perkiraan harga karena ukuran transaksi.",
+  "swap_price_impact_ignore_variant": "Abaikan",
+  "swap_slippage_tolerance": "Toleransi Slippage",
+  "swap_slippage_tolerance_description": "Jumlah perubahan harga yang tidak menguntungkan sebelum transaksi dibatalkan.",
+  "swap_slippage_tolerance_placeholder_custom": "Kustom",
   "swap_title": "Tukar",
   "today": "Hari ini",
   "tokenDetails": {

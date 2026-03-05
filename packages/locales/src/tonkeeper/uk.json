@@ -324,6 +324,11 @@
     "subtitle": "NFT може бути небезпечним з однієї з наступних причин.",
     "title": "Неперевірений NFT"
   },
+  "swap_price_impact_description": "Різниця між ринковою ціною та розрахунковою ціною через розмір угоди.",
+  "swap_price_impact_ignore_variant": "Ігнорувати",
+  "swap_slippage_tolerance": "Допустиме проковзування",
+  "swap_slippage_tolerance_description": "Величина, на яку ціна може змінитися несприятливо до скасування операції.",
+  "swap_slippage_tolerance_placeholder_custom": "Власне",
   "swap_title": "Обмін",
   "today": "Сьогодні",
   "tokenDetails": {
