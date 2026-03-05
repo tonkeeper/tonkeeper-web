@@ -19,6 +19,7 @@ import {
     PortfolioTokenBalance,
     usePortfolioBalances
 } from '../../state/portfolio/usePortfolioBalances';
+import { usePromotedStakingPool } from '../../state/staking/usePromotedStakingPool';
 import {
     getStakingPoolTonAmount,
     hasActiveStakeForPool,
@@ -252,7 +253,7 @@ export const DesktopStakingPoolsPage = () => {
     const navigate = useNavigate();
 
     const { data: portfolio, isStakingLoading } = usePortfolioBalances();
-    const tonstakersPool = portfolio?.tonstakersPool;
+    const promotedPool = usePromotedStakingPool();
 
     const poolRows = useMemo(() => {
         const rows: Array<{
@@ -296,10 +297,10 @@ export const DesktopStakingPoolsPage = () => {
             upsertRow(token.stakingPool, { stakingTokenBalance: token });
         }
 
-        if (tonstakersPool) {
-            upsertRow(tonstakersPool, {});
+        if (promotedPool) {
+            upsertRow(promotedPool, {});
             const tonstakersIndex = rows.findIndex(row =>
-                eqAddresses(row.pool.address, tonstakersPool.address)
+                eqAddresses(row.pool.address, promotedPool.address)
             );
             if (tonstakersIndex > 0) {
                 const [tonstakersRow] = rows.splice(tonstakersIndex, 1);
@@ -308,7 +309,7 @@ export const DesktopStakingPoolsPage = () => {
         }
 
         return rows;
-    }, [portfolio, tonstakersPool]);
+    }, [portfolio, promotedPool]);
 
     const handlePoolClick = (poolAddress: string) => {
         navigate(AppRoute.staking + StakingRoute.pool + '/' + poolAddress);
@@ -318,7 +319,7 @@ export const DesktopStakingPoolsPage = () => {
         navigate(AppRoute.staking + StakingRoute.stake + '/' + poolAddress);
     };
 
-    const isLoading = isStakingLoading && !tonstakersPool;
+    const isLoading = isStakingLoading && !promotedPool;
 
     return (
         <StakingPageWrapper mobileContentPaddingTop>
