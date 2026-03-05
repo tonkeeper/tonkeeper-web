@@ -4,7 +4,7 @@ import { styled } from 'styled-components';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { formatDisplayAmount } from '../../libs/formatDisplayAmount';
+import { formatter, formatFiatCurrency } from '../../hooks/balance';
 import { useRate, useFormatFiat } from '../../state/rates';
 import { useTonBalance } from '../../state/wallet';
 import { Body2, Body2Class, Body3 } from '../Text';
@@ -151,14 +151,7 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
     };
 
     const fiatDisplay = useMemo(() => {
-        const formatted = fiatAmount
-            ? fiatAmount
-            : formatDisplayAmount({
-                  kind: 'fiat',
-                  amount: 0,
-                  currency: fiat,
-                  profile: 'default'
-              });
+        const formatted = fiatAmount ? fiatAmount : formatFiatCurrency(fiat, 0);
         return `≈${formatted}`;
     }, [fiatAmount, fiat]);
 
@@ -167,12 +160,7 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
             return '0';
         }
 
-        return formatDisplayAmount({
-            kind: 'token',
-            amount: balanceTON,
-            unit: 'TON',
-            withUnit: false
-        });
+        return formatter.formatDisplay(balanceTON);
     }, [balanceTON]);
 
     return (
