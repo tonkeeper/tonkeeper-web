@@ -141,7 +141,10 @@ export const usePortfolioBalances = () => {
             .filter(hasStakingPositionActivity)
             .map(position => {
                 const pool = findPoolByPositionAddress(position.pool);
-                if (!pool) return undefined;
+                if (!pool) {
+                    console.warn('Staking position pool not found:', position.pool);
+                    return undefined;
+                }
                 return {
                     kind: 'staking-position' as const,
                     pool,
