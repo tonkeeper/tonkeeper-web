@@ -299,12 +299,12 @@ export const DesktopStakingPoolsPage = () => {
 
         if (promotedPool) {
             upsertRow(promotedPool, {});
-            const tonstakersIndex = rows.findIndex(row =>
+            const promotedIndex = rows.findIndex(row =>
                 eqAddresses(row.pool.address, promotedPool.address)
             );
-            if (tonstakersIndex > 0) {
-                const [tonstakersRow] = rows.splice(tonstakersIndex, 1);
-                rows.unshift(tonstakersRow);
+            if (promotedIndex > 0) {
+                const [promotedRow] = rows.splice(promotedIndex, 1);
+                rows.unshift(promotedRow);
             }
         }
 

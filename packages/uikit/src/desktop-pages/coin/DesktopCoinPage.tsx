@@ -65,7 +65,7 @@ import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Image } from '../../components/shared/Image';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { TronFeeBanner } from '../../components/jettons/TronFeeBanner';
-import { usePortfolioStakingPoolByJetton } from '../../state/portfolio/usePortfolioBalances';
+import { useIsStakingJetton } from '../../state/staking/useStakingPools';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -145,9 +145,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
         navigate(AppRoute.swap, { replace: false });
     };
 
-    const { data: stakingPool } = usePortfolioStakingPoolByJetton(
-        token === CryptoCurrency.TON ? undefined : token
-    );
+    const stakingPool = useIsStakingJetton(token === CryptoCurrency.TON ? undefined : token);
 
     const onStake = () => {
         if (stakingPool) {
