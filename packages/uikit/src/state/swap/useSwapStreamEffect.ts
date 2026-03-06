@@ -38,6 +38,7 @@ export function useSwapStreamEffect() {
     const slippageBps = useSlippageBps();
     const closeRef = useRef<(() => void) | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastParamsRef = useRef<string | null>(null);
     const [, setConfirmation] = useAtom(swapConfirmation$);
     const [, setIsFetching] = useAtom(swapIsFetching$);
     const [, setError] = useAtom(swapError$);
@@ -49,6 +50,7 @@ export function useSwapStreamEffect() {
         }
 
         if (isNotCompleted || !fromAmountRelative) {
+            lastParamsRef.current = null;
             setConfirmation(null);
             setIsFetching(false);
             setError(null);
@@ -57,9 +59,15 @@ export function useSwapStreamEffect() {
 
         const fromAmountWei = unShiftedDecimals(fromAmountRelative, fromAsset.decimals);
 
+        const paramsKey = `${toTradeAssetId(fromAsset.address)}:${toTradeAssetId(toAsset.address)}:${fromAmountWei.toFixed(0)}:${slippageBps}:${wallet.rawAddress}`;
+        const isParamsChanged = lastParamsRef.current !== paramsKey;
+        lastParamsRef.current = paramsKey;
+
+        if (isParamsChanged) {
+            setConfirmation(null);
+        }
         setIsFetching(true);
         setError(null);
-        setConfirmation(null);
 
         const abortController = new AbortController();
 
@@ -75,7 +83,6 @@ export function useSwapStreamEffect() {
                 setIsFetching(false);
             },
             onError: error => {
-                setConfirmation(null);
                 setError(error);
                 setIsFetching(false);
             },
@@ -118,6 +125,29 @@ export function useSwapStreamEffect() {
             }
         };
     }, [subscribe]);
+
+    // Re-subscribe when app regains visibility or network
+    useEffect(() => {
+        const onResume = () => {
+            if (!isNotCompleted && fromAmountRelative) {
+                subscribe();
+            }
+        };
+
+        const onVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                onResume();
+            }
+        };
+
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        window.addEventListener('online', onResume);
+
+        return () => {
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+            window.removeEventListener('online', onResume);
+        };
+    }, [subscribe, isNotCompleted, fromAmountRelative]);
 }
 
 export function useSwapConfirmation() {
