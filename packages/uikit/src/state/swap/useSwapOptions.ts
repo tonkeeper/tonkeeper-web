@@ -8,7 +8,7 @@ export type SwapOptions = {
 };
 
 const defaultSwapOptions: SwapOptions = {
-    slippageBps: 50,
+    slippageBps: 100,
     maxPriceImpact: 0.3
 };
 
