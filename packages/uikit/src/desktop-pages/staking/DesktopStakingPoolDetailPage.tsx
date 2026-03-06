@@ -3,6 +3,7 @@ import { FC, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
+import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useDateFormat } from '../../hooks/dateFormat';
@@ -209,6 +210,31 @@ const DescriptionText = styled(Body3)`
     line-height: 16px;
 `;
 
+function useClaimAction(pool: PoolInfo | undefined, isLiquid: boolean, readyWithdraw: number) {
+    const [params, setParams] = useState<TonConnectTransactionPayload | null>(null);
+    const { mutateAsync: encodeClaim, isLoading } = useEncodeStakingUnstake();
+
+    const canClaim = readyWithdraw > 0 && !isLiquid && !!pool;
+
+    const handleClaim = async () => {
+        if (!pool) return;
+        try {
+            const encoded = await encodeClaim({ pool, amount: 0n, isSendAll: true });
+            setParams(encoded);
+        } catch {
+            // encode mutation tracks error state via React Query
+        }
+    };
+
+    return {
+        canClaim,
+        handleClaim,
+        claimDisabled: isLoading || !!params,
+        claimParams: params,
+        closeClaim: () => setParams(null)
+    };
+}
+
 interface PoolDetailTokenRowProps {
     jettonMaster: string;
     onClick: () => void;
@@ -309,14 +335,8 @@ export const DesktopStakingPoolDetailPage = ({
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const countdown = useStakingCycleCountdown(pool);
 
-    const [claimModalParams, setClaimModalParams] = useState<TonConnectTransactionPayload | null>(
-        null
-    );
-    const { mutateAsync: encodeClaim, isLoading: isClaimEncoding } = useEncodeStakingUnstake();
-
-    const { data: poolIconJettonInfo } = useJettonInfo(
-        isLiquid ? pool?.liquidJettonMaster ?? '' : ''
-    );
+    const liquidJettonMaster = isLiquid ? pool?.liquidJettonMaster : undefined;
+    const { data: poolIconJettonInfo } = useJettonInfo(liquidJettonMaster ?? '');
 
     const { fiatAmount } = useFormatFiat(tonRate, stakedAmount);
 
@@ -328,9 +348,7 @@ export const DesktopStakingPoolDetailPage = ({
         ? t('staking_pool_detail', { apy: pool.apy.toFixed(2), minDeposit: minStakeTON })
         : '';
 
-    const pendingWithdraw = position?.pendingWithdraw ?? 0;
-    const pendingDeposit = position?.pendingDeposit ?? 0;
-    const readyWithdraw = position?.readyWithdraw ?? 0;
+    const { pendingWithdraw = 0, pendingDeposit = 0, readyWithdraw = 0 } = position ?? {};
 
     const cycleEndDate = pool && pendingWithdraw > 0 ? pool.cycleEnd * 1000 : undefined;
     const dateOptions = useMemo<Intl.DateTimeFormatOptions>(
@@ -357,36 +375,21 @@ export const DesktopStakingPoolDetailPage = ({
         return t('staking_pool_liquid_desc', { pool: pool.name, token: symbol, tokenName: symbol });
     }, [isLiquid, pool, poolIconJettonInfo, t]);
 
-    const handleStake = () => {
-        if (!address) return;
-        navigate(AppRoute.staking + StakingRoute.stake + '/' + address);
-    };
+    const { canClaim, handleClaim, claimDisabled, claimParams, closeClaim } = useClaimAction(
+        pool,
+        isLiquid,
+        readyWithdraw
+    );
 
-    const handleUnstake = () => {
+    const navigateToPool = (route: string) => {
         if (!address) return;
-        navigate(AppRoute.staking + StakingRoute.unstake + '/' + address);
+        navigate(AppRoute.staking + route + '/' + address);
     };
 
     const handleTokenClick = () => {
-        if (pool?.liquidJettonMaster) {
-            navigate(AppRoute.coins + '/' + pool.liquidJettonMaster);
+        if (liquidJettonMaster) {
+            navigate(AppRoute.coins + '/' + liquidJettonMaster);
         }
-    };
-
-    const canClaim = readyWithdraw > 0 && !isLiquid && pool;
-
-    const handleClaim = async () => {
-        if (!pool) return;
-        try {
-            const params = await encodeClaim({ pool, amount: 0n, isSendAll: true });
-            setClaimModalParams(params);
-        } catch {
-            // encode mutation tracks error state via React Query
-        }
-    };
-
-    const onCloseClaimModal = (_result?: { boc: string }) => {
-        setClaimModalParams(null);
     };
 
     if (isPoolError) {
@@ -420,15 +423,14 @@ export const DesktopStakingPoolDetailPage = ({
                     </AmountSection>
                 </HeaderSection>
                 <ButtonsRow>
-                    <ActionButton onClick={handleStake}>{t('staking_action_stake')}</ActionButton>
-                    <ActionButton onClick={handleUnstake}>
+                    <ActionButton onClick={() => navigateToPool(StakingRoute.stake)}>
+                        {t('staking_action_stake')}
+                    </ActionButton>
+                    <ActionButton onClick={() => navigateToPool(StakingRoute.unstake)}>
                         {t('staking_action_unstake')}
                     </ActionButton>
                     {canClaim && (
-                        <ActionButton
-                            onClick={handleClaim}
-                            disabled={isClaimEncoding || !!claimModalParams}
-                        >
+                        <ActionButton onClick={handleClaim} disabled={claimDisabled}>
                             {t('staking_claim')}
                         </ActionButton>
                     )}
@@ -447,11 +449,11 @@ export const DesktopStakingPoolDetailPage = ({
                     pendingDeposit={pendingDeposit}
                     readyWithdraw={readyWithdraw}
                 />
-                {isLiquid && pool?.liquidJettonMaster && (
+                {liquidJettonMaster && (
                     <>
                         <Divider />
                         <PoolDetailTokenRow
-                            jettonMaster={pool.liquidJettonMaster}
+                            jettonMaster={liquidJettonMaster}
                             onClick={handleTokenClick}
                         />
                         {liquidDesc && <DescriptionText>{liquidDesc}</DescriptionText>}
@@ -464,8 +466,8 @@ export const DesktopStakingPoolDetailPage = ({
                 )}
             </ContentArea>
             <TonTransactionNotification
-                handleClose={onCloseClaimModal}
-                params={claimModalParams}
+                handleClose={closeClaim}
+                params={claimParams}
                 waitInvalidation
             />
         </StakingPageWrapper>
