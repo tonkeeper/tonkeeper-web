@@ -8,6 +8,8 @@ export async function fetchSwapAssets(baseUrl: string): Promise<SwapAsset[]> {
     return response.json();
 }
 
+const QUOTE_TIMEOUT_MS = 10_000;
+
 export function subscribeToOmnistonStream(params: {
     baseUrl: string;
     fromAsset: string;
@@ -29,22 +31,32 @@ export function subscribeToOmnistonStream(params: {
     }
 
     const eventSource = new EventSource(url.toString());
+    let quoteTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const onMessage = (event: MessageEvent<string>) => {
         try {
             const data = JSON.parse(event.data);
 
             if (data.type === 'connected') {
+                quoteTimeoutId = setTimeout(() => {
+                    close();
+                    params.onError(new Error('Quote request timed out'));
+                }, QUOTE_TIMEOUT_MS);
                 return;
             }
 
+            clearTimeout(quoteTimeoutId);
+
             if (data.error) {
+                close();
                 params.onError(new Error(data.error));
                 return;
             }
 
             params.onQuote(data as SwapConfirmation);
         } catch (e) {
+            clearTimeout(quoteTimeoutId);
+            close();
             params.onError(e instanceof Error ? e : new Error('Failed to parse SSE message'));
         }
     };
@@ -58,6 +70,7 @@ export function subscribeToOmnistonStream(params: {
     eventSource.addEventListener('error', onError);
 
     const close = () => {
+        clearTimeout(quoteTimeoutId);
         eventSource.removeEventListener('message', onMessage);
         eventSource.removeEventListener('error', onError);
         eventSource.close();
