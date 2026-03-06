@@ -1,26 +1,33 @@
 import BigNumber from 'bignumber.js';
 import { FC, useMemo } from 'react';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { STAKE_GAS_RESERVE_TON } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/staking-encoder';
+import { PoolImplementationType, PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { formatter, formatFiatCurrency } from '../../hooks/balance';
 import { useRate, useFormatFiat } from '../../state/rates';
-import { useTonBalance } from '../../state/wallet';
+import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
 import { AmountField, ErrorText, BalanceLabel, MaxButton } from './AmountField';
 
-export interface StakingAmountInputProps {
+export interface UnstakeAmountInputProps {
     amount: string;
     onChange: (value: string) => void;
+    onMaxClick: () => void;
+    pool: PoolInfo | undefined;
 }
 
-export const GAS_RESERVE_TON = STAKE_GAS_RESERVE_TON;
-
-export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChange }) => {
+export const UnstakeAmountInput: FC<UnstakeAmountInputProps> = ({
+    amount,
+    onChange,
+    onMaxClick,
+    pool
+}) => {
     const { t } = useTranslation();
     const { fiat } = useAppContext();
-    const { data: balance } = useTonBalance();
-    const { data: rate } = useRate(CryptoCurrency.TON);
+    const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const { tonAmount } = usePoolStakedBalance(pool);
+
+    const isTfPool = pool?.implementation === PoolImplementationType.Tf;
 
     const amountBN = useMemo(() => {
         if (!amount) return undefined;
@@ -28,39 +35,22 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
         return bn.isNaN() ? undefined : bn;
     }, [amount]);
 
-    const { fiatAmount } = useFormatFiat(rate, amountBN);
-
-    const balanceTON = useMemo(() => {
-        if (!balance) return undefined;
-        return balance.relativeAmount;
-    }, [balance]);
-
-    const maxAmount = useMemo(() => {
-        if (!balanceTON) return undefined;
-        const max = balanceTON.minus(GAS_RESERVE_TON);
-        return max.gt(0) ? max : new BigNumber(0);
-    }, [balanceTON]);
+    const { fiatAmount } = useFormatFiat(tonRate, amountBN);
 
     const isInsufficient = useMemo(() => {
-        if (!amountBN || !maxAmount) return false;
-        return amountBN.gt(maxAmount);
-    }, [amountBN, maxAmount]);
-
-    const onMaxClick = () => {
-        if (maxAmount !== undefined) {
-            onChange(maxAmount.toFixed(9, BigNumber.ROUND_DOWN));
-        }
-    };
+        if (!amountBN || !tonAmount) return false;
+        return amountBN.gt(tonAmount);
+    }, [amountBN, tonAmount]);
 
     const fiatDisplay = useMemo(() => {
         const formatted = fiatAmount ? fiatAmount : formatFiatCurrency(fiat, 0);
         return `≈${formatted}`;
     }, [fiatAmount, fiat]);
 
-    const balanceDisplay = useMemo(() => {
-        if (!balanceTON) return '0';
-        return formatter.formatDisplay(balanceTON);
-    }, [balanceTON]);
+    const unstakableDisplay = useMemo(() => {
+        if (!tonAmount) return '0';
+        return formatter.formatDisplay(tonAmount);
+    }, [tonAmount]);
 
     return (
         <AmountField
@@ -68,13 +58,16 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
             onChange={onChange}
             fiatDisplay={fiatDisplay}
             isErrored={isInsufficient}
+            disabled={isTfPool}
             footer={
                 isInsufficient ? (
                     <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                ) : isTfPool ? (
+                    <BalanceLabel>{t('staking_tf_full_withdrawal_only')}</BalanceLabel>
                 ) : (
                     <>
                         <BalanceLabel>
-                            {t('staking_balance_label')}: {balanceDisplay}
+                            {t('staking_available_label')}: {unstakableDisplay}
                         </BalanceLabel>
                         <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
                     </>
