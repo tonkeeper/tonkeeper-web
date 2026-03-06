@@ -19,6 +19,16 @@ import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 
+const HeaderButtons = styled.div`
+    margin-left: auto;
+    display: flex;
+
+    > * {
+        color: ${p => p.theme.iconSecondary};
+        padding: 10px;
+    }
+`;
+
 const SwapPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;
 
@@ -54,9 +64,9 @@ const DesktopSwapPageContent = () => {
                 <DesktopViewHeaderContent
                     title={t('wallet_swap')}
                     right={
-                        <DesktopViewHeaderContent.Right>
+                        <HeaderButtons>
                             <SwapSettingsButton />
-                        </DesktopViewHeaderContent.Right>
+                        </HeaderButtons>
                     }
                 />
             </DesktopViewHeader>
