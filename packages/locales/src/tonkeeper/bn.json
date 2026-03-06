@@ -277,6 +277,10 @@
   "signer_scan_result": "স্বাক্ষরিত লেনদেন স্ক্যান করুন",
   "signer_scan_tx_description": "কৃপয়া Signer খুলুন এবং লেনদেনের সাথে QR কোড স্ক্যান করুন",
   "spam_action": "স্প্যাম",
+  "staking_action_stake": "স্টেক করুন",
+  "staking_action_unstake": "আনস্টেক",
+  "staking_available_label": "উপলব্ধ",
+  "staking_balance_label": "ব্যালেন্স",
   "staking": {
     "deposit": "স্টেক করুন",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "আনস্টেক"
   },
+  "staking_earnings_section_title": "প্রত্যাশিত বার্ষিক আয়",
+  "staking_enter_amount": "একটি পরিমাণ প্রবেশ করুন",
+  "staking_insufficient_balance": "অপর্যাপ্ত ব্যালেন্স",
+  "staking_max": "সর্বোচ্চ",
+  "staking_min_deposit_label": "ন্যূনতম ডিপোজিট",
+  "staking_next_cycle_desc_liquid": "তাৎক্ষণিক আনস্টেক উপলব্ধ",
+  "staking_next_cycle_message": "{value} এ পরবর্তী চক্র",
+  "staking_pool_detail": "APY ≈{apy}% · ন্যূনতম জমা {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON উত্তোলনের জন্য প্রস্তুত",
+  "staking_rewards_after_stake": "স্টেক করার পরে",
+  "staking_rewards_current": "বর্তমান",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "স্টেক করা হয়েছে",
+  "staking_title": "স্টেকিং",
+  "staking_top_up": "স্টেক করুন",
+  "staking_unstake_title": "আনস্টেক",
   "start_screen": {
     "create_wallet_button": "নতুন ওয়ালেট তৈরি করুন",
     "import_wallet_button": "বিদ্যমান ওয়ালেট আমদানি করুন"

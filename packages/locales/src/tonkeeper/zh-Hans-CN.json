@@ -277,6 +277,10 @@
   "signer_scan_result": "扫描签名交易",
   "signer_scan_tx_description": "请打开Signer并通过QR码扫描交易",
   "spam_action": "垃圾邮件",
+  "staking_action_stake": "质押",
+  "staking_action_unstake": "取消质押",
+  "staking_available_label": "可用",
+  "staking_balance_label": "余额",
   "staking": {
     "deposit": "存款",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "提款"
   },
+  "staking_earnings_section_title": "预计年收益",
+  "staking_enter_amount": "输入金额",
+  "staking_insufficient_balance": "余额不足",
+  "staking_max": "最大",
+  "staking_min_deposit_label": "最低存款",
+  "staking_next_cycle_desc_liquid": "即时取消质押可用",
+  "staking_next_cycle_message": "下一个周期在 {value}",
+  "staking_pool_detail": "APY ≈{apy}% · 最低存款 {minDeposit} TON",
+  "staking_pools_apy": "年化收益率 ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON 可提取",
+  "staking_rewards_after_stake": "质押后",
+  "staking_rewards_current": "当前的",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "已质押",
+  "staking_title": "质押",
+  "staking_top_up": "充值",
+  "staking_unstake_title": "取消质押",
   "start_screen": {
     "create_wallet_button": "创建新钱包",
     "import_wallet_button": "导入现有钱包"

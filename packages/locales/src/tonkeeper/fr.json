@@ -277,6 +277,10 @@
   "signer_scan_result": "Scannez la transaction signée",
   "signer_scan_tx_description": "Veuillez ouvrir Signer et scanner le code QR avec la transaction",
   "spam_action": "Spam",
+  "staking_action_stake": "Dépôt",
+  "staking_action_unstake": "Retirer",
+  "staking_available_label": "Disponible",
+  "staking_balance_label": "Solde",
   "staking": {
     "deposit": "Dépôt",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "Retirer"
   },
+  "staking_earnings_section_title": "Gains annuels estimés",
+  "staking_enter_amount": "Entrez un montant",
+  "staking_insufficient_balance": "Solde insuffisant",
+  "staking_max": "MAX",
+  "staking_min_deposit_label": "Dépôt minimum",
+  "staking_next_cycle_desc_liquid": "Déverrouillage instantané disponible",
+  "staking_next_cycle_message": "Prochain cycle dans {value}",
+  "staking_pool_detail": "TAR ≈{apy}% · Dépôt min. {minDeposit} TON",
+  "staking_pools_apy": "TAR ≈{apy} %",
+  "staking_ready_withdraw": "{amount} TON prêt à retirer",
+  "staking_rewards_after_stake": "Après dépôt",
+  "staking_rewards_current": "Actuel",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "Mis en dépôt",
+  "staking_title": "Staking",
+  "staking_top_up": "Dépôt",
+  "staking_unstake_title": "Retirer",
   "start_screen": {
     "create_wallet_button": "Créer un nouveau portefeuille",
     "import_wallet_button": "Importer un portefeuille existant"
