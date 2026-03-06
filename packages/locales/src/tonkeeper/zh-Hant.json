@@ -277,6 +277,10 @@
   "signer_scan_result": "掃描已簽署的交易",
   "signer_scan_tx_description": "請打開 Signer 並掃描交易二維碼",
   "spam_action": "垃圾訊息",
+  "staking_action_stake": "質押",
+  "staking_action_unstake": "解除質押",
+  "staking_available_label": "可用",
+  "staking_balance_label": "質押餘額",
   "staking": {
     "deposit": "質押",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "解除質押"
   },
+  "staking_earnings_section_title": "預期年度收益",
+  "staking_enter_amount": "輸入數量",
+  "staking_insufficient_balance": "餘額不足",
+  "staking_max": "最大",
+  "staking_min_deposit_label": "最低存款金額",
+  "staking_next_cycle_desc_liquid": "可立即解除質押",
+  "staking_next_cycle_message": "下一個週期在 {value}",
+  "staking_pool_detail": "APY ≈{apy}% · 最低存款 {minDeposit} TON",
+  "staking_pools_apy": "年利率 ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON 可提領",
+  "staking_rewards_after_stake": "質押後",
+  "staking_rewards_current": "當前",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "已質押",
+  "staking_title": "質押",
+  "staking_top_up": "質押",
+  "staking_unstake_title": "解除質押",
   "start_screen": {
     "create_wallet_button": "創建新錢包",
     "import_wallet_button": "導入現有錢包"

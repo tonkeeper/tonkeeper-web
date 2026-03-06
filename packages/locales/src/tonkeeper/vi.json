@@ -277,6 +277,10 @@
   "signer_scan_result": "Quét giao dịch đã ký",
   "signer_scan_tx_description": "Vui lòng mở Signer và quét mã QR với giao dịch",
   "spam_action": "Thư rác",
+  "staking_action_stake": "Gửi tiền",
+  "staking_action_unstake": "Gỡ cọc",
+  "staking_available_label": "Có sẵn",
+  "staking_balance_label": "Số dư",
   "staking": {
     "deposit": "Gửi tiền",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "Rút tiền"
   },
+  "staking_earnings_section_title": "Thu nhập dự kiến hàng năm",
+  "staking_enter_amount": "Nhập số tiền",
+  "staking_insufficient_balance": "Số dư không đủ",
+  "staking_max": "TỐI ĐA",
+  "staking_min_deposit_label": "Số tiền gửi tối thiểu",
+  "staking_next_cycle_desc_liquid": "Có thể rút stake ngay lập tức",
+  "staking_next_cycle_message": "Chu kỳ tiếp theo trong {value}",
+  "staking_pool_detail": "APY ≈{apy}% · Gửi tối thiểu {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON sẵn sàng rút",
+  "staking_rewards_after_stake": "Sau khi gửi tiền",
+  "staking_rewards_current": "Hiện tại",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "Đã gửi",
+  "staking_title": "Đặt cọc",
+  "staking_top_up": "Gửi tiền",
+  "staking_unstake_title": "Gỡ cọc",
   "start_screen": {
     "create_wallet_button": "Tạo ví mới",
     "import_wallet_button": "Nhập ví hiện có"

@@ -277,6 +277,10 @@
   "signer_scan_result": "हस्ताक्षरित लेनदेन स्कैन करें",
   "signer_scan_tx_description": "कृपया Signer खोलें और लेनदेन के साथ QR कोड स्कैन करें",
   "spam_action": "स्पैम",
+  "staking_action_stake": "दांव लगाएं",
+  "staking_action_unstake": "अन्स्‍टेक करें",
+  "staking_available_label": "उपलब्ध",
+  "staking_balance_label": "शेष",
   "staking": {
     "deposit": "जमा",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "अन्स्‍टेक करें"
   },
+  "staking_earnings_section_title": "प्रत्याशित वार्षिक कमाई",
+  "staking_enter_amount": "एक राशि दर्ज करें",
+  "staking_insufficient_balance": "पर्याप्त शेष राशि नहीं है",
+  "staking_max": "अधिकतम",
+  "staking_min_deposit_label": "न्यूनतम जमा",
+  "staking_next_cycle_desc_liquid": "तत्काल अनस्टेक उपलब्ध",
+  "staking_next_cycle_message": "अगला चक्र {value} में",
+  "staking_pool_detail": "APY ≈{apy}% · न्यूनतम जमा {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON निकासी के लिए तैयार",
+  "staking_rewards_after_stake": "दांव के बाद",
+  "staking_rewards_current": "वर्तमान",
+  "staking_rewards_value": "≈ {value} टन",
+  "staking_staked": "जमा किया गया",
+  "staking_title": "स्टेकिंग",
+  "staking_top_up": "जमा करें",
+  "staking_unstake_title": "अन्स्‍टेक करें",
   "start_screen": {
     "create_wallet_button": "नया वॉलेट बनाएँ",
     "import_wallet_button": "मौजूदा वॉलेट आयात करें"

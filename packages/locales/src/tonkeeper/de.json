@@ -277,6 +277,10 @@
   "signer_scan_result": "Signierte Transaktion scannen",
   "signer_scan_tx_description": "Bitte öffnen Sie Signer und scannen Sie den QR-Code mit der Transaktion",
   "spam_action": "Spam",
+  "staking_action_stake": "Einzahlung",
+  "staking_action_unstake": "Unstake",
+  "staking_available_label": "Verfügbar",
+  "staking_balance_label": "Guthaben",
   "staking": {
     "deposit": "Einzahlung",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "Unstake"
   },
+  "staking_earnings_section_title": "Erwarteter Jahresertrag",
+  "staking_enter_amount": "Geben Sie einen Betrag ein",
+  "staking_insufficient_balance": "Unzureichendes Guthaben",
+  "staking_max": "MAX",
+  "staking_min_deposit_label": "Minimale Einzahlung",
+  "staking_next_cycle_desc_liquid": "Sofortiges Unstaking verfügbar",
+  "staking_next_cycle_message": "Nächster Zyklus in {value}",
+  "staking_pool_detail": "APY ≈{apy}% · Min. Einzahlung {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON bereit zum Abheben",
+  "staking_rewards_after_stake": "Nach Einzahlung",
+  "staking_rewards_current": "Aktuell",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "Eingesetzt",
+  "staking_title": "Staking",
+  "staking_top_up": "Einzahlung",
+  "staking_unstake_title": "Unstake",
   "start_screen": {
     "create_wallet_button": "Neues Wallet erstellen",
     "import_wallet_button": "Vorhandenes Wallet importieren"

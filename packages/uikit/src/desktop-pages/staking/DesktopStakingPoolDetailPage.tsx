@@ -98,6 +98,11 @@ const ActionButton = styled.button`
     }
 `;
 
+const ActionSign = styled.span`
+    font-size: 16px;
+    line-height: 1;
+`;
+
 const Divider = styled.div`
     height: 0.5px;
     background: ${p => p.theme.separatorCommon};
@@ -424,9 +429,11 @@ export const DesktopStakingPoolDetailPage = ({
                 </HeaderSection>
                 <ButtonsRow>
                     <ActionButton onClick={() => navigateToPool(StakingRoute.stake)}>
+                        <ActionSign>+</ActionSign>
                         {t('staking_action_stake')}
                     </ActionButton>
                     <ActionButton onClick={() => navigateToPool(StakingRoute.unstake)}>
+                        <ActionSign>&mdash;</ActionSign>
                         {t('staking_action_unstake')}
                     </ActionButton>
                     {canClaim && (

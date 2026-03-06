@@ -277,6 +277,10 @@
   "signer_scan_result": "Pindai transaksi yang ditandatangani",
   "signer_scan_tx_description": "Silakan buka Signer dan pindai transaksi dengan kode QR",
   "spam_action": "Spam",
+  "staking_action_stake": "Stake",
+  "staking_action_unstake": "Unstake",
+  "staking_available_label": "Tersedia",
+  "staking_balance_label": "Saldo",
   "staking": {
     "deposit": "Setor",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "Tarik Dana"
   },
+  "staking_earnings_section_title": "Penghasilan tahunan yang diharapkan",
+  "staking_enter_amount": "Masukkan jumlah",
+  "staking_insufficient_balance": "Saldo tidak mencukupi",
+  "staking_max": "MAKS",
+  "staking_min_deposit_label": "Setoran minimum",
+  "staking_next_cycle_desc_liquid": "Unstake instan tersedia",
+  "staking_next_cycle_message": "Siklus berikutnya dalam {value}",
+  "staking_pool_detail": "APY ≈{apy}% · Deposit min. {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON siap ditarik",
+  "staking_rewards_after_stake": "Setelah setor",
+  "staking_rewards_current": "Saat ini",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "Dipertaruhkan",
+  "staking_title": "Staking",
+  "staking_top_up": "Isi ulang",
+  "staking_unstake_title": "Unstake",
   "start_screen": {
     "create_wallet_button": "Buat Dompet Baru",
     "import_wallet_button": "Impor Dompet yang Ada"
