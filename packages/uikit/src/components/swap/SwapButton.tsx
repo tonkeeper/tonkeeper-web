@@ -36,17 +36,6 @@ export const SwapButton: FC<{
         );
     }
 
-    const isNotEnoughFunds =
-        max !== undefined && swapAmount?.gt(shiftedDecimals(max, fromAsset.decimals));
-
-    if (isNotEnoughFunds) {
-        return (
-            <Button size={size} secondary disabled>
-                {t('swap_not_enough_funds')}
-            </Button>
-        );
-    }
-
     if (!isFetching && !confirmation && error) {
         return (
             <Button size={size} disabled>
@@ -79,6 +68,17 @@ export const SwapButton: FC<{
         return (
             <Button size={size} secondary disabled>
                 {t('swap_trade_is_not_available')}
+            </Button>
+        );
+    }
+
+    const isNotEnoughFunds =
+        max !== undefined && swapAmount?.gt(shiftedDecimals(max, fromAsset.decimals));
+
+    if (isNotEnoughFunds) {
+        return (
+            <Button size={size} secondary disabled>
+                {t('swap_not_enough_funds')}
             </Button>
         );
     }
