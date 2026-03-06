@@ -324,6 +324,7 @@
     "subtitle": "NFT може бути небезпечним з однієї з наступних причин.",
     "title": "Неперевірений NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Недостатньо TON для комісії мережі ({required})",
   "swap_exchange_in": "Обміняти в",
   "swap_expired_refresh": "Своп закінчився. Оновіть котирування",
   "swap_price_impact_description": "Різниця між ринковою ціною та розрахунковою ціною через розмір угоди.",

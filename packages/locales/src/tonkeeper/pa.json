@@ -324,6 +324,7 @@
     "subtitle": "NFT ਹੇਠਾਂ ਦਿੱਤੇ ਕਾਰਣਾਂ ਵਿਚੋਂ ਕਿਸੇ ਇੱਕ ਕਾਰਨ ਕਰਕੇ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਹੋ ਸਕਦਾ.",
     "title": "ਗੈਰ-ਤਸਦੀਕਸ਼ੁਦਾ NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "ਨੈੱਟਵਰਕ ਫੀਸ ਲਈ ਕਾਫ਼ੀ TON ਨਹੀਂ ({required})",
   "swap_exchange_in": "ਵਿੱਚ ਐਕਸਚੇਂਜ",
   "swap_expired_refresh": "ਸਵੈਪ ਦੀ ਮਿਆਦ ਖਤਮ ਹੋ ਗਈ। ਕੋਟ ਨੂੰ ਤਾਜ਼ਾ ਕਰੋ",
   "swap_price_impact_description": "ਵਪਾਰ ਦੇ ਆਕਾਰ ਕਾਰਨ ਮਾਰਕੀਟ ਕੀਮਤ ਅਤੇ ਅਨੁਮਾਨਿਤ ਕੀਮਤ ਵਿਚਕਾਰ ਅੰਤਰ।",

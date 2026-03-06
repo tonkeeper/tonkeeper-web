@@ -324,6 +324,7 @@
     "subtitle": "NFT 可能因以下原因之一而不安全使用。",
     "title": "未驗證的NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "TON 不足以支付網絡費用 ({required})",
   "swap_exchange_in": "兌換",
   "swap_expired_refresh": "交換已過期。重新整理報價",
   "swap_price_impact_description": "由於交易規模導致市場價格與預估價格之間的差異。",

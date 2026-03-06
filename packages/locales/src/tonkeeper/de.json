@@ -324,6 +324,7 @@
     "subtitle": "NFT ist möglicherweise aus einem der folgenden Gründe nicht sicher zu verwenden.",
     "title": "Unverifiziertes NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Nicht genug TON für Netzwerkgebühr ({required})",
   "swap_exchange_in": "Tausch in",
   "swap_expired_refresh": "Swap abgelaufen. Kurs aktualisieren",
   "swap_price_impact_description": "Die Differenz zwischen dem Marktpreis und dem geschätzten Preis aufgrund der Handelsgröße.",

@@ -324,6 +324,7 @@
     "subtitle": "NFT quyidagi sabablardan biri uchun xavfsiz bo'lmasligi mumkin.",
     "title": "Tasdiqlanmagan NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Tarmoq to'lovi uchun TON yetarli emas ({required})",
   "swap_exchange_in": "Almashtirish",
   "swap_expired_refresh": "Swap muddati tugadi. Kotirovkani yangilang",
   "swap_price_impact_description": "Savdo hajmi tufayli bozor narxi va taxminiy narx o'rtasidagi farq.",
