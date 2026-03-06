@@ -316,7 +316,10 @@ const SwapConfirmContent: FC<{
     return (
         <NotificationBlock>
             <ConfirmOperationHeading
-                icons={[{ src: fromAsset.image || '' }, { src: toAsset.image || '' }]}
+                icons={[
+                    { src: fromAsset.image || '', noRadius: fromAsset.noImageCorners },
+                    { src: toAsset.image || '', noRadius: toAsset.noImageCorners }
+                ]}
                 actionLabel={t('swap_title')}
                 mainAmount={
                     <>

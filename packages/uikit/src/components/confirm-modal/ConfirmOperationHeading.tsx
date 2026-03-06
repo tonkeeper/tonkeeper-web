@@ -18,6 +18,7 @@ const IconsRow = styled.div`
 const TokenIcon = styled(Image)`
     width: 56px;
     height: 56px;
+    border-radius: 50%;
 `;
 
 const OverlappingTokenIcon = styled(TokenIcon)`
@@ -42,7 +43,7 @@ const Subtitle = styled(Body1)`
 `;
 
 export const ConfirmOperationHeading: FC<{
-    icons: Array<{ src: string }>;
+    icons: Array<{ src: string; noRadius?: boolean }>;
     actionLabel: string;
     mainAmount: ReactNode;
     mainAmountColor?: string;
@@ -53,9 +54,13 @@ export const ConfirmOperationHeading: FC<{
             <IconsRow>
                 {icons.map((icon, i) =>
                     i === 0 ? (
-                        <TokenIcon key={i} src={icon.src} />
+                        <TokenIcon key={i} src={icon.src} noRadius={icon.noRadius} />
                     ) : (
-                        <OverlappingTokenIcon key={i} src={icon.src} />
+                        <OverlappingTokenIcon
+                            key={i}
+                            src={icon.src}
+                            noRadius={icon.noRadius}
+                        />
                     )
                 )}
             </IconsRow>
