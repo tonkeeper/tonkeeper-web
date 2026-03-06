@@ -324,6 +324,7 @@
     "subtitle": "NFT puede no ser seguro por una de las siguientes razones.",
     "title": "NFT no verificado"
   },
+  "swap_confirm_not_enough_ton_for_fee": "TON insuficiente para comisión de red ({required})",
   "swap_exchange_in": "Intercambiar en",
   "swap_expired_refresh": "Intercambio caducado. Actualiza la cotización",
   "swap_price_impact_description": "La diferencia entre el precio de mercado y el precio estimado debido al tamaño de la operación.",

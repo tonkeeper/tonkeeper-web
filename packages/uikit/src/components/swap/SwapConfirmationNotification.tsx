@@ -30,7 +30,7 @@ import {
     useTonConnectAvailableSendersChoices
 } from '../../hooks/blockchain/useSender';
 import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
-import { useActiveAccount } from '../../state/wallet';
+import { useActiveAccount, useTonBalance } from '../../state/wallet';
 import { useBatteryUnitTonRate } from '../../state/battery';
 import { useRate } from '../../state/rates';
 import {
@@ -243,9 +243,11 @@ const SwapConfirmContent: FC<{
 
     // --- Fee ---
     const batteryUnitTonRate = useBatteryUnitTonRate();
+    const gasExtra = useMemo(
+        () => new AssetAmount({ asset: TON_ASSET, weiAmount: confirmation.gasBudget }),
+        [confirmation.gasBudget]
+    );
     const fee: TransactionFee = useMemo(() => {
-        const gasExtra = new AssetAmount({ asset: TON_ASSET, weiAmount: confirmation.gasBudget });
-
         if (selectedSenderType === BATTERY_SENDER_CHOICE.type) {
             return {
                 type: 'battery',
@@ -257,7 +259,25 @@ const SwapConfirmContent: FC<{
         }
 
         return { type: 'ton-asset', extra: gasExtra };
-    }, [confirmation.gasBudget, selectedSenderType, batteryUnitTonRate]);
+    }, [gasExtra, selectedSenderType, batteryUnitTonRate]);
+
+    // --- TON balance check for external sender ---
+    const { data: tonBalance } = useTonBalance();
+    const totalTonRequired = useMemo(
+        () =>
+            new AssetAmount({
+                asset: TON_ASSET,
+                weiAmount: payload.messages.reduce(
+                    (acc, msg) => acc.plus(msg.amount),
+                    new BigNumber(0)
+                )
+            }),
+        [payload.messages]
+    );
+    const insufficientTonForFee =
+        selectedSenderType === EXTERNAL_SENDER_CHOICE.type &&
+        tonBalance !== undefined &&
+        totalTonRequired.isGT(tonBalance);
 
     // --- Slippage ---
     const slippagePercent = useMemo(
@@ -466,6 +486,12 @@ const SwapConfirmContent: FC<{
                     ) : isExpired ? (
                         <Button size="small" fullWidth type="button" onClick={() => handleClose()}>
                             {t('swap_expired_refresh')}
+                        </Button>
+                    ) : insufficientTonForFee ? (
+                        <Button size="small" fullWidth type="button" disabled>
+                            {t('swap_confirm_not_enough_ton_for_fee', {
+                                required: totalTonRequired.stringAssetRelativeAmount
+                            })}
                         </Button>
                     ) : (
                         <Button

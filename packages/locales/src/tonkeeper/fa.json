@@ -324,6 +324,7 @@
     "subtitle": "NFT ممکن است به یکی از دلایل زیر امن نباشد.",
     "title": "NFT تاییدنشده"
   },
+  "swap_confirm_not_enough_ton_for_fee": "TON کافی برای کارمزد شبکه وجود ندارد ({required})",
   "swap_exchange_in": "تبادل در",
   "swap_expired_refresh": "مبادله منقضی شد. قیمت را بروزرسانی کنید",
   "swap_price_impact_description": "تفاوت بین قیمت بازار و قیمت تخمینی به دلیل حجم معامله.",

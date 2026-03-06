@@ -324,6 +324,7 @@
     "subtitle": "NFT ব্যবহার নিরাপদ নাও হতে পারে নিম্নলিখিত কারণে।",
     "title": "অবৈধ NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "নেটওয়ার্ক ফি এর জন্য পর্যাপ্ত TON নেই ({required})",
   "swap_exchange_in": "এক্সচেঞ্জ ইন",
   "swap_expired_refresh": "সোয়াপ মেয়াদ শেষ। কোট রিফ্রেশ করুন",
   "swap_price_impact_description": "বাণিজ্যের আকারের কারণে বাজার মূল্য এবং আনুমানিক মূল্যের মধ্যে পার্থক্য।",

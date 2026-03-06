@@ -324,6 +324,7 @@
     "subtitle": "NFT may not be safe to use for one of the following reasons.",
     "title": "Unverified NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "नेटवर्क शुल्क के लिए पर्याप्त TON नहीं है ({required})",
   "swap_exchange_in": "एक्सचेंज इन",
   "swap_expired_refresh": "स्वैप समाप्त हो गया। कोट रिफ्रेश करें",
   "swap_price_impact_description": "व्यापार आकार के कारण बाजार मूल्य और अनुमानित मूल्य के बीच का अंतर।",

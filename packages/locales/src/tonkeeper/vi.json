@@ -324,6 +324,7 @@
     "subtitle": "NFT có thể không an toàn để sử dụng vì một trong những lý do sau.",
     "title": "NFT chưa được xác minh"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Không đủ TON để trả phí mạng ({required})",
   "swap_exchange_in": "Hoán đổi trong",
   "swap_expired_refresh": "Giao dịch đã hết hạn. Làm mới báo giá",
   "swap_price_impact_description": "Chênh lệch giữa giá thị trường và giá ước tính do quy mô giao dịch.",
