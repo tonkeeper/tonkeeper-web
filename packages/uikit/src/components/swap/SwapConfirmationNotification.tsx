@@ -49,6 +49,7 @@ import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ConfirmOperationHeading } from '../confirm-modal/ConfirmOperationHeading';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
+import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
 
 const EXPIRE_BUFFER_SECONDS = 3;
 
@@ -290,6 +291,7 @@ const SwapConfirmContent: FC<{
             setTimeout(() => handleClose({ boc }), 300);
         } catch (e) {
             sdk.hapticNotification('error');
+            setTimeout(() => handleClose(), 3000);
             console.error(e);
         }
     }, [isAlmostExpired, isSending, mutateAsync, sdk, handleClose]);
@@ -449,7 +451,9 @@ const SwapConfirmContent: FC<{
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <FooterGap />
-                    {sendError ? (
+                    {sendError &&
+                    !(sendError instanceof UserCancelledError) &&
+                    sendError.message !== 'Cancel auth request' ? (
                         <ResultButtonErrored>
                             <ExclamationMarkCircleIconStyled />
                             <Label2>{getErrorText(sendError, { t })}</Label2>
