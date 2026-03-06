@@ -11,7 +11,7 @@ import { DesktopUnstakeFormPage } from './DesktopUnstakeFormPage';
 import { DesktopStakingPoolsPage } from './DesktopStakingPoolsPage';
 import { DesktopStakingPoolDetailPage } from './DesktopStakingPoolDetailPage';
 
-const StakingEntryRedirect = () => {
+const StakingDefaultView = () => {
     const entryPoint = useStakingEntryPoint();
 
     if (!entryPoint) return null;
@@ -43,7 +43,7 @@ const StakingRouter = () => {
                 path={path + StakingRoute.unstake + '/:address'}
                 component={DesktopUnstakeFormPage}
             />
-            <Route exact path={path} component={StakingEntryRedirect} />
+            <Route exact path={path} component={StakingDefaultView} />
         </Switch>
     );
 };
