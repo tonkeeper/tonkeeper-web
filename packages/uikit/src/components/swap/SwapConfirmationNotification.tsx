@@ -10,7 +10,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import type { SwapConfirmation } from '@tonkeeper/core/dist/swapsApi';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
@@ -31,6 +31,7 @@ import {
 } from '../../hooks/blockchain/useSender';
 import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
 import { useActiveAccount } from '../../state/wallet';
+import { useBatteryUnitTonRate } from '../../state/battery';
 import { useRate } from '../../state/rates';
 import {
     Notification,
@@ -240,13 +241,22 @@ const SwapConfirmContent: FC<{
     const askFiat = useAssetFiat(toAsset.address, askFormatted);
 
     // --- Fee ---
-    const fee: TransactionFeeTonAsset = useMemo(
-        () => ({
-            type: 'ton-asset',
-            extra: new AssetAmount({ asset: TON_ASSET, weiAmount: confirmation.gasBudget })
-        }),
-        [confirmation.gasBudget]
-    );
+    const batteryUnitTonRate = useBatteryUnitTonRate();
+    const fee: TransactionFee = useMemo(() => {
+        const gasExtra = new AssetAmount({ asset: TON_ASSET, weiAmount: confirmation.gasBudget });
+
+        if (selectedSenderType === BATTERY_SENDER_CHOICE.type) {
+            return {
+                type: 'battery',
+                charges: gasExtra.relativeAmount
+                    .div(batteryUnitTonRate)
+                    .integerValue(BigNumber.ROUND_UP)
+                    .toNumber()
+            };
+        }
+
+        return { type: 'ton-asset', extra: gasExtra };
+    }, [confirmation.gasBudget, selectedSenderType, batteryUnitTonRate]);
 
     // --- Slippage ---
     const slippagePercent = useMemo(
