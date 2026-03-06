@@ -1,10 +1,9 @@
 import BigNumber from 'bignumber.js';
 import { FC, useMemo } from 'react';
 import { styled } from 'styled-components';
-import { jettonToTonAssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { useTranslation } from '../../hooks/translation';
-import { useJettonBalance } from '../../state/jetton';
+import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
 import { Body2 } from '../Text';
 
 const EarningsWrapper = styled.div`
@@ -56,12 +55,8 @@ export interface StakingEarningsInfoProps {
 
 export const StakingEarningsInfo: FC<StakingEarningsInfoProps> = ({ pool, amount }) => {
     const { t } = useTranslation();
-    const { data: tsTonBalance } = useJettonBalance(pool?.liquidJettonMaster);
-
-    const currentStakedTON = useMemo(() => {
-        if (!tsTonBalance) return new BigNumber(0);
-        return jettonToTonAssetAmount(tsTonBalance).relativeAmount;
-    }, [tsTonBalance]);
+    const { tonAmount } = usePoolStakedBalance(pool);
+    const currentStakedTON = tonAmount ?? new BigNumber(0);
 
     const inputAmountBN = useMemo(() => {
         if (!amount) return new BigNumber(0);

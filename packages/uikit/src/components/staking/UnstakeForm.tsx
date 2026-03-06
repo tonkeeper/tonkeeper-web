@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
 import { toNano } from '@ton/core';
-import { jettonToTonAssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
@@ -18,14 +17,13 @@ import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { formatter, formatFiatCurrency } from '../../hooks/balance';
 import { useRate, useFormatFiat } from '../../state/rates';
-import { useJettonBalance } from '../../state/jetton';
 import { useTonBalance } from '../../state/wallet';
 import { stakingSelectedPool$ } from '../../state/staking/stakingAtoms';
 import { useStakingPools } from '../../state/staking/useStakingPools';
 import { useEncodeStakingUnstake } from '../../state/staking/useEncodeStaking';
 import { useStakingCycleCountdown } from '../../state/staking/useStakingCycleCountdown';
-import { useStakingPosition } from '../../state/staking/useStakingPosition';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
+import { convertTonToPoolTokenNano } from '../../state/staking/poolStakeState';
 import { TonTransactionNotification } from '../connect/TonTransactionNotification';
 import { Body2, Body2Class, Body3 } from '../Text';
 import { Button } from '../fields/Button';
@@ -168,7 +166,6 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
     const navigate = useNavigate();
 
     const pool = selectedPool ?? pools?.[0];
-    const isLiquid = !!pool?.liquidJettonMaster;
     const isTfPool = pool?.implementation === PoolImplementationType.Tf;
     const isWhalesPool = pool?.implementation === PoolImplementationType.Whales;
 
@@ -178,31 +175,22 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
         ? UNSTAKE_TF_GAS_TON
         : UNSTAKE_LIQUID_GAS_TON;
 
-    const { data: tsTonBalance, isLoading: isTsTonLoading } = useJettonBalance(
-        isLiquid ? pool?.liquidJettonMaster : undefined
-    );
-    const { data: position } = useStakingPosition(isLiquid ? undefined : pool?.address);
+    const {
+        tonAmount,
+        isLoading: isBalanceLoading,
+        isLiquid,
+        liquidTokenBalance,
+        tonPrice
+    } = usePoolStakedBalance(pool);
     const { data: tonBalance } = useTonBalance();
-
-    const unstakableAmount = useMemo(() => {
-        if (isLiquid) {
-            if (!tsTonBalance) return undefined;
-            return jettonToTonAssetAmount(tsTonBalance).relativeAmount;
-        }
-        if (position) {
-            return shiftedDecimals(position.amount);
-        }
-        return undefined;
-    }, [isLiquid, tsTonBalance, position]);
+    const [isMax, setIsMax] = useState(false);
 
     useEffect(() => {
-        if (isTfPool && unstakableAmount !== undefined) {
-            setAmount(unstakableAmount.toFixed(9, BigNumber.ROUND_DOWN));
+        if (isTfPool && tonAmount !== undefined) {
+            setIsMax(true);
+            setAmount(tonAmount.toFixed(9, BigNumber.ROUND_DOWN));
         }
-    }, [isTfPool, unstakableAmount]);
-
-    const tokenSymbol = isLiquid ? tsTonBalance?.jetton?.symbol ?? 'tsTON' : 'TON';
-    const isBalanceLoading = isLiquid ? isTsTonLoading : !position;
+    }, [isTfPool, tonAmount]);
 
     const amountBN = useMemo(() => {
         if (!amount) return undefined;
@@ -210,40 +198,50 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
         return bn.isNaN() ? undefined : bn;
     }, [amount]);
 
-    const rateToken = isLiquid
-        ? pool?.liquidJettonMaster ?? CryptoCurrency.TON
-        : CryptoCurrency.TON;
-    const { data: rate } = useRate(rateToken);
-    const { fiatAmount } = useFormatFiat(rate, amountBN);
+    const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const { fiatAmount } = useFormatFiat(tonRate, amountBN);
 
     const countdown = useStakingCycleCountdown(pool);
 
     const isInsufficient = useMemo(() => {
         if (!amountBN || isBalanceLoading) return false;
-        if (!unstakableAmount) return true;
-        return amountBN.gt(unstakableAmount);
-    }, [amountBN, unstakableAmount, isBalanceLoading]);
+        if (!tonAmount) return true;
+        return amountBN.gt(tonAmount);
+    }, [amountBN, tonAmount, isBalanceLoading]);
 
     const onMaxClick = () => {
-        if (unstakableAmount !== undefined) {
-            setAmount(unstakableAmount.toFixed(9, BigNumber.ROUND_DOWN));
+        if (tonAmount !== undefined) {
+            setIsMax(true);
+            setAmount(tonAmount.toFixed(9, BigNumber.ROUND_DOWN));
         }
     };
 
+    const onAmountChange = (value: string) => {
+        setIsMax(false);
+        setAmount(value);
+    };
+
     const onConfirm = async () => {
-        if (
-            !pool ||
-            !unstakableAmount ||
-            !amount ||
-            !amountBN ||
-            amountBN.isZero() ||
-            amountBN.isNegative()
-        )
+        if (!pool || !tonAmount || !amountBN || amountBN.isZero() || amountBN.isNegative())
             return;
-        const amountNano = toNano(amountBN.toFixed(9));
-        const isSendAll = isWhalesPool && amountBN.eq(unstakableAmount);
+
+        let encoderAmount: bigint;
+        let isSendAll = false;
+
+        if (isLiquid) {
+            if (isMax) {
+                encoderAmount = 0n;
+                isSendAll = true;
+            } else {
+                encoderAmount = convertTonToPoolTokenNano(amountBN, liquidTokenBalance!, tonPrice!);
+            }
+        } else {
+            encoderAmount = toNano(amountBN.toFixed(9));
+            isSendAll = isWhalesPool && isMax;
+        }
+
         try {
-            const params = await encode({ pool, amount: amountNano, isSendAll });
+            const params = await encode({ pool, amount: encoderAmount, isSendAll });
             setModalParams(params);
         } catch {
             // encode mutation tracks error state via React Query
@@ -277,7 +275,7 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
             );
         }
 
-        if (isBalanceLoading || tonBalanceBN === undefined) {
+        if (isBalanceLoading || tonBalanceBN === undefined || tonAmount === undefined) {
             return <Button size="large" fullWidth secondary disabled loading />;
         }
 
@@ -316,12 +314,12 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
     }, [fiatAmount, fiat]);
 
     const unstakableDisplay = useMemo(() => {
-        if (!unstakableAmount) {
+        if (!tonAmount) {
             return '0';
         }
 
-        return formatter.formatDisplay(unstakableAmount);
-    }, [unstakableAmount]);
+        return formatter.formatDisplay(tonAmount);
+    }, [tonAmount]);
 
     return (
         <MainFormWrapper className={className}>
@@ -334,14 +332,14 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
                                 min="0"
                                 step="any"
                                 value={amount}
-                                onChange={e => setAmount(e.target.value)}
+                                onChange={e => onAmountChange(e.target.value)}
                                 placeholder="0"
                                 inputMode="decimal"
                                 $isErrored={isInsufficient}
                                 $width={Math.max(1, (amount || '0').length)}
                                 disabled={isTfPool}
                             />
-                            <TokenLabel>{tokenSymbol}</TokenLabel>
+                            <TokenLabel>TON</TokenLabel>
                         </InputLeft>
                         <FiatAmount>{fiatDisplay}</FiatAmount>
                     </InputBorderedBox>
