@@ -132,13 +132,16 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
                     onMaxClick={onMaxClick}
                     pool={pool}
                 />
-                {countdown !== null && (countdown || isLiquid) && (
+                {!isLiquid && countdown && (
                     <CycleInfoCard>
                         <CycleInfoText>
-                            {countdown
-                                ? t('staking_unstake_cycle_info', { value: countdown })
-                                : t('staking_next_cycle_desc_liquid')}
+                            {t('staking_unstake_cycle_info', { value: countdown })}
                         </CycleInfoText>
+                    </CycleInfoCard>
+                )}
+                {isLiquid && (
+                    <CycleInfoCard>
+                        <CycleInfoText>{t('staking_next_cycle_desc_liquid')}</CycleInfoText>
                     </CycleInfoCard>
                 )}
             </TopRow>

@@ -24,7 +24,7 @@ export const useStakingCycleCountdown = (pool: PoolInfo | undefined): string | n
         const update = () => {
             const remaining = cycleEnd - Math.floor(Date.now() / 1000);
             if (remaining <= 0) {
-                setCountdown('');
+                setCountdown(null);
                 if (id !== undefined) {
                     clearInterval(id);
                     id = undefined;
