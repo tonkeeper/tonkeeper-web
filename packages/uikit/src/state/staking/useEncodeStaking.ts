@@ -50,7 +50,8 @@ export const useEncodeStakingUnstake = () => {
                     }
                     return encoder.encodeUnstake({
                         tsTonMasterAddress: pool.liquidJettonMaster,
-                        amount
+                        amount,
+                        isSendAll
                     });
             }
         }

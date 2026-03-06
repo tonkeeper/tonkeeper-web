@@ -13,13 +13,9 @@ import { formatter, formatTokenDisplay } from '../../hooks/balance';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { usePoolInfo } from '../../state/staking/usePoolInfo';
-import { useStakingPosition } from '../../state/staking/useStakingPosition';
+import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
 import { useStakingCycleCountdown } from '../../state/staking/useStakingCycleCountdown';
 import { useEncodeStakingUnstake } from '../../state/staking/useEncodeStaking';
-import {
-    getStakingPoolTonAmount,
-    StakingPoolLiquidTokenBalance
-} from '../../state/staking/poolStakeState';
 import { Body3, Label2, H3 } from '../../components/Text';
 import {
     DesktopViewHeader,
@@ -309,64 +305,18 @@ export const DesktopStakingPoolDetailPage = ({
     const address = poolAddress ?? routeAddress;
 
     const { data: pool, isError: isPoolError } = usePoolInfo(address);
-    const { data: position } = useStakingPosition(address);
+    const { tonAmount: stakedAmount, position, isLiquid } = usePoolStakedBalance(pool);
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const countdown = useStakingCycleCountdown(pool);
 
     const [claimModalParams, setClaimModalParams] = useState<TonConnectTransactionPayload | null>(
         null
     );
-    const {
-        mutateAsync: encodeClaim,
-        isLoading: isClaimEncoding
-    } = useEncodeStakingUnstake();
-
-    const isLiquid = !!pool?.liquidJettonMaster;
+    const { mutateAsync: encodeClaim, isLoading: isClaimEncoding } = useEncodeStakingUnstake();
 
     const { data: poolIconJettonInfo } = useJettonInfo(
         isLiquid ? pool?.liquidJettonMaster ?? '' : ''
     );
-
-    const { data: liquidJettonBalance } = useJettonBalance(
-        isLiquid ? pool?.liquidJettonMaster : undefined
-    );
-    const { data: liquidJettonRate } = useRate(pool?.liquidJettonMaster ?? CryptoCurrency.TON);
-
-    const tonPrice = useMemo(() => {
-        return tonRate?.prices !== undefined ? new BigNumber(tonRate.prices) : undefined;
-    }, [tonRate?.prices]);
-
-    const liquidTokenBalance = useMemo<StakingPoolLiquidTokenBalance | undefined>(() => {
-        if (!isLiquid || !liquidJettonBalance) {
-            return undefined;
-        }
-
-        const decimals = liquidJettonBalance.jetton?.decimals ?? 9;
-        const relativeAmount = new BigNumber(liquidJettonBalance.balance).div(
-            new BigNumber(10).pow(decimals)
-        );
-
-        return {
-            weiAmount: new BigNumber(liquidJettonBalance.balance),
-            relativeAmount,
-            price:
-                liquidJettonRate?.prices !== undefined
-                    ? new BigNumber(liquidJettonRate.prices)
-                    : undefined
-        };
-    }, [isLiquid, liquidJettonBalance, liquidJettonRate?.prices]);
-
-    const canResolveLiquidTonAmount = useMemo(() => {
-        return !!liquidTokenBalance?.price && !!tonPrice && !tonPrice.isZero();
-    }, [liquidTokenBalance?.price, tonPrice]);
-
-    const stakedAmount = useMemo((): BigNumber | undefined => {
-        if (isLiquid && (!liquidTokenBalance || !canResolveLiquidTonAmount)) {
-            return undefined;
-        }
-
-        return getStakingPoolTonAmount({ position, liquidTokenBalance, tonPrice });
-    }, [isLiquid, liquidTokenBalance, canResolveLiquidTonAmount, position, tonPrice]);
 
     const { fiatAmount } = useFormatFiat(tonRate, stakedAmount);
 
@@ -384,7 +334,13 @@ export const DesktopStakingPoolDetailPage = ({
 
     const cycleEndDate = pool && pendingWithdraw > 0 ? pool.cycleEnd * 1000 : undefined;
     const dateOptions = useMemo<Intl.DateTimeFormatOptions>(
-        () => ({ month: 'long', day: 'numeric', year: 'numeric', hour: undefined, minute: undefined }),
+        () => ({
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            hour: undefined,
+            minute: undefined
+        }),
         []
     );
     const formattedCycleDate = useDateFormat(cycleEndDate, dateOptions);

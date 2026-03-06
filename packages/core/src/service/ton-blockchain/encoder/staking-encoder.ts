@@ -44,6 +44,7 @@ export class StakingEncoder {
     encodeUnstake = async (params: {
         tsTonMasterAddress: string;
         amount: bigint;
+        isSendAll?: boolean;
     }): Promise<TonConnectTransactionPayload> => {
         const jettonBalance = await new AccountsApi(this.api.tonApiV2).getAccountJettonBalance({
             accountId: this.walletAddress,
@@ -51,6 +52,7 @@ export class StakingEncoder {
         });
 
         const jettonWalletAddress = jettonBalance.walletAddress.address;
+        const burnAmount = params.isSendAll ? BigInt(jettonBalance.balance) : params.amount;
 
         const customPayload = beginCell()
             .storeUint(1, 1) // waitTillRoundEnd = true
@@ -60,7 +62,7 @@ export class StakingEncoder {
         const body = beginCell()
             .storeUint(BURN_OP, 32)
             .storeUint(getTonkeeperQueryId(), 64)
-            .storeCoins(params.amount)
+            .storeCoins(burnAmount)
             .storeAddress(Address.parse(this.walletAddress))
             .storeMaybeRef(customPayload)
             .endCell();
