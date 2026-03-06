@@ -277,6 +277,10 @@
   "signer_scan_result": "مسح المعاملة الموقعة",
   "signer_scan_tx_description": "الرجاء فتح الموقّع (Signer) ومسح رمز الاستجابة السريعة (QR) مع المعاملة",
   "spam_action": "غير مرغوب فيها",
+  "staking_action_stake": "تحصيص",
+  "staking_action_unstake": "إلغاء الحِصَّة",
+  "staking_available_label": "متوفر",
+  "staking_balance_label": "الرصيد",
   "staking": {
     "deposit": "تحصيص",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "الغاء التحصيص"
   },
+  "staking_earnings_section_title": "الأرباح السنوية المتوقعة",
+  "staking_enter_amount": "ادخل مبلغ",
+  "staking_insufficient_balance": "الرصيد غير كافٍ",
+  "staking_max": "الحد الأقصى",
+  "staking_min_deposit_label": "الحد الأدنى للإيداع",
+  "staking_next_cycle_desc_liquid": "إلغاء التحصيص الفوري متاح",
+  "staking_next_cycle_message": "الدورة التالية خلال {value}",
+  "staking_pool_detail": "APY ≈{apy}% · الحد الأدنى للإيداع {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON جاهز للسحب",
+  "staking_rewards_after_stake": "بعد التحصيص",
+  "staking_rewards_current": "حاليا",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "محصصة",
+  "staking_title": "التحصيص",
+  "staking_top_up": "تحصيص",
+  "staking_unstake_title": "إلغاء الحِصَّة",
   "start_screen": {
     "create_wallet_button": "إنشاء محفظة جديدة",
     "import_wallet_button": "استيراد محفظة موجودة"
@@ -324,6 +345,14 @@
     "subtitle": "قد يكون الـNFT غير آمن للاستخدام بسبب أحد الأسباب التالية.",
     "title": "لم يتم التحقق منه NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "لا يوجد TON كافٍ لرسوم الشبكة ({required})",
+  "swap_exchange_in": "التبادل في",
+  "swap_expired_refresh": "انتهت صلاحية المبادلة. حدّث عرض السعر",
+  "swap_price_impact_description": "الفرق بين سعر السوق والسعر المقدر بسبب حجم الصفقة.",
+  "swap_price_impact_ignore_variant": "تجاهل",
+  "swap_slippage_tolerance": "تحمل الانزلاق السعري",
+  "swap_slippage_tolerance_description": "المبلغ الذي يمكن أن يتغير به السعر بشكل غير مناسب قبل إلغاء الصفقة.",
+  "swap_slippage_tolerance_placeholder_custom": "مخصص",
   "swap_title": "مبادلة",
   "today": "اليوم",
   "tokenDetails": {

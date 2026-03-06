@@ -277,6 +277,10 @@
   "signer_scan_result": "Imzolangan tranzaksiyani skaner qiling",
   "signer_scan_tx_description": "Iltimos, Signer'ni oching va tranzaksiyani QR kodi orqali skaner qiling",
   "spam_action": "Spam",
+  "staking_action_stake": "Staking qilish",
+  "staking_action_unstake": "Chiqarib olish",
+  "staking_available_label": "Mavjud",
+  "staking_balance_label": "Balans",
   "staking": {
     "deposit": "Depozit",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "Chiqarib olish"
   },
+  "staking_earnings_section_title": "Kutilayotgan yillik daromad",
+  "staking_enter_amount": "Miqdorni kiriting",
+  "staking_insufficient_balance": "Hisobda yetarli mablag' yo'q",
+  "staking_max": "MAKS",
+  "staking_min_deposit_label": "Minimal depozit",
+  "staking_next_cycle_desc_liquid": "Tezkor qaytarib olish mavjud",
+  "staking_next_cycle_message": "Keyingi tsikl {value} ichida",
+  "staking_pool_detail": "APY ≈{apy}% · Min. depozit {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON yechib olishga tayyor",
+  "staking_rewards_after_stake": "Staking qilgandan keyin",
+  "staking_rewards_current": "Joriy",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "Steykingda",
+  "staking_title": "Staking",
+  "staking_top_up": "To'ldirish",
+  "staking_unstake_title": "Chiqarib olish",
   "start_screen": {
     "create_wallet_button": "Yangi hamyon yaratish",
     "import_wallet_button": "Mavjud hamyonni import qilish"
@@ -324,6 +345,14 @@
     "subtitle": "NFT quyidagi sabablardan biri uchun xavfsiz bo'lmasligi mumkin.",
     "title": "Tasdiqlanmagan NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Tarmoq to'lovi uchun TON yetarli emas ({required})",
+  "swap_exchange_in": "Almashtirish",
+  "swap_expired_refresh": "Swap muddati tugadi. Kotirovkani yangilang",
+  "swap_price_impact_description": "Savdo hajmi tufayli bozor narxi va taxminiy narx o'rtasidagi farq.",
+  "swap_price_impact_ignore_variant": "E'tibor bermaslik",
+  "swap_slippage_tolerance": "Slippage Tolerance",
+  "swap_slippage_tolerance_description": "Savdo bekor bo'lishidan oldin narx noqulay o'zgarishi mumkin bo'lgan miqdor.",
+  "swap_slippage_tolerance_placeholder_custom": "Boshqa",
   "swap_title": "Almashtirish",
   "today": "Bugun",
   "tokenDetails": {

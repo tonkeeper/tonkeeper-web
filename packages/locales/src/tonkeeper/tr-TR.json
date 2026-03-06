@@ -277,6 +277,10 @@
   "signer_scan_result": "İmzalı işlemi tarayın",
   "signer_scan_tx_description": "Lütfen Signer'ı açın ve işlemi QR koduyla tarayın",
   "spam_action": "İstenmeyen mesaj",
+  "staking_action_stake": "Stake Et",
+  "staking_action_unstake": "Stake'i Kaldır",
+  "staking_available_label": "Mevcut",
+  "staking_balance_label": "Bakiye",
   "staking": {
     "deposit": "Yatırma",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "Çekme"
   },
+  "staking_earnings_section_title": "Beklenen yıllık kazanç",
+  "staking_enter_amount": "Bir tutar girin",
+  "staking_insufficient_balance": "Yetersiz bakiye",
+  "staking_max": "MAKS",
+  "staking_min_deposit_label": "Minimum yatırabilecek tutar",
+  "staking_next_cycle_desc_liquid": "Anında stake geri alma mevcut",
+  "staking_next_cycle_message": "Sonraki döngü {value} içinde",
+  "staking_pool_detail": "APY ≈{apy}% · Min. yatırım {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON çekilmeye hazır",
+  "staking_rewards_after_stake": "Yatırma işleminden sonra",
+  "staking_rewards_current": "Güncel",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "Stake Edildi",
+  "staking_title": "Stake Etme",
+  "staking_top_up": "Yatırma",
+  "staking_unstake_title": "Çek",
   "start_screen": {
     "create_wallet_button": "Yeni cüzdan oluşturun",
     "import_wallet_button": "Mevcut cüzdanı içe aktarın"
@@ -324,6 +345,14 @@
     "subtitle": "NFT aşağıdaki nedenlerden biri nedeniyle güvenli olmayabilir.",
     "title": "Doğrulanmamış NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Ağ ücreti için yeterli TON yok ({required})",
+  "swap_exchange_in": "Takas giriş",
+  "swap_expired_refresh": "Takas süresi doldu. Fiyat teklifini yenile",
+  "swap_price_impact_description": "İşlem büyüklüğü nedeniyle piyasa fiyatı ile tahmini fiyat arasındaki fark.",
+  "swap_price_impact_ignore_variant": "Yoksay",
+  "swap_slippage_tolerance": "Kayma Toleransı",
+  "swap_slippage_tolerance_description": "İşlem geri alınmadan önce fiyatın olumsuz yönde değişebileceği miktar.",
+  "swap_slippage_tolerance_placeholder_custom": "Özel",
   "swap_title": "Takas",
   "today": "Bugün",
   "tokenDetails": {

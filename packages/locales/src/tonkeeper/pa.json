@@ -277,6 +277,10 @@
   "signer_scan_result": "ਦਸਤਖਤ ਕੀਤੀ ਲੈਣ-ਦੇਣ ਨੂੰ ਸਕੈਨ ਕਰੋ",
   "signer_scan_tx_description": "ਕਿਰਪਾ ਕਰਕੇ Signer ਖੋਲ੍ਹੋ ਅਤੇ ਲੈਣ-ਦੇਣ ਨੂੰ QR ਕੋਡ ਨਾਲ ਸਕੈਨ ਕਰੋ",
   "spam_action": "ਸਪੈਮ",
+  "staking_action_stake": "ਜਮ੍ਹਾਂ",
+  "staking_action_unstake": "ਅਨਸਟੇਕ ਕਰੋ",
+  "staking_available_label": "ਉਪਲਬਧ",
+  "staking_balance_label": "ਬਕਾਇਆ",
   "staking": {
     "deposit": "ਜਮ੍ਹਾਂ",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "ਅਨਸਟੇਕ ਕਰੋ"
   },
+  "staking_earnings_section_title": "ਸਾਲਾਨਾ ਅਨੁਮਾਨਿਤ ਕਮਾਈ",
+  "staking_enter_amount": "ਇੱਕ ਰਕਮ ਦਰਜ ਕਰੋ",
+  "staking_insufficient_balance": "ਪ੍ਰਯਾਪਤ ਬਕਾਇਆ ਨਹੀਂ",
+  "staking_max": "ਅਧਿਕਤਮ",
+  "staking_min_deposit_label": "ਘੱਟੋ-ਘੱਟ ਜਮ੍ਹਾਂ",
+  "staking_next_cycle_desc_liquid": "ਤੁਰੰਤ ਅਨਸਟੇਕ ਉਪਲਬਧ ਹੈ",
+  "staking_next_cycle_message": "ਅਗਲਾ ਚੱਕਰ {value} ਵਿੱਚ",
+  "staking_pool_detail": "APY ≈{apy}% · ਘੱਟੋ-ਘੱਟ ਜਮ੍ਹਾਂ {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON ਕਢਵਾਉਣ ਲਈ ਤਿਆਰ",
+  "staking_rewards_after_stake": "ਜਮ੍ਹਾਂ ਕਰਨ ਤੋਂ ਬਾਅਦ",
+  "staking_rewards_current": "ਮੌਜੂਦਾ",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "ਜਮ੍ਹਾਂ ਕੀਤਾ",
+  "staking_title": "ਸਟੇਕਿੰਗ",
+  "staking_top_up": "ਜਮ੍ਹਾਂ",
+  "staking_unstake_title": "ਅਨਸਟੇਕ",
   "start_screen": {
     "create_wallet_button": "ਨਵਾਂ ਵਾਲਿਟ ਬਣਾਓ",
     "import_wallet_button": "ਮੌਜੂਦਾ ਵਾਲਿਟ ਆਯਾਤ ਕਰੋ"
@@ -324,6 +345,14 @@
     "subtitle": "NFT ਹੇਠਾਂ ਦਿੱਤੇ ਕਾਰਣਾਂ ਵਿਚੋਂ ਕਿਸੇ ਇੱਕ ਕਾਰਨ ਕਰਕੇ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਹੋ ਸਕਦਾ.",
     "title": "ਗੈਰ-ਤਸਦੀਕਸ਼ੁਦਾ NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "ਨੈੱਟਵਰਕ ਫੀਸ ਲਈ ਕਾਫ਼ੀ TON ਨਹੀਂ ({required})",
+  "swap_exchange_in": "ਵਿੱਚ ਐਕਸਚੇਂਜ",
+  "swap_expired_refresh": "ਸਵੈਪ ਦੀ ਮਿਆਦ ਖਤਮ ਹੋ ਗਈ। ਕੋਟ ਨੂੰ ਤਾਜ਼ਾ ਕਰੋ",
+  "swap_price_impact_description": "ਵਪਾਰ ਦੇ ਆਕਾਰ ਕਾਰਨ ਮਾਰਕੀਟ ਕੀਮਤ ਅਤੇ ਅਨੁਮਾਨਿਤ ਕੀਮਤ ਵਿਚਕਾਰ ਅੰਤਰ।",
+  "swap_price_impact_ignore_variant": "ਅਣਗੌਲਾ ਕਰੋ",
+  "swap_slippage_tolerance": "ਸਲਿਪੇਜ ਸਹਿਣਸ਼ੀਲਤਾ",
+  "swap_slippage_tolerance_description": "ਵਪਾਰ ਵਾਪਸ ਹੋਣ ਤੋਂ ਪਹਿਲਾਂ ਕੀਮਤ ਕਿੰਨੀ ਪ੍ਰਤੀਕੂਲ ਬਦਲ ਸਕਦੀ ਹੈ।",
+  "swap_slippage_tolerance_placeholder_custom": "ਕਸਟਮ",
   "swap_title": "ਬਦਲੋ",
   "today": "ਅੱਜ",
   "tokenDetails": {

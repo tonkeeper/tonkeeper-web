@@ -277,6 +277,10 @@
   "signer_scan_result": "Escanee la transacción firmada",
   "signer_scan_tx_description": "Por favor, abra Signer y escanee la transacción con el código QR",
   "spam_action": "Correo no deseado",
+  "staking_action_stake": "Depositar",
+  "staking_action_unstake": "Retirar",
+  "staking_available_label": "Disponible",
+  "staking_balance_label": "Balance",
   "staking": {
     "deposit": "Depósito",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "Retirar"
   },
+  "staking_earnings_section_title": "Ganancia anual esperada",
+  "staking_enter_amount": "Ingresar la cantidad",
+  "staking_insufficient_balance": "Saldo insuficiente",
+  "staking_max": "MÁX",
+  "staking_min_deposit_label": "Depósito mínimo",
+  "staking_next_cycle_desc_liquid": "Deshacer participación instantánea disponible",
+  "staking_next_cycle_message": "Próximo ciclo en {value}",
+  "staking_pool_detail": "APY ≈{apy}% · Depósito mín. {minDeposit} TON",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON listo para retirar",
+  "staking_rewards_after_stake": "Después del depósito",
+  "staking_rewards_current": "Actual",
+  "staking_rewards_value": "≈ {value} TON",
+  "staking_staked": "Apostado",
+  "staking_title": "Participación",
+  "staking_top_up": "Recargar",
+  "staking_unstake_title": "Retirar",
   "start_screen": {
     "create_wallet_button": "Crear Nueva Billetera",
     "import_wallet_button": "Importar billetera existente"
@@ -324,6 +345,14 @@
     "subtitle": "NFT puede no ser seguro por una de las siguientes razones.",
     "title": "NFT no verificado"
   },
+  "swap_confirm_not_enough_ton_for_fee": "TON insuficiente para comisión de red ({required})",
+  "swap_exchange_in": "Intercambiar en",
+  "swap_expired_refresh": "Intercambio caducado. Actualiza la cotización",
+  "swap_price_impact_description": "La diferencia entre el precio de mercado y el precio estimado debido al tamaño de la operación.",
+  "swap_price_impact_ignore_variant": "Ignorar",
+  "swap_slippage_tolerance": "Tolerancia de Deslizamiento",
+  "swap_slippage_tolerance_description": "La cantidad que el precio puede cambiar desfavorablemente antes de que la operación se revierta.",
+  "swap_slippage_tolerance_placeholder_custom": "Personalizado",
   "swap_title": "Intercambiar",
   "today": "Hoy",
   "tokenDetails": {

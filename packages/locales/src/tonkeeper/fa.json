@@ -277,6 +277,10 @@
   "signer_scan_result": "تراکنش امضا شده را اسکن کنید",
   "signer_scan_tx_description": "لطفاً برنامه Signer را باز کنید و با استفاده از کد QR تراکنش را اسکن نمایید",
   "spam_action": "هرزنامه",
+  "staking_action_stake": "استیک",
+  "staking_action_unstake": "لغو استیک",
+  "staking_available_label": "موجود",
+  "staking_balance_label": "موجودی",
   "staking": {
     "deposit": "واریز",
     "details": {
@@ -286,6 +290,23 @@
     },
     "withdraw": "برداشت"
   },
+  "staking_earnings_section_title": "درآمد سالانه پیش‌بینی‌شده",
+  "staking_enter_amount": "مقدار را وارد کنید",
+  "staking_insufficient_balance": "موجودی کافی نیست",
+  "staking_max": "حداکثر",
+  "staking_min_deposit_label": "حداقل واریز",
+  "staking_next_cycle_desc_liquid": "برداشت فوری موجود است",
+  "staking_next_cycle_message": "چرخه بعدی در {value}",
+  "staking_pool_detail": "APY ≈{apy}% · حداقل واریز {minDeposit} تون",
+  "staking_pools_apy": "APY ≈{apy}%",
+  "staking_ready_withdraw": "{amount} TON آماده برداشت",
+  "staking_rewards_after_stake": "پس از استیک",
+  "staking_rewards_current": "فعلی",
+  "staking_rewards_value": "≈ {value} تن",
+  "staking_staked": "استیک شده",
+  "staking_title": "استیکینگ",
+  "staking_top_up": "واریز",
+  "staking_unstake_title": "لغو استیک",
   "start_screen": {
     "create_wallet_button": "ایجاد کیف پول جدید",
     "import_wallet_button": "وارد کردن کیف پول موجود"
@@ -324,6 +345,14 @@
     "subtitle": "NFT ممکن است به یکی از دلایل زیر امن نباشد.",
     "title": "NFT تاییدنشده"
   },
+  "swap_confirm_not_enough_ton_for_fee": "TON کافی برای کارمزد شبکه وجود ندارد ({required})",
+  "swap_exchange_in": "تبادل در",
+  "swap_expired_refresh": "مبادله منقضی شد. قیمت را بروزرسانی کنید",
+  "swap_price_impact_description": "تفاوت بین قیمت بازار و قیمت تخمینی به دلیل حجم معامله.",
+  "swap_price_impact_ignore_variant": "نادیده گرفتن",
+  "swap_slippage_tolerance": "تلورانس لغزش",
+  "swap_slippage_tolerance_description": "مقداری که قیمت می‌تواند قبل از لغو معامله به صورت نامطلوب تغییر کند.",
+  "swap_slippage_tolerance_placeholder_custom": "سفارشی",
   "swap_title": "مبادله",
   "today": "امروز",
   "tokenDetails": {
