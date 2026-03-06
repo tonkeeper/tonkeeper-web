@@ -51,19 +51,24 @@ export const hasActiveStakeForPool = ({
     );
 };
 
+export const convertTonToPoolTokenNano = (
+    tonAmount: BigNumber,
+    liquidTokenBalance: StakingPoolLiquidTokenBalance,
+    tonPrice: BigNumber
+): bigint => {
+    const tsTonAmount = tonAmount.multipliedBy(tonPrice).div(liquidTokenBalance.price!);
+    return BigInt(tsTonAmount.shiftedBy(9).toFixed(0, BigNumber.ROUND_DOWN));
+};
+
 export const getStakingPoolTonAmount = ({
     position,
     liquidTokenBalance,
     tonPrice
 }: ResolvePoolStakeStateParams) => {
-    const stakedAmount = position?.amount ?? 0;
-    if (stakedAmount > 0) {
-        return shiftedDecimals(stakedAmount);
-    }
-
     if (liquidTokenBalance && hasLiquidStakingTokenActivity(liquidTokenBalance)) {
         return getLiquidStakingTonAmount(liquidTokenBalance, tonPrice);
     }
 
+    const stakedAmount = position?.amount ?? 0;
     return shiftedDecimals(stakedAmount);
 };
