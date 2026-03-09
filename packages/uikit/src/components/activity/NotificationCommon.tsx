@@ -12,7 +12,7 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { ChevronRightIcon, SpinnerIcon, TonkeeperProCardIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
-import { Body1, Body2Class, Body3, Body3Class, H2, Label1, Label2 } from '../Text';
+import { Body1, Body2, Body2Class, Body3, Body3Class, H2, Label1, Label2 } from '../Text';
 import { Button, ButtonFlat } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
 import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
@@ -99,6 +99,12 @@ const Timestamp = styled(Body1)`
 export const Label = styled(Body1)`
     user-select: none;
     color: ${props => props.theme.textSecondary};
+`;
+
+const CompactLabel = styled(Body2)`
+    user-select: none;
+    color: ${props => props.theme.textSecondary};
+    align-self: flex-start;
 `;
 
 export const LabelPrimary = styled(Body1)`
@@ -458,6 +464,10 @@ const FeeLabelColumn = styled.div`
     flex-direction: column;
 `;
 
+const CompactListItemPayload = styled(ListItemPayload)`
+    align-items: flex-start;
+`;
+
 const TransparentButton = styled.button`
     text-align: start;
     ${Body2Class};
@@ -512,23 +522,27 @@ export const ActionFeeDetailsUniversal: FC<
     {
         fee: TransactionFee | undefined | null;
         className?: string;
+        compact?: boolean;
     } & (FeeDetailsPropsTon | FeeDetailsPropsUniversal)
-> = ({ fee, className, ...rest }) => {
+> = ({ fee, className, compact, ...rest }) => {
     const { t } = useTranslation();
 
     const noAvailableTronOptions = rest.availableSendersOptions?.every(
         choice => isTronSenderOption(choice) && !choice.isEnoughBalance
     );
 
+    const FeeLabel = compact ? CompactLabel : Label;
+    const Payload = compact ? CompactListItemPayload : ListItemPayload;
+
     return (
         <ListItem hover={false} className={className}>
-            <ListItemPayload>
+            <Payload>
                 <FeeLabelColumn>
-                    <Label>
+                    <FeeLabel>
                         {isTransactionFeeRefund(fee ?? undefined)
                             ? t('txActions_refund')
                             : t('transaction_fee')}
-                    </Label>
+                    </FeeLabel>
                     <SelectSenderDropdown {...rest} />
                 </FeeLabelColumn>
                 {fee ? (
@@ -538,7 +552,7 @@ export const ActionFeeDetailsUniversal: FC<
                 ) : (
                     <SpinnerIcon />
                 )}
-            </ListItemPayload>
+            </Payload>
         </ListItem>
     );
 };

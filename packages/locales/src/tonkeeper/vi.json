@@ -324,6 +324,14 @@
     "subtitle": "NFT có thể không an toàn để sử dụng vì một trong những lý do sau.",
     "title": "NFT chưa được xác minh"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Không đủ TON để trả phí mạng ({required})",
+  "swap_exchange_in": "Hoán đổi trong",
+  "swap_expired_refresh": "Giao dịch đã hết hạn. Làm mới báo giá",
+  "swap_price_impact_description": "Chênh lệch giữa giá thị trường và giá ước tính do quy mô giao dịch.",
+  "swap_price_impact_ignore_variant": "Bỏ qua",
+  "swap_slippage_tolerance": "Dung sai trượt giá",
+  "swap_slippage_tolerance_description": "Mức giá có thể thay đổi bất lợi trước khi giao dịch bị hoàn tác.",
+  "swap_slippage_tolerance_placeholder_custom": "Tùy chỉnh",
   "swap_title": "Hoán đổi",
   "today": "Hôm nay",
   "tokenDetails": {

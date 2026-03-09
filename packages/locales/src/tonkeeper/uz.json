@@ -324,6 +324,14 @@
     "subtitle": "NFT quyidagi sabablardan biri uchun xavfsiz bo'lmasligi mumkin.",
     "title": "Tasdiqlanmagan NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Tarmoq to'lovi uchun TON yetarli emas ({required})",
+  "swap_exchange_in": "Almashtirish",
+  "swap_expired_refresh": "Swap muddati tugadi. Kotirovkani yangilang",
+  "swap_price_impact_description": "Savdo hajmi tufayli bozor narxi va taxminiy narx o'rtasidagi farq.",
+  "swap_price_impact_ignore_variant": "E'tibor bermaslik",
+  "swap_slippage_tolerance": "Slippage Tolerance",
+  "swap_slippage_tolerance_description": "Savdo bekor bo'lishidan oldin narx noqulay o'zgarishi mumkin bo'lgan miqdor.",
+  "swap_slippage_tolerance_placeholder_custom": "Boshqa",
   "swap_title": "Almashtirish",
   "today": "Bugun",
   "tokenDetails": {

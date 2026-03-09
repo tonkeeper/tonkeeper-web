@@ -324,6 +324,14 @@
     "subtitle": "NFT может быть небезопасным по одной из следующих причин.",
     "title": "Непроверенный NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Недостаточно TON для комиссии сети ({required})",
+  "swap_exchange_in": "Обменять в",
+  "swap_expired_refresh": "Своп истёк. Обновите котировку",
+  "swap_price_impact_description": "Разница между рыночной ценой и расчётной ценой из-за размера сделки.",
+  "swap_price_impact_ignore_variant": "Игнорировать",
+  "swap_slippage_tolerance": "Допустимое проскальзывание",
+  "swap_slippage_tolerance_description": "Величина неблагоприятного изменения цены, при которой сделка будет отменена.",
+  "swap_slippage_tolerance_placeholder_custom": "Свой",
   "swap_title": "Обмен",
   "today": "Сегодня",
   "tokenDetails": {

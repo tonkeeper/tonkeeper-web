@@ -61,9 +61,6 @@ export enum QueryKey {
     dashboardData = 'dashboardData',
 
     stonfiAssets = 'stonfiAssets',
-    swapCalculate = 'swapCalculate',
-    swapGasConfig = 'swapCalculate',
-    swapMaxValue = 'swapMaxValue',
     swapAllAssets = 'swapAllAssets',
     swapWalletAssets = 'swapWalletAssets',
     swapCustomToken = 'swapCustomToken',

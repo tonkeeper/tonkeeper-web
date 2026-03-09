@@ -324,6 +324,14 @@
     "subtitle": "NFT може да не е безопасно за използване по една от следните причини.",
     "title": "Непроверено NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "Недостатъчно TON за мрежова такса ({required})",
+  "swap_exchange_in": "Обмяна в",
+  "swap_expired_refresh": "Обменът изтече. Обновете офертата",
+  "swap_price_impact_description": "Разликата между пазарната цена и прогнозната цена поради размера на сделката.",
+  "swap_price_impact_ignore_variant": "Игнорирай",
+  "swap_slippage_tolerance": "Толеранс на отклонение",
+  "swap_slippage_tolerance_description": "Размерът, с който цената може да се промени неблагоприятно, преди транзакцията да се отмени.",
+  "swap_slippage_tolerance_placeholder_custom": "Персонализиран",
   "swap_title": "Размяна",
   "today": "Днес",
   "tokenDetails": {

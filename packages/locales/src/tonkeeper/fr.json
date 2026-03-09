@@ -324,6 +324,14 @@
     "subtitle": "NFT peut ne pas être sûr à utiliser pour l'une des raisons suivantes.",
     "title": "NFT non vérifié"
   },
+  "swap_confirm_not_enough_ton_for_fee": "TON insuffisant pour les frais de réseau ({required})",
+  "swap_exchange_in": "Échanger en",
+  "swap_expired_refresh": "Swap expiré. Actualiser le devis",
+  "swap_price_impact_description": "La différence entre le prix du marché et le prix estimé en raison de la taille de la transaction.",
+  "swap_price_impact_ignore_variant": "Ignorer",
+  "swap_slippage_tolerance": "Tolérance de Glissement",
+  "swap_slippage_tolerance_description": "Le montant que le prix peut changer défavorablement avant que la transaction ne soit annulée.",
+  "swap_slippage_tolerance_placeholder_custom": "Personnalisé",
   "swap_title": "Échanger",
   "today": "Aujourd’hui",
   "tokenDetails": {

@@ -324,6 +324,14 @@
     "subtitle": "NFT ব্যবহার নিরাপদ নাও হতে পারে নিম্নলিখিত কারণে।",
     "title": "অবৈধ NFT"
   },
+  "swap_confirm_not_enough_ton_for_fee": "নেটওয়ার্ক ফি এর জন্য পর্যাপ্ত TON নেই ({required})",
+  "swap_exchange_in": "এক্সচেঞ্জ ইন",
+  "swap_expired_refresh": "সোয়াপ মেয়াদ শেষ। কোট রিফ্রেশ করুন",
+  "swap_price_impact_description": "বাণিজ্যের আকারের কারণে বাজার মূল্য এবং আনুমানিক মূল্যের মধ্যে পার্থক্য।",
+  "swap_price_impact_ignore_variant": "উপেক্ষা করুন",
+  "swap_slippage_tolerance": "স্লিপেজ সহনশীলতা",
+  "swap_slippage_tolerance_description": "ট্রেড বাতিল হওয়ার আগে মূল্য কতটা প্রতিকূলভাবে পরিবর্তিত হতে পারে।",
+  "swap_slippage_tolerance_placeholder_custom": "কাস্টম",
   "swap_title": "বদলান",
   "today": "আজ",
   "tokenDetails": {

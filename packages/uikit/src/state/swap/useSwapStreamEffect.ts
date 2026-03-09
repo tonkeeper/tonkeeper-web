@@ -1,0 +1,159 @@
+import { useCallback, useEffect, useRef } from 'react';
+import { isTon, TonAssetAddress } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { Address } from '@ton/core';
+import { useSwapFromAmount, useSwapFromAsset, useSwapToAsset } from './useSwapForm';
+import { useSwapsConfig } from './useSwapsConfig';
+import { useActiveWallet } from '../wallet';
+import { subscribeToOmnistonStream } from '@tonkeeper/core/dist/swapsApi';
+import type { SwapConfirmation } from '@tonkeeper/core/dist/swapsApi';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { useAtom } from '../../libs/useAtom';
+import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useIsSwapFormNotCompleted } from './useSwapForm';
+import { useSlippageBps } from './useSwapOptions';
+
+export const swapConfirmation$ = atom<SwapConfirmation | null>(null);
+const swapIsFetching$ = atom(false);
+const swapError$ = atom<Error | null>(null);
+
+const toTradeAssetId = (address: TonAssetAddress) => {
+    return isTon(address) ? 'ton' : Address.isAddress(address) ? address.toRawString() : address;
+};
+
+const DEBOUNCE_MS = 300;
+
+/**
+ * Side-effect-only hook that manages SSE subscription to the Omniston swap stream.
+ * Must be mounted once at page level (desktop swap page / mobile swap notification).
+ * Writes to global atoms (swapConfirmation$, swapIsFetching$, swapError$) that are
+ * read by child components via useSwapConfirmation().
+ */
+export function useSwapStreamEffect() {
+    const wallet = useActiveWallet();
+    const { baseUrl } = useSwapsConfig();
+    const [fromAsset] = useSwapFromAsset();
+    const [toAsset] = useSwapToAsset();
+    const [fromAmountRelative] = useSwapFromAmount();
+    const isNotCompleted = useIsSwapFormNotCompleted();
+    const slippageBps = useSlippageBps();
+    const closeRef = useRef<(() => void) | null>(null);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastParamsRef = useRef<string | null>(null);
+    const [, setConfirmation] = useAtom(swapConfirmation$);
+    const [, setIsFetching] = useAtom(swapIsFetching$);
+    const [, setError] = useAtom(swapError$);
+
+    const subscribe = useCallback(() => {
+        if (closeRef.current) {
+            closeRef.current();
+            closeRef.current = null;
+        }
+
+        if (isNotCompleted || !fromAmountRelative) {
+            lastParamsRef.current = null;
+            setConfirmation(null);
+            setIsFetching(false);
+            setError(null);
+            return;
+        }
+
+        const fromAmountWei = unShiftedDecimals(fromAmountRelative, fromAsset.decimals);
+
+        const paramsKey = `${toTradeAssetId(fromAsset.address)}:${toTradeAssetId(toAsset.address)}:${fromAmountWei.toFixed(0)}:${slippageBps}:${wallet.rawAddress}`;
+        const isParamsChanged = lastParamsRef.current !== paramsKey;
+        lastParamsRef.current = paramsKey;
+
+        if (isParamsChanged) {
+            setConfirmation(null);
+        }
+        setIsFetching(true);
+        setError(null);
+
+        const abortController = new AbortController();
+
+        const { close } = subscribeToOmnistonStream({
+            baseUrl,
+            fromAsset: toTradeAssetId(fromAsset.address),
+            toAsset: toTradeAssetId(toAsset.address),
+            fromAmount: fromAmountWei.toFixed(0),
+            userAddress: wallet.rawAddress,
+            slippageBps,
+            onQuote: confirmation => {
+                setConfirmation(confirmation);
+                setIsFetching(false);
+            },
+            onError: error => {
+                setError(error);
+                setIsFetching(false);
+            },
+            signal: abortController.signal
+        });
+
+        closeRef.current = () => {
+            abortController.abort();
+            close();
+        };
+    }, [
+        baseUrl,
+        fromAsset,
+        toAsset,
+        fromAmountRelative,
+        isNotCompleted,
+        slippageBps,
+        wallet.rawAddress,
+        setConfirmation,
+        setIsFetching,
+        setError
+    ]);
+
+    useEffect(() => {
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current);
+        }
+
+        debounceRef.current = setTimeout(() => {
+            subscribe();
+        }, DEBOUNCE_MS);
+
+        return () => {
+            if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+            }
+            if (closeRef.current) {
+                closeRef.current();
+                closeRef.current = null;
+            }
+        };
+    }, [subscribe]);
+
+    // Re-subscribe when app regains visibility or network
+    useEffect(() => {
+        const onResume = () => {
+            if (!isNotCompleted && fromAmountRelative) {
+                subscribe();
+            }
+        };
+
+        const onVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                onResume();
+            }
+        };
+
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        window.addEventListener('online', onResume);
+
+        return () => {
+            document.removeEventListener('visibilitychange', onVisibilityChange);
+            window.removeEventListener('online', onResume);
+        };
+    }, [subscribe, isNotCompleted, fromAmountRelative]);
+}
+
+export function useSwapConfirmation() {
+    const [confirmation] = useAtom(swapConfirmation$);
+    const [isFetching] = useAtom(swapIsFetching$);
+    const [error] = useAtom(swapError$);
+
+    return { confirmation, isFetching, error };
+}
