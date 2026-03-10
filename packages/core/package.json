@@ -12,13 +12,15 @@
         "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUODX7B3Y53DIQL2FQ2C2DVCCZA' --output ./src/tonConsoleApi",
         "generate:batteryApi": "rm -fr ./src/batteryApi && docker build --no-cache --build-arg GITHUB_TOKEN=GHSAT0AAAAAACJYQUODBULKMUQJQTJ7E7ES2H3LZ7A -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
         "generate:2faApi": "rm -fr src/2faApi && docker build -f resource/Dockerfile.2faApi . -t 2faapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local 2faapi",
+        "test": "vitest",
         "build:pkg": "yarn build",
         "build:analytics": "ts-node --project ./tsconfig.task.json ./task/build-analytics.ts"
     },
     "devDependencies": {
         "@types/aes-js": "^3.1.4",
         "@types/punycode": "^2",
-        "typescript": "^4.9.4"
+        "typescript": "^4.9.4",
+        "vitest": "^4.0.18"
     },
     "dependencies": {
         "@keystonehq/keystone-sdk": "0.7.2",
