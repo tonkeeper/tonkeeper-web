@@ -12,6 +12,7 @@ export interface GlobalPreferences {
         tron: boolean;
     };
     interceptTonLinks: InterceptTonLinksConfig;
+    blindSignEnabled: boolean;
 }
 
 const defaultGlobalPreferences: GlobalPreferences = {
@@ -21,7 +22,8 @@ const defaultGlobalPreferences: GlobalPreferences = {
     highlightFeatures: {
         tron: true
     },
-    interceptTonLinks: 'ask'
+    interceptTonLinks: 'ask',
+    blindSignEnabled: false
 };
 
 export async function getGlobalPreferences(storage: IStorage) {

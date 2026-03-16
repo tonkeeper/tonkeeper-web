@@ -11,7 +11,8 @@ import React, {
     isValidElement,
     useContext,
     useState,
-    useEffect
+    useEffect,
+    useCallback
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -55,6 +56,9 @@ import {
 } from '../../hooks/blockchain/sender/sender-type';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
 import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
+import { useGlobalPreferencesQuery } from '../../state/global-preferences';
+import { BlindSignConfirmNotification } from '../modals/BlindSignConfirmNotification';
+import { Button } from '../fields/Button';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -379,8 +383,28 @@ export const ConfirmViewButtons: FC<{
         handleSubmit
     } = useConfirmViewContext();
     const { t } = useTranslation();
+    const { data: preferences } = useGlobalPreferencesQuery();
+    const [showBlindSignWarning, setShowBlindSignWarning] = useState(false);
 
     const isValid = !isLoading && !estimationLoading;
+    // Determine error type based on estimation data presence (same logic as original)
+    // If estimation data exists, it's a send error; otherwise it's an estimation error
+    const hasError = !!error && !(error instanceof UserCancelledError);
+    const hasEstimationError = hasError && !estimation;
+    const hasSendError = hasError && !!estimation;
+
+    const handleBlindSignClick = useCallback(() => {
+        setShowBlindSignWarning(true);
+    }, []);
+
+    const handleBlindSignConfirm = useCallback(async () => {
+        setShowBlindSignWarning(false);
+        await handleSubmit();
+    }, [handleSubmit]);
+
+    const handleBlindSignClose = useCallback(() => {
+        setShowBlindSignWarning(false);
+    }, []);
 
     if (done) {
         return (
@@ -391,20 +415,59 @@ export const ConfirmViewButtons: FC<{
         );
     }
 
-    if (error && !(error instanceof UserCancelledError)) {
-        const defaultError = estimation
-            ? t('send_publish_tx_error')
-            : t('send_fee_estimation_error');
+    // Helper to get user-friendly error text
+    const getDisplayErrorText = (err: Error | null | undefined, defaultError: string) => {
+        // Replace generic API error with user-friendly message
+        if (err instanceof Error && err.message === 'Response returned an error code') {
+            return defaultError;
+        }
+        return getErrorText(err, { t, defaultError });
+    };
 
-        if (error instanceof Error && error.message === 'Response returned an error code') {
-            error.message = defaultError;
+    // Show send error (not estimation error)
+    if (hasSendError) {
+        const errorText = getDisplayErrorText(error, t('send_publish_tx_error'));
+
+        return (
+            <ResultErrorButtonStyled>
+                <ExclamationMarkCircleIconStyled />
+                <ErrorLabelStyled>{errorText}</ErrorLabelStyled>
+            </ResultErrorButtonStyled>
+        );
+    }
+
+    // Show estimation error
+    if (hasEstimationError) {
+        const errorText = getDisplayErrorText(error, t('send_fee_estimation_error'));
+
+        // If blind sign is enabled, show warning button instead of error
+        if (preferences?.blindSignEnabled) {
+            return (
+                <>
+                    <ResultErrorButtonStyled>
+                        <ExclamationMarkCircleIconStyled />
+                        <ErrorLabelStyled>{errorText}</ErrorLabelStyled>
+                    </ResultErrorButtonStyled>
+                    <Button
+                        fullWidth
+                        size="large"
+                        warn
+                        onClick={handleBlindSignClick}
+                        disabled={isLoading}
+                    >
+                        {t('blind_sign_send_anyway')}
+                    </Button>
+                    <BlindSignConfirmNotification
+                        isOpen={showBlindSignWarning}
+                        onClose={handleBlindSignClose}
+                        onConfirm={handleBlindSignConfirm}
+                        isLoading={isLoading}
+                    />
+                </>
+            );
         }
 
-        const errorText = getErrorText(error, {
-            t,
-            defaultError
-        });
-
+        // Standard error display when blind sign is disabled
         return (
             <ResultErrorButtonStyled>
                 <ExclamationMarkCircleIconStyled />
