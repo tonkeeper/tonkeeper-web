@@ -3,13 +3,15 @@ import { BorderSmallResponsive } from './Styles';
 import { Body3Class } from '../Text';
 
 export const Tooltip = styled.div<{ placement: 'top' | 'bottom' }>`
+    && {
+        pointer-events: none;
+    }
     transform: translate3d(0, -10px, 0);
     z-index: 100;
     left: 0;
     right: 0;
     transition: all 0.15s ease-in-out;
     opacity: 0;
-    pointer-events: none;
     position: absolute;
     background-color: ${p => p.theme.backgroundContentTint};
     padding: 8px 12px;
