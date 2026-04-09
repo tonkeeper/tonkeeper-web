@@ -240,7 +240,7 @@ export class Tonendpoint {
         return this.GET('/apps/popular');
     };
 
-    public supportedCurrencies = async (): Promise<{ code: string }[]> => {
+    public supportedCurrencies = async (): Promise<{ currencies: { code: string }[] }> => {
         const response = await fetch(`${this.tonkeeperApiUrl}/currencies?${this.toSearchParams()}`);
 
         return response.json();

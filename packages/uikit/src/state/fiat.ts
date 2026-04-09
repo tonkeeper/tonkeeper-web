@@ -9,7 +9,7 @@ export const useAllowedFiatCurrencies = () => {
     const { tonendpoint } = useAppContext();
     return useQuery([QueryKey.allowedFiatCurrencies], async () => {
         const result = await tonendpoint.supportedCurrencies();
-        return result.map(i => i.code);
+        return result.currencies.map(i => i.code);
     });
 };
 
