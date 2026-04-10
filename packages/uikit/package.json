@@ -9,6 +9,7 @@
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
         "build": "rm -fr dist && tsc",
+        "dev": "tsc -w",
         "start": "tsc -w",
         "build:pkg": "yarn build"
     },

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { AccountStakingInfo, StakingApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountStakingInfo, StakingApi, ResponseError } from '@tonkeeper/core/dist/tonApiV2';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveApi, useActiveWallet, useActiveTonNetwork } from '../wallet';
@@ -15,10 +15,18 @@ export const useStakingPositions = () => {
     return useQuery<AccountStakingInfo[], Error>(
         [wallet.rawAddress, QueryKey.staking, 'positions', network],
         async () => {
-            const response = await new StakingApi(api.tonApiV2).getAccountNominatorsPools({
-                accountId: wallet.rawAddress
-            });
-            return response.pools;
+            try {
+                const response = await new StakingApi(api.tonApiV2).getAccountNominatorsPools({
+                    accountId: wallet.rawAddress
+                });
+                return response.pools;
+            } catch (error) {
+                // API return 404 for new wallets
+                if (error instanceof ResponseError && error.response.status === 404) {
+                    return [];
+                }
+                throw error;
+            }
         },
         {
             staleTime: 60_000,

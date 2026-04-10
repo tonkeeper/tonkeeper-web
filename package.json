@@ -6,6 +6,7 @@
         "url": "https://github.com/tonkeeper/tonkeeper-web.git"
     },
     "scripts": {
+        "dev:web": "npx turbo dev --filter=@tonkeeper/web --filter=@tonkeeper/uikit --filter=@tonkeeper/locales --parallel",
         "build": "npx turbo build",
         "build:web": "npx turbo build:web",
         "build:twa": "npx turbo build:twa",

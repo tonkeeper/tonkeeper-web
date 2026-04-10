@@ -2,6 +2,13 @@ import { PoolImplementationType, PoolInfo } from '@tonkeeper/core/dist/tonApiV2'
 
 export type StakingPoolProvider = 'tonstakers' | 'tonnominators' | 'tonwhales' | 'tonkeeper';
 
+const PROVIDER_LINK_URLS: Record<StakingPoolProvider, string | null> = {
+    tonstakers: 'https://tonstakers.com',
+    tonnominators: null,
+    tonwhales: 'https://tonwhales.com',
+    tonkeeper: null
+};
+
 export const getStakingPoolProvider = (
     pool: PoolInfo | undefined
 ): StakingPoolProvider | undefined => {
@@ -25,4 +32,10 @@ export const getStakingPoolProvider = (
     }
 
     return undefined;
+};
+
+export const getStakingPoolProviderLinkUrl = (pool: PoolInfo | undefined): string | null => {
+    const provider = getStakingPoolProvider(pool);
+    if (!provider) return null;
+    return PROVIDER_LINK_URLS[provider];
 };

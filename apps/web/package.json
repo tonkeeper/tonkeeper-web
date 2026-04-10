@@ -37,6 +37,7 @@
     },
     "scripts": {
         "locales": "ts-node ./task/locales",
+        "dev": "yarn locales && vite dev",
         "start": "yarn locales && vite dev",
         "preview": "vite preview",
         "build": "tsc && vite build && yarn locales",

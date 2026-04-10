@@ -44,7 +44,7 @@ export const UnstakeAmountInput: FC<UnstakeAmountInputProps> = ({
 
     const fiatDisplay = useMemo(() => {
         const formatted = fiatAmount ? fiatAmount : formatFiatCurrency(fiat, 0);
-        return `≈${formatted}`;
+        return `≈ ${formatted}`;
     }, [fiatAmount, fiat]);
 
     const unstakableDisplay = useMemo(() => {
@@ -57,11 +57,13 @@ export const UnstakeAmountInput: FC<UnstakeAmountInputProps> = ({
             amount={amount}
             onChange={onChange}
             fiatDisplay={fiatDisplay}
-            isErrored={isInsufficient}
             disabled={isTfPool}
             footer={
                 isInsufficient ? (
-                    <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                    <>
+                        <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                        <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
+                    </>
                 ) : isTfPool ? (
                     <BalanceLabel>{t('staking_tf_full_withdrawal_only')}</BalanceLabel>
                 ) : (

@@ -89,6 +89,11 @@ const PoolInfoRight = styled.div`
     flex-shrink: 0;
 `;
 
+const PoolEnd = styled.div`
+    flex-shrink: 0;
+    padding: 0 16px;
+`;
+
 const PoolNameLabel = styled(Label2)`
     color: ${p => p.theme.textPrimary};
     font-weight: 510;
@@ -208,15 +213,9 @@ const PoolListRow: FC<PoolListRowProps> = ({
                     <PoolInfoLeft>
                         <PoolNameLabel>{pool.name}</PoolNameLabel>
                     </PoolInfoLeft>
-                    {hasActivePosition ? (
+                    {hasActivePosition && (
                         <PoolInfoRight>
                             <PoolAmountLabel>{displayAmount}</PoolAmountLabel>
-                        </PoolInfoRight>
-                    ) : (
-                        <PoolInfoRight>
-                            <StakeButton onClick={handleStakeClick}>
-                                {t('staking_top_up')}
-                            </StakeButton>
                         </PoolInfoRight>
                     )}
                 </PoolInfoRow>
@@ -238,12 +237,19 @@ const PoolListRow: FC<PoolListRowProps> = ({
                     <PoolInfoRow>
                         <PoolInfoLeft>
                             <PoolPendingText>
-                                {t('staking_pools_pending_withdraw', { amount: pendingAmount })}
+                                {t('staking_portfolio_pending_withdraw', { amount: pendingAmount })}
                             </PoolPendingText>
                         </PoolInfoLeft>
                     </PoolInfoRow>
                 )}
             </PoolCenter>
+            <PoolEnd>
+                {!hasActivePosition && (
+                    <PoolInfoRight>
+                        <StakeButton onClick={handleStakeClick}>{t('staking_top_up')}</StakeButton>
+                    </PoolInfoRight>
+                )}
+            </PoolEnd>
         </PoolRow>
     );
 };

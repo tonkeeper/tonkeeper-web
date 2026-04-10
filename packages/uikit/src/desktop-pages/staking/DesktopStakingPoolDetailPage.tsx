@@ -25,6 +25,7 @@ import {
 import { TonTransactionNotification } from '../../components/connect/TonTransactionNotification';
 import { StakingPoolIcon } from '../../components/staking/StakingPoolIcon';
 import { StakingPageWrapper } from './StakingLayout';
+import { usePortfolioBalances } from '../../state/portfolio/usePortfolioBalances';
 
 const ContentArea = styled.div`
     display: flex;
@@ -68,7 +69,25 @@ const FiatText = styled(Label2)`
 const ButtonsRow = styled.div`
     display: flex;
     gap: 8px;
+`;
+
+const ActionsRow = styled.div`
+    display: flex;
+    justify-content: space-between;
     padding: 0 16px 16px;
+`;
+const WithdrawInfo = styled.div`
+    display: flex;
+    align-items: center;
+    background: ${p => p.theme.buttonSecondaryBackground};
+    color: ${p => p.theme.buttonSecondaryForeground};
+
+    padding: 10px 12px;
+    border-radius: 8px;
+`;
+
+const Body3Secondary = styled(Body3)`
+    color: ${p => p.theme.textSecondary};
 `;
 
 const ActionButton = styled.button`
@@ -203,14 +222,14 @@ const TokenFiatText = styled(Body3)`
     text-align: right;
 `;
 
-const TokenPriceChange = styled(Body3)<{ negative?: boolean }>`
-    color: ${p => (p.negative ? p.theme.accentRed : p.theme.accentGreen)};
+const TokenPriceChange = styled(Body3)<{ $negative?: boolean }>`
+    color: ${p => (p.$negative ? p.theme.accentRed : p.theme.accentGreen)};
     white-space: nowrap;
 `;
 
 const DescriptionText = styled(Body3)`
     color: ${p => p.theme.textTertiary};
-    padding: 0 16px 16px;
+    padding: 8px 16px 16px;
     max-width: 520px;
     line-height: 16px;
 `;
@@ -264,7 +283,7 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
     const { fiatPrice, fiatAmount } = useFormatFiat(jettonRate, tokenAmount);
 
     const diff24h = jettonRate?.diff24h;
-    const isNegative = diff24h ? diff24h.startsWith('-') : false;
+    const isNegative = diff24h ? diff24h.startsWith('−') : false;
 
     return (
         <TokenRow onClick={onClick}>
@@ -282,7 +301,7 @@ const PoolDetailTokenRow: FC<PoolDetailTokenRowProps> = ({ jettonMaster, onClick
                     <TokenPriceText>
                         {fiatPrice}
                         {diff24h && (
-                            <TokenPriceChange negative={isNegative}> {diff24h}</TokenPriceChange>
+                            <TokenPriceChange $negative={isNegative}> {diff24h}</TokenPriceChange>
                         )}
                     </TokenPriceText>
                     {fiatAmount && <TokenFiatText>{fiatAmount}</TokenFiatText>}
@@ -335,6 +354,17 @@ export const DesktopStakingPoolDetailPage = ({
     const { address: routeAddress } = useParams() as { address?: string };
     const address = poolAddress ?? routeAddress;
 
+    const { data: portfolio, isStakingLoading } = usePortfolioBalances();
+
+    const stakingPositionsCount = useMemo(() => {
+        if (!portfolio) return 0;
+
+        const positionsCount = portfolio.stakingPositions.length;
+        const stakingTokenBalancesCount = portfolio.tokenBalances.filter(
+            token => token.stakingPool
+        ).length;
+        return positionsCount + stakingTokenBalancesCount;
+    }, [portfolio]);
     const { data: pool, isError: isPoolError } = usePoolInfo(address);
     const { tonAmount: stakedAmount, position, isLiquid } = usePoolStakedBalance(pool);
     const { data: tonRate } = useRate(CryptoCurrency.TON);
@@ -346,12 +376,6 @@ export const DesktopStakingPoolDetailPage = ({
     const { fiatAmount } = useFormatFiat(tonRate, stakedAmount);
 
     const displayAmount = stakedAmount ? formatTokenDisplay(stakedAmount, 'TON') : '— TON';
-
-    const minStakeTON = pool ? shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0) : '—';
-
-    const apyStr = pool
-        ? t('staking_pool_detail', { apy: pool.apy.toFixed(2), minDeposit: minStakeTON })
-        : '';
 
     const { pendingWithdraw = 0, pendingDeposit = 0, readyWithdraw = 0 } = position ?? {};
 
@@ -371,7 +395,7 @@ export const DesktopStakingPoolDetailPage = ({
     const withdrawDateStr = useMemo(() => {
         if (pendingWithdraw <= 0 || !formattedCycleDate) return '';
         const amount = formatter.formatDisplay(shiftedDecimals(pendingWithdraw));
-        return t('staking_pool_withdraw_date', { amount, date: formattedCycleDate });
+        return t('staking_portfolio_pending_withdraw', { amount });
     }, [pendingWithdraw, formattedCycleDate, t]);
 
     const liquidDesc = useMemo(() => {
@@ -400,7 +424,7 @@ export const DesktopStakingPoolDetailPage = ({
     if (isPoolError) {
         return (
             <StakingPageWrapper mobileContentPaddingTop>
-                <DesktopViewHeader backButton borderBottom>
+                <DesktopViewHeader backButton={stakingPositionsCount > 1} borderBottom>
                     <DesktopViewHeaderContent title="" />
                 </DesktopViewHeader>
                 <ContentArea>
@@ -414,7 +438,7 @@ export const DesktopStakingPoolDetailPage = ({
 
     return (
         <StakingPageWrapper mobileContentPaddingTop>
-            <DesktopViewHeader backButton borderBottom>
+            <DesktopViewHeader backButton={stakingPositionsCount > 1} borderBottom>
                 <DesktopViewHeaderContent title={pool?.name ?? ''} />
             </DesktopViewHeader>
             <ContentArea>
@@ -427,31 +451,28 @@ export const DesktopStakingPoolDetailPage = ({
                         {fiatAmount && <FiatText>{fiatAmount}</FiatText>}
                     </AmountSection>
                 </HeaderSection>
-                <ButtonsRow>
-                    <ActionButton onClick={() => navigateToPool(StakingRoute.stake)}>
-                        <ActionSign>+</ActionSign>
-                        {t('staking_action_stake')}
-                    </ActionButton>
-                    <ActionButton onClick={() => navigateToPool(StakingRoute.unstake)}>
-                        <ActionSign>&mdash;</ActionSign>
-                        {t('staking_action_unstake')}
-                    </ActionButton>
-                    {canClaim && (
-                        <ActionButton onClick={handleClaim} disabled={claimDisabled}>
-                            {t('staking_claim')}
+                <ActionsRow>
+                    <ButtonsRow>
+                        <ActionButton onClick={() => navigateToPool(StakingRoute.stake)}>
+                            <ActionSign>+</ActionSign>
+                            {t('staking_action_stake')}
                         </ActionButton>
-                    )}
-                </ButtonsRow>
-                <Divider />
-                <InfoRow>
-                    <InfoLeft>{apyStr}</InfoLeft>
+                        <ActionButton onClick={() => navigateToPool(StakingRoute.unstake)}>
+                            <ActionSign>&mdash;</ActionSign>
+                            {t('staking_action_unstake')}
+                        </ActionButton>
+                        {canClaim && (
+                            <ActionButton onClick={handleClaim} disabled={claimDisabled}>
+                                {t('staking_claim')}
+                            </ActionButton>
+                        )}
+                    </ButtonsRow>
                     {withdrawDateStr && (
-                        <InfoRight>
-                            {withdrawDateStr}
-                            {countdown && ` (${countdown})`}
-                        </InfoRight>
+                        <WithdrawInfo>
+                            <Body3Secondary>{withdrawDateStr}</Body3Secondary>
+                        </WithdrawInfo>
                     )}
-                </InfoRow>
+                </ActionsRow>
                 <PendingOperationsSection
                     pendingDeposit={pendingDeposit}
                     readyWithdraw={readyWithdraw}

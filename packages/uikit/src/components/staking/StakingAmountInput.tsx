@@ -31,12 +31,10 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
     const { fiatAmount } = useFormatFiat(rate, amountBN);
 
     const balanceTON = useMemo(() => {
-        if (!balance) return undefined;
-        return balance.relativeAmount;
+        return balance?.relativeAmount ?? new BigNumber(0);
     }, [balance]);
 
     const maxAmount = useMemo(() => {
-        if (!balanceTON) return undefined;
         const max = balanceTON.minus(GAS_RESERVE_TON);
         return max.gt(0) ? max : new BigNumber(0);
     }, [balanceTON]);
@@ -48,13 +46,13 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
 
     const onMaxClick = () => {
         if (maxAmount !== undefined) {
-            onChange(maxAmount.toFixed(9, BigNumber.ROUND_DOWN));
+            onChange(maxAmount.decimalPlaces(9, BigNumber.ROUND_DOWN).toFixed());
         }
     };
 
     const fiatDisplay = useMemo(() => {
         const formatted = fiatAmount ? fiatAmount : formatFiatCurrency(fiat, 0);
-        return `≈${formatted}`;
+        return `≈ ${formatted}`;
     }, [fiatAmount, fiat]);
 
     const balanceDisplay = useMemo(() => {
@@ -67,18 +65,19 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
             amount={amount}
             onChange={onChange}
             fiatDisplay={fiatDisplay}
-            isErrored={isInsufficient}
             footer={
-                isInsufficient ? (
-                    <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
-                ) : (
-                    <>
+                <>
+                    {isInsufficient ? (
+                        <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                    ) : (
                         <BalanceLabel>
                             {t('staking_balance_label')}: {balanceDisplay}
                         </BalanceLabel>
+                    )}
+                    {!balanceTON.isZero() && (
                         <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
-                    </>
-                )
+                    )}
+                </>
             }
         />
     );

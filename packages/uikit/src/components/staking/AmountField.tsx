@@ -1,6 +1,11 @@
-import { FC, ReactNode } from 'react';
+import { ChangeEvent, FC, ReactNode, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { Body2, Body2Class, Body3 } from '../Text';
+import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
+import { replaceTypedDecimalSeparator, seeIfValueValid } from '../transfer/amountView/AmountViewUI';
+
+const STAKING_AMOUNT_DECIMALS = 9;
 
 const FieldContainer = styled.div`
     flex: 1;
@@ -35,12 +40,12 @@ const InputLeft = styled.div`
     overflow: hidden;
 `;
 
-const AmountInputStyled = styled.input<{ $isErrored: boolean; $width: number }>`
+const AmountInputStyled = styled.input<{ $width: number }>`
     border: none;
     background: none;
     text-align: left;
     outline: none;
-    color: ${p => (p.$isErrored ? p.theme.accentRed : p.theme.textPrimary)};
+    color: ${p => p.theme.textPrimary};
     font-family: inherit;
     min-width: 1ch;
     width: ${p => p.$width}ch;
@@ -100,11 +105,64 @@ export const MaxButton = styled.button`
     line-height: 16px;
 `;
 
+function amountPropToDisplay(amount: string): string {
+    if (!amount) return '';
+    return amount.replace('.', getDecimalSeparator());
+}
+
+function displayToAmountProp(display: string): string {
+    if (!display) return '';
+    const decSep = getDecimalSeparator();
+    const normalized = removeGroupSeparator(display);
+    const [whole, fraction] = normalized.split(decSep);
+    if (fraction === undefined) return whole;
+    return fraction.length ? `${whole}.${fraction}` : `${whole}.`;
+}
+
+function sanitizeDecimalInput(raw: string): string {
+    let s = replaceTypedDecimalSeparator(raw);
+    const decSep = getDecimalSeparator();
+    const altSep = getNotDecimalSeparator();
+    const trimmed = s.trim();
+    if (trimmed.length === 1 && (trimmed === decSep || trimmed === altSep)) {
+        return decSep;
+    }
+
+    s = removeGroupSeparator(s);
+    let out = '';
+    let hasSep = false;
+    for (const ch of s) {
+        if (ch >= '0' && ch <= '9') {
+            out += ch;
+        } else if ((ch === decSep || ch === altSep) && !hasSep) {
+            out += decSep;
+            hasSep = true;
+        }
+    }
+    return out;
+}
+
+function normalizeIntegerLeadingZeros(display: string, decSep: string): string {
+    const parts = display.split(decSep);
+    const whole = parts[0] ?? '';
+    const fraction = parts.length > 1 ? parts.slice(1).join(decSep) : undefined;
+
+    let newWhole: string;
+    if (fraction !== undefined) {
+        const stripped = whole.replace(/^0+/, '');
+        newWhole = stripped === '' ? '0' : stripped;
+    } else {
+        const stripped = whole.replace(/^0+/, '');
+        newWhole = stripped === '' ? '0' : stripped;
+    }
+
+    return fraction !== undefined ? `${newWhole}${decSep}${fraction}` : newWhole;
+}
+
 export interface AmountFieldProps {
     amount: string;
     onChange: (value: string) => void;
     fiatDisplay: string;
-    isErrored?: boolean;
     disabled?: boolean;
     footer: ReactNode;
 }
@@ -113,29 +171,75 @@ export const AmountField: FC<AmountFieldProps> = ({
     amount,
     onChange,
     fiatDisplay,
-    isErrored,
     disabled,
     footer
-}) => (
-    <FieldContainer>
-        <InputBorderedBox $disabled={disabled}>
-            <InputLeft>
-                <AmountInputStyled
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={amount}
-                    onChange={e => onChange(e.target.value)}
-                    placeholder="0"
-                    inputMode="decimal"
-                    $isErrored={!!isErrored}
-                    $width={Math.max(1, (amount || '0').length)}
-                    disabled={disabled}
-                />
-                <TokenLabel>TON</TokenLabel>
-            </InputLeft>
-            <FiatAmount>{fiatDisplay}</FiatAmount>
-        </InputBorderedBox>
-        <FieldFooter>{footer}</FieldFooter>
-    </FieldContainer>
-);
+}) => {
+    const [inputValue, setInputValue] = useState(() => amountPropToDisplay(amount));
+    const prevDisplayRef = useRef<string>(amountPropToDisplay(amount));
+
+    useEffect(() => {
+        const d = amountPropToDisplay(amount);
+        setInputValue(d);
+        prevDisplayRef.current = d;
+    }, [amount]);
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value;
+        const decSep = getDecimalSeparator();
+        let processed = sanitizeDecimalInput(raw);
+
+        if (processed === '') {
+            prevDisplayRef.current = '';
+            setInputValue('');
+            onChange('');
+            return;
+        }
+
+        if (processed === decSep) {
+            processed = `0${decSep}`;
+        }
+
+        if (processed === '0') {
+            const prev = prevDisplayRef.current;
+            if (prev === '') {
+                processed = `0${decSep}`;
+            } else if (prev === `0${decSep}` && raw.length < prev.length) {
+                processed = '0';
+            }
+        }
+
+        processed = normalizeIntegerLeadingZeros(processed, decSep);
+
+        if (!seeIfValueValid(processed, STAKING_AMOUNT_DECIMALS)) {
+            return;
+        }
+
+        prevDisplayRef.current = processed;
+        setInputValue(processed);
+        onChange(displayToAmountProp(processed));
+    };
+
+    const widthChars = Math.max(1, (inputValue || '0').length);
+
+    return (
+        <FieldContainer>
+            <InputBorderedBox $disabled={disabled}>
+                <InputLeft>
+                    <AmountInputStyled
+                        type="text"
+                        inputMode="decimal"
+                        autoComplete="off"
+                        value={inputValue}
+                        onChange={handleChange}
+                        placeholder="0"
+                        $width={widthChars}
+                        disabled={disabled}
+                    />
+                    <TokenLabel>TON</TokenLabel>
+                </InputLeft>
+                <FiatAmount>{fiatDisplay}</FiatAmount>
+            </InputBorderedBox>
+            <FieldFooter>{footer}</FieldFooter>
+        </FieldContainer>
+    );
+};

@@ -222,5 +222,9 @@ export const usePortfolioBalances = () => {
 
 export const usePortfolioBalancesForList = () => {
     const portfolio = usePortfolioBalances();
-    return { ...portfolio, data: portfolio.data?.balancesForList };
+    return {
+        ...portfolio,
+        data: portfolio.data?.balancesForList,
+        stakingPositions: portfolio.data?.stakingPositions ?? []
+    };
 };

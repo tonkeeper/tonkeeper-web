@@ -39,6 +39,7 @@ import { WalletAsideMenuBrowserTabs } from './WalletAsideMenuBrowserTabs';
 import { useHideActiveBrowserTab, useIsBrowserOpened } from '../../../state/dapp-browser';
 import { IfFeatureEnabled } from '../../shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../../state/tonendpoint';
+import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
 
 const WalletAsideContainer = styled.div`
     overflow: auto;
@@ -224,10 +225,11 @@ const StakingItem = () => {
     const isTestnet = useActiveTonNetwork() === Network.TESTNET;
     const hideBrowser = useHideBrowserAfterNavigation();
     const isBrowserOpened = useIsBrowserOpened();
+    const isDesktopPro = useIsFullWidthMode();
 
     return (
         <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
-            {!isReadOnly && !isTestnet && (
+            {!isReadOnly && !isTestnet && isDesktopPro && (
                 <NavLink to={AppRoute.staking} disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>

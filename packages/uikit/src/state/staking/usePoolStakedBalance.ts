@@ -31,9 +31,7 @@ export const usePoolStakedBalance = (pool: PoolInfo | undefined): PoolStakedBala
     );
 
     const { data: tonRate } = useRate(CryptoCurrency.TON);
-    const { data: jettonRate } = useRate(
-        pool?.liquidJettonMaster ?? CryptoCurrency.TON
-    );
+    const { data: jettonRate } = useRate(pool?.liquidJettonMaster ?? CryptoCurrency.TON);
 
     const tonPrice = useMemo(() => {
         return tonRate?.prices !== undefined ? new BigNumber(tonRate.prices) : undefined;
@@ -48,10 +46,7 @@ export const usePoolStakedBalance = (pool: PoolInfo | undefined): PoolStakedBala
         return {
             weiAmount: new BigNumber(jettonBalance.balance),
             relativeAmount,
-            price:
-                jettonRate?.prices !== undefined
-                    ? new BigNumber(jettonRate.prices)
-                    : undefined
+            price: jettonRate?.prices !== undefined ? new BigNumber(jettonRate.prices) : undefined
         };
     }, [isLiquid, jettonBalance, jettonRate?.prices]);
 

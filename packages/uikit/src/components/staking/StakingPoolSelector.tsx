@@ -1,13 +1,14 @@
 import BigNumber from 'bignumber.js';
 import { FC } from 'react';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { useTranslation } from '../../hooks/translation';
 import { Body2, Body3 } from '../Text';
 import { StakingPoolIcon } from './StakingPoolIcon';
+import { getStakingPoolProviderLinkUrl } from '../../state/staking/poolBranding';
 
-const PoolCard = styled.div`
+const PoolCard = styled.div<{ onClick?: () => void }>`
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p =>
         p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
@@ -17,6 +18,16 @@ const PoolCard = styled.div`
     gap: 12px;
     flex: 1;
     min-width: 0;
+
+    ${p =>
+        p.onClick &&
+        css`
+            cursor: pointer;
+
+            &:hover {
+                background: ${p.theme.backgroundContentTint};
+            }
+        `};
 `;
 
 const PoolTextWrapper = styled.div`
@@ -50,9 +61,16 @@ export const StakingPoolSelector: FC<StakingPoolSelectorProps> = ({ pool }) => {
 
     const apyStr = pool.apy.toFixed(2);
     const minStakeTON = shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0);
+    const providerLinkUrl = getStakingPoolProviderLinkUrl(pool);
 
     return (
-        <PoolCard>
+        <PoolCard
+            onClick={() => {
+                if (providerLinkUrl) {
+                    window.open(providerLinkUrl, '_blank');
+                }
+            }}
+        >
             <StakingPoolIcon pool={pool} size={24} variant="provider" />
             <PoolTextWrapper>
                 <PoolName>{pool.name}</PoolName>

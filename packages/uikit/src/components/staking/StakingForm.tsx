@@ -8,12 +8,14 @@ import { useAtom } from '../../libs/useAtom';
 import { useEncodeStakingDeposit } from '../../state/staking/useEncodeStaking';
 import { stakingSelectedPool$ } from '../../state/staking/stakingAtoms';
 import { useStakingPools } from '../../state/staking/useStakingPools';
-import { TonTransactionNotification } from '../connect/TonTransactionNotification';
+import { StakingTransactionModal } from './StakingTransactionModal';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { StakingAmountInput } from './StakingAmountInput';
 import { StakingButton } from './StakingButton';
 import { StakingEarningsInfo } from './StakingEarningsInfo';
 import { StakingPoolSelector } from './StakingPoolSelector';
+import { Body3 } from '../Text';
+import { useTranslation } from '../../hooks/translation';
 
 const MainFormWrapper = styled.div`
     display: flex;
@@ -27,6 +29,11 @@ const TopRow = styled.div`
     align-items: flex-start;
 `;
 
+const Notice = styled(Body3)`
+    color: ${p => p.theme.textTertiary};
+    max-width: 520px;
+`;
+
 export const StakingForm: FC<{ className?: string }> = ({ className }) => {
     const [amount, setAmount] = useState('');
     const [modalParams, setModalParams] = useState<TonConnectTransactionPayload | null>(null);
@@ -34,6 +41,7 @@ export const StakingForm: FC<{ className?: string }> = ({ className }) => {
     const { data: pools, isError: poolsError } = useStakingPools();
     const { isLoading, isError: encodeError, mutateAsync: encode } = useEncodeStakingDeposit();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const pool = selectedPool ?? pools?.[0];
 
@@ -72,9 +80,12 @@ export const StakingForm: FC<{ className?: string }> = ({ className }) => {
                 poolError={poolsError}
                 encodeError={encodeError}
             />
-            <TonTransactionNotification
+            <Notice>{t('staking_tonstakers_notice')}</Notice>
+            <StakingTransactionModal
                 handleClose={onCloseConfirmModal}
                 params={modalParams}
+                pool={pool}
+                amount={amount}
                 waitInvalidation
             />
         </MainFormWrapper>
