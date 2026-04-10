@@ -43,8 +43,8 @@ const EarningLabel = styled(Body2)`
     font-weight: 400;
 `;
 
-const EarningValue = styled(Body2)`
-    color: ${p => p.theme.textPrimary};
+const EarningValue = styled(Body2)<{ $accent?: boolean }>`
+    color: ${p => (p.$accent ? p.theme.accentGreen : p.theme.textPrimary)};
     font-weight: 500;
 `;
 
@@ -85,14 +85,20 @@ export const StakingEarningsInfo: FC<StakingEarningsInfoProps> = ({ pool, amount
         <EarningsWrapper>
             <SectionTitle>{t('staking_earnings_section_title')}</SectionTitle>
             <EarningsCard>
+                {currentEarnings.gt(0) && (
+                    <>
+                        <RowDivider />
+                        <EarningRow>
+                            <EarningLabel>{t('staking_rewards_current')}</EarningLabel>
+                            <EarningValue>{formatValue(currentEarnings)}</EarningValue>{' '}
+                        </EarningRow>
+                    </>
+                )}
                 <EarningRow>
                     <EarningLabel>{t('staking_rewards_after_stake')}</EarningLabel>
-                    <EarningValue>{formatValue(afterStakeEarnings)}</EarningValue>
-                </EarningRow>
-                <RowDivider />
-                <EarningRow>
-                    <EarningLabel>{t('staking_rewards_current')}</EarningLabel>
-                    <EarningValue>{formatValue(currentEarnings)}</EarningValue>
+                    {inputAmountBN.gt(0) && (
+                        <EarningValue $accent>{formatValue(afterStakeEarnings)}</EarningValue>
+                    )}
                 </EarningRow>
             </EarningsCard>
         </EarningsWrapper>

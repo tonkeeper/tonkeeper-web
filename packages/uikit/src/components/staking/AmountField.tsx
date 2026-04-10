@@ -35,12 +35,12 @@ const InputLeft = styled.div`
     overflow: hidden;
 `;
 
-const AmountInputStyled = styled.input<{ $isErrored: boolean; $width: number }>`
+const AmountInputStyled = styled.input<{ $width: number }>`
     border: none;
     background: none;
     text-align: left;
     outline: none;
-    color: ${p => (p.$isErrored ? p.theme.accentRed : p.theme.textPrimary)};
+    color: ${p => p.theme.textPrimary};
     font-family: inherit;
     min-width: 1ch;
     width: ${p => p.$width}ch;
@@ -104,7 +104,6 @@ export interface AmountFieldProps {
     amount: string;
     onChange: (value: string) => void;
     fiatDisplay: string;
-    isErrored?: boolean;
     disabled?: boolean;
     footer: ReactNode;
 }
@@ -113,7 +112,6 @@ export const AmountField: FC<AmountFieldProps> = ({
     amount,
     onChange,
     fiatDisplay,
-    isErrored,
     disabled,
     footer
 }) => (
@@ -128,7 +126,6 @@ export const AmountField: FC<AmountFieldProps> = ({
                     onChange={e => onChange(e.target.value)}
                     placeholder="0"
                     inputMode="decimal"
-                    $isErrored={!!isErrored}
                     $width={Math.max(1, (amount || '0').length)}
                     disabled={disabled}
                 />

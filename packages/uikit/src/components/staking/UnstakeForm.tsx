@@ -14,8 +14,8 @@ import { useEncodeStakingUnstake } from '../../state/staking/useEncodeStaking';
 import { useStakingCycleCountdown } from '../../state/staking/useStakingCycleCountdown';
 import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
 import { convertTonToPoolTokenNano } from '../../state/staking/poolStakeState';
-import { TonTransactionNotification } from '../connect/TonTransactionNotification';
 import { Body3 } from '../Text';
+import { StakingTransactionModal } from './StakingTransactionModal';
 import { UnstakeAmountInput } from './UnstakeAmountInput';
 import { UnstakeButton } from './UnstakeButton';
 
@@ -132,16 +132,11 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
                     onMaxClick={onMaxClick}
                     pool={pool}
                 />
-                {!isLiquid && countdown && (
+                {isLiquid && countdown && (
                     <CycleInfoCard>
                         <CycleInfoText>
                             {t('staking_unstake_cycle_info', { value: countdown })}
                         </CycleInfoText>
-                    </CycleInfoCard>
-                )}
-                {isLiquid && (
-                    <CycleInfoCard>
-                        <CycleInfoText>{t('staking_next_cycle_desc_liquid')}</CycleInfoText>
                     </CycleInfoCard>
                 )}
             </TopRow>
@@ -152,9 +147,12 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
                 pool={pool}
                 encodeError={encodeError}
             />
-            <TonTransactionNotification
+            <StakingTransactionModal
                 handleClose={onCloseConfirmModal}
                 params={modalParams}
+                pool={pool}
+                amount={amount}
+                variant="unstake"
                 waitInvalidation
             />
         </MainFormWrapper>

@@ -8,7 +8,6 @@ import { SubHeader } from '../../components/SubHeader';
 import { HomeActions } from '../../components/home/TonActions';
 import { CoinInfo } from '../../components/jettons/Info';
 import { useFormatBalance } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useWalletAccountInfo } from '../../state/wallet';
 import { MobileAssetHistory } from './Jetton';
@@ -31,7 +30,6 @@ const ItemHeader: FC<{ extra: ExtraCurrency }> = ({ extra }) => {
 };
 
 export const ExtraCurrencyPage: FC<{ name: string }> = ({ name }) => {
-    const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
     const { data: info } = useWalletAccountInfo();

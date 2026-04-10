@@ -18,7 +18,10 @@ import {
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { formatter } from '../../hooks/balance';
 import { useJettonList } from '../../state/jetton';
+import { isSignificantPendingWithdraw } from '../../state/staking/pendingWithdraw';
+import { useStakingPosition } from '../../state/staking/useStakingPosition';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -112,8 +115,23 @@ export const JettonAsset = forwardRef<
 
     const balance = tokenBalance.assetAmount;
     const { data: jettonBalances } = useJettonList();
+    const isFullWidth = useIsFullWidthMode();
 
     const stakingPool = tokenBalance.stakingPool;
+    const { data: stakingPosition } = useStakingPosition(stakingPool?.address);
+
+    const pendingWithdrawLine = useMemo(() => {
+        if (!isFullWidth || !stakingPool || !stakingPosition) {
+            return undefined;
+        }
+        const pending = stakingPosition.pendingWithdraw ?? 0;
+        if (!isSignificantPendingWithdraw(pending)) {
+            return undefined;
+        }
+        const pendingTon = shiftedDecimals(pending);
+        const amount = formatter.formatDisplay(pendingTon);
+        return t('staking_portfolio_pending_withdraw', { amount });
+    }, [isFullWidth, stakingPool, stakingPosition, t]);
 
     const rate = useMemo(() => {
         const jetton = jettonBalances?.balances.find(j =>
@@ -125,7 +143,6 @@ export const JettonAsset = forwardRef<
     const { fiatPrice, fiatAmount } = useFormatFiat(rate, balance.relativeAmount);
 
     const verification = isTonAsset(balance.asset) ? balance.asset.verification : undefined;
-    const isFullWidth = useIsFullWidthMode();
 
     return (
         <ListItem
@@ -162,6 +179,7 @@ export const JettonAsset = forwardRef<
                     symbol={stakingPool ? undefined : balance.asset.symbol}
                     balance={balance.stringRelativeAmount}
                     secondary={stakingPool ? stakingPool.name : fiatPrice}
+                    tertiary={pendingWithdrawLine}
                     fiatAmount={fiatAmount}
                     rate={stakingPool ? undefined : rate}
                 />

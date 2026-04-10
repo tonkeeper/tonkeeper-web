@@ -8,7 +8,7 @@ import { useAtom } from '../../libs/useAtom';
 import { useEncodeStakingDeposit } from '../../state/staking/useEncodeStaking';
 import { stakingSelectedPool$ } from '../../state/staking/stakingAtoms';
 import { useStakingPools } from '../../state/staking/useStakingPools';
-import { TonTransactionNotification } from '../connect/TonTransactionNotification';
+import { StakingTransactionModal } from './StakingTransactionModal';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { StakingAmountInput } from './StakingAmountInput';
 import { StakingButton } from './StakingButton';
@@ -72,9 +72,11 @@ export const StakingForm: FC<{ className?: string }> = ({ className }) => {
                 poolError={poolsError}
                 encodeError={encodeError}
             />
-            <TonTransactionNotification
+            <StakingTransactionModal
                 handleClose={onCloseConfirmModal}
                 params={modalParams}
+                pool={pool}
+                amount={amount}
                 waitInvalidation
             />
         </MainFormWrapper>

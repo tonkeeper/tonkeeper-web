@@ -2,6 +2,8 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { AccountStakingInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -18,6 +20,9 @@ import { useTranslation } from '../../hooks/translation';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
+import { isSignificantPendingWithdraw } from '../../state/staking/pendingWithdraw';
+import { useStakingPositions } from '../../state/staking/useStakingPosition';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
@@ -115,8 +120,40 @@ const DividerInner = styled(Divider)`
     margin: 0;
 `;
 
+const PENDING_STAKING_POOL_ROW_HEIGHT_PX = 93;
+
+const hasPendingWithdraw = (
+    token: PortfolioTokenBalance,
+    positions: AccountStakingInfo[] | undefined,
+    isFullWidth: boolean
+) => {
+    if (!isFullWidth || !token.stakingPool || !positions?.length) {
+        return false;
+    }
+    const position = positions.find(p => eqAddresses(p.pool, token.stakingPool!.address));
+    if (!position) {
+        return false;
+    }
+    const pending = position.pendingWithdraw ?? 0;
+    return isSignificantPendingWithdraw(pending);
+};
+
+const getPortfolioBalanceRowHeight = (
+    balance: PortfolioBalance | undefined,
+    defaultSize: number,
+    positions: AccountStakingInfo[] | undefined,
+    isFullWidth: boolean
+) => {
+    if (balance?.kind === 'token' && hasPendingWithdraw(balance, positions, isFullWidth)) {
+        return PENDING_STAKING_POOL_ROW_HEIGHT_PX;
+    }
+    return defaultSize;
+};
+
 const DesktopTokensPayload = () => {
     const { data: balances } = usePortfolioBalancesForList();
+    const { data: stakingPositions } = useStakingPositions();
+    const isFullWidth = useIsFullWidthMode();
     const [tonTokenBalance, listBalances] = useMemo(() => {
         return [
             balances?.find(
@@ -156,10 +193,35 @@ const DesktopTokensPayload = () => {
 
     const virtualScrollPaddingBase = itemSize;
 
+    const listOffsetBeforeIndex = useCallback(
+        (index: number) => {
+            if (!listBalances) {
+                return 0;
+            }
+            let offset = 0;
+            for (let i = 0; i < index; i += 1) {
+                offset += getPortfolioBalanceRowHeight(
+                    listBalances[i],
+                    itemSize,
+                    stakingPositions,
+                    isFullWidth
+                );
+            }
+            return offset;
+        },
+        [listBalances, itemSize, stakingPositions, isFullWidth]
+    );
+
     const rowVirtualizer = useVirtualizer({
         count: listBalances?.length ?? 0,
         getScrollElement: () => containerRef.current,
-        estimateSize: () => itemSize,
+        estimateSize: index =>
+            getPortfolioBalanceRowHeight(
+                listBalances?.[index],
+                itemSize,
+                stakingPositions,
+                isFullWidth
+            ),
         getItemKey: index => getPortfolioBalanceId(listBalances![index]),
         paddingStart:
             canShowChart && showChart
@@ -189,19 +251,19 @@ const DesktopTokensPayload = () => {
             });
             if (index !== -1) {
                 rowVirtualizer.scrollToOffset(
-                    (tonRef.current?.offsetTop ?? 0) + (index + 1) * itemSize
+                    (tonRef.current?.offsetTop ?? 0) + listOffsetBeforeIndex(index)
                 );
             }
         },
-        [listBalances, rowVirtualizer, rowVirtualizer.elementsCache, env]
+        [listBalances, listOffsetBeforeIndex, rowVirtualizer, rowVirtualizer.elementsCache, env]
     );
 
     /**
-     * Cover Ionic virtualisation bug
+     * Cover Ionic virtualisation bug; remeasure when list or pending-withdraw row heights change
      */
     useEffect(() => {
         rowVirtualizer.measure();
-    }, []);
+    }, [listBalances, stakingPositions, isFullWidth, rowVirtualizer]);
 
     return (
         <DesktopViewPageLayout ref={containerRef}>

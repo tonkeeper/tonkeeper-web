@@ -67,18 +67,17 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
             amount={amount}
             onChange={onChange}
             fiatDisplay={fiatDisplay}
-            isErrored={isInsufficient}
             footer={
-                isInsufficient ? (
-                    <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
-                ) : (
-                    <>
+                <>
+                    {isInsufficient ? (
+                        <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                    ) : (
                         <BalanceLabel>
                             {t('staking_balance_label')}: {balanceDisplay}
                         </BalanceLabel>
-                        <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
-                    </>
-                )
+                    )}
+                    <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
+                </>
             }
         />
     );
