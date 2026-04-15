@@ -1632,5 +1632,20 @@
     "wallet_send": "পাঠান",
     "wallet_swap": "বদলান",
     "wallet_title": "ওয়ালেট",
-    "yesterday": "গতকাল"
+    "yesterday": "গতকাল",
+    "staking_pool_liquid_desc": "আপনি যখন Tonstakers পুলে TON স্টেক করেন, আপনি tsTON নামের একটি টোকেন পান যা পুলে আপনার অংশের প্রতিনিধিত্ব করে। পুল লাভ জমা হলে, আপনার tsTON আরও বেশি TON নির্দেশ করে।",
+    "staking_pool_withdraw_date": "{date}-এ {amount} TON উত্তোলন করা হবে",
+    "staking_portfolio_pending_withdraw": "চক্র শেষ হলে {amount} TON উত্তোলন করা হবে",
+    "staking_portfolio_pending_withdraw_countdown": "{value}-এ {amount} TON উত্তোলন করা হবে",
+    "staking_confirm_modal_provider": "প্রদানকারী",
+    "staking_confirm_modal_amount": "পরিমাণ",
+    "staking_confirm_modal_apy": "APY",
+    "staking_confirm_modal_wallet": "ওয়ালেট",
+    "staking_unstake_cycle_info": "বৈধতা চক্র শেষ হওয়ার {value} পরে অনুরোধ প্রক্রিয়া করা হবে",
+    "staking_tonstakers_notice": "স্টেকিং তৃতীয় পক্ষের স্মার্ট চুক্তির উপর ভিত্তি করে। Tonkeeper স্টেকিং অভিজ্ঞতার জন্য দায়ী নয়।",
+    "staking_claim": "দাবি করুন",
+    "staking_details_pool_address_label": "পুল ঠিকানা",
+    "staking_pending_deposit": "{amount} TON স্টেকিংয়ের অপেক্ষায়",
+    "staking_pools_min_deposit": "সর্বনিম্ন জমা {minDeposit} TON",
+    "staking_tf_full_withdrawal_only": "শুধুমাত্র সম্পূর্ণ উত্তোলন উপলব্ধ"
 }

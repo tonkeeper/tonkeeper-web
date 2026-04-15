@@ -1672,5 +1672,20 @@
     "wallet_send": "发送",
     "wallet_swap": "交换",
     "wallet_title": "钱包",
-    "yesterday": "昨天"
+    "yesterday": "昨天",
+    "staking_pool_liquid_desc": "在 Tonstakers 池中质押 TON 时，您会收到名为 tsTON 的代币，代表您在池中的份额。随着池子累积收益，您的 tsTON 对应更多 TON。",
+    "staking_pool_withdraw_date": "{amount} TON 将于 {date} 提取",
+    "staking_portfolio_pending_withdraw": "周期结束后将提取 {amount} TON",
+    "staking_portfolio_pending_withdraw_countdown": "{value} 内将提取 {amount} TON",
+    "staking_confirm_modal_provider": "提供商",
+    "staking_confirm_modal_amount": "金额",
+    "staking_confirm_modal_apy": "APY",
+    "staking_confirm_modal_wallet": "钱包",
+    "staking_unstake_cycle_info": "验证周期结束后 {value} 内将处理请求",
+    "staking_tonstakers_notice": "质押基于第三方智能合约。Tonkeeper 不对质押体验负责。",
+    "staking_claim": "领取",
+    "staking_details_pool_address_label": "池地址",
+    "staking_pending_deposit": "{amount} TON 待质押",
+    "staking_pools_min_deposit": "最低存入 {minDeposit} TON",
+    "staking_tf_full_withdrawal_only": "仅支持全额提取"
 }

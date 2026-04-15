@@ -1674,5 +1674,20 @@
     "wallet_send": "Gönder",
     "wallet_swap": "Takas",
     "wallet_title": "Cüzdan",
-    "yesterday": "Dün"
+    "yesterday": "Dün",
+    "staking_pool_liquid_desc": "TON’u bir Tonstakers havuzunda stake ettiğinizde, havuzdaki payınızı temsil eden tsTON adlı bir jeton alırsınız. Havuz kar biriktirdikçe tsTON’unuz daha fazla TON’u temsil eder.",
+    "staking_pool_withdraw_date": "{amount} TON {date} tarihinde çekilecek",
+    "staking_portfolio_pending_withdraw": "{amount} TON döngü sonunda çekilecek",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} TON {value} içinde çekilecek",
+    "staking_confirm_modal_provider": "Sağlayıcı",
+    "staking_confirm_modal_amount": "Tutar",
+    "staking_confirm_modal_apy": "APY",
+    "staking_confirm_modal_wallet": "Cüzdan",
+    "staking_unstake_cycle_info": "İstek, doğrulama döngüsü sona erdikten sonra {value} içinde işlenecek",
+    "staking_tonstakers_notice": "Stake, üçüncü taraf akıllı sözleşmelere dayanır. Tonkeeper stake deneyiminden sorumlu değildir.",
+    "staking_claim": "Talep et",
+    "staking_details_pool_address_label": "Havuz adresi",
+    "staking_pending_deposit": "{amount} TON stake bekliyor",
+    "staking_pools_min_deposit": "Min. yatırma {minDeposit} TON",
+    "staking_tf_full_withdrawal_only": "Yalnızca tam çekim mümkün"
 }

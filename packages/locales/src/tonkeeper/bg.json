@@ -1656,5 +1656,20 @@
     "wallet_send": "Изпращане",
     "wallet_swap": "Размяна",
     "wallet_title": "Портфейл",
-    "yesterday": "Вчера"
+    "yesterday": "Вчера",
+    "staking_pool_liquid_desc": "Когато заложите TON в пул на Tonstakers, получавате токен tsTON, който представлява вашия дял в пула. Когато пулът натрупва печалби, вашият tsTON представлява по-голямо количество TON.",
+    "staking_pool_withdraw_date": "{amount} TON ще бъдат изтеглени на {date}",
+    "staking_portfolio_pending_withdraw": "{amount} TON ще бъдат изтеглени след края на цикъла",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} TON ще бъдат изтеглени след {value}",
+    "staking_confirm_modal_provider": "Доставчик",
+    "staking_confirm_modal_amount": "Сума",
+    "staking_confirm_modal_apy": "APY",
+    "staking_confirm_modal_wallet": "Портфейл",
+    "staking_unstake_cycle_info": "Заявката ще бъде обработена след края на цикъла на валидация след {value}",
+    "staking_tonstakers_notice": "Стейкингът се основава на смарт договори на трети страни. Tonkeeper не носи отговорност за стабилността и резултата.",
+    "staking_claim": "Събери",
+    "staking_details_pool_address_label": "Адрес на пула",
+    "staking_pending_deposit": "{amount} TON чакат залагане",
+    "staking_pools_min_deposit": "Мин. депозит {minDeposit} TON",
+    "staking_tf_full_withdrawal_only": "Налично е само пълно теглене"
 }

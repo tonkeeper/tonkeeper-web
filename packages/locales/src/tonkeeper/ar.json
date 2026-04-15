@@ -1631,5 +1631,20 @@
     "wallet_send": "إرسال",
     "wallet_swap": "تبادل",
     "wallet_title": "المحفظة",
-    "yesterday": "أمس"
+    "yesterday": "أمس",
+    "staking_pool_liquid_desc": "عند تخزين TON في مجموعة Tonstakers، تستلم رمزًا يُسمى tsTON يمثّل حصتك في المجموعة. مع تراكم أرباح المجموعة، يمثّل tsTON كمية أكبر من TON.",
+    "staking_pool_withdraw_date": "سيتم سحب {amount} TON في {date}",
+    "staking_portfolio_pending_withdraw": "سيتم سحب {amount} TON بعد انتهاء الدورة",
+    "staking_portfolio_pending_withdraw_countdown": "سيتم سحب {amount} TON خلال {value}",
+    "staking_confirm_modal_provider": "المزوّد",
+    "staking_confirm_modal_amount": "المبلغ",
+    "staking_confirm_modal_apy": "APY",
+    "staking_confirm_modal_wallet": "المحفظة",
+    "staking_unstake_cycle_info": "سيتم معالجة الطلب بعد انتهاء دورة التحقق خلال {value}",
+    "staking_tonstakers_notice": "يعتمد التخزين على عقود ذكية من أطراف ثالثة. Tonkeeper غير مسؤول عن تجربة التخزين.",
+    "staking_claim": "المطالبة",
+    "staking_details_pool_address_label": "عنوان المجموعة",
+    "staking_pending_deposit": "{amount} TON قيد التخزين",
+    "staking_pools_min_deposit": "الحد الأدنى للإيداع {minDeposit} TON",
+    "staking_tf_full_withdrawal_only": "السحب الكامل متاح فقط"
 }

@@ -968,5 +968,20 @@
     "wallet_send": "Invia",
     "wallet_swap": "Swap",
     "wallet_title": "Wallet",
-    "yesterday": "Ieri"
+    "yesterday": "Ieri",
+    "staking_pool_liquid_desc": "Quando metti in staking TON in un pool Tonstakers, ricevi un token chiamato tsTON che rappresenta la tua quota nel pool. Man mano che il pool accumula profitti, il tuo tsTON rappresenta una quantità maggiore di TON.",
+    "staking_pool_withdraw_date": "{amount} TON saranno prelevati il {date}",
+    "staking_portfolio_pending_withdraw": "{amount} TON saranno prelevati al termine del ciclo",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} TON saranno prelevati tra {value}",
+    "staking_confirm_modal_provider": "Fornitore",
+    "staking_confirm_modal_amount": "Importo",
+    "staking_confirm_modal_apy": "APY",
+    "staking_confirm_modal_wallet": "Portafoglio",
+    "staking_unstake_cycle_info": "La richiesta sarà elaborata dopo la fine del ciclo di validazione tra {value}",
+    "staking_tonstakers_notice": "Lo staking si basa su smart contract di terze parti. Tonkeeper non è responsabile dell’esperienza di staking.",
+    "staking_claim": "Riscatta",
+    "staking_details_pool_address_label": "Indirizzo del pool",
+    "staking_pending_deposit": "{amount} TON in attesa di stake",
+    "staking_pools_min_deposit": "Deposito min. {minDeposit} TON",
+    "staking_tf_full_withdrawal_only": "È disponibile solo il prelievo completo"
 }
