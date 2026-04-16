@@ -1,9 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { DashboardRow, DashboardRowNullable } from '@tonkeeper/core/dist/entries/dashboard';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { sortWalletsByVersion, TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
-import { useAppContext } from '../../hooks/appContext';
+import { IAppContext, useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { ClientColumns, useDashboardColumnsAsForm } from './useDashboardColumns';
@@ -11,6 +13,10 @@ import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useAccountsOrdered } from '../folders';
 import { seeIfMainnnetAccount, Account } from '@tonkeeper/core/dist/entries/account';
 import { useAppSdk } from '../../hooks/appSdk';
+import BigNumber from 'bignumber.js';
+import { fetchStakedFiatPerWallet } from '../asset';
+import { useRate } from '../rates';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
 
 const sortedAccountWallets = (a: Account) => {
     if (a.type === 'mnemonic' || a.type === 'ton-only') {
@@ -20,11 +26,69 @@ const sortedAccountWallets = (a: Account) => {
     return a.allTonWallets;
 };
 
+const TOTAL_BALANCE_COLUMN_ID = 'total_balance';
+
+async function applyStakingToDashboardTotalBalance(
+    rows: DashboardRow[],
+    columns: string[],
+    accountsFormatted: string[],
+    mainnetWallets: ReadonlyArray<TonContract & { account: Account }>,
+    appContext: IAppContext,
+    tonRate: { prices?: number } | undefined,
+    isStakingEnabled: boolean
+): Promise<DashboardRow[]> {
+    const colIndex = columns.indexOf(TOTAL_BALANCE_COLUMN_ID);
+    if (colIndex === -1 || !isStakingEnabled || tonRate?.prices === undefined) {
+        return rows;
+    }
+
+    const rawAddresses = accountsFormatted.map(walletAddress => {
+        const wallet = mainnetWallets.find(w =>
+            Address.parse(w.rawAddress).equals(Address.parse(walletAddress))
+        );
+        return wallet?.rawAddress;
+    });
+
+    if (rawAddresses.some(a => !a)) {
+        return rows;
+    }
+
+    const stakedPerWallet = await fetchStakedFiatPerWallet(
+        appContext,
+        Network.MAINNET,
+        rawAddresses as string[],
+        new BigNumber(tonRate.prices)
+    );
+
+    return rows.map((row, rowIndex) => {
+        const add = stakedPerWallet[rowIndex];
+        if (!add || add.isZero()) {
+            return row;
+        }
+        const cell = row.cells[colIndex];
+        if (!cell || cell.columnId !== TOTAL_BALANCE_COLUMN_ID) {
+            return row;
+        }
+        if (cell.type === 'numeric_fiat') {
+            const newCells = [...row.cells];
+            newCells[colIndex] = {
+                ...cell,
+                value: cell.value.plus(add)
+            };
+            return { ...row, cells: newCells };
+        }
+        return row;
+    });
+}
+
 export function useDashboardData() {
     const sdk = useAppSdk();
     const { data: columns } = useDashboardColumnsAsForm();
     const selectedColumns = columns?.filter(c => c.isEnabled);
-    const { fiat } = useAppContext();
+    const appContext = useAppContext();
+    const { fiat } = appContext;
+    const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const isStakingEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.STAKING);
     const {
         i18n: { language },
         t
@@ -39,7 +103,15 @@ export function useDashboardData() {
     const idsMainnet = mainnetWallets.map(w => w!.id);
 
     return useQuery<DashboardRow[]>(
-        [QueryKey.dashboardData, selectedColIds, idsMainnet, fiat, language],
+        [
+            QueryKey.dashboardData,
+            selectedColIds,
+            idsMainnet,
+            fiat,
+            language,
+            tonRate?.prices,
+            isStakingEnabled
+        ],
         async ctx => {
             if (!selectedColIds?.length || !idsMainnet?.length || !mainnetWallets?.length) {
                 return [];
@@ -98,7 +170,15 @@ export function useDashboardData() {
                 });
                 /* append client columns */
 
-                return result;
+                return applyStakingToDashboardTotalBalance(
+                    result,
+                    query.columns,
+                    query.accounts,
+                    mainnetWallets,
+                    appContext,
+                    tonRate,
+                    isStakingEnabled
+                );
             };
 
             const pastQueries = client.getQueriesData({
@@ -107,7 +187,9 @@ export function useDashboardData() {
                     !!q.queryKey[1] &&
                     !!q.queryKey[2] &&
                     q.queryKey[3] === ctx.queryKey[3] &&
-                    q.queryKey[4] === ctx.queryKey[4],
+                    q.queryKey[4] === ctx.queryKey[4] &&
+                    q.queryKey[5] === ctx.queryKey[5] &&
+                    q.queryKey[6] === ctx.queryKey[6],
                 fetchStatus: 'idle'
             });
 
@@ -123,7 +205,7 @@ export function useDashboardData() {
                 idsMainnet.forEach((id, walletIndex) => {
                     selectedColIds.forEach((col, colIndex) => {
                         const matchingQueries = pastQueries.filter(
-                            ([key, _]) =>
+                            ([key]) =>
                                 (key[2] as string[] | undefined)?.includes(id) &&
                                 (key[1] as string[] | undefined)?.includes(col)
                         );

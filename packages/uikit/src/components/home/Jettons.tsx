@@ -33,6 +33,7 @@ import {
     PortfolioStakingPosition,
     PortfolioTokenBalance
 } from '../../state/portfolio/usePortfolioBalances';
+import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
 
 export interface TonAssetData {
     info: Account;
@@ -119,7 +120,8 @@ export const JettonAsset = forwardRef<
 
     const stakingPool = tokenBalance.stakingPool;
     const { data: stakingPosition } = useStakingPosition(stakingPool?.address);
-
+    const { tonAmount: stakedAmount } = usePoolStakedBalance(stakingPool);
+    const stakedDisplayAmount = stakedAmount ? formatter.formatDisplay(stakedAmount) : null;
     const pendingWithdrawLine = useMemo(() => {
         if (!isFullWidth || !stakingPool || !stakingPosition) {
             return undefined;
@@ -177,7 +179,7 @@ export const JettonAsset = forwardRef<
                     }
                     verification={stakingPool ? undefined : verification}
                     symbol={stakingPool ? undefined : balance.asset.symbol}
-                    balance={balance.stringRelativeAmount}
+                    balance={stakedDisplayAmount ?? balance.stringRelativeAmount}
                     secondary={stakingPool ? stakingPool.name : fiatPrice}
                     tertiary={pendingWithdrawLine}
                     fiatAmount={fiatAmount}

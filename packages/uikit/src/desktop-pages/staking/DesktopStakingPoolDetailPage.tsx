@@ -354,7 +354,7 @@ export const DesktopStakingPoolDetailPage = ({
     const { address: routeAddress } = useParams() as { address?: string };
     const address = poolAddress ?? routeAddress;
 
-    const { data: portfolio, isStakingLoading } = usePortfolioBalances();
+    const { data: portfolio } = usePortfolioBalances();
 
     const stakingPositionsCount = useMemo(() => {
         if (!portfolio) return 0;

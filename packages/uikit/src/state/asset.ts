@@ -1,6 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { AssetIdentification } from '@tonkeeper/core/dist/entries/crypto/asset/asset-identification';
@@ -17,11 +19,13 @@ import {
     jettonToTonAssetAmount
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { DashboardCellNumeric } from '@tonkeeper/core/dist/entries/dashboard';
+import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
-import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
+import { JettonBalance, ResponseError, StakingApi } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
-import { useAppContext } from '../hooks/appContext';
+import { IAppContext, useAppContext } from '../hooks/appContext';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from './tonendpoint';
 import { QueryKey } from '../libs/queryKey';
 import { useUserFiat } from './fiat';
 import { useAssets } from './home';
@@ -35,7 +39,12 @@ import {
     useUSDTRate
 } from './rates';
 import { useTronBalances } from './tron/tron';
-import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useActiveWallet,
+    useWalletAccountInfo
+} from './wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
 import { useAppSdk } from '../hooks/appSdk';
@@ -159,18 +168,93 @@ function tokenColor(tokenAddress: string) {
     return restColors[addressId % restColors.length];
 }
 
+export async function fetchStakedFiatPerWallet(
+    appContext: IAppContext,
+    network: Network,
+    walletRawAddresses: string[],
+    tonPrice: BigNumber
+): Promise<BigNumber[]> {
+    if (walletRawAddresses.length === 0) {
+        return [];
+    }
+
+    const api = getContextApiByNetwork(appContext, network);
+    const stakingApi = new StakingApi(api.tonApiV2);
+
+    const [poolsResponse, ...positionsPerWallet] = await Promise.all([
+        stakingApi.getStakingPools({ includeUnverified: false }),
+        ...walletRawAddresses.map(async accountId => {
+            try {
+                return (await stakingApi.getAccountNominatorsPools({ accountId })).pools;
+            } catch (error) {
+                if (error instanceof ResponseError && error.response.status === 404) {
+                    return [];
+                }
+                throw error;
+            }
+        })
+    ]);
+
+    const findPool = (poolAddress: string) =>
+        poolsResponse.pools.find(p => eqAddresses(p.address, poolAddress));
+
+    return positionsPerWallet.map(positions => {
+        let stakedFiat = new BigNumber(0);
+        for (const position of positions) {
+            if (findPool(position.pool)?.liquidJettonMaster) {
+                continue;
+            }
+            if (position.amount > 0) {
+                stakedFiat = stakedFiat.plus(
+                    shiftedDecimals(position.amount).multipliedBy(tonPrice)
+                );
+            }
+        }
+        return stakedFiat;
+    });
+}
+
+async function fetchStakedFiatEquivalent(
+    appContext: IAppContext,
+    network: Network,
+    walletRawAddresses: string[],
+    tonPrice: BigNumber
+): Promise<BigNumber> {
+    const perWallet = await fetchStakedFiatPerWallet(
+        appContext,
+        network,
+        walletRawAddresses,
+        tonPrice
+    );
+    return perWallet.reduce((acc, v) => acc.plus(v), new BigNumber(0));
+}
+
 export const useWalletTotalBalance = () => {
     const [assets] = useAssets();
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const fiat = useUserFiat();
+    const appContext = useAppContext();
+    const wallet = useActiveWallet();
+    const account = useActiveAccount();
+    const network = useMemo(() => getNetworkByAccount(account), [account]);
+    const isStakingEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.STAKING);
 
     const { data: tronBalances } = useTronBalances();
     const { data: usdtRate } = useUSDTRate();
 
     const client = useQueryClient();
     return useQuery<BigNumber>(
-        [QueryKey.total, fiat, assets, tonRate],
-        () => {
+        [
+            QueryKey.total,
+            fiat,
+            assets,
+            tonRate,
+            wallet.rawAddress,
+            network,
+            isStakingEnabled,
+            usdtRate?.prices
+        ],
+        async () => {
             if (!assets) {
                 return new BigNumber(0);
             }
@@ -178,13 +262,24 @@ export const useWalletTotalBalance = () => {
                 getJettonsFiatAmount(fiat, assets)
             );
 
-            if (!tronBalances || !usdtRate?.prices) {
-                return tonAssetsAmount;
+            let total =
+                !tronBalances || !usdtRate?.prices
+                    ? tonAssetsAmount
+                    : tonAssetsAmount.plus(
+                          tronBalances.usdt.relativeAmount.multipliedBy(usdtRate.prices)
+                      );
+
+            if (isStakingEnabled && tonRate?.prices !== undefined) {
+                const stakedFiat = await fetchStakedFiatEquivalent(
+                    appContext,
+                    network,
+                    [wallet.rawAddress],
+                    new BigNumber(tonRate.prices)
+                );
+                total = total.plus(stakedFiat);
             }
 
-            return tonAssetsAmount.plus(
-                tronBalances.usdt.relativeAmount.multipliedBy(usdtRate.prices)
-            );
+            return total;
         },
         { enabled: !!assets && !!tonRate && !!usdtRate && tronBalances !== undefined }
     );
@@ -192,7 +287,10 @@ export const useWalletTotalBalance = () => {
 
 export const useAllWalletsTotalBalance = (network: Network) => {
     const sdk = useAppSdk();
+    const appContext = useAppContext();
     const fiat = useUserFiat();
+    const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const isStakingEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.STAKING);
     const allAccounts = useAccountsState();
     const allWalletsAddresses = useMemo(
         () =>
@@ -200,11 +298,18 @@ export const useAllWalletsTotalBalance = (network: Network) => {
                 .filter(acc => getNetworkByAccount(acc) === network)
                 .flatMap(acc => acc.allTonWallets)
                 .map(w => w.rawAddress),
-        [allAccounts]
+        [allAccounts, network]
     );
 
     return useQuery<BigNumber>(
-        [QueryKey.allWalletsTotalBalance, fiat, allWalletsAddresses],
+        [
+            QueryKey.allWalletsTotalBalance,
+            fiat,
+            allWalletsAddresses,
+            network,
+            tonRate?.prices,
+            isStakingEnabled
+        ],
         async () => {
             const queryToFetch = {
                 accounts: allWalletsAddresses,
@@ -215,9 +320,25 @@ export const useAllWalletsTotalBalance = (network: Network) => {
                 token: await sdk.subscriptionService.getToken()
             });
 
-            return result
+            let total = result
                 .map(row => new BigNumber((row.cells[0] as DashboardCellNumeric).value))
                 .reduce((v, acc) => acc.plus(v), new BigNumber(0));
+
+            if (
+                isStakingEnabled &&
+                tonRate?.prices !== undefined &&
+                allWalletsAddresses.length > 0
+            ) {
+                const stakedFiat = await fetchStakedFiatEquivalent(
+                    appContext,
+                    network,
+                    allWalletsAddresses,
+                    new BigNumber(tonRate.prices)
+                );
+                total = total.plus(stakedFiat);
+            }
+
+            return total;
         }
     );
 };
