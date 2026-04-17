@@ -16,7 +16,9 @@ export interface StakingAmountInputProps {
 
 export const GAS_RESERVE_TON = STAKE_GAS_RESERVE_TON;
 
-export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChange }) => {
+export const TONSTAKERS_RECOMMENDED_FEE_RESERVE = 1.4;
+
+export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, pool, onChange }) => {
     const { t } = useTranslation();
     const { fiat } = useAppContext();
     const { data: balance } = useTonBalance();
@@ -40,8 +42,13 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
     }, [balanceTON]);
 
     const isInsufficient = useMemo(() => {
-        if (!amountBN || !maxAmount) return false;
-        return amountBN.gt(maxAmount);
+        if (!amountBN) return false;
+        return amountBN.gt(balanceTON);
+    }, [amountBN, balanceTON]);
+
+    const isInsufficientRecommendedFeeReserve = useMemo(() => {
+        if (!amountBN) return false;
+        return balanceTON.lt(amountBN?.plus(GAS_RESERVE_TON));
     }, [amountBN, maxAmount]);
 
     const onMaxClick = () => {
@@ -69,6 +76,8 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
                 <>
                     {isInsufficient ? (
                         <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                    ) : isInsufficientRecommendedFeeReserve ? (
+                        <ErrorText>{t('staking_insufficient_recommended_fee_reserve')}</ErrorText>
                     ) : (
                         <BalanceLabel>
                             {t('staking_balance_label')}: {balanceDisplay}

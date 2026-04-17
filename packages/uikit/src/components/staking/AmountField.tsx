@@ -80,10 +80,10 @@ const FiatAmount = styled(Body2)`
 
 const FieldFooter = styled.div`
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 4px 12px;
     min-height: 20px;
-    gap: 4px;
+    gap: 12px;
 `;
 
 export const ErrorText = styled(Body3)`

@@ -8,6 +8,10 @@ import { formatter, formatFiatCurrency } from '../../hooks/balance';
 import { useRate, useFormatFiat } from '../../state/rates';
 import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
 import { AmountField, ErrorText, BalanceLabel, MaxButton } from './AmountField';
+import { STAKE_GAS_RESERVE_TON } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/staking-encoder';
+import { useTonBalance } from '../../state/wallet';
+
+export const GAS_RESERVE_TON = STAKE_GAS_RESERVE_TON;
 
 export interface UnstakeAmountInputProps {
     amount: string;
@@ -26,8 +30,13 @@ export const UnstakeAmountInput: FC<UnstakeAmountInputProps> = ({
     const { fiat } = useAppContext();
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const { tonAmount } = usePoolStakedBalance(pool);
+    const { data: balance } = useTonBalance();
 
     const isTfPool = pool?.implementation === PoolImplementationType.Tf;
+
+    const balanceTON = useMemo(() => {
+        return balance?.relativeAmount ?? new BigNumber(0);
+    }, [balance]);
 
     const amountBN = useMemo(() => {
         if (!amount) return undefined;
@@ -52,6 +61,11 @@ export const UnstakeAmountInput: FC<UnstakeAmountInputProps> = ({
         return formatter.formatDisplay(tonAmount);
     }, [tonAmount]);
 
+    const isInsufficientRecommendedFeeReserve = useMemo(() => {
+        if (!amountBN) return false;
+        return balanceTON.lte(GAS_RESERVE_TON) && !amountBN?.isZero();
+    }, [amountBN, tonAmount]);
+
     return (
         <AmountField
             amount={amount}
@@ -62,6 +76,11 @@ export const UnstakeAmountInput: FC<UnstakeAmountInputProps> = ({
                 isInsufficient ? (
                     <>
                         <ErrorText>{t('staking_insufficient_balance')}</ErrorText>
+                        <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
+                    </>
+                ) : isInsufficientRecommendedFeeReserve ? (
+                    <>
+                        <ErrorText>{t('staking_insufficient_recommended_fee_reserve')}</ErrorText>
                         <MaxButton onClick={onMaxClick}>{t('staking_max')}</MaxButton>
                     </>
                 ) : isTfPool ? (

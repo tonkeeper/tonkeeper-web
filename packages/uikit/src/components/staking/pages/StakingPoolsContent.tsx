@@ -22,6 +22,7 @@ import {
     StakingPoolLiquidTokenBalance
 } from '../../../state/staking/poolStakeState';
 import { StakingPoolIcon } from '../StakingPoolIcon';
+import { useStakingCycleCountdown } from '../../../state/staking/useStakingCycleCountdown';
 
 const PoolList = styled.div`
     display: flex;
@@ -159,6 +160,7 @@ const PoolListRow: FC<PoolListRowProps> = ({
     const tonPrice = useMemo(() => {
         return tonRate?.prices !== undefined ? new BigNumber(tonRate.prices) : undefined;
     }, [tonRate?.prices]);
+    const countdown = useStakingCycleCountdown(pool);
 
     const liquidTokenBalance = useMemo<StakingPoolLiquidTokenBalance | undefined>(() => {
         if (!stakingTokenBalance) {
@@ -232,7 +234,14 @@ const PoolListRow: FC<PoolListRowProps> = ({
                     <PoolInfoRow>
                         <PoolInfoLeft>
                             <PoolPendingText>
-                                {t('staking_portfolio_pending_withdraw', { amount: pendingAmount })}
+                                {countdown
+                                    ? t('staking_portfolio_pending_withdraw_countdown', {
+                                          amount: pendingAmount,
+                                          value: countdown
+                                      })
+                                    : t('staking_portfolio_pending_withdraw', {
+                                          amount: pendingAmount
+                                      })}
                             </PoolPendingText>
                         </PoolInfoLeft>
                     </PoolInfoRow>

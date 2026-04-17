@@ -407,8 +407,10 @@ export const StakingPoolDetailContent = ({
     const withdrawDateStr = useMemo(() => {
         if (pendingWithdraw <= 0 || !formattedCycleDate) return '';
         const amount = formatter.formatDisplay(shiftedDecimals(pendingWithdraw));
-        return t('staking_portfolio_pending_withdraw', { amount });
-    }, [pendingWithdraw, formattedCycleDate, t]);
+        return countdown
+            ? t('staking_portfolio_pending_withdraw_countdown', { amount, value: countdown })
+            : t('staking_portfolio_pending_withdraw', { amount });
+    }, [pendingWithdraw, formattedCycleDate, t, countdown]);
 
     const liquidDesc = useMemo(() => {
         if (!isLiquid || !pool) return '';

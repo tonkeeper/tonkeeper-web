@@ -34,6 +34,7 @@ import {
     PortfolioTokenBalance
 } from '../../state/portfolio/usePortfolioBalances';
 import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
+import { useStakingCycleCountdown } from '../../state/staking/useStakingCycleCountdown';
 
 export interface TonAssetData {
     info: Account;
@@ -122,6 +123,7 @@ export const JettonAsset = forwardRef<
     const { data: stakingPosition } = useStakingPosition(stakingPool?.address);
     const { tonAmount: stakedAmount } = usePoolStakedBalance(stakingPool);
     const stakedDisplayAmount = stakedAmount ? formatter.formatDisplay(stakedAmount) : null;
+    const countdown = useStakingCycleCountdown(stakingPool);
     const pendingWithdrawLine = useMemo(() => {
         if (!isFullWidth || !stakingPool || !stakingPosition) {
             return undefined;
@@ -132,8 +134,10 @@ export const JettonAsset = forwardRef<
         }
         const pendingTon = shiftedDecimals(pending);
         const amount = formatter.formatDisplay(pendingTon);
-        return t('staking_portfolio_pending_withdraw', { amount });
-    }, [isFullWidth, stakingPool, stakingPosition, t]);
+        return countdown
+            ? t('staking_portfolio_pending_withdraw_countdown', { amount, value: countdown })
+            : t('staking_portfolio_pending_withdraw', { amount });
+    }, [isFullWidth, stakingPool, stakingPosition, t, countdown]);
 
     const rate = useMemo(() => {
         const jetton = jettonBalances?.balances.find(j =>
