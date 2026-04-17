@@ -8,7 +8,7 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { useTranslation } from '../../../hooks/translation';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, StakingRoute } from '../../../libs/routes';
-import { formatter, formatTokenDisplay } from '../../../hooks/balance';
+import { formatTokenDisplay } from '../../../hooks/balance';
 import { useFormatFiat, useRate } from '../../../state/rates';
 import { Body3, Label2 } from '../../Text';
 import {
@@ -23,6 +23,7 @@ import {
 } from '../../../state/staking/poolStakeState';
 import { StakingPoolIcon } from '../StakingPoolIcon';
 import { useStakingCycleCountdown } from '../../../state/staking/useStakingCycleCountdown';
+import { getStakingPendingSubtitleLine } from '../../../state/staking/stakingPendingSubtitleLines';
 
 const PoolList = styled.div`
     display: flex;
@@ -184,10 +185,10 @@ const PoolListRow: FC<PoolListRowProps> = ({
 
     const { fiatAmount } = useFormatFiat(tonRate, tonAmount);
 
-    const hasPendingWithdraw = (position?.pendingWithdraw ?? 0) > 0;
-    const pendingAmount = useMemo(() => {
-        return formatter.formatDisplay(shiftedDecimals(position?.pendingWithdraw ?? 0));
-    }, [position?.pendingWithdraw]);
+    const pendingSubtitleLine = useMemo(
+        () => getStakingPendingSubtitleLine(t, position, countdown),
+        [t, position, countdown]
+    );
 
     const displayAmount = useMemo(() => {
         return formatTokenDisplay(tonAmount, 'TON');
@@ -230,19 +231,10 @@ const PoolListRow: FC<PoolListRowProps> = ({
                         </PoolInfoRight>
                     )}
                 </PoolInfoRow>
-                {hasPendingWithdraw && (
+                {pendingSubtitleLine && (
                     <PoolInfoRow>
                         <PoolInfoLeft>
-                            <PoolPendingText>
-                                {countdown
-                                    ? t('staking_portfolio_pending_withdraw_countdown', {
-                                          amount: pendingAmount,
-                                          value: countdown
-                                      })
-                                    : t('staking_portfolio_pending_withdraw', {
-                                          amount: pendingAmount
-                                      })}
-                            </PoolPendingText>
+                            <PoolPendingText>{pendingSubtitleLine}</PoolPendingText>
                         </PoolInfoLeft>
                     </PoolInfoRow>
                 )}

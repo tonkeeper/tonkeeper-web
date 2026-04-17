@@ -96,6 +96,16 @@ const TertiaryText = styled(Body3)`
     white-space: nowrap;
 `;
 
+const TertiaryMultiline = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    min-width: 0;
+    white-space: normal;
+`;
+
 const Symbol = styled(Label1)`
     color: ${props => props.theme.textSecondary};
 `;
@@ -141,7 +151,11 @@ export const TokenLayout: FC<{
             </SecondLine>
             {tertiary ? (
                 <ThirdLine>
-                    <TertiaryText>{tertiary}</TertiaryText>
+                    {typeof tertiary === 'string' ? (
+                        <TertiaryText>{tertiary}</TertiaryText>
+                    ) : (
+                        <TertiaryMultiline>{tertiary}</TertiaryMultiline>
+                    )}
                 </ThirdLine>
             ) : null}
         </Description>

@@ -16,6 +16,7 @@ import { useJettonBalance, useJettonInfo } from '../../../state/jetton';
 import { usePoolInfo } from '../../../state/staking/usePoolInfo';
 import { usePoolStakedBalance } from '../../../state/staking/usePoolStakedBalance';
 import { useStakingCycleCountdown } from '../../../state/staking/useStakingCycleCountdown';
+import { getStakingPendingCycleLine } from '../../../state/staking/stakingPendingSubtitleLines';
 import { useEncodeStakingUnstake } from '../../../state/staking/useEncodeStaking';
 import { Body3, Label2, H3 } from '../../Text';
 import { TonTransactionNotification } from '../../connect/TonTransactionNotification';
@@ -406,10 +407,7 @@ export const StakingPoolDetailContent = ({
 
     const withdrawDateStr = useMemo(() => {
         if (pendingWithdraw <= 0 || !formattedCycleDate) return '';
-        const amount = formatter.formatDisplay(shiftedDecimals(pendingWithdraw));
-        return countdown
-            ? t('staking_portfolio_pending_withdraw_countdown', { amount, value: countdown })
-            : t('staking_portfolio_pending_withdraw', { amount });
+        return getStakingPendingCycleLine(t, pendingWithdraw, countdown);
     }, [pendingWithdraw, formattedCycleDate, t, countdown]);
 
     const liquidDesc = useMemo(() => {

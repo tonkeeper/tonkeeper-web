@@ -20,7 +20,7 @@ import {
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatter } from '../../hooks/balance';
 import { useJettonList } from '../../state/jetton';
-import { isSignificantPendingWithdraw } from '../../state/staking/pendingWithdraw';
+import { getStakingPendingSubtitleLine } from '../../state/staking/stakingPendingSubtitleLines';
 import { useStakingPosition } from '../../state/staking/useStakingPosition';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -124,19 +124,11 @@ export const JettonAsset = forwardRef<
     const { tonAmount: stakedAmount } = usePoolStakedBalance(stakingPool);
     const stakedDisplayAmount = stakedAmount ? formatter.formatDisplay(stakedAmount) : null;
     const countdown = useStakingCycleCountdown(stakingPool);
-    const pendingWithdrawLine = useMemo(() => {
+    const pendingStakingSubtitle = useMemo(() => {
         if (!isFullWidth || !stakingPool || !stakingPosition) {
             return undefined;
         }
-        const pending = stakingPosition.pendingWithdraw ?? 0;
-        if (!isSignificantPendingWithdraw(pending)) {
-            return undefined;
-        }
-        const pendingTon = shiftedDecimals(pending);
-        const amount = formatter.formatDisplay(pendingTon);
-        return countdown
-            ? t('staking_portfolio_pending_withdraw_countdown', { amount, value: countdown })
-            : t('staking_portfolio_pending_withdraw', { amount });
+        return getStakingPendingSubtitleLine(t, stakingPosition, countdown);
     }, [isFullWidth, stakingPool, stakingPosition, t, countdown]);
 
     const rate = useMemo(() => {
@@ -185,7 +177,7 @@ export const JettonAsset = forwardRef<
                     symbol={stakingPool ? undefined : balance.asset.symbol}
                     balance={stakedDisplayAmount ?? balance.stringRelativeAmount}
                     secondary={stakingPool ? stakingPool.name : fiatPrice}
-                    tertiary={pendingWithdrawLine}
+                    tertiary={pendingStakingSubtitle}
                     fiatAmount={fiatAmount}
                     rate={stakingPool ? undefined : rate}
                 />
@@ -212,6 +204,13 @@ export const StakingPositionAsset = forwardRef<
         [tonAmount]
     );
     const { fiatAmount } = useFormatFiat(tonRate, tonAmount);
+    const countdown = useStakingCycleCountdown(stakingPosition.pool);
+    const pendingStakingSubtitle = useMemo(() => {
+        if (!isFullWidth || !stakingPosition) {
+            return undefined;
+        }
+        return getStakingPendingSubtitleLine(t, stakingPosition.position, countdown);
+    }, [isFullWidth, stakingPosition.position, t, countdown]);
 
     return (
         <ListItem
@@ -233,6 +232,7 @@ export const StakingPositionAsset = forwardRef<
                     name={t('staking_staked')}
                     balance={balanceStr}
                     secondary={stakingPosition.pool.name}
+                    tertiary={pendingStakingSubtitle}
                     fiatAmount={fiatAmount}
                     rate={undefined}
                 />

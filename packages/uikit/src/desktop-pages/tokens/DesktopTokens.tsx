@@ -20,7 +20,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
-import { isSignificantPendingWithdraw } from '../../state/staking/pendingWithdraw';
+import { hasAnySignificantPendingStakingSubtitle } from '../../state/staking/stakingPendingSubtitleLines';
 import { useStakingPositions } from '../../state/staking/useStakingPosition';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useAppTargetEnv } from '../../hooks/appSdk';
@@ -120,23 +120,28 @@ const DividerInner = styled(Divider)`
     margin: 0;
 `;
 
-const PENDING_STAKING_POOL_ROW_HEIGHT_PX = 93;
-
-const hasPendingWithdraw = (
-    token: PortfolioTokenBalance,
+const hasPendingStakingSubtitle = (
+    token: PortfolioBalance,
     positions: AccountStakingInfo[] | undefined,
     isFullWidth: boolean
 ) => {
-    if (!isFullWidth || !token.stakingPool || !positions?.length) {
+    if (!isFullWidth || !positions?.length) {
         return false;
     }
-    const position = positions.find(p => eqAddresses(p.pool, token.stakingPool!.address));
+
+    const stakingPool = token.kind === 'token' ? token.stakingPool : token.pool;
+    if (!stakingPool) {
+        return false;
+    }
+
+    const position = positions.find(p => eqAddresses(p.pool, stakingPool.address));
     if (!position) {
         return false;
     }
-    const pending = position.pendingWithdraw ?? 0;
-    return isSignificantPendingWithdraw(pending);
+    return hasAnySignificantPendingStakingSubtitle(position);
 };
+
+const PENDING_STAKING_POOL_ROW_HEIGHT_PX = 93;
 
 const getPortfolioBalanceRowHeight = (
     balance: PortfolioBalance | undefined,
@@ -144,7 +149,7 @@ const getPortfolioBalanceRowHeight = (
     positions: AccountStakingInfo[] | undefined,
     isFullWidth: boolean
 ) => {
-    if (balance?.kind === 'token' && hasPendingWithdraw(balance, positions, isFullWidth)) {
+    if (balance && hasPendingStakingSubtitle(balance, positions, isFullWidth)) {
         return PENDING_STAKING_POOL_ROW_HEIGHT_PX;
     }
     return defaultSize;
