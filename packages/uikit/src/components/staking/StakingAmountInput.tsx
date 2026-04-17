@@ -18,7 +18,7 @@ export const GAS_RESERVE_TON = STAKE_GAS_RESERVE_TON;
 
 export const TONSTAKERS_RECOMMENDED_FEE_RESERVE = 1.4;
 
-export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, pool, onChange }) => {
+export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChange }) => {
     const { t } = useTranslation();
     const { fiat } = useAppContext();
     const { data: balance } = useTonBalance();
