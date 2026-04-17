@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "درآمد سالانه پیش‌بینی‌شده",
     "staking_enter_amount": "مقدار را وارد کنید",
     "staking_insufficient_balance": "موجودی کافی نیست",
+    "staking_insufficient_recommended_fee_reserve": "موجودی کافی نیست: موجودی کیف پول باید شامل 1 TON ذخیره و 0.05 TON کارمزد باشد.",
     "staking_max": "حداکثر",
     "staking_min_deposit_label": "حداقل واریز",
     "staking_next_cycle_desc_liquid": "برداشت فوری موجود است",
@@ -365,6 +366,7 @@
     "ton_login_notice": "قبل از اتصال کیف پول، حتماً آدرس سرویس را بررسی کنید.",
     "ton_login_success": "انجام شد",
     "transaction_bid_dns": "نام",
+    "transaction_cancelled": "تراکنش لغو شد",
     "transactionDetails": {
         "comment": "نظر",
         "operation": "عملیات",

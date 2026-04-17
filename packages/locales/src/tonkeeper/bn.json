@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "প্রত্যাশিত বার্ষিক আয়",
     "staking_enter_amount": "একটি পরিমাণ প্রবেশ করুন",
     "staking_insufficient_balance": "অপর্যাপ্ত ব্যালেন্স",
+    "staking_insufficient_recommended_fee_reserve": "অপর্যাপ্ত তহবিল: ওয়ালেট ব্যালেন্সে 1 TON রিজার্ভ এবং 0.05 TON ফি থাকতে হবে।",
     "staking_max": "সর্বোচ্চ",
     "staking_min_deposit_label": "ন্যূনতম ডিপোজিট",
     "staking_next_cycle_desc_liquid": "তাৎক্ষণিক আনস্টেক উপলব্ধ",
@@ -365,6 +366,7 @@
     "ton_login_notice": "ওয়ালেট সংযুক্ত করার আগে পরিষেবার ঠিকানা যাচাই করতে ভুলবেন না।",
     "ton_login_success": "সম্পন্ন",
     "transaction_bid_dns": "নাম",
+    "transaction_cancelled": "লেনদেন বাতিল হয়েছে",
     "transactionDetails": {
         "comment": "মন্তব্য",
         "operation": "অপারেশন",

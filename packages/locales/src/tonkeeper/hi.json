@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "प्रत्याशित वार्षिक कमाई",
     "staking_enter_amount": "एक राशि दर्ज करें",
     "staking_insufficient_balance": "पर्याप्त शेष राशि नहीं है",
+    "staking_insufficient_recommended_fee_reserve": "अपर्याप्त धनराशि: वॉलेट बैलेंस में 1 TON रिजर्व और 0.05 TON शुल्क होना चाहिए।",
     "staking_max": "अधिकतम",
     "staking_min_deposit_label": "न्यूनतम जमा",
     "staking_next_cycle_desc_liquid": "तत्काल अनस्टेक उपलब्ध",
@@ -365,6 +366,7 @@
     "ton_login_notice": "वॉलेट को जोड़ने से पहले सेवा पते की जांच करना सुनिश्चित करें।",
     "ton_login_success": "किया",
     "transaction_bid_dns": "नाम",
+    "transaction_cancelled": "लेनदेन रद्द कर दिया गया",
     "transactionDetails": {
         "comment": "टिप्पणी",
         "operation": "ऑपरेशन",

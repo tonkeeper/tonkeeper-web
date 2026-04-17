@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Kutilayotgan yillik daromad",
     "staking_enter_amount": "Miqdorni kiriting",
     "staking_insufficient_balance": "Hisobda yetarli mablag' yo'q",
+    "staking_insufficient_recommended_fee_reserve": "Mablag' yetarli emas: hamyonda 1 TON zaxira va 0.05 TON komissiya uchun mablag' bo'lishi kerak.",
     "staking_max": "MAKS",
     "staking_min_deposit_label": "Minimal depozit",
     "staking_next_cycle_desc_liquid": "Tezkor qaytarib olish mavjud",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Hamyonni ulashdan oldin xizmat manzilini tekshirganingizga ishonch hosil qiling.",
     "ton_login_success": "Bajarildi",
     "transaction_bid_dns": "Ism",
+    "transaction_cancelled": "Tranzaksiya bekor qilindi",
     "transactionDetails": {
         "comment": "Izoh",
         "operation": "Amaliyot",

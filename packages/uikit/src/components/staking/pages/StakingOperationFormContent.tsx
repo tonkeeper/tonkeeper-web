@@ -17,5 +17,5 @@ export const StakingOperationFormContent = ({
 
     useSyncSelectedStakingPool(address);
 
-    return mode === 'stake' ? <StakingForm /> : <UnstakeForm />;
+    return mode === 'stake' ? <StakingForm /> : <UnstakeForm key={address ?? 'unstake'} />;
 };

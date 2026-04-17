@@ -22,7 +22,7 @@ import { UnstakeButton } from './UnstakeButton';
 const MainFormWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 24px;
 `;
 
 const TopRow = styled.div`
@@ -42,7 +42,7 @@ const CycleInfoCard = styled.div`
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p =>
         p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
-    padding: 12px;
+    padding: 6px 12px;
     flex: 1;
     min-width: 0;
     min-height: 52px;

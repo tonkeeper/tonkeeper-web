@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Очікуваний річний дохід",
     "staking_enter_amount": "Введіть суму",
     "staking_insufficient_balance": "Недостатній баланс",
+    "staking_insufficient_recommended_fee_reserve": "Недостатньо коштів: на балансі гаманця мають бути 1 TON у резерві та 0.05 TON на комісію.",
     "staking_max": "МАКС",
     "staking_min_deposit_label": "Мінімальний депозит",
     "staking_next_cycle_desc_liquid": "Доступне миттєве зняття",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Обов'язково перевірте адресу сервісу перед підключенням гаманця.",
     "ton_login_success": "Готово",
     "transaction_bid_dns": "Ім'я",
+    "transaction_cancelled": "Транзакцію скасовано",
     "transactionDetails": {
         "comment": "Коментар",
         "operation": "Операція",

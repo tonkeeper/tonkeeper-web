@@ -18,5 +18,5 @@ export const StakeAction = () => {
         navigate(AppRoute.staking);
     };
 
-    return <Action icon={<StakingIconStyled />} title={'staking_top_up'} action={onAction} />;
+    return <Action icon={<StakingIconStyled />} title={'staking_title'} action={onAction} />;
 };

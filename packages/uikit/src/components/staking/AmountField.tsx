@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 import { Body2, Body2Class, Body3 } from '../Text';
 import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
@@ -32,6 +32,7 @@ const InputBorderedBox = styled.label<{ $disabled?: boolean }>`
 `;
 
 const InputLeft = styled.div`
+    position: relative;
     display: flex;
     align-items: center;
     gap: 2px;
@@ -40,15 +41,28 @@ const InputLeft = styled.div`
     overflow: hidden;
 `;
 
-const AmountInputStyled = styled.input<{ $width: number }>`
+const AmountMeasureText = styled.span`
+    position: absolute;
+    left: 0;
+    top: 0;
+    visibility: hidden;
+    white-space: pre;
+    pointer-events: none;
+    font-family: inherit;
+    ${Body2Class}
+`;
+
+const INPUT_CARET_EXTRA_PX = 2;
+
+const AmountInputStyled = styled.input<{ $widthPx: number }>`
     border: none;
     background: none;
     text-align: left;
     outline: none;
     color: ${p => p.theme.textPrimary};
     font-family: inherit;
-    min-width: 1ch;
-    width: ${p => p.$width}ch;
+    min-width: 0;
+    width: ${p => Math.max(p.$widthPx, 10)}px;
 
     ${Body2Class}
 
@@ -81,6 +95,7 @@ const FiatAmount = styled(Body2)`
 const FieldFooter = styled.div`
     display: flex;
     align-items: flex-start;
+    justify-content: space-between;
     padding: 4px 12px;
     min-height: 20px;
     gap: 12px;
@@ -183,6 +198,18 @@ export const AmountField: FC<AmountFieldProps> = ({
         prevDisplayRef.current = d;
     }, [amount]);
 
+    const measureRef = useRef<HTMLSpanElement>(null);
+    const [inputWidthPx, setInputWidthPx] = useState(0);
+
+    const widthMeasureSource = inputValue || '0';
+
+    useLayoutEffect(() => {
+        const el = measureRef.current;
+        if (!el) return;
+        const w = el.getBoundingClientRect().width;
+        setInputWidthPx(Math.ceil(w) + INPUT_CARET_EXTRA_PX);
+    }, [widthMeasureSource]);
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value;
         const decSep = getDecimalSeparator();
@@ -219,12 +246,13 @@ export const AmountField: FC<AmountFieldProps> = ({
         onChange(displayToAmountProp(processed));
     };
 
-    const widthChars = Math.max(1, (inputValue || '0').length);
-
     return (
         <FieldContainer>
             <InputBorderedBox $disabled={disabled}>
                 <InputLeft>
+                    <AmountMeasureText ref={measureRef} aria-hidden>
+                        {widthMeasureSource}
+                    </AmountMeasureText>
                     <AmountInputStyled
                         type="text"
                         inputMode="decimal"
@@ -232,7 +260,7 @@ export const AmountField: FC<AmountFieldProps> = ({
                         value={inputValue}
                         onChange={handleChange}
                         placeholder="0"
-                        $width={widthChars}
+                        $widthPx={inputWidthPx}
                         disabled={disabled}
                     />
                     <TokenLabel>TON</TokenLabel>

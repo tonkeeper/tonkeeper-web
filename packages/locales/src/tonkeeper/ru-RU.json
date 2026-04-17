@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Ожидаемый годовой доход",
     "staking_enter_amount": "Введите сумму",
     "staking_insufficient_balance": "Недостаточно средств",
+    "staking_insufficient_recommended_fee_reserve": "Недостаточно средств: на балансе кошелька должны быть 1 TON в резерве и 0.05 TON на комиссию.",
     "staking_max": "МАКС",
     "staking_min_deposit_label": "Минимальный депозит",
     "staking_next_cycle_desc_liquid": "Мгновенный вывод доступен",
@@ -380,6 +381,7 @@
     "ton_login_notice": "Обязательно проверьте адрес сервиса перед подключением кошелька.",
     "ton_login_success": "Готово",
     "transaction_bid_dns": "Имя",
+    "transaction_cancelled": "Транзакция отменена",
     "transactionDetails": {
         "comment": "Комментарий",
         "operation": "Операция",

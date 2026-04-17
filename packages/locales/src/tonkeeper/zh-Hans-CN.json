@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "预计年收益",
     "staking_enter_amount": "输入金额",
     "staking_insufficient_balance": "余额不足",
+    "staking_insufficient_recommended_fee_reserve": "资金不足：钱包余额中需要预留 1 TON 储备金和 0.05 TON 手续费。",
     "staking_max": "最大",
     "staking_min_deposit_label": "最低存款",
     "staking_next_cycle_desc_liquid": "即时取消质押可用",
@@ -365,6 +366,7 @@
     "ton_login_notice": "连接钱包之前，请务必检查服务地址。",
     "ton_login_success": "完成",
     "transaction_bid_dns": "名称",
+    "transaction_cancelled": "交易已取消",
     "transactionDetails": {
         "comment": "评论",
         "operation": "操作",

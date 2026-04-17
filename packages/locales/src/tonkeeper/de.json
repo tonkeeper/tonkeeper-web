@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Erwarteter Jahresertrag",
     "staking_enter_amount": "Geben Sie einen Betrag ein",
     "staking_insufficient_balance": "Unzureichendes Guthaben",
+    "staking_insufficient_recommended_fee_reserve": "Unzureichende Mittel: Im Wallet-Guthaben sind 1 TON Reserve und 0.05 TON Gebühr erforderlich.",
     "staking_max": "MAX",
     "staking_min_deposit_label": "Minimale Einzahlung",
     "staking_next_cycle_desc_liquid": "Sofortiges Unstaking verfügbar",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Überprüfen Sie die Serviceadresse, bevor Sie die Wallet verbinden.",
     "ton_login_success": "Fertig",
     "transaction_bid_dns": "Name",
+    "transaction_cancelled": "Transaktion abgebrochen",
     "transactionDetails": {
         "comment": "Kommentar",
         "operation": "Vorgang",

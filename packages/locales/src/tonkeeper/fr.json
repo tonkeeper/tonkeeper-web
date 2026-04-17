@@ -293,6 +293,7 @@
   "staking_earnings_section_title": "Gains annuels estimés",
   "staking_enter_amount": "Entrez un montant",
   "staking_insufficient_balance": "Solde insuffisant",
+  "staking_insufficient_recommended_fee_reserve": "Fonds insuffisants : le solde du portefeuille doit inclure 1 TON de réserve et 0.05 TON de frais.",
   "staking_max": "MAX",
   "staking_min_deposit_label": "Dépôt minimum",
   "staking_next_cycle_desc_liquid": "Déverrouillage instantané disponible",
@@ -365,6 +366,7 @@
   "ton_login_notice": "Assurez-vous de vérifier l’adresse du service avant de connecter le portefeuille.",
   "ton_login_success": "Terminé",
   "transaction_bid_dns": "Nom",
+  "transaction_cancelled": "Transaction annulée",
   "transactionDetails": {
     "comment": "Commentaire",
     "operation": "Opération",

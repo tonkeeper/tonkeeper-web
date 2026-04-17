@@ -293,7 +293,7 @@
     "staking_earnings_section_title": "Expected annual earning",
     "staking_enter_amount": "Enter an amount",
     "staking_insufficient_balance": "Insufficient balance",
-    "staking_insufficient_recommended_fee_reserve": "Insufficient funds: 1 TON reserve + 0.4 TON fee required in wallet balance.",
+    "staking_insufficient_recommended_fee_reserve": "Insufficient funds: 1 TON reserve + 0.05 TON fee required in wallet balance.",
     "staking_max": "MAX",
     "staking_min_deposit_label": "Minimum deposit",
     "staking_next_cycle_desc_liquid": "Instant unstake available",
@@ -381,6 +381,7 @@
     "ton_login_notice": "Be sure to check the service address before connecting the wallet.",
     "ton_login_success": "Done",
     "transaction_bid_dns": "Name",
+    "transaction_cancelled": "Transaction cancelled",
     "transactionDetails": {
         "comment": "Comment",
         "operation": "Operation",

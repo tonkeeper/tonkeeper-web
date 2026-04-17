@@ -20,7 +20,7 @@ import { useTranslation } from '../../hooks/translation';
 const MainFormWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 24px;
 `;
 
 const TopRow = styled.div`

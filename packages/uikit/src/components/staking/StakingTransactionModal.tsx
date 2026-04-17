@@ -35,6 +35,7 @@ import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
 import {
     useTonConnectTransactionEstimation,
@@ -465,6 +466,9 @@ const StakingModalContent: FC<{
     const done = sendResult !== undefined;
     const isNotEnoughBalance = error && error instanceof NotEnoughBalanceError;
 
+    const isAuthCancelled =
+        sendError instanceof UserCancelledError || sendError?.message === 'Cancel auth request';
+
     const showSenderPicker =
         !!availableSendersChoices && availableSendersChoices.length > 1 && !isNotEnoughBalance;
 
@@ -564,7 +568,11 @@ const StakingModalContent: FC<{
                         {sendError ? (
                             <ResultButton>
                                 <ExclamationMarkCircleIconStyled />
-                                <Label2>{getErrorText(sendError, { t })}</Label2>
+                                <Label2>
+                                    {isAuthCancelled
+                                        ? t('transaction_cancelled')
+                                        : getErrorText(sendError, { t })}
+                                </Label2>
                             </ResultButton>
                         ) : done ? (
                             <ResultButton done>

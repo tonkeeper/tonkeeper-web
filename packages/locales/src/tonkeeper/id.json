@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Penghasilan tahunan yang diharapkan",
     "staking_enter_amount": "Masukkan jumlah",
     "staking_insufficient_balance": "Saldo tidak mencukupi",
+    "staking_insufficient_recommended_fee_reserve": "Dana tidak mencukupi: saldo dompet harus mencakup cadangan 1 TON dan biaya 0.05 TON.",
     "staking_max": "MAKS",
     "staking_min_deposit_label": "Setoran minimum",
     "staking_next_cycle_desc_liquid": "Unstake instan tersedia",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Pastikan untuk memeriksa alamat layanan sebelum menghubungkan dompet.",
     "ton_login_success": "Selesai",
     "transaction_bid_dns": "Nama",
+    "transaction_cancelled": "Transaksi dibatalkan",
     "transactionDetails": {
         "comment": "Komentar",
         "operation": "Operasi",

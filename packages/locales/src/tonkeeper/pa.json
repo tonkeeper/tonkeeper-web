@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "ਸਾਲਾਨਾ ਅਨੁਮਾਨਿਤ ਕਮਾਈ",
     "staking_enter_amount": "ਇੱਕ ਰਕਮ ਦਰਜ ਕਰੋ",
     "staking_insufficient_balance": "ਪ੍ਰਯਾਪਤ ਬਕਾਇਆ ਨਹੀਂ",
+    "staking_insufficient_recommended_fee_reserve": "ਅਪਰ्यਾਪਤ ਫੰਡ: ਵਾਲਿਟ ਬਕਾਇਆ ਵਿੱਚ 1 TON ਰਿਜ਼ਰਵ ਅਤੇ 0.05 TON ਫੀ ਹੋਣੀ ਚਾਹੀਦੀ ਹੈ।",
     "staking_max": "ਅਧਿਕਤਮ",
     "staking_min_deposit_label": "ਘੱਟੋ-ਘੱਟ ਜਮ੍ਹਾਂ",
     "staking_next_cycle_desc_liquid": "ਤੁਰੰਤ ਅਨਸਟੇਕ ਉਪਲਬਧ ਹੈ",
@@ -365,6 +366,7 @@
     "ton_login_notice": "ਵਾਲਿਟ ਜੋੜਣ ਤੋਂ ਪਹਿਲਾਂ ਸਰਵਿਸ ਪਤੇ ਦੀ ਜਾਂਚ ਕਰਨਾ ਯਕੀਨੀ ਬਣਾਓ।",
     "ton_login_success": "ਹੋ ਗਿਆ",
     "transaction_bid_dns": "ਨਾਮ",
+    "transaction_cancelled": "ਲੈਣ-ਦੇਣ ਰੱਦ ਕੀਤੀ ਗਈ",
     "transactionDetails": {
         "comment": "ਟਿੱਪਣੀ",
         "operation": "ਓਪਰੇਸ਼ਨ",

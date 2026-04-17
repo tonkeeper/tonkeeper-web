@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Thu nhập dự kiến hàng năm",
     "staking_enter_amount": "Nhập số tiền",
     "staking_insufficient_balance": "Số dư không đủ",
+    "staking_insufficient_recommended_fee_reserve": "Không đủ tiền: số dư ví phải có 1 TON dự trữ và 0.05 TON phí.",
     "staking_max": "TỐI ĐA",
     "staking_min_deposit_label": "Số tiền gửi tối thiểu",
     "staking_next_cycle_desc_liquid": "Có thể rút stake ngay lập tức",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Hãy chắc chắn kiểm tra địa chỉ dịch vụ trước khi kết nối ví.",
     "ton_login_success": "Hoàn thành",
     "transaction_bid_dns": "Tên",
+    "transaction_cancelled": "Giao dịch đã bị hủy",
     "transactionDetails": {
         "comment": "Bình luận",
         "operation": "Hoạt động",

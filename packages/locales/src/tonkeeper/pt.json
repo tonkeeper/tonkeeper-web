@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Ganho anual esperado",
     "staking_enter_amount": "Insira um valor",
     "staking_insufficient_balance": "Saldo insuficiente",
+    "staking_insufficient_recommended_fee_reserve": "Fundos insuficientes: o saldo da carteira deve incluir 1 TON de reserva e 0.05 TON de taxa.",
     "staking_max": "MÁX",
     "staking_min_deposit_label": "Depósito mínimo",
     "staking_next_cycle_desc_liquid": "Unstake instantâneo disponível",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Certifique-se de verificar o endereço do serviço antes de conectar a carteira.",
     "ton_login_success": "Concluído",
     "transaction_bid_dns": "Nome",
+    "transaction_cancelled": "Transação cancelada",
     "transactionDetails": {
         "comment": "Comentário",
         "operation": "Operação",

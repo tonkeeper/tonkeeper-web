@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Guadagno annuale previsto",
     "staking_enter_amount": "Inserisci un importo",
     "staking_insufficient_balance": "Saldo insufficiente",
+    "staking_insufficient_recommended_fee_reserve": "Fondi insufficienti: il saldo del wallet deve includere 1 TON di riserva e 0.05 TON di commissione.",
     "staking_max": "MAX",
     "staking_min_deposit_label": "Deposito minimo",
     "staking_next_cycle_desc_liquid": "Unstake istantaneo disponibile",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Assicurati di controllare l'indirizzo del servizio prima di collegare il wallet.",
     "ton_login_success": "Fatto",
     "transaction_bid_dns": "Nome",
+    "transaction_cancelled": "Transazione annullata",
     "transactionDetails": {
         "comment": "Commento",
         "operation": "Operazione",

@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Beklenen yıllık kazanç",
     "staking_enter_amount": "Bir tutar girin",
     "staking_insufficient_balance": "Yetersiz bakiye",
+    "staking_insufficient_recommended_fee_reserve": "Yetersiz bakiye: cüzdan bakiyesinde 1 TON rezerv ve 0.05 TON işlem ücreti bulunmalıdır.",
     "staking_max": "MAKS",
     "staking_min_deposit_label": "Minimum yatırabilecek tutar",
     "staking_next_cycle_desc_liquid": "Anında stake geri alma mevcut",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Cüzdanı bağlamadan önce servis adresini kontrol ettiğinizden emin olun.",
     "ton_login_success": "Tamamlandı",
     "transaction_bid_dns": "İsim",
+    "transaction_cancelled": "İşlem iptal edildi",
     "transactionDetails": {
         "comment": "Yorum",
         "operation": "İşlem",

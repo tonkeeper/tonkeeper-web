@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Очаквана годишна печалба",
     "staking_enter_amount": "Въведете сума",
     "staking_insufficient_balance": "Недостатъчен баланс",
+    "staking_insufficient_recommended_fee_reserve": "Недостатъчно средства: балансът на портфейла трябва да включва 1 TON резерв и 0.05 TON такса.",
     "staking_max": "МАКС",
     "staking_min_deposit_label": "Минимален депозит",
     "staking_next_cycle_desc_liquid": "Налично незабавно разставане",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Уверете се, че проверите адреса на услугата, преди да свържете портфейла.",
     "ton_login_success": "Готово",
     "transaction_bid_dns": "Име",
+    "transaction_cancelled": "Транзакцията е отменена",
     "transactionDetails": {
         "comment": "Коментар",
         "operation": "Операция",

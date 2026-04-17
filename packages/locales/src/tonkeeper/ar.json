@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "الأرباح السنوية المتوقعة",
     "staking_enter_amount": "ادخل مبلغ",
     "staking_insufficient_balance": "الرصيد غير كافٍ",
+    "staking_insufficient_recommended_fee_reserve": "الأموال غير كافية: يجب أن يتضمن رصيد المحفظة 1 TON كاحتياطي و0.05 TON كرسوم.",
     "staking_max": "الحد الأقصى",
     "staking_min_deposit_label": "الحد الأدنى للإيداع",
     "staking_next_cycle_desc_liquid": "إلغاء التحصيص الفوري متاح",
@@ -365,6 +366,7 @@
     "ton_login_notice": "يرجى التحقق من عنوان الخدمة قبل ربط المحفظة.",
     "ton_login_success": "تم",
     "transaction_bid_dns": "الاسم",
+    "transaction_cancelled": "تم إلغاء المعاملة",
     "transactionDetails": {
         "comment": "تعليق",
         "operation": "العملية",

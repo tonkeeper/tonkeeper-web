@@ -293,6 +293,7 @@
     "staking_earnings_section_title": "Ganancia anual esperada",
     "staking_enter_amount": "Ingresar la cantidad",
     "staking_insufficient_balance": "Saldo insuficiente",
+    "staking_insufficient_recommended_fee_reserve": "Fondos insuficientes: el saldo de la billetera debe incluir 1 TON de reserva y 0.05 TON de comisión.",
     "staking_max": "MÁX",
     "staking_min_deposit_label": "Depósito mínimo",
     "staking_next_cycle_desc_liquid": "Deshacer participación instantánea disponible",
@@ -365,6 +366,7 @@
     "ton_login_notice": "Asegúrate de verificar la dirección del servicio antes de conectar la billetera.",
     "ton_login_success": "Hecho",
     "transaction_bid_dns": "Nombre",
+    "transaction_cancelled": "Transacción cancelada",
     "transactionDetails": {
         "comment": "Comentario",
         "operation": "Operación",
