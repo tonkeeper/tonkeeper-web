@@ -11,6 +11,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../ios/HideOnReview';
 import { IfFeatureEnabled } from '../shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
+import { StakeAction } from './StakeAction';
 
 export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -26,11 +27,11 @@ export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = () => {
                     {!isTestnet && !isReadOnly && <SwapAction fromAsset={TON_ASSET} />}
                 </IfFeatureEnabled>
             </HideOnReview>
-            {/* <HideOnReview>
+            <HideOnReview>
                 <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
                     {!isTestnet && !isReadOnly && <StakeAction />}
                 </IfFeatureEnabled>
-            </HideOnReview> */}
+            </HideOnReview>
             {/* <SellAction sell={sell} /> */}
         </ActionsRow>
     );

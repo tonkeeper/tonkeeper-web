@@ -6,7 +6,7 @@ import {
     sortWalletsByVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
@@ -14,7 +14,14 @@ import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../libs/routes';
 import { useUserCountry } from '../state/country';
 import { useActiveAccount, useActiveWallet, useMutateActiveTonWallet } from '../state/wallet';
 import { DropDown } from './DropDown';
-import { DoneIcon, DownIcon, ExclamationMarkTriangleIcon, PlusIcon, SettingsIcon } from './Icon';
+import {
+    ChevronLeftIcon,
+    DoneIcon,
+    DownIcon,
+    ExclamationMarkTriangleIcon,
+    PlusIcon,
+    SettingsIcon
+} from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1, Label2 } from './Text';
@@ -31,6 +38,9 @@ import { useTwoFAWalletConfig } from '../state/two-fa';
 import { BorderSmallResponsive } from './shared/Styles';
 import { hexToRGBA } from '../libs/css';
 import { useNavigate } from '../hooks/router/useNavigate';
+import { useAppSdk } from '../hooks/appSdk';
+import { useNativeBackButton } from './BackButton';
+import { RoundedButton } from './fields/RoundedButton';
 
 const Block = styled.div<{
     center?: boolean;
@@ -150,6 +160,28 @@ const Column = styled.div`
     align-items: flex-start;
     gap: 8px;
 `;
+
+export const BackButtonLeft = styled(RoundedButton)`
+    align-self: center;
+    margin-right: 1rem;
+`;
+
+const BackButton = () => {
+    const sdk = useAppSdk();
+    const navigate = useNavigate();
+    const back = useCallback(() => navigate(-1), [navigate]);
+    useNativeBackButton(sdk, back);
+
+    if (sdk.nativeBackButton) {
+        return <></>;
+    } else {
+        return (
+            <BackButtonLeft onClick={() => navigate(-1)}>
+                <ChevronLeftIcon />
+            </BackButtonLeft>
+        );
+    }
+};
 
 const WalletRow: FC<{
     account: Account;
@@ -397,6 +429,21 @@ export const SettingsHeader = () => {
     return (
         <Block second>
             <H1>{t('settings_title')}</H1>
+        </Block>
+    );
+};
+
+const PageHeaderTitle = styled(H1)`
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+`;
+
+export const PageHeader = ({ title, backButton }: { title: string; backButton?: boolean }) => {
+    return (
+        <Block second>
+            {backButton && <BackButton />}
+            <PageHeaderTitle>{title}</PageHeaderTitle>
         </Block>
     );
 };

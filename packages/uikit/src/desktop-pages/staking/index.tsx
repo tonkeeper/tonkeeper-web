@@ -1,3 +1,4 @@
+import { FC, PropsWithChildren } from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
@@ -48,16 +49,49 @@ const StakingRouter = () => {
     );
 };
 
+/** Same guards as DesktopStakingPage; used by Ionic/Capacitor flat routes (see apps/mobile NarrowContent). */
+export const DesktopStakingPageShell: FC<PropsWithChildren> = ({ children }) => (
+    <HideOnReview>
+        <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
+            <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Staking page')}>
+                {children}
+            </ErrorBoundary>
+        </IfFeatureEnabled>
+    </HideOnReview>
+);
+
+/**
+ * Top-level routes for IonRouterOutlet: one Route per path so nested /staking/* URLs do not
+ * reuse a single /staking view (avoids Ionic stack transition early-exit / black screen).
+ */
+export const DesktopStakingPoolDetailIonRoute = () => (
+    <DesktopStakingPageShell>
+        <DesktopStakingPoolDetailPage />
+    </DesktopStakingPageShell>
+);
+
+export const DesktopStakingFormIonRoute = () => (
+    <DesktopStakingPageShell>
+        <DesktopStakingFormPage />
+    </DesktopStakingPageShell>
+);
+
+export const DesktopStakingUnstakeIonRoute = () => (
+    <DesktopStakingPageShell>
+        <DesktopUnstakeFormPage />
+    </DesktopStakingPageShell>
+);
+
+export const DesktopStakingDefaultIonRoute = () => (
+    <DesktopStakingPageShell>
+        <StakingDefaultView />
+    </DesktopStakingPageShell>
+);
+
 export const DesktopStakingPage = () => {
     return (
-        <HideOnReview>
-            <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
-                <ErrorBoundary
-                    fallbackRender={fallbackRenderOver('Failed to display Staking page')}
-                >
-                    <StakingRouter />
-                </ErrorBoundary>
-            </IfFeatureEnabled>
-        </HideOnReview>
+        <DesktopStakingPageShell>
+            <StakingRouter />
+        </DesktopStakingPageShell>
     );
 };

@@ -2,7 +2,7 @@ import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonCo
 import { toNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
 import { FC, useState } from 'react';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { AppRoute } from '../../libs/routes';
 import { useAtom } from '../../libs/useAtom';
 import { useEncodeStakingDeposit } from '../../state/staking/useEncodeStaking';
@@ -27,6 +27,13 @@ const TopRow = styled.div`
     display: flex;
     gap: 8px;
     align-items: flex-start;
+
+    ${p =>
+        (p.theme.proDisplayType === 'mobile' || p.theme.displayType === 'compact') &&
+        css`
+            flex-direction: column;
+            align-items: stretch;
+        `}
 `;
 
 const Notice = styled(Body3)`
@@ -60,7 +67,7 @@ export const StakingForm: FC<{ className?: string }> = ({ className }) => {
 
     const onCloseConfirmModal = (result?: { boc: string }) => {
         setModalParams(null);
-        if (result) {
+        if (result?.boc) {
             navigate(AppRoute.activity);
         }
     };

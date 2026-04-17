@@ -3,7 +3,7 @@ import { toNano } from '@ton/core';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { PoolImplementationType } from '@tonkeeper/core/dist/tonApiV2';
 import { FC, useEffect, useMemo, useState } from 'react';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { AppRoute } from '../../libs/routes';
 import { useAtom } from '../../libs/useAtom';
 import { useTranslation } from '../../hooks/translation';
@@ -29,6 +29,13 @@ const TopRow = styled.div`
     display: flex;
     gap: 8px;
     align-items: flex-start;
+
+    ${p =>
+        (p.theme.proDisplayType === 'mobile' || p.theme.displayType === 'compact') &&
+        css`
+            flex-direction: column;
+            align-items: stretch;
+        `}
 `;
 
 const CycleInfoCard = styled.div`
@@ -118,7 +125,7 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
 
     const onCloseConfirmModal = (result?: { boc: string }) => {
         setModalParams(null);
-        if (result) {
+        if (result?.boc) {
             navigate(AppRoute.activity);
         }
     };

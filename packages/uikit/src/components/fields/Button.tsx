@@ -72,6 +72,7 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
         props.fullWidth
             ? css`
                   width: 100%;
+                  box-sizing: border-box;
               `
             : props.fitContent
             ? css`

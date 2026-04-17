@@ -52,14 +52,7 @@ import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { StakingPoolIcon } from './StakingPoolIcon';
 
 const ButtonGap = styled.div`
-    ${props =>
-        props.theme.displayType === 'full-width'
-            ? css`
-                  height: 1rem;
-              `
-            : css`
-                  display: none;
-              `}
+    height: 1rem;
 `;
 
 const Root = styled.div``;
@@ -153,11 +146,16 @@ const EmojiWrap = styled.div`
 `;
 
 const FooterSlot = styled.div`
-    padding: 16px;
     padding-top: 0;
     width: 100%;
     box-sizing: border-box;
     background: ${p => p.theme.backgroundPage};
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            padding: 16px;
+        `}
 `;
 
 const ErrorStyled = styled.div`
@@ -594,7 +592,11 @@ const StakingModalContent: FC<{
 };
 
 const NotificationStyled = styled(Notification)`
-    max-width: 400px;
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            max-width: 400px;
+        `}
 `;
 
 export const StakingTransactionModal: FC<{
