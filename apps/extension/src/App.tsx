@@ -68,6 +68,7 @@ const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/A
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
+const StakingPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/staking'));
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
@@ -366,6 +367,11 @@ export const Content: FC<{
                 <Route path={AppRoute.swap}>
                     <Suspense fallback={null}>
                         <SwapPage />
+                    </Suspense>
+                </Route>
+                <Route path={AppRoute.staking}>
+                    <Suspense fallback={null}>
+                        <StakingPage />
                     </Suspense>
                 </Route>
                 <Route path="*" component={IndexPage} />
