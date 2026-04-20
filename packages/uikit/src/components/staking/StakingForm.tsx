@@ -16,6 +16,7 @@ import { StakingEarningsInfo } from './StakingEarningsInfo';
 import { StakingPoolSelector } from './StakingPoolSelector';
 import { Body3 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
+import { PoolImplementationType } from '@tonkeeper/core/dist/tonApiV2';
 
 const MainFormWrapper = styled.div`
     display: flex;
@@ -34,6 +35,12 @@ const TopRow = styled.div`
             flex-direction: column;
             align-items: stretch;
         `}
+`;
+
+const ButtonWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 `;
 
 const Notice = styled(Body3)`
@@ -79,15 +86,20 @@ export const StakingForm: FC<{ className?: string }> = ({ className }) => {
                 <StakingPoolSelector pool={pool} />
             </TopRow>
             <StakingEarningsInfo pool={pool} amount={amount} />
-            <StakingButton
-                onClick={onConfirm}
-                isLoading={isLoading || !!modalParams}
-                amount={amount}
-                pool={pool}
-                poolError={poolsError}
-                encodeError={encodeError}
-            />
-            <Notice>{t('staking_tonstakers_notice')}</Notice>
+            <ButtonWrapper>
+                <StakingButton
+                    onClick={onConfirm}
+                    isLoading={isLoading || !!modalParams}
+                    amount={amount}
+                    pool={pool}
+                    poolError={poolsError}
+                    encodeError={encodeError}
+                />
+                {pool?.implementation === PoolImplementationType.LiquidTf && (
+                    <Notice>{t('staking_tonstakers_notice')}</Notice>
+                )}
+            </ButtonWrapper>
+
             <StakingTransactionModal
                 handleClose={onCloseConfirmModal}
                 params={modalParams}
