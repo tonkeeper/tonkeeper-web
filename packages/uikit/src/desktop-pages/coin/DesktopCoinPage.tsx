@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import { FC, RefCallback, useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
-import { Body2, Body3, Label2, Num3 } from '../../components/Text';
+import { Body2, Body3, Label2, Mono, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent,
@@ -23,7 +23,7 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
-import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
+import { toTokenRate, useFormatFiat, useRate, useUSDTRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
@@ -110,6 +110,55 @@ const ButtonStyled = styled(Button)`
     }
 `;
 
+const CoinPriceSectionWrapper = styled.div`
+    padding: 12px 16px;
+    border-bottom: 1px solid ${p => p.theme.separatorCommon};
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+`;
+
+const CoinPriceValue = styled(Label2)`
+    color: ${p => p.theme.textPrimary};
+`;
+
+const CoinPriceDelta = styled(Body3)<{ $positive: boolean }>`
+    ${props =>
+        props.$positive
+            ? css`
+                  color: ${props.theme.accentGreen};
+              `
+            : css`
+                  color: ${props.theme.accentRed};
+              `}
+`;
+
+const CoinPriceSection: FC<{ token: string }> = ({ token }) => {
+    const { data: rate } = useRate(token);
+    const { fiatPrice } = useFormatFiat(rate, 1);
+
+    if (!rate || !fiatPrice) {
+        return null;
+    }
+
+    const diff24h = rate.diff24h;
+    const showDelta = Boolean(diff24h && diff24h !== '0.00%');
+    const positive = Boolean(diff24h?.startsWith('+'));
+
+    return (
+        <CoinPriceSectionWrapper>
+            <CoinPriceValue>
+                <Mono>{fiatPrice}</Mono>
+            </CoinPriceValue>
+            {showDelta && diff24h && (
+                <CoinPriceDelta $positive={positive}>
+                    <Mono>{diff24h}</Mono>
+                </CoinPriceDelta>
+            )}
+        </CoinPriceSectionWrapper>
+    );
+};
+
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -133,7 +182,6 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
         setSwapFromAsset(swapAsset!);
         navigate(AppRoute.swap, { replace: false });
     };
-
     const sdk = useAppSdk();
     return (
         <CoinHeaderStyled>
@@ -446,6 +494,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
                 ]}
             />
             <CoinHeader token={token} />
+            <CoinPriceSection token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />

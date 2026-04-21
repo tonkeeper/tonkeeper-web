@@ -12,6 +12,7 @@ import {
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
+    StakingIcon,
     SwapIcon
 } from '../components/Icon';
 import { Body3, Label2 } from '../components/Text';
@@ -144,6 +145,18 @@ export const MobileProHomePage = () => {
                                 <MenuItem to={AppRoute.swap}>
                                     <SwapIconStyled />
                                     <Label2>{t('wallet_swap')}</Label2>
+                                    <ChevronRightIcon />
+                                </MenuItem>
+                                <Divider />
+                            </>
+                        )}
+                    </IfFeatureEnabled>
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.STAKING}>
+                        {!isReadOnly && !isTestnet && (
+                            <>
+                                <MenuItem to={AppRoute.staking}>
+                                    <StakingIcon />
+                                    <Label2>{t('staking_title')}</Label2>
                                     <ChevronRightIcon />
                                 </MenuItem>
                                 <Divider />

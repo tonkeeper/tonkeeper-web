@@ -64,9 +64,9 @@ const ButtonRowStyled = styled.div`
     }
 `;
 
-const useSendMutation = (
+export const useTonConnectTransactionSendMutation = (
     params: TonConnectTransactionPayload,
-    estimate: TonEstimationDetailed,
+    estimate: TonEstimationDetailed | undefined,
     options: {
         senderChoice: SenderChoice;
         multisigTTL?: MultisigOrderLifetimeMinutes;
@@ -79,6 +79,10 @@ const useSendMutation = (
     const tonConnectService = useTonConnectTransactionService();
 
     return useMutation<string, Error>(async () => {
+        if (!estimate) {
+            throw new Error('Transaction estimate is not ready');
+        }
+
         if (account.type === 'watch-only') {
             throw new Error('Cant use this account');
         }
@@ -181,15 +185,18 @@ const TonTransactionContent: FC<{
     const [selectedSenderType, onSenderTypeChange] = useState<TonSenderChoiceUserAvailable['type']>(
         EXTERNAL_SENDER_CHOICE.type
     );
+    const availableSendersChoicesKey = useMemo(
+        () => availableSendersChoices?.map(c => c.type).join('|') ?? '',
+        [availableSendersChoices]
+    );
     useEffect(() => {
-        if (
-            availableSendersChoices &&
-            availableSendersChoices[0] &&
-            availableSendersChoices[0].type !== selectedSenderType
-        ) {
-            onSenderTypeChange(availableSendersChoices[0].type);
+        const first = availableSendersChoices?.[0];
+        if (first && first.type !== selectedSenderType) {
+            onSenderTypeChange(first.type);
         }
-    }, [JSON.stringify(availableSendersChoices)]);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [availableSendersChoicesKey]);
 
     const senderChoice: SenderChoice = useMemo(() => {
         if (selectedSenderType === BATTERY_SENDER_CHOICE.type) {
@@ -214,13 +221,20 @@ const TonTransactionContent: FC<{
         isLoading: isEstimating,
         isError,
         error
-    } = useEstimation(params, senderChoice, { multisigTTL, paramsLoading: isChoicesLoading });
+    } = useTonConnectTransactionEstimation(params, senderChoice, {
+        multisigTTL,
+        paramsLoading: isChoicesLoading
+    });
     const {
         mutateAsync,
         isLoading,
         error: sendError,
         data: sendResult
-    } = useSendMutation(params, estimate!, { multisigTTL, waitInvalidation, senderChoice });
+    } = useTonConnectTransactionSendMutation(params, estimate, {
+        multisigTTL,
+        waitInvalidation,
+        senderChoice
+    });
 
     useEffect(() => {
         if (sdk.twaExpand) {
@@ -316,7 +330,7 @@ const TonTransactionContent: FC<{
     );
 };
 
-const useEstimation = (
+export const useTonConnectTransactionEstimation = (
     params: TonConnectTransactionPayload,
     senderChoice: SenderChoice,
     options: { multisigTTL?: MultisigOrderLifetimeMinutes; paramsLoading?: boolean }

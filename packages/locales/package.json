@@ -4,12 +4,14 @@
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Tonkeeper locales",
     "scripts": {
+        "dev": "nodemon --watch src ./task/build.ts",
         "build": "ts-node ./task/build",
         "build:pkg": "yarn build"
     },
     "devDependencies": {
         "@types/node": "^20.6.3",
         "dotenv": "^16.3.1",
+        "nodemon": "^3.1.14",
         "ts-node": "^10.9.1",
         "typescript": "^4.9.4"
     }

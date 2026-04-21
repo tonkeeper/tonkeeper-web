@@ -10,6 +10,7 @@ import {
     AppRoute,
     DevSettingsRoute,
     SettingsRoute,
+    StakingRoute,
     WalletSettingsRoute
 } from '@tonkeeper/uikit/dist/libs/routes';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
@@ -75,6 +76,12 @@ import { Button } from '@tonkeeper/uikit';
 import { MobileDappBrowserController } from '../components/dapp-browser/MobileDappBrowserController';
 import { ProSubscriptionSettings } from '@tonkeeper/uikit/dist/components/settings/ProSubscriptionSettings';
 import { routerLocation$ } from '@tonkeeper/uikit/dist/hooks/router/useLocation';
+import {
+    DesktopStakingDefaultIonRoute,
+    DesktopStakingFormIonRoute,
+    DesktopStakingPoolDetailIonRoute,
+    DesktopStakingUnstakeIonRoute
+} from '@tonkeeper/uikit/dist/desktop-pages/staking';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -283,6 +290,23 @@ const NarrowContentAppRouting = () => {
                             <Route path={AppRoute.swap} component={DesktopSwapPage} />
                             <Route path={AppRoute.home} exact component={MobileProHomePage} />
                             <Route path={AppRoute.coins} exact component={DesktopTokens} />
+                            <Route
+                                path={`${AppRoute.staking}${StakingRoute.pool}/:address`}
+                                component={DesktopStakingPoolDetailIonRoute}
+                            />
+                            <Route
+                                path={`${AppRoute.staking}${StakingRoute.stake}/:address?`}
+                                component={DesktopStakingFormIonRoute}
+                            />
+                            <Route
+                                path={`${AppRoute.staking}${StakingRoute.unstake}/:address`}
+                                component={DesktopStakingUnstakeIonRoute}
+                            />
+                            <Route
+                                path={AppRoute.staking}
+                                exact
+                                component={DesktopStakingDefaultIonRoute}
+                            />
                             <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
 
                             {/* Wallet settings */}

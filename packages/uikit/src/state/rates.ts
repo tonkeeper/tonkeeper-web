@@ -131,9 +131,12 @@ export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount?: BigNumb
 
     const [fiatPrice, fiatAmount] = useMemo(() => {
         if (!rate || !tokenAmount) return [undefined, undefined] as const;
+
+        const fiatValue = new BigNumber(rate.prices).multipliedBy(tokenAmount);
+
         return [
             formatFiatCurrency(fiat, rate.prices),
-            formatFiatCurrency(fiat, new BigNumber(rate.prices).multipliedBy(tokenAmount))
+            formatFiatCurrency(fiat, fiatValue)
         ] as const;
     }, [rate, fiat, tokenAmount]);
     return {

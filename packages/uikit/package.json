@@ -8,7 +8,8 @@
     "scripts": {
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
-        "build": "rm -fr dist && tsc",
+        "build": "rm -fr dist && tsc && mkdir -p dist/components/staking && cp -R src/components/staking/assets dist/components/staking/",
+        "dev": "tsc -w",
         "start": "tsc -w",
         "build:pkg": "yarn build"
     },

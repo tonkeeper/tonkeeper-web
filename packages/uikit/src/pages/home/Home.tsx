@@ -6,46 +6,48 @@ import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
 import { TabsView } from '../../components/home/TabsView';
 import { HomeActions } from '../../components/home/TonActions';
-import { useAllChainsAssets } from '../../state/home';
 import { usePreFetchRates } from '../../state/rates';
 
 import { useWalletFilteredNftList } from '../../state/nft';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 import { MobileCancelLegacySubscriptionBanner } from '../../components/legacy-plugins/MobileCancelLegacySubscriptionBanner';
+import {
+    PortfolioBalance,
+    usePortfolioBalancesForList
+} from '../../state/portfolio/usePortfolioBalances';
 
 const HomeAssets: FC<{
-    assets: AssetAmount[];
+    balances: PortfolioBalance[];
     nfts: NFT[];
-}> = ({ assets, nfts }) => {
+}> = ({ balances, nfts }) => {
     const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
 
-    if (assets.length + nfts.length < 11 || assets.length < 4 || !isNftEnabled) {
-        return <CompactView assets={assets} nfts={nfts} />;
+    if (balances.length + nfts.length < 11 || balances.length < 4 || !isNftEnabled) {
+        return <CompactView balances={balances} nfts={nfts} />;
     } else {
-        return <TabsView assets={assets} nfts={nfts} />;
+        return <TabsView balances={balances} nfts={nfts} />;
     }
 };
 
 const Home = () => {
     const { isFetched } = usePreFetchRates();
 
-    const { assets, error } = useAllChainsAssets();
+    const { data: balances, tokenError } = usePortfolioBalancesForList();
 
     const { data: nfts, isFetching: isNftLoading } = useWalletFilteredNftList();
 
-    const isLoading = !assets || isNftLoading;
+    const isLoading = !balances || isNftLoading;
 
-    if (!nfts || !assets || !isFetched) {
+    if (!nfts || !balances || !isFetched) {
         return <HomeSkeleton />;
     }
 
     return (
         <>
             <MobileCancelLegacySubscriptionBanner />
-            <Balance error={error} isFetching={isLoading} />
+            <Balance error={tokenError} isFetching={isLoading} />
             <HomeActions chain={BLOCKCHAIN_NAME.TON} />
-            <HomeAssets assets={assets} nfts={nfts} />
+            <HomeAssets balances={balances} nfts={nfts} />
         </>
     );
 };

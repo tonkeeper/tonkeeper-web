@@ -1,9 +1,10 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, forwardRef, useMemo } from 'react';
+import BigNumber from 'bignumber.js';
+import { FC, forwardRef, useMemo } from 'react';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute } from '../../libs/routes';
+import { AppRoute, StakingRoute } from '../../libs/routes';
 import { toTokenRate, useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
@@ -11,16 +12,29 @@ import { TronBalances } from '../../state/tron/tron';
 import { TronAssetComponent } from './TronAssets';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { isTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { isTonAsset, isTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import {
-    tonAssetAddressToString,
-    TonAsset as TonAssetType
+    TonAsset as TonAssetType,
+    tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { formatter } from '../../hooks/balance';
 import { useJettonList } from '../../state/jetton';
+import { getStakingPendingSubtitleLine } from '../../state/staking/stakingPendingSubtitleLines';
+import { useStakingPosition } from '../../state/staking/useStakingPosition';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { StakingPoolIcon } from '../staking/StakingPoolIcon';
+import {
+    getPortfolioBalanceId,
+    PortfolioBalance,
+    PortfolioStakingPosition,
+    PortfolioTokenBalance
+} from '../../state/portfolio/usePortfolioBalances';
+import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
+import { useStakingCycleCountdown } from '../../state/staking/useStakingCycleCountdown';
 
 export interface TonAssetData {
     info: Account;
@@ -71,10 +85,12 @@ export const TonAsset = forwardRef<
 export const AnyChainAsset = forwardRef<
     HTMLDivElement,
     {
-        balance: AssetAmount;
+        tokenBalance: PortfolioTokenBalance;
         className?: string;
     }
->(({ balance, className }, ref) => {
+>(({ tokenBalance, className }, ref) => {
+    const balance = tokenBalance.assetAmount;
+
     if (isTronAsset(balance.asset)) {
         return (
             <TronAssetComponent
@@ -84,22 +100,36 @@ export const AnyChainAsset = forwardRef<
             />
         );
     } else {
-        return <JettonAsset ref={ref} balance={balance} className={className} />;
+        return <JettonAsset ref={ref} tokenBalance={tokenBalance} className={className} />;
     }
 });
 
 export const JettonAsset = forwardRef<
     HTMLDivElement,
     {
-        balance: AssetAmount;
+        tokenBalance: PortfolioTokenBalance;
         className?: string;
     }
->(({ balance, className }, ref) => {
+>(({ tokenBalance, className }, ref) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { fiat } = useAppContext();
 
+    const balance = tokenBalance.assetAmount;
     const { data: jettonBalances } = useJettonList();
+    const isFullWidth = useIsFullWidthMode();
+
+    const stakingPool = tokenBalance.stakingPool;
+    const { data: stakingPosition } = useStakingPosition(stakingPool?.address);
+    const { tonAmount: stakedAmount } = usePoolStakedBalance(stakingPool);
+    const stakedDisplayAmount = stakedAmount ? formatter.formatDisplay(stakedAmount) : null;
+    const countdown = useStakingCycleCountdown(stakingPool);
+    const pendingStakingSubtitle = useMemo(() => {
+        if (!isFullWidth || !stakingPool || !stakingPosition) {
+            return undefined;
+        }
+        return getStakingPendingSubtitleLine(t, stakingPosition, countdown);
+    }, [isFullWidth, stakingPool, stakingPosition, t, countdown]);
 
     const rate = useMemo(() => {
         const jetton = jettonBalances?.balances.find(j =>
@@ -107,25 +137,86 @@ export const JettonAsset = forwardRef<
         );
 
         return jetton?.price ? toTokenRate(jetton.price, fiat) : undefined;
-    }, [jettonBalances, fiat]);
+    }, [balance.asset.address, fiat, jettonBalances]);
     const { fiatPrice, fiatAmount } = useFormatFiat(rate, balance.relativeAmount);
 
-    const verification = useMemo(
-        () =>
-            jettonBalances?.balances.find(j => eqAddresses(j.jetton.address, balance.asset.address))
-                ?.jetton.verification,
-        [jettonBalances, fiat]
+    const verification = isTonAsset(balance.asset) ? balance.asset.verification : undefined;
+
+    return (
+        <ListItem
+            onClick={() => {
+                if (stakingPool) {
+                    navigate(AppRoute.staking + StakingRoute.pool + '/' + stakingPool.address, {
+                        replace: false
+                    });
+                } else {
+                    navigate(
+                        AppRoute.coins +
+                            `/${encodeURIComponent(
+                                tonAssetAddressToString((balance.asset as TonAssetType).address)
+                            )}`,
+                        { replace: false }
+                    );
+                }
+            }}
+            className={className}
+            ref={ref}
+            backgroundHighlighted={isFullWidth}
+        >
+            <ListItemPayload>
+                {stakingPool ? (
+                    <StakingPoolIcon pool={stakingPool} size={isFullWidth ? 44 : 40} />
+                ) : (
+                    <TokenLogo src={balance.asset.image} noRadius={balance.asset.noImageCorners} />
+                )}
+                <TokenLayout
+                    name={
+                        stakingPool ? t('staking_staked') : balance.asset.name ?? t('Unknown_COIN')
+                    }
+                    verification={stakingPool ? undefined : verification}
+                    symbol={stakingPool ? undefined : balance.asset.symbol}
+                    balance={stakedDisplayAmount ?? balance.stringRelativeAmount}
+                    secondary={stakingPool ? stakingPool.name : fiatPrice}
+                    tertiary={pendingStakingSubtitle}
+                    fiatAmount={fiatAmount}
+                    rate={stakingPool ? undefined : rate}
+                />
+            </ListItemPayload>
+        </ListItem>
     );
+});
+
+export const StakingPositionAsset = forwardRef<
+    HTMLDivElement,
+    { stakingPosition: PortfolioStakingPosition; className?: string }
+>(({ stakingPosition, className }, ref) => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
     const isFullWidth = useIsFullWidthMode();
+    const { data: tonRate } = useRate(CryptoCurrency.TON);
+
+    const tonAmount = useMemo(
+        () => shiftedDecimals(stakingPosition.position.amount),
+        [stakingPosition.position.amount]
+    );
+    const balanceStr = useMemo(
+        () => `${tonAmount.toFixed(2, BigNumber.ROUND_DOWN)} TON`,
+        [tonAmount]
+    );
+    const { fiatAmount } = useFormatFiat(tonRate, tonAmount);
+    const countdown = useStakingCycleCountdown(stakingPosition.pool);
+    const pendingStakingSubtitle = useMemo(() => {
+        if (!isFullWidth || !stakingPosition) {
+            return undefined;
+        }
+        return getStakingPendingSubtitleLine(t, stakingPosition.position, countdown);
+    }, [isFullWidth, stakingPosition.position, t, countdown]);
 
     return (
         <ListItem
             onClick={() =>
                 navigate(
-                    AppRoute.coins +
-                        `/${encodeURIComponent(
-                            tonAssetAddressToString((balance.asset as TonAssetType).address)
-                        )}`,
+                    AppRoute.staking + StakingRoute.pool + '/' + stakingPosition.pool.address,
                     {
                         replace: false
                     }
@@ -136,38 +227,53 @@ export const JettonAsset = forwardRef<
             backgroundHighlighted={isFullWidth}
         >
             <ListItemPayload>
-                <TokenLogo src={balance.asset.image} noRadius={balance.asset.noImageCorners} />
+                <StakingPoolIcon pool={stakingPosition.pool} size={isFullWidth ? 44 : 40} />
                 <TokenLayout
-                    name={balance.asset.name ?? t('Unknown_COIN')}
-                    verification={verification}
-                    symbol={balance.asset.symbol}
-                    balance={balance.stringRelativeAmount}
-                    secondary={fiatPrice}
+                    name={t('staking_staked')}
+                    balance={balanceStr}
+                    secondary={stakingPosition.pool.name}
+                    tertiary={pendingStakingSubtitle}
                     fiatAmount={fiatAmount}
-                    rate={rate}
+                    rate={undefined}
                 />
             </ListItemPayload>
         </ListItem>
     );
 });
 
-export const JettonList: FC<{ assets: AssetAmount[] }> = ({ assets }) => {
-    const [tonAssetAmount, restAssets] = useMemo(() => {
+export const JettonList: FC<{ balances: PortfolioBalance[] }> = ({ balances }) => {
+    const [tonTokenBalance, restBalances] = useMemo(() => {
         return [
-            assets.find(item => item.asset.id === TON_ASSET.id)!,
-            assets.filter(item => item.asset.id !== TON_ASSET.id)
+            balances.find(
+                (item): item is PortfolioTokenBalance =>
+                    item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id
+            ),
+            balances.filter(
+                item => !(item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id)
+            )
         ];
-    }, [assets]);
+    }, [balances]);
+
+    if (!tonTokenBalance) {
+        return null;
+    }
 
     return (
         <>
             <ListBlock noUserSelect>
-                <TonAsset balance={tonAssetAmount} />
+                <TonAsset balance={tonTokenBalance.assetAmount} />
             </ListBlock>
             <ListBlock noUserSelect>
-                {restAssets.map(item => (
-                    <AnyChainAsset key={item.asset.id} balance={item} />
-                ))}
+                {restBalances.map(item =>
+                    item.kind === 'token' ? (
+                        <AnyChainAsset key={getPortfolioBalanceId(item)} tokenBalance={item} />
+                    ) : (
+                        <StakingPositionAsset
+                            key={getPortfolioBalanceId(item)}
+                            stakingPosition={item}
+                        />
+                    )
+                )}
             </ListBlock>
         </>
     );

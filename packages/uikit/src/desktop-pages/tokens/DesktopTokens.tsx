@@ -1,6 +1,11 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { AccountStakingInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { fallbackRenderOver } from '../../components/Error';
 import { Body2 } from '../../components/Text';
@@ -10,18 +15,26 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
-import { AnyChainAsset, TonAsset } from '../../components/home/Jettons';
+import { AnyChainAsset, StakingPositionAsset, TonAsset } from '../../components/home/Jettons';
 import { useTranslation } from '../../hooks/translation';
-import { allChainsAssetsKeys, useAllChainsAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { hasAnySignificantPendingStakingSubtitle } from '../../state/staking/stakingPendingSubtitleLines';
+import { useStakingPositions } from '../../state/staking/useStakingPosition';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
+import {
+    getPortfolioBalanceId,
+    portfolioBalancesKeys,
+    PortfolioBalance,
+    PortfolioTokenBalance,
+    usePortfolioBalancesForList
+} from '../../state/portfolio/usePortfolioBalances';
 
 export const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -48,6 +61,10 @@ const TonAssetStyled = styled(TonAsset)`
 `;
 
 const AnyChainAssetStyled = styled(AnyChainAsset)`
+    ${DesktopAssetStylesOverride}
+`;
+
+const StakingPositionAssetStyled = styled(StakingPositionAsset)`
     ${DesktopAssetStylesOverride}
 `;
 
@@ -103,14 +120,57 @@ const DividerInner = styled(Divider)`
     margin: 0;
 `;
 
+const hasPendingStakingSubtitle = (
+    token: PortfolioBalance,
+    positions: AccountStakingInfo[] | undefined,
+    isFullWidth: boolean
+) => {
+    if (!isFullWidth || !positions?.length) {
+        return false;
+    }
+
+    const stakingPool = token.kind === 'token' ? token.stakingPool : token.pool;
+    if (!stakingPool) {
+        return false;
+    }
+
+    const position = positions.find(p => eqAddresses(p.pool, stakingPool.address));
+    if (!position) {
+        return false;
+    }
+    return hasAnySignificantPendingStakingSubtitle(position);
+};
+
+const PENDING_STAKING_POOL_ROW_HEIGHT_PX = 93;
+
+const getPortfolioBalanceRowHeight = (
+    balance: PortfolioBalance | undefined,
+    defaultSize: number,
+    positions: AccountStakingInfo[] | undefined,
+    isFullWidth: boolean
+) => {
+    if (balance && hasPendingStakingSubtitle(balance, positions, isFullWidth)) {
+        return PENDING_STAKING_POOL_ROW_HEIGHT_PX;
+    }
+    return defaultSize;
+};
+
 const DesktopTokensPayload = () => {
-    const { assets: allAssets } = useAllChainsAssets() ?? [];
-    const [tonAssetAmount, assets] = useMemo(() => {
+    const { data: balances } = usePortfolioBalancesForList();
+    const { data: stakingPositions } = useStakingPositions();
+    const isFullWidth = useIsFullWidthMode();
+    const [tonTokenBalance, listBalances] = useMemo(() => {
         return [
-            allAssets?.find(item => item.asset.id === TON_ASSET.id),
-            allAssets?.filter(item => item.asset.id !== TON_ASSET.id)
+            balances?.find(
+                (item): item is PortfolioTokenBalance =>
+                    item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id
+            ),
+            balances?.filter(
+                item => !(item.kind === 'token' && item.assetAmount.asset.id === TON_ASSET.id)
+            )
         ];
-    }, [allAssets]);
+    }, [balances]);
+    const tonAssetAmount = tonTokenBalance?.assetAmount;
     const { t } = useTranslation();
     const { data: distribution } = useAssetsDistribution();
     const { data: uiPreferences } = useUserUIPreferences();
@@ -138,11 +198,36 @@ const DesktopTokensPayload = () => {
 
     const virtualScrollPaddingBase = itemSize;
 
+    const listOffsetBeforeIndex = useCallback(
+        (index: number) => {
+            if (!listBalances) {
+                return 0;
+            }
+            let offset = 0;
+            for (let i = 0; i < index; i += 1) {
+                offset += getPortfolioBalanceRowHeight(
+                    listBalances[i],
+                    itemSize,
+                    stakingPositions,
+                    isFullWidth
+                );
+            }
+            return offset;
+        },
+        [listBalances, itemSize, stakingPositions, isFullWidth]
+    );
+
     const rowVirtualizer = useVirtualizer({
-        count: assets?.length ?? 0,
+        count: listBalances?.length ?? 0,
         getScrollElement: () => containerRef.current,
-        estimateSize: () => itemSize,
-        getItemKey: index => assets![index].asset.id,
+        estimateSize: index =>
+            getPortfolioBalanceRowHeight(
+                listBalances?.[index],
+                itemSize,
+                stakingPositions,
+                isFullWidth
+            ),
+        getItemKey: index => getPortfolioBalanceId(listBalances![index]),
         paddingStart:
             canShowChart && showChart
                 ? chartSize + virtualScrollPaddingBase
@@ -162,22 +247,28 @@ const DesktopTokensPayload = () => {
                 return rowVirtualizer.scrollToOffset(containerRef.current!.scrollHeight);
             }
 
-            const index = assets!.findIndex(item => item.asset.address === address);
-            if (index !== undefined) {
+            const index = listBalances!.findIndex(item => {
+                if (item.kind !== 'token') return false;
+
+                const asset = item.assetAmount.asset;
+                if (!isTonAsset(asset)) return false;
+                return tonAssetAddressToString(asset.address) === address;
+            });
+            if (index !== -1) {
                 rowVirtualizer.scrollToOffset(
-                    (tonRef.current?.offsetTop ?? 0) + (index + 1) * itemSize
+                    (tonRef.current?.offsetTop ?? 0) + listOffsetBeforeIndex(index)
                 );
             }
         },
-        [assets, rowVirtualizer, rowVirtualizer.elementsCache, env]
+        [listBalances, listOffsetBeforeIndex, rowVirtualizer, rowVirtualizer.elementsCache, env]
     );
 
     /**
-     * Cover Ionic virtualisation bug
+     * Cover Ionic virtualisation bug; remeasure when list or pending-withdraw row heights change
      */
     useEffect(() => {
         rowVirtualizer.measure();
-    }, []);
+    }, [listBalances, stakingPositions, isFullWidth, rowVirtualizer]);
 
     return (
         <DesktopViewPageLayout ref={containerRef}>
@@ -206,13 +297,13 @@ const DesktopTokensPayload = () => {
                     }
                 />
             </DesktopViewHeader>
-            <PullToRefresh invalidate={allChainsAssetsKeys} />
+            <PullToRefresh invalidate={portfolioBalancesKeys} />
             <TokensPageBody
                 style={{
                     height: `${rowVirtualizer.getTotalSize()}px`
                 }}
             >
-                {tonAssetAmount && assets && distribution && uiPreferences && (
+                {tonAssetAmount && listBalances && distribution && uiPreferences && (
                     <>
                         {canShowChart && showChart && (
                             <ErrorBoundary
@@ -244,7 +335,7 @@ const DesktopTokensPayload = () => {
                                         'Failed to display tokens list'
                                     )}
                                 >
-                                    <AnyChainAssetStyled balance={assets[virtualRow.index]} />
+                                    <PortfolioBalanceRow balance={listBalances[virtualRow.index]} />
                                     <DividerInner />
                                 </ErrorBoundary>
                             </div>
@@ -254,6 +345,13 @@ const DesktopTokensPayload = () => {
             </TokensPageBody>
         </DesktopViewPageLayout>
     );
+};
+
+const PortfolioBalanceRow: FC<{ balance: PortfolioBalance }> = ({ balance }) => {
+    if (balance.kind === 'token') {
+        return <AnyChainAssetStyled tokenBalance={balance} />;
+    }
+    return <StakingPositionAssetStyled stakingPosition={balance} />;
 };
 
 export const DesktopTokens = () => {

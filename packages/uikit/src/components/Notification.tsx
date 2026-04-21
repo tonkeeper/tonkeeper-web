@@ -63,7 +63,7 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: 
 
     return (
         <NotificationContainer
-            className={'notification-container' + className ? ' ' + className : ''}
+            className={cn('notification-container', className)}
             id=""
             scrollbarWidth={scrollbarWidth}
         >

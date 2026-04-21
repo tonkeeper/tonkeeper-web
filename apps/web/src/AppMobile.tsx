@@ -21,13 +21,13 @@ import { AppRoute, SignerRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense, useMemo } from "react";
-import { Route, Switch, useLocation } from "react-router-dom";
+import React, { FC, Suspense, useMemo } from 'react';
+import { Route, Switch, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
-import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
+import { UrlTonConnectSubscription } from './components/UrlTonConnectSubscription';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
-import { RedirectFromDesktopSettings } from "@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings";
+import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -35,6 +35,7 @@ const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/A
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
+const StakingPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/staking'));
 const WebTonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
 );
@@ -97,7 +98,7 @@ const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
     }
 `;
 
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean; recovery: boolean; }>`
+const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean; recovery: boolean }>`
     box-sizing: border-box;
     padding-top: ${props => (props.recovery ? 0 : 64)}px;
     padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
@@ -114,7 +115,6 @@ export const MobileView: FC<{
     useTrackLocation();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
-
 
     const updated = useMemo(() => {
         theme.displayType = 'compact';
@@ -144,11 +144,11 @@ export const MobileContent: FC<{
             <Wrapper standalone={standalone}>
                 <Switch>
                     <Route path={AppRoute.signer}>
-                        <Route
-                            path={SignerRoute.link}
-                        ><Suspense>
-                          <SignerLinkPage />
-                        </Suspense></Route>
+                        <Route path={SignerRoute.link}>
+                            <Suspense>
+                                <SignerLinkPage />
+                            </Suspense>
+                        </Route>
                     </Route>
                 </Switch>
             </Wrapper>
@@ -168,47 +168,54 @@ export const MobileContent: FC<{
     }
 
     return (
-        <Wrapper standalone={standalone} recovery={location.pathname.includes(SettingsRoute.recovery)}>
+        <Wrapper
+            standalone={standalone}
+            recovery={location.pathname.includes(SettingsRoute.recovery)}
+        >
             <Switch>
-                <Route
-                    path={AppRoute.activity}
-                > <Suspense fallback={<ActivitySkeletonPage />}>
-                  <Activity />
-                </Suspense>
+                <Route path={AppRoute.activity}>
+                    <Suspense fallback={<ActivitySkeletonPage />}>
+                        <Activity />
+                    </Suspense>
                 </Route>
-                <Route
-                    path={AppRoute.browser}
-                > <Suspense fallback={<BrowserSkeletonPage />}>
-                  <Browser />
-                </Suspense></Route>
-                <Route
-                    path={AppRoute.settings}
-                > <Suspense fallback={<SettingsSkeletonPage />}>
-                  <Settings />
-                </Suspense></Route>
+                <Route path={AppRoute.browser}>
+                    <Suspense fallback={<BrowserSkeletonPage />}>
+                        <Browser />
+                    </Suspense>
+                </Route>
+                <Route path={AppRoute.settings}>
+                    <Suspense fallback={<SettingsSkeletonPage />}>
+                        <Settings />
+                    </Suspense>
+                </Route>
                 <Route path={AppRoute.walletSettings}>
-                  <RedirectFromDesktopSettings />
+                    <RedirectFromDesktopSettings />
                 </Route>
                 <Route path={`${AppRoute.coins}/:name`}>
                     <Suspense fallback={<CoinSkeletonPage />}>
-                      <Coin />
+                        <Coin />
                     </Suspense>
                 </Route>
-                <Route
-                    path={AppRoute.swap}
-                > <Suspense fallback={null}>
-                  <SwapPage />
-                </Suspense></Route>
-                <Route
-                    path="*"
-                > <>
-                  <Header />
-                  <InnerBody>
-                    <Suspense fallback={<HomeSkeleton />}>
-                      <Home />
+                <Route path={AppRoute.swap}>
+                    <Suspense fallback={null}>
+                        <SwapPage />
                     </Suspense>
-                  </InnerBody>
-                </></Route>
+                </Route>
+                <Route path={AppRoute.staking}>
+                    <Suspense fallback={null}>
+                        <StakingPage />
+                    </Suspense>
+                </Route>
+                <Route path="*">
+                    <>
+                        <Header />
+                        <InnerBody>
+                            <Suspense fallback={<HomeSkeleton />}>
+                                <Home />
+                            </Suspense>
+                        </InnerBody>
+                    </>
+                </Route>
             </Switch>
             <Footer standalone={standalone} />
             <MemoryScroll />

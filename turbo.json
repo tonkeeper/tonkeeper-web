@@ -37,8 +37,7 @@
             "outputs": [".next/**", "dist/**"]
         },
         "dev": {
-            "dependsOn": ["^dev"],
-            "outputs": [".next/**", "dist/**"]
+            "cache": false
         }
     }
 }

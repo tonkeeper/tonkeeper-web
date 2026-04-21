@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { TokenRate } from '../../state/rates';
-import { Body2, Label1, Label4 } from '../Text';
+import { Body2, Body3, Label1, Label4 } from '../Text';
 import { Image } from '../shared/Image';
 
 export const ListItemPayload = styled.div`
@@ -79,8 +79,31 @@ const SecondLine = styled.div`
     justify-content: space-between;
 `;
 
+const ThirdLine = styled.div`
+    display: flex;
+    justify-content: flex-start;
+    min-width: 0;
+`;
+
 const Secondary = styled(Body2)`
     color: ${props => props.theme.textSecondary};
+`;
+
+const TertiaryText = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`;
+
+const TertiaryMultiline = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    min-width: 0;
+    white-space: normal;
 `;
 
 const Symbol = styled(Label1)`
@@ -96,11 +119,12 @@ export const TokenLayout: FC<{
     symbol?: string;
     balance: string;
     secondary: React.ReactNode;
+    tertiary?: React.ReactNode;
     fiatAmount?: string;
     label?: string;
     rate: TokenRate | undefined;
     verification?: JettonVerificationType;
-}> = ({ name, symbol, balance, secondary, fiatAmount, label, rate, verification }) => {
+}> = ({ name, symbol, balance, secondary, tertiary, fiatAmount, label, rate, verification }) => {
     const { t } = useTranslation();
 
     return (
@@ -125,6 +149,15 @@ export const TokenLayout: FC<{
                 </Secondary>
                 <Secondary>{fiatAmount}</Secondary>
             </SecondLine>
+            {tertiary ? (
+                <ThirdLine>
+                    {typeof tertiary === 'string' ? (
+                        <TertiaryText>{tertiary}</TertiaryText>
+                    ) : (
+                        <TertiaryMultiline>{tertiary}</TertiaryMultiline>
+                    )}
+                </ThirdLine>
+            ) : null}
         </Description>
     );
 };
