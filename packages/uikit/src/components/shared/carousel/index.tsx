@@ -110,10 +110,6 @@ export const Carousel: FC<PropsWithChildren<CarouselProps>> = ({
                 slidesToShow={slidesToShow}
                 centerPadding={centerPadding}
                 className={className}
-                onWheel={(e: WheelEvent) => {
-                    if (e.deltaX > 0) carousel?.scrollNext();
-                    else if (e.deltaX < 0) carousel?.scrollPrev();
-                }}
             >
                 {canGoLeft && (
                     <SwipeButton position="left" onClick={() => carousel?.scrollPrev()}>
