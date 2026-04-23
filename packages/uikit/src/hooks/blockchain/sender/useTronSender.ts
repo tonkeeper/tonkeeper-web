@@ -191,6 +191,8 @@ const useGetTronTonSender = () => {
     const activeAccount = useActiveAccount();
     const batteryApi = useBatteryApi();
     const sdk = useAppSdk();
+    const { data: authToken } = useBatteryAuthToken();
+    const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
@@ -208,15 +210,27 @@ const useGetTronTonSender = () => {
             throw new Error('Ton wallet does not support trc20 fee covering');
         }
         const signer = getMultiPayloadSigner(sdk, tronApi, activeAccount);
+        const batteryToken = authToken ?? (await requestToken());
+
         return new TronTonSender(
             tronApi,
             tonApi,
             batteryApi,
             activeTronWallet,
             activeTonWallet,
-            signer
+            signer,
+            batteryToken
         );
-    }, [activeAccount, activeTonWallet, activeTronWallet, tonApi, tronApi, batteryApi]);
+    }, [
+        activeAccount,
+        activeTonWallet,
+        activeTronWallet,
+        tonApi,
+        tronApi,
+        batteryApi,
+        authToken,
+        requestToken
+    ]);
 };
 
 const useGetBatteryTronSender = () => {
@@ -392,13 +406,18 @@ const useTronEstimationTonSender = () => {
     const tonApi = useActiveApi();
     const activeAccount = useActiveAccount();
     const batteryApi = useBatteryApi();
+    const { data: authToken } = useBatteryAuthToken();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
         : undefined;
 
     return useMemo(() => {
-        if (!activeTronWallet || !isStandardTonWallet(activeAccount.activeTonWallet)) {
+        if (
+            !activeTronWallet ||
+            !isStandardTonWallet(activeAccount.activeTonWallet) ||
+            !authToken
+        ) {
             return undefined;
         }
 
@@ -408,9 +427,17 @@ const useTronEstimationTonSender = () => {
             batteryApi,
             activeTronWallet,
             activeAccount.activeTonWallet,
-            emptySigner
+            emptySigner,
+            authToken
         );
-    }, [activeAccount, activeTronWallet, activeAccount.activeTonWallet, tronApi, batteryApi]);
+    }, [
+        activeAccount,
+        activeTronWallet,
+        activeAccount.activeTonWallet,
+        tronApi,
+        batteryApi,
+        authToken
+    ]);
 };
 
 const useTronEstimationFreeProSender = () => {
