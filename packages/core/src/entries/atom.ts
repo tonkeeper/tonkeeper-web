@@ -41,7 +41,7 @@ export class Atom<T> {
     }
 }
 
-export class ReplySubject<T> {
+export class ReplaySubject<T> {
     private buffer: T[] = [];
 
     private subscribers: ((value: T) => void)[] = [];
@@ -53,7 +53,7 @@ export class ReplySubject<T> {
     }
 
     public subscribe(fn: (value: T) => void): () => void {
-        this.buffer.forEach(fn);
+        this.buffer.forEach(value => fn(value));
         this.subscribers.push(fn);
 
         return () => {
@@ -72,14 +72,14 @@ export class ReplySubject<T> {
     }
 }
 
-export const replySubject = <T>(bufferSize: number | 'all' = 1): ReplySubject<T> =>
-    new ReplySubject<T>(bufferSize);
+export const replaySubject = <T>(bufferSize: number | 'all' = 1): ReplaySubject<T> =>
+    new ReplaySubject<T>(bufferSize);
 export const atom = <T>(value: T): Atom<T> => new Atom<T>(value);
 export const subject = <T>(): Subject<T> => new Subject<T>();
 
 export type ReadonlyAtom<T> = Omit<Atom<T>, 'next'>;
 export type ReadonlySubject<T> = Omit<Subject<T>, 'next'>;
-export type ReadonlyReplySubject<T> = Omit<ReplySubject<T>, 'next'>;
+export type ReadonlyReplaySubject<T> = Omit<ReplaySubject<T>, 'next'>;
 
 export function mapSubject<T, U>(source: Subject<T>, fn: (value: T) => U): Subject<U> {
     const mapped = new Subject<U>();
@@ -93,12 +93,12 @@ export function mapAtom<T, U>(source: Atom<T>, fn: (value: T) => U): Atom<U> {
     return mapped;
 }
 
-export function mapReplySubject<T, U>(
-    source: ReplySubject<T>,
+export function mapReplaySubject<T, U>(
+    source: ReplaySubject<T>,
     fn: (value: T) => U,
     bufferSize: number | 'all' = 1
-): ReplySubject<U> {
-    const mapped = new ReplySubject<U>(bufferSize);
+): ReplaySubject<U> {
+    const mapped = new ReplaySubject<U>(bufferSize);
     source.subscribe(value => mapped.next(fn(value)));
     return mapped;
 }
