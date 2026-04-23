@@ -5,10 +5,15 @@ import { sendEventToBridge } from './httpBridge';
 export const replyHttpBadRequestResponse = async ({
     connection,
     request: { id, method },
+    message,
     bridgeEndpoint
-}: TonConnectAppRequest<'http'> & { bridgeEndpoint: string }) => {
+}: Pick<TonConnectAppRequest<'http'>, 'connection'> & {
+    request: Pick<TonConnectAppRequest<'http'>['request'], 'id' | 'method'>;
+    message?: string;
+    bridgeEndpoint: string;
+}) => {
     await sendEventToBridge({
-        response: sendBadRequestResponse(id, method),
+        response: sendBadRequestResponse(id, method, message),
         sessionKeyPair: connection.sessionKeyPair,
         clientSessionId: connection.clientSessionId,
         bridgeEndpoint

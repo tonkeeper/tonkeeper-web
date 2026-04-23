@@ -8,7 +8,9 @@ import { getLastEventId, subscribeTonConnect } from './httpBridge';
 import { accountsStorage } from '../accountsStorage';
 import { IStorage } from '../../Storage';
 import { TonConnectAppRequest, TonConnectAppRequestPayload } from '../../entries/tonConnect';
+import { TonConnectError } from '../../entries/exception';
 import { getWalletById } from '../../entries/account';
+import { checkTonConnectFromAndNetwork } from './connectService';
 import { replyHttpBadRequestResponse, replyHttpDisconnectResponse } from './actionService';
 import { delay } from '../../utils/common';
 import {
@@ -142,11 +144,20 @@ export class TonConnectSSE {
         await this.reconnect();
     };
 
-    private onDisconnect = async ({ connection, request }: TonConnectAppRequest<'http'>) => {
+    private getStandardWalletByClientSessionId = async (clientSessionId: string) => {
         const accounts = await accountsStorage(this.storage).getAccounts();
-        const wallet = getWalletById(accounts, this.dist[connection.clientSessionId]);
+        const wallet = getWalletById(accounts, this.dist[clientSessionId]);
 
         if (!wallet || !isStandardTonWallet(wallet)) {
+            return null;
+        }
+
+        return wallet;
+    };
+
+    private onDisconnect = async ({ connection, request }: TonConnectAppRequest<'http'>) => {
+        const wallet = await this.getStandardWalletByClientSessionId(connection.clientSessionId);
+        if (!wallet) {
             return;
         }
 
@@ -183,6 +194,31 @@ export class TonConnectSSE {
     };
 
     private handleMessage = async (params: TonConnectAppRequest<'http'>) => {
+        const replyBadRequest = (message?: string) =>
+            this.bridgeEndpoint.then(bridgeEndpoint =>
+                replyHttpBadRequestResponse({ ...params, message, bridgeEndpoint })
+            );
+
+        const validatePayload = async (
+            payload: TonConnectAppRequestPayload['payload']
+        ): Promise<boolean> => {
+            const wallet = await this.getStandardWalletByClientSessionId(
+                params.connection.clientSessionId
+            );
+            if (!wallet) {
+                await replyBadRequest('Unknown session');
+                return false;
+            }
+
+            try {
+                await checkTonConnectFromAndNetwork(this.storage, wallet, payload);
+                return true;
+            } catch (e) {
+                await replyBadRequest(e instanceof TonConnectError ? e.message : 'Bad request');
+                return false;
+            }
+        };
+
         switch (params.request.method) {
             case 'disconnect': {
                 return this.onDisconnect(params);
@@ -194,7 +230,15 @@ export class TonConnectSSE {
                     kind: 'sendTransaction',
                     payload: JSON.parse(params.request.params[0])
                 };
-                await this.selectWallet(params.connection.clientSessionId);
+                if (!(await validatePayload(value.payload))) {
+                    return;
+                }
+                try {
+                    await this.selectWallet(params.connection.clientSessionId);
+                } catch (e) {
+                    await replyBadRequest(e instanceof Error ? e.message : 'Bad request');
+                    return;
+                }
                 return this.listeners.onRequest(value);
             }
             case 'signData': {
@@ -204,14 +248,19 @@ export class TonConnectSSE {
                     kind: 'signData',
                     payload: JSON.parse(params.request.params[0])
                 };
-                await this.selectWallet(params.connection.clientSessionId);
+                if (!(await validatePayload(value.payload))) {
+                    return;
+                }
+                try {
+                    await this.selectWallet(params.connection.clientSessionId);
+                } catch (e) {
+                    await replyBadRequest(e instanceof Error ? e.message : 'Bad request');
+                    return;
+                }
                 return this.listeners.onRequest(value);
             }
             default: {
-                return replyHttpBadRequestResponse({
-                    ...params,
-                    bridgeEndpoint: await this.bridgeEndpoint
-                });
+                return replyBadRequest();
             }
         }
     };

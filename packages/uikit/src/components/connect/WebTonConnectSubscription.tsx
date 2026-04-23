@@ -5,10 +5,12 @@ import {
     TonConnectAppRequest,
     TonConnectAppRequestPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import {
     replyHttpBadRequestResponse,
     replyHttpDisconnectResponse
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
+import { checkTonConnectFromAndNetwork } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -66,7 +68,37 @@ const WebTonConnectSubscription = () => {
                 }, 100);
             }
         };
-        const handleMessage = (params: TonConnectAppRequest<'http'>) => {
+        const isValidRequest = async (
+            params: TonConnectAppRequest<'http'>,
+            payload: TonConnectAppRequestPayload['payload']
+        ): Promise<boolean> => {
+            const walletToActivate = appConnections?.find(i =>
+                i.connections.some(c => c.clientSessionId === params.connection.clientSessionId)
+            )?.wallet;
+
+            if (!walletToActivate) {
+                await replyHttpBadRequestResponse({
+                    ...params,
+                    message: 'Unknown session',
+                    bridgeEndpoint: mainnetConfig.ton_connect_bridge
+                });
+                return false;
+            }
+
+            try {
+                await checkTonConnectFromAndNetwork(sdk.storage, walletToActivate, payload);
+                return true;
+            } catch (e) {
+                await replyHttpBadRequestResponse({
+                    ...params,
+                    message: e instanceof TonConnectError ? e.message : 'Bad request',
+                    bridgeEndpoint: mainnetConfig.ton_connect_bridge
+                });
+                return false;
+            }
+        };
+
+        const handleMessage = async (params: TonConnectAppRequest<'http'>) => {
             switch (params.request.method) {
                 case 'disconnect': {
                     return disconnect(params.connection).then(() =>
@@ -77,23 +109,29 @@ const WebTonConnectSubscription = () => {
                     );
                 }
                 case 'sendTransaction': {
-                    setRequest(undefined);
                     const value: TonConnectAppRequestPayload = {
                         connection: params.connection,
                         id: params.request.id,
                         kind: 'sendTransaction',
                         payload: JSON.parse(params.request.params[0])
                     };
+                    if (!(await isValidRequest(params, value.payload))) {
+                        return;
+                    }
+                    setRequest(undefined);
                     return openNotification(params.connection.clientSessionId, value);
                 }
                 case 'signData': {
-                    setRequest(undefined);
                     const value: TonConnectAppRequestPayload = {
                         connection: params.connection,
                         id: params.request.id,
                         kind: 'signData',
                         payload: JSON.parse(params.request.params[0])
                     };
+                    if (!(await isValidRequest(params, value.payload))) {
+                        return;
+                    }
+                    setRequest(undefined);
                     return openNotification(params.connection.clientSessionId, value);
                 }
                 default: {
