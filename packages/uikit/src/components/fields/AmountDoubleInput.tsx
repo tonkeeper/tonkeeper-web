@@ -277,6 +277,11 @@ export const AmountDoubleInput = forwardRef<
     };
 
     const onToggleCurrency = () => {
+        const secondaryValue =
+            currencyAmount.activeCurrencyId === currencies[0].id
+                ? currencyAmount.value2
+                : currencyAmount.value1;
+
         setCurrencyAmount(s => ({
             ...s,
             activeCurrencyId:
@@ -289,11 +294,7 @@ export const AmountDoubleInput = forwardRef<
                 currencyAmount.activeCurrencyId === currencies[0].id
                     ? currencies[1].id
                     : currencies[0].id,
-            input: inputValueToBN(
-                currencyAmount.activeCurrencyId === currencies[0].id
-                    ? currencyAmount.value2
-                    : currencyAmount.value1
-            )
+            input: secondaryValue ? inputValueToBN(secondaryValue) : new BigNumber(0)
         });
     };
 
