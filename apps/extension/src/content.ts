@@ -28,10 +28,6 @@ interface PageMessagePayload {
     message: DAppMessage;
 }
 
-interface PageMessage {
-    data?: PageMessagePayload;
-}
-
 /**
  * the transport-specific streams for communication between provider and background
  */
@@ -39,7 +35,7 @@ async function setupStream() {
     let port: browser.Runtime.Port;
 
     const onPortMessage = (data: unknown) => {
-        window.postMessage(data, '*');
+        window.postMessage(data, window.location.origin);
     };
 
     const connectBackground = () => {
@@ -49,10 +45,14 @@ async function setupStream() {
 
     connectBackground();
 
-    const onPageMessage = (e: PageMessage) => {
+    const onPageMessage = (e: MessageEvent<PageMessagePayload>) => {
+        // Accept only messages dispatched within the same window context
+        if (e.source !== window) return;
+        // Accept only messages whose real browser origin matches this page
+        if (e.origin !== window.location.origin) return;
         if (!e.data) return;
         if (e.data.type !== 'TonkeeperProvider') return;
-        if (e.data.message.origin !== window.location.origin) return;
+        if (e.data.message?.origin !== window.location.origin) return;
 
         sendMessageToActivePort(e.data);
     };
