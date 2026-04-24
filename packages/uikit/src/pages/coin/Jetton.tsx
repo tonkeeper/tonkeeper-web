@@ -18,7 +18,6 @@ import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { SwapAction } from '../../components/home/SwapAction';
 import { CoinInfo } from '../../components/jettons/Info';
 import { SendAction } from '../../components/transfer/SendActionButton';
-import { useAppContext } from '../../hooks/appContext';
 import { useFormatBalance } from '../../hooks/balance';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
@@ -37,8 +36,6 @@ export const MobileAssetHistory: FC<{
     assetAddress: string;
     innerRef: React.RefObject<HTMLDivElement>;
 }> = ({ assetAddress, innerRef }) => {
-    const { standalone } = useAppContext();
-
     const {
         refetch,
         isFetched: isActivityFetched,
@@ -52,12 +49,10 @@ export const MobileAssetHistory: FC<{
 
     const isFetchingNextPage = isActivityFetchingNextPage;
 
-    useFetchNext(
+    const setSentinelRef = useFetchNext(
         hasActivityNextPage,
         isFetchingNextPage,
-        fetchActivityNextPage,
-        standalone,
-        innerRef
+        fetchActivityNextPage
     );
 
     if (!isActivityFetched || !activity) {
@@ -76,6 +71,7 @@ export const MobileAssetHistory: FC<{
         <>
             <MobileActivityList items={activity} />
             {isFetchingNextPage && <SkeletonListWithImages size={3} />}
+            <div ref={setSentinelRef} />
         </>
     );
 };

@@ -207,7 +207,6 @@ export const DesktopHistory: FC<{
         });
     }, [activity]);
 
-    const key = aggregatedActivity.length ? aggregatedActivity[0].key : undefined;
     if (activity && !activity.length) {
         return <NoTransactionsYet>{t('history_no_transactions_yet')}</NoTransactionsYet>;
     }
@@ -219,7 +218,6 @@ export const DesktopHistory: FC<{
                 handleClose={() => setSelectedActivity(undefined)}
             />
             <HistoryEvents
-                key={key}
                 className={className}
                 aggregatedActivity={aggregatedActivity}
                 setSelectedActivity={setSelectedActivity}
