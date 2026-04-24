@@ -3,17 +3,13 @@ import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonListWithImages } from '../../components/Skeleton';
 
-import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { MobileActivityList } from '../../components/activity/MobileActivityList';
-import { mergeRefs } from '../../libs/common';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
 const Activity: FC = () => {
-    const { standalone } = useAppContext();
-
     const {
         refetch,
         isFetched: isActivityFetched,
@@ -23,15 +19,14 @@ const Activity: FC = () => {
         data: activity
     } = useFetchFilteredActivity();
 
-    const scrollRef = useScrollMonitor(refetch, 5000);
+    const setScrollRef = useScrollMonitor(refetch, 5000);
 
     const isFetchingNextPage = isActivityFetchingNextPage;
 
-    const fetchNextRef = useFetchNext(
+    const setSentinelRef = useFetchNext(
         hasActivityNextPage,
         isFetchingNextPage,
-        fetchActivityNextPage,
-        standalone
+        fetchActivityNextPage
     );
 
     if (!isActivityFetched || !activity) {
@@ -49,9 +44,10 @@ const Activity: FC = () => {
     return (
         <>
             <ActivityHeader />
-            <InnerBody ref={mergeRefs<HTMLDivElement>(scrollRef, fetchNextRef)}>
+            <InnerBody ref={setScrollRef}>
                 <MobileActivityList items={activity} />
                 {isFetchingNextPage && <SkeletonListWithImages size={3} />}
+                <div ref={setSentinelRef} />
             </InnerBody>
         </>
     );

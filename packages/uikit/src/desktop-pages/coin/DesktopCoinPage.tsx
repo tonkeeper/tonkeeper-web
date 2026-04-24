@@ -2,7 +2,7 @@ import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/cr
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, RefCallback, useEffect, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Body3, Label2, Mono, Num3 } from '../../components/Text';
@@ -46,7 +46,6 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
 import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { mergeRefs } from '../../libs/common';
 import { ExternalLink } from '../../components/shared/ExternalLink';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
@@ -413,7 +412,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
 
     const scrollMonitorRef = useScrollMonitor(refetch, 5000);
 
-    const fetchRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true);
+    const setSentinelRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage);
 
     const [assets] = useAssets();
     const asset = useMemo(() => {
@@ -448,9 +447,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     }
 
     return (
-        <DesktopViewPageLayout
-            ref={mergeRefs(scrollMonitorRef, fetchRef) as RefCallback<HTMLDivElement>}
-        >
+        <DesktopViewPageLayout ref={scrollMonitorRef}>
             <DesktopViewHeader backButton borderBottom>
                 <DesktopViewHeaderContent
                     title={
@@ -498,6 +495,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
+                <div ref={setSentinelRef} />
             </HistoryContainer>
         </DesktopViewPageLayout>
     );
@@ -555,12 +553,12 @@ export const TronUSDTPage = () => {
 
     const setScrollRef = useScrollMonitor(refetch, 5000);
 
-    const setFetchNextRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true);
+    const setSentinelRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage);
 
     const { data: rate } = useUSDTRate();
 
     return (
-        <DesktopViewPageLayoutStyled ref={mergeRefs<HTMLDivElement>(setScrollRef, setFetchNextRef)}>
+        <DesktopViewPageLayoutStyled ref={setScrollRef}>
             <DesktopViewHeader backButton borderBottom={true}>
                 <DesktopViewHeaderContent
                     title={
@@ -627,6 +625,7 @@ export const TronUSDTPage = () => {
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
+                <div ref={setSentinelRef} />
             </HistoryContainer>
         </DesktopViewPageLayoutStyled>
     );
