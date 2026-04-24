@@ -77,7 +77,7 @@ export const useTonendpointBuyMethods = () => {
             const layout = methods.layoutByCountry.find(item => item.countryCode === countryCode);
 
             const buildMethods = (acc: TonendpoinFiatItem[], id: string) => {
-                const method = buy.items.find(item => item.id === id);
+                const method = buy.items?.find(item => item.id === id);
                 if (method) {
                     acc.push(method);
                 }
