@@ -66,6 +66,35 @@ tab. This API key will look something like `AuthKey_ABCD123456.p8` and can only 
 
 Keychain - Certificate Type - `Developer ID Application`
 
+## Regenerating API clients
+
+`packages/core` ships auto-generated TypeScript clients for several Tonkeeper
+backends. Some of the swagger specs live in **private** GitHub repositories,
+so regeneration requires a GitHub Personal Access Token (never commit it):
+
+1. Create a fine-grained PAT at
+   [github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens/new)
+   with `Contents: Read` access to the backend repo(s) you need:
+    - `tonkeeper/tonendpoint_backend` — `generate:tonkeeperApi`
+    - `tonkeeper/tonkeeper_2fa_backend` — `generate:2faApi`
+    - `tonkeeper/custodial-battery` — `generate:batteryApi`
+    - `tonkeeper/pro_backend` — `generate:pro`
+    - `tonkeeper/tonconsole_backend` — `generate:tonConsoleApi`
+    - (`generate:sdkV2` targets a public repo and needs no token.)
+2. Export the token in your shell:
+
+    ```sh
+    export GITHUB_TOKEN=<your-token>
+    ```
+
+3. Run the generator from the repo root:
+
+    ```sh
+    yarn workspace @tonkeeper/core generate:tonkeeperApi
+    ```
+
+The yarn scripts fail fast with a helpful message if `GITHUB_TOKEN` is unset.
+
 ## License
 
 (c) Copyright 2025 Ton APPS UK Limited Released under the

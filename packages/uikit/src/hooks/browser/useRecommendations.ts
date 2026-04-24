@@ -1,5 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Recommendations } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import {
+    CarouselApp,
+    isCarouselApp,
+    isPromotedApp,
+    PromotionCategory,
+    Recommendations
+} from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { QueryKey } from '../../libs/queryKey';
 import { useAppContext } from '../appContext';
 
@@ -21,14 +27,29 @@ export function useRecommendations() {
     const { tonendpoint } = useAppContext();
 
     return useQuery<Recommendations, Error>([QueryKey.featuredRecommendations], async () => {
-        const data: Recommendations = await tonendpoint.appsPopular();
-        // TODO: Remove mobile hack
-        data.categories = data.categories.filter(item => item.id !== 'featured');
+        const raw = await tonendpoint.appsPopular();
 
-        if (data.apps) {
-            shuffle(data.apps);
-        }
+        /**
+         * The OpenAPI spec marks `url`, `icon` and `poster` as optional, but
+         * the UI treats them as required. Filter out entries that are missing
+         * any of the fields the renderers need — effectively discarding data
+         * we can't render anyway.
+         */
+        const apps: CarouselApp[] = raw.apps.filter(isCarouselApp);
+        const categories: PromotionCategory[] = raw.categories
+            // TODO: Remove mobile hack
+            .filter(category => category.id !== 'featured')
+            .map(category => ({
+                ...category,
+                apps: category.apps.filter(isPromotedApp)
+            }));
 
-        return data;
+        shuffle(apps);
+
+        return {
+            ...raw,
+            apps,
+            categories
+        };
     });
 }

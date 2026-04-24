@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ -z "${GITHUB_TOKEN:-}" ]; then
+    echo "error: GITHUB_TOKEN env var is required (passed via --build-arg GITHUB_TOKEN)" >&2
+    exit 1
+fi
+
 WORKDIR="."
 TONAPI_FILE="./tonapi.yml"
 BATTERY_API_FILE="./battery-api.yml"
