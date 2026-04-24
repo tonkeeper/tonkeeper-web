@@ -4,4 +4,4 @@ COPY resource/generate_openapi_client.sh /generate_openapi_client.sh
 RUN chmod +x /generate_openapi_client.sh
 
 ENTRYPOINT ["/generate_openapi_client.sh"]
-CMD ["https://raw.githubusercontent.com/tonkeeper/tonkeeper_2fa_backend/refs/heads/main/swagger.yaml", "/local/src/2faApi"]
+CMD ["https://raw.githubusercontent.com/tonkeeper/tonendpoint_backend/refs/heads/main/swagger.yaml", "/local/src/tonkeeperApiGenerated"]
