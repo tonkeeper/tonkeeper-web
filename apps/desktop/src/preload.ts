@@ -5,10 +5,21 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { Message } from './libs/message';
 import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { atom, replaySubject } from '@tonkeeper/core/dist/entries/atom';
 
 const tcRequests$ = atom<string>(undefined);
+const tonConnectRequests$ = replaySubject<TonConnectAppRequestPayload>('all');
+const tonConnectDisconnects$ = replaySubject<AccountConnection>('all');
+const refreshes$ = replaySubject<void>('all');
+
 ipcRenderer.on('tc', (_event, value) => tcRequests$.next(value));
+ipcRenderer.on('tonConnectRequest', (_event, value: TonConnectAppRequestPayload) =>
+    tonConnectRequests$.next(value)
+);
+ipcRenderer.on('disconnect', (_event, value: AccountConnection) =>
+    tonConnectDisconnects$.next(value)
+);
+ipcRenderer.on('refresh', () => refreshes$.next());
 
 contextBridge.exposeInMainWorld('backgroundApi', {
     platform: () => process.platform,
@@ -23,9 +34,13 @@ contextBridge.exposeInMainWorld('backgroundApi', {
             callback(tcRequests$.value);
         }
     },
-    onTonConnectRequest: (callback: (value: TonConnectAppRequestPayload) => void) =>
-        ipcRenderer.on('tonConnectRequest', (_event, value) => callback(value)),
-    onTonConnectDisconnect: (callback: (value: AccountConnection) => void) =>
-        ipcRenderer.on('disconnect', (_event, value) => callback(value)),
-    onRefresh: (callback: () => void) => ipcRenderer.on('refresh', _event => callback())
+    onTonConnectRequest: (callback: (value: TonConnectAppRequestPayload) => void) => {
+        tonConnectRequests$.subscribe(callback);
+    },
+    onTonConnectDisconnect: (callback: (value: AccountConnection) => void) => {
+        tonConnectDisconnects$.subscribe(callback);
+    },
+    onRefresh: (callback: () => void) => {
+        refreshes$.subscribe(callback);
+    }
 });

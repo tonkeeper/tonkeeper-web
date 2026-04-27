@@ -1,10 +1,10 @@
 import browser from 'webextension-polyfill';
 import { AskProcessor, NotificationData } from './libs/event';
-import { replySubject } from '@tonkeeper/core/dist/entries/atom';
+import { replaySubject } from '@tonkeeper/core/dist/entries/atom';
 
 let port: browser.Runtime.Port;
 
-export const extensionBackgroundEvents$ = replySubject<{
+export const extensionBackgroundEvents$ = replaySubject<{
     type: 'showNotification';
     data: NotificationData;
 }>();
