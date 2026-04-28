@@ -33,6 +33,7 @@ import {
 import { useProAuthToken } from '../../../state/pro';
 import { TronFreeProSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-free-pro-sender';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../../state/tonendpoint';
+import { useIsFullWidthMode } from '../../useIsFullWidthMode';
 
 export enum TRON_SENDER_TYPE {
     TRX = 'tron-trx',
@@ -74,6 +75,9 @@ export const useAvailableTronSendersChoices = (
     const { data: batteryAuthToken } = useBatteryAuthToken();
     const activeAccount = useActiveAccount();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
+    // Pro features modal isn't designed for compact layouts (extension, web mobile, twa),
+    // so the FreePro sender option is hidden there.
+    const isFreeProSenderAvailable = useIsFullWidthMode();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
@@ -92,7 +96,7 @@ export const useAvailableTronSendersChoices = (
         const options: TronSenderOption[] = [];
 
         // FreePro
-        if (freeTrc20Config && isTronEnabled) {
+        if (freeTrc20Config && isTronEnabled && isFreeProSenderAvailable) {
             options.push({
                 type: TRON_SENDER_TYPE.FREE_PRO,
                 isEnoughBalance:
@@ -146,6 +150,7 @@ export const useAvailableTronSendersChoices = (
         assetAmount.asset,
         freeTrc20Config,
         isTronEnabled,
+        isFreeProSenderAvailable,
         batteryAuthToken,
         batterySenderFee.charges,
         batteryBalance,
