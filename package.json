@@ -14,7 +14,6 @@
         "build:extension": "npx turbo build:extension",
         "build:desktop": "npx turbo build:desktop",
         "build:ipad": "npx turbo build:ipad",
-        "build:swap-widget": "npx turbo build:swap-widget",
         "build:pkg": "npx turbo build:pkg",
         "prepare-release": "node scripts/prepare-release.js"
     },

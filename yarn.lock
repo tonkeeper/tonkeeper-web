@@ -33,79 +33,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@amplitude/analytics-browser@npm:^2.1.0":
-  version: 2.3.7
-  resolution: "@amplitude/analytics-browser@npm:2.3.7"
-  dependencies:
-    "@amplitude/analytics-client-common": "npm:^2.0.9"
-    "@amplitude/analytics-core": "npm:^2.1.2"
-    "@amplitude/analytics-types": "npm:^2.3.1"
-    "@amplitude/plugin-page-view-tracking-browser": "npm:^2.0.17"
-    "@amplitude/plugin-web-attribution-browser": "npm:^2.0.17"
-    tslib: "npm:^2.4.1"
-  checksum: 10/072c81f967ad155fc3202c7c838ee9bb1017f9c41175d7e82f40ea6cf753db1c00cf074c3e44e2570a23f19a79061d3d982e6322385fbb8207300a8717150157
-  languageName: node
-  linkType: hard
-
-"@amplitude/analytics-client-common@npm:^2.0.9":
-  version: 2.0.9
-  resolution: "@amplitude/analytics-client-common@npm:2.0.9"
-  dependencies:
-    "@amplitude/analytics-connector": "npm:^1.4.8"
-    "@amplitude/analytics-core": "npm:^2.1.2"
-    "@amplitude/analytics-types": "npm:^2.3.1"
-    tslib: "npm:^2.4.1"
-  checksum: 10/d1890a9ec782cedb12be72ec31ef8b80a173a2fbd83f360810c2f49263c5805c13468b3357c532909597c94322dabbc57c82260eade15cf38ea8eca385fa9bb1
-  languageName: node
-  linkType: hard
-
-"@amplitude/analytics-connector@npm:^1.4.8":
-  version: 1.5.0
-  resolution: "@amplitude/analytics-connector@npm:1.5.0"
-  checksum: 10/7f0c8f769e75697d8f85cfb8fba993fcbea966f7f678c7c5badaaf4af1f0e7579e157f63e4aaa7b9edf2cfd749df2dcc3593886be8625b138ffdf14cf77ec9ab
-  languageName: node
-  linkType: hard
-
-"@amplitude/analytics-core@npm:^2.1.2":
-  version: 2.1.2
-  resolution: "@amplitude/analytics-core@npm:2.1.2"
-  dependencies:
-    "@amplitude/analytics-types": "npm:^2.3.1"
-    tslib: "npm:^2.4.1"
-  checksum: 10/fbfbbb2e5af8bdc6ebea1e8dae94d98c46491fdc466f6208f1df320c931f7454d7d2ec5a5735f10f650cee6f8f9527b4f2cee2b16fc292c444928e85d45283b6
-  languageName: node
-  linkType: hard
-
-"@amplitude/analytics-types@npm:^2.3.1":
-  version: 2.3.1
-  resolution: "@amplitude/analytics-types@npm:2.3.1"
-  checksum: 10/f37edc1b90240dc2e5bc8fecf3b4bc7c8add7dfc9dde9add0eebda246bba98d8a35cc67bb9626209a1e8329bbf9029f660a9a983228d2d5257d311cd98fdd1fa
-  languageName: node
-  linkType: hard
-
-"@amplitude/plugin-page-view-tracking-browser@npm:^2.0.17":
-  version: 2.0.17
-  resolution: "@amplitude/plugin-page-view-tracking-browser@npm:2.0.17"
-  dependencies:
-    "@amplitude/analytics-client-common": "npm:^2.0.9"
-    "@amplitude/analytics-types": "npm:^2.3.1"
-    tslib: "npm:^2.4.1"
-  checksum: 10/85f3a4e175f2c4fef3f21ce4a8c456195c42187ccfbba937789187429f92515635e54ae18f8ad6aca55615a099883e49454926f3074522401112a2fe9f22b69d
-  languageName: node
-  linkType: hard
-
-"@amplitude/plugin-web-attribution-browser@npm:^2.0.17":
-  version: 2.0.17
-  resolution: "@amplitude/plugin-web-attribution-browser@npm:2.0.17"
-  dependencies:
-    "@amplitude/analytics-client-common": "npm:^2.0.9"
-    "@amplitude/analytics-core": "npm:^2.1.2"
-    "@amplitude/analytics-types": "npm:^2.3.1"
-    tslib: "npm:^2.4.1"
-  checksum: 10/d836d66a2b8c7047213b28577c91066f0a19757721a5d28f0a3dc3b5d4675a4621bb1bf79cc3bbd4c431ab4e1dac8242858f1cd3b4594ea6495656d380a2a673
-  languageName: node
-  linkType: hard
-
 "@ampproject/remapping@npm:^2.2.0":
   version: 2.2.1
   resolution: "@ampproject/remapping@npm:2.2.1"
@@ -4329,17 +4256,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/core@npm:^0.56.0":
-  version: 0.56.3
-  resolution: "@ton/core@npm:0.56.3"
-  dependencies:
-    symbol.inspect: "npm:1.0.1"
-  peerDependencies:
-    "@ton/crypto": ">=3.2.0"
-  checksum: 10/5fe0284bc66789e4b408cce7d459d30d0f8477ce981337ef7bfe7beeee93eda575e8178338fb3d73d47cd8f78065ed84988b82db839b463a39e576be39831243
-  languageName: node
-  linkType: hard
-
 "@ton/crypto-primitives@npm:2.0.0":
   version: 2.0.0
   resolution: "@ton/crypto-primitives@npm:2.0.0"
@@ -4675,46 +4591,6 @@ __metadata:
     tweetnacl: "npm:^1.0.3"
     typescript: "npm:^4.9.4"
     uuid: "npm:^9.0.0"
-  languageName: unknown
-  linkType: soft
-
-"@tonkeeper/web-swap-widget@workspace:apps/web-swap-widget":
-  version: 0.0.0-use.local
-  resolution: "@tonkeeper/web-swap-widget@workspace:apps/web-swap-widget"
-  dependencies:
-    "@amplitude/analytics-browser": "npm:^2.1.0"
-    "@tanstack/react-query": "npm:4.3.4"
-    "@testing-library/dom": "npm:^9.3.1"
-    "@testing-library/jest-dom": "npm:^5.16.5"
-    "@testing-library/react": "npm:^13.4.0"
-    "@testing-library/user-event": "npm:^13.5.0"
-    "@ton/core": "npm:^0.56.0"
-    "@tonkeeper/core": "npm:0.1.0"
-    "@tonkeeper/locales": "npm:0.1.0"
-    "@tonkeeper/uikit": "npm:0.1.0"
-    "@types/fs-extra": "npm:^11.0.4"
-    "@types/jest": "npm:^27.5.2"
-    "@types/node": "npm:^20.11.0"
-    "@types/react": "npm:^18.0.26"
-    "@types/react-dom": "npm:^18.0.9"
-    "@types/styled-components": "npm:^5.1.26"
-    "@vitejs/plugin-react": "npm:^4.2.1"
-    buffer: "npm:^6.0.3"
-    copy-to-clipboard: "npm:^3.3.3"
-    fs-extra: "npm:^11.2.0"
-    i18next: "npm:^22.1.4"
-    i18next-browser-languagedetector: "npm:^7.0.2"
-    i18next-http-backend: "npm:^2.0.2"
-    process: "npm:^0.11.10"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    react-i18next: "npm:^12.1.1"
-    react-is: "npm:^18.2.0"
-    styled-components: "npm:^6.1.1"
-    ts-node: "npm:^10.9.1"
-    typescript: "npm:5.2.2"
-    vite: "npm:^5.0.11"
-    vite-plugin-node-polyfills: "npm:0.17.0"
   languageName: unknown
   linkType: soft
 
@@ -18536,7 +18412,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.2.0, tslib@npm:^2.3.0, tslib@npm:^2.4.1, tslib@npm:^2.5.0":
+"tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.2.0, tslib@npm:^2.3.0, tslib@npm:^2.5.0":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 10/bd26c22d36736513980091a1e356378e8b662ded04204453d353a7f34a4c21ed0afc59b5f90719d4ba756e581a162ecbf93118dc9c6be5acf70aa309188166ca

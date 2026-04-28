@@ -133,8 +133,7 @@ tonkeeper-web/
 │   ├── extension/    — Browser extension (Chrome, Firefox)
 │   ├── web/          — Web application
 │   ├── mobile/       — Mobile/iPad app (Capacitor)
-│   ├── twa/          — Telegram Web App
-│   └── web-swap-widget/
+│   └── twa/          — Telegram Web App
 ├── packages/
 │   ├── core/         — Core business logic
 │   ├── uikit/        — UI components
