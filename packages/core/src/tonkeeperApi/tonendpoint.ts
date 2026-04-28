@@ -9,7 +9,6 @@ export interface BootParams {
         | 'tablet'
         | 'extension'
         | 'pro_mobile_ios'
-        | 'swap_widget_web'
         | 'twa';
     lang: 'en' | 'ru' | string;
     build: string;

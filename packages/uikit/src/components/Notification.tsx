@@ -181,7 +181,7 @@ const Splash = styled.div`
     }
 `;
 
-const Content = styled.div<{ standalone: boolean; $isInWidget: boolean }>`
+const Content = styled.div<{ standalone: boolean }>`
     width: 100%;
     background-color: ${props => props.theme.backgroundPage};
     border-top-right-radius: ${props => props.theme.cornerMedium};
@@ -194,12 +194,6 @@ const Content = styled.div<{ standalone: boolean; $isInWidget: boolean }>`
         props.standalone &&
         css`
             padding-bottom: 2rem;
-        `}
-
-    ${props =>
-        props.$isInWidget &&
-        css`
-            padding-bottom: 46px;
         `}
 
     ${p =>
@@ -857,7 +851,6 @@ export const NotificationDesktopAndWeb: FC<{
     const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
-    const isInWidget = useAppTargetEnv() === 'swap_widget_web';
     const isKeyboardOpen = useKeyboardHeight();
 
     return (
@@ -889,7 +882,6 @@ export const NotificationDesktopAndWeb: FC<{
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                     <Content
-                                        $isInWidget={isInWidget}
                                         standalone={standalone}
                                         ref={containerRef}
                                         className="dialog-content"
