@@ -8,7 +8,6 @@ import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encode
 
 import { useActiveAccountQuery, useActiveApi, useMetaEncryptionData } from '../state/wallet';
 import { useGetAccountSigner } from '../state/mnemonic';
-import { useAppContext } from './appContext';
 import { useAppSdk } from './appSdk';
 
 export const useDebuggingTools = () => {
@@ -153,31 +152,4 @@ export const useDebuggingTools = () => {
             };
         }
     }, [api, activeAccount, getSigner, metaEncryptionMap]);
-};
-
-export const useSwapWidgetDebuggingTools = () => {
-    const { tonendpoint } = useAppContext();
-    const env = tonendpoint.params.platform;
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const activityKey =
-                'I UNDERSTAND THAT BY DOING THIS I MAY LOSE ALL MY FUNDS/Я ПОНИМАЮ, ЧТО ПОДЕЛАЯ ТАК, Я МОГУ ПОТЕРЯТЬ ВСЕ СВОИ СРЕДСТВА';
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            window.kdt = {
-                checkKey() {
-                    return this.key && this.key === activityKey;
-                },
-                async enableTonkeeperInjectionContext() {
-                    if (!this.checkKey()) {
-                        console.error('ERR: method is not supported');
-                        return;
-                    }
-
-                    window.localStorage.setItem('tonkeeper::test-injection-context', 'true');
-                }
-            };
-        }
-    }, [env]);
 };
