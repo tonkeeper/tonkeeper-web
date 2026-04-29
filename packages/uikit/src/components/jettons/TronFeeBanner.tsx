@@ -31,6 +31,7 @@ import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 import { useProState } from '../../state/pro';
 import { isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const SmallDivider = styled.div`
     width: 100%;
@@ -270,6 +271,7 @@ const FeeTable = () => {
     const { onOpen: onGetPro } = useProFeaturesNotification();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
+    const isFullWidthMode = useIsFullWidthMode();
 
     const hasBatteryTransfers = typeof batteryTransfers === 'number' && batteryTransfers > 0;
 
@@ -293,7 +295,7 @@ const FeeTable = () => {
 
     return (
         <TableWrapper>
-            {isTronEnabled && (
+            {isTronEnabled && isFullWidthMode && (
                 <TableRow>
                     <TableFirsLineText>{t('tron_fee_table_free_transfer_title')}</TableFirsLineText>
                     {trc20FreeTransfers === undefined ? (

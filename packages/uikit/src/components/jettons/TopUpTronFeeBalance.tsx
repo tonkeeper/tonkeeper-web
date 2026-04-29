@@ -22,6 +22,7 @@ import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 import { isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProState } from '../../state/pro';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const NotificationStyled = styled(Notification)`
     max-width: 648px;
@@ -231,6 +232,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
     const { data: trc20FreeTransfersConfig } = useTrc20FreeTransfersConfig();
     const formatDate = useDateTimeFormat();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
+    const isFullWidthMode = useIsFullWidthMode();
 
     const onTopupToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -349,7 +351,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                 </MethodCard>
             </Cards>
 
-            {isTronEnabled && (
+            {isTronEnabled && isFullWidthMode && (
                 <ProCard>
                     <TonkeeperProCardIcon />
                     <MethodInfo>
