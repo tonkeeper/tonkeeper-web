@@ -42,7 +42,8 @@ export class TronTonSender extends BaseTronSender implements ITronSender {
         batteryConfig: BatteryConfiguration,
         protected tronWallet: TronWallet,
         private tonWalletInfo: TonWalletStandard,
-        private multiTransactionsSigner: MultiTransactionsSigner
+        private multiTransactionsSigner: MultiTransactionsSigner,
+        private readonly xTonConnectAuth: string
     ) {
         super();
         this.batteryApi = new BatteryApi(batteryConfig);
@@ -95,6 +96,7 @@ export class TronTonSender extends BaseTronSender implements ITronSender {
 
         try {
             await this.batteryApi.tronSend({
+                xTonConnectAuth: this.xTonConnectAuth,
                 tronSendRequest: {
                     tx: Buffer.from(JSON.stringify(signedTronTx!)).toString('base64'),
                     wallet: this.tronWallet.address,
