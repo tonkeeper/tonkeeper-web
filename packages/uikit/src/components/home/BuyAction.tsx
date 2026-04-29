@@ -66,7 +66,7 @@ const ActionNotification: FC<{
                     </NotificationTitleBlock>
                 </NotificationHeader>
             </NotificationHeaderPortal>
-            <BuyList items={item.items} kind={kind} />
+            <BuyList items={item.items ?? []} kind={kind} />
             {!!config.exchangePostUrl && (
                 <OtherBlock>
                     <OtherLink

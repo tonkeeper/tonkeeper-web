@@ -1,24 +1,33 @@
 import { Network } from '../entries/network';
 import { removeLastSlash } from '../utils/url';
 import { intlLocale } from '../entries/language';
+import { Configuration, Middleware, SystemApi } from '../tonkeeperApiGenerated';
+import type {
+    Currency,
+    FiatCategory,
+    FiatCategoryItemsInner,
+    FiatCategoryItemsInnerActionButton,
+    FiatCategoryItemsInnerInfoButtonsInner,
+    GetFiatMethods200ResponseData,
+    GetFiatMethods200ResponseDataLayoutByCountryInner,
+    GetPopularApps200ResponseData,
+    MyIp200Response,
+    Platform,
+    PopularApp,
+    PopularCategory
+} from '../tonkeeperApiGenerated';
 
 export interface BootParams {
-    platform:
-        | 'web'
-        | 'desktop'
-        | 'tablet'
-        | 'extension'
-        | 'pro_mobile_ios'
-        | 'swap_widget_web'
-        | 'twa';
+    platform: Extract<
+        Platform,
+        'web' | 'desktop' | 'tablet' | 'extension' | 'pro_mobile_ios' | 'swap_widget_web' | 'twa'
+    >;
     lang: 'en' | 'ru' | string;
     build: string;
     network: Network;
     store_country_code?: string;
     device_country_code?: string;
 }
-
-type TonendpointResponse<Data> = { success: false } | { success: true; data: Data };
 
 export interface TonendpointConfig {
     flags: {
@@ -168,28 +177,116 @@ export const defaultTonendpointConfig: TonendpointConfig = {
     tonkeeper_utm_track: ''
 };
 
-interface CountryIP {
-    ip: string;
-    country: string;
-}
+/**
+ * Shape returned by GET /my/ip.
+ * Re-exported from the generated client.
+ */
+export type CountryIP = MyIp200Response;
+
+/**
+ * Fiat exchange models. Aliased to the generated OpenAPI types so the client
+ * and the backend schema stay in sync.
+ */
+export type TonendpoinFiatMethods = GetFiatMethods200ResponseData;
+export type TonendpoinFiatCategory = FiatCategory;
+export type TonendpoinFiatItem = FiatCategoryItemsInner;
+export type TonendpoinFiatButton =
+    | FiatCategoryItemsInnerActionButton
+    | FiatCategoryItemsInnerInfoButtonsInner;
+export type LayoutByCountry = GetFiatMethods200ResponseDataLayoutByCountryInner;
+
+/**
+ * Raw popular-apps response exactly as the backend declares it in the
+ * OpenAPI spec. `url`, `icon` and `poster` are optional here, so this type
+ * is useful when you want to inspect every entry the API returned without
+ * discarding malformed ones.
+ */
+export type RawRecommendations = GetPopularApps200ResponseData;
+export type RawPromotedApp = PopularApp;
+export type RawPromotionCategory = PopularCategory;
+
+/**
+ * Narrowed views used by the browser UI. They only add the fields that the
+ * UI actually treats as required (`url`, `icon` and additionally `poster`
+ * for the carousel). Use the type guards below to promote raw entries to
+ * these narrowed shapes after runtime validation.
+ */
+export type PromotedApp = PopularApp & { url: string; icon: string };
+export type CarouselApp = PromotedApp & { poster: string };
+export type PromotionCategory = Omit<PopularCategory, 'apps'> & { apps: PromotedApp[] };
+export type Recommendations = Omit<GetPopularApps200ResponseData, 'categories' | 'apps'> & {
+    categories: PromotionCategory[];
+    apps: CarouselApp[];
+};
+
+export const isPromotedApp = (app: PopularApp): app is PromotedApp =>
+    typeof app.url === 'string' && typeof app.icon === 'string';
+
+export const isCarouselApp = (app: PopularApp): app is CarouselApp =>
+    isPromotedApp(app) && typeof app.poster === 'string';
+
+const PRIMARY_BOOT_PATH = 'https://boot.tonkeeper.com';
+const FALLBACK_BOOT_PATH = 'https://block.tonkeeper.com';
+
+/**
+ * Build the query object shared by every Tonendpoint call.
+ *
+ * The generated `SystemApi` covers a small part of these; the rest (chainName,
+ * snake-cased country codes) belong to the boot endpoint only and are applied
+ * via a per-call middleware instead of duplicating the generator's logic.
+ */
+const toCommonQuery = (
+    params: BootParams,
+    rewrite?: Partial<BootParams>
+): Record<string, string> => {
+    const network = rewrite?.network ?? params.network;
+    const deviceCountryCode = rewrite?.device_country_code ?? params.device_country_code;
+    const storeCountryCode = rewrite?.store_country_code ?? params.store_country_code;
+
+    const query: Record<string, string> = {
+        lang: intlLocale(rewrite?.lang ?? params.lang),
+        build: rewrite?.build ?? params.build,
+        chainName: network === Network.TESTNET ? 'testnet' : 'mainnet',
+        platform: rewrite?.platform ?? params.platform
+    };
+
+    if (deviceCountryCode) {
+        query.device_country_code = deviceCountryCode;
+    }
+    if (storeCountryCode) {
+        query.store_country_code = storeCountryCode;
+    }
+
+    return query;
+};
+
+/**
+ * Pre-middleware that merges extra query params into every request made by
+ * the generated `SystemApi`. This keeps call sites trivial while still sending
+ * the Tonkeeper-specific bookkeeping params that aren't part of the official
+ * OpenAPI contract (e.g. `chainName`).
+ */
+const extraQueryMiddleware = (extraQuery: Record<string, string>): Middleware => ({
+    pre: async ({ url, init }) => {
+        const parsed = new URL(url);
+        for (const [key, value] of Object.entries(extraQuery)) {
+            if (!parsed.searchParams.has(key)) {
+                parsed.searchParams.set(key, value);
+            }
+        }
+        return { url: parsed.toString(), init };
+    }
+});
 
 export class Tonendpoint {
     public params: BootParams;
 
     private tonkeeperApiUrl = defaultTonendpointConfig.tonkeeper_api_url;
 
-    private readonly primaryBootPath = 'https://boot.tonkeeper.com';
-
-    private readonly fallbackBootPath = 'https://block.tonkeeper.com';
-
     private switchToFallbackBootPath = false;
 
     private get bootPath() {
-        if (this.switchToFallbackBootPath) {
-            return this.fallbackBootPath;
-        }
-
-        return this.primaryBootPath;
+        return this.switchToFallbackBootPath ? FALLBACK_BOOT_PATH : PRIMARY_BOOT_PATH;
     }
 
     constructor({
@@ -204,88 +301,66 @@ export class Tonendpoint {
     }
 
     boot = async (network: Network): Promise<TonendpointConfig> => {
-        let response;
+        /**
+         * NOTE: the OpenAPI spec marks `GET /keys` as deprecated and points
+         * to `GET /v2/keys` as the successor, but per the backend team that
+         * flag is incorrect — `/v2/keys` does not actually work in production
+         * and `/keys` is the real, supported endpoint. There is no plan to
+         * migrate; we just call `/keys` and wait for the spec to be corrected.
+         */
+        const attempt = () => this.systemApi(this.bootPath, { network }).getKeys({});
+
+        let result: TonendpointConfig;
         try {
-            response = await this.fetchBoot(network);
+            result = (await attempt()) as TonendpointConfig;
         } catch (e) {
             if (this.switchToFallbackBootPath) {
                 throw e;
             }
-
             console.error(e);
             this.switchToFallbackBootPath = true;
-            response = await this.fetchBoot(network);
+            result = (await attempt()) as TonendpointConfig;
         }
 
-        const result: TonendpointConfig = await response.json();
         if (result.tonkeeper_api_url) {
             this.tonkeeperApiUrl = removeLastSlash(result.tonkeeper_api_url);
         }
         return result;
     };
 
-    country = async (): Promise<CountryIP> => {
-        const response = await fetch(`${this.tonkeeperApiUrl}/my/ip`, {
-            method: 'GET'
-        });
-
-        return response.json();
+    country = (): Promise<CountryIP> => {
+        return this.systemApi(this.tonkeeperApiUrl).myIp();
     };
 
-    fiatMethods = (): Promise<TonendpoinFiatMethods> => {
-        return this.GET('/fiat/methods');
+    fiatMethods = async (): Promise<TonendpoinFiatMethods> => {
+        const response = await this.systemApi(this.tonkeeperApiUrl).getFiatMethods({});
+        if (!response.success || !response.data) {
+            throw new Error('Failed to get "/fiat/methods" data');
+        }
+        return response.data;
     };
 
-    appsPopular = (): Promise<Recommendations> => {
-        return this.GET('/apps/popular');
+    appsPopular = async (): Promise<RawRecommendations> => {
+        const response = await this.systemApi(this.tonkeeperApiUrl).getPopularApps({});
+        if (!response.success || !response.data) {
+            throw new Error('Failed to get "/apps/popular" data');
+        }
+        return response.data;
     };
 
-    public supportedCurrencies = async (): Promise<{ code: string }[]> => {
-        const response = await fetch(`${this.tonkeeperApiUrl}/currencies?${this.toSearchParams()}`);
-
-        return response.json();
+    public supportedCurrencies = async (): Promise<Currency[]> => {
+        const response = await this.systemApi(this.tonkeeperApiUrl).getCurrencies({});
+        return response.currencies;
     };
 
-    private fetchBoot(network: Network) {
-        return fetch(`${this.bootPath}/keys?${this.toSearchParams({ network })}`);
+    private systemApi(basePath: string, rewrite?: Partial<BootParams>): SystemApi {
+        return new SystemApi(
+            new Configuration({
+                basePath,
+                middleware: [extraQueryMiddleware(toCommonQuery(this.params, rewrite))]
+            })
+        );
     }
-
-    private GET = async <Data>(path: string): Promise<Data> => {
-        const response = await fetch(`${this.tonkeeperApiUrl}${path}?${this.toSearchParams()}`);
-
-        const result: TonendpointResponse<Data> = await response.json();
-        if (!result.success) {
-            throw new Error(`Failed to get "${path}" data`);
-        }
-
-        return result.data;
-    };
-
-    private toSearchParams = (rewriteParams?: Partial<BootParams>) => {
-        const params = new URLSearchParams({
-            lang: intlLocale(rewriteParams?.lang ?? this.params.lang),
-            build: rewriteParams?.build ?? this.params.build,
-            chainName:
-                (rewriteParams?.network ?? this.params.network) === Network.TESTNET
-                    ? 'testnet'
-                    : 'mainnet',
-            platform: rewriteParams?.platform ?? this.params.platform
-        });
-
-        const device_country_code =
-            rewriteParams?.device_country_code ?? this.params.device_country_code;
-        if (device_country_code) {
-            params.append('device_country_code', device_country_code);
-        }
-
-        const store_country_code =
-            rewriteParams?.store_country_code ?? this.params.store_country_code;
-        if (store_country_code) {
-            params.append('store_country_code', store_country_code);
-        }
-
-        return params.toString();
-    };
 }
 
 export const getServerConfig = async (
@@ -303,62 +378,3 @@ export const getServerConfig = async (
         }
     };
 };
-
-export interface TonendpoinFiatButton {
-    title: string;
-    url: string;
-}
-export interface TonendpoinFiatItem {
-    id: string;
-    disabled: boolean;
-    title: string;
-    subtitle: string;
-    description: string;
-    icon_url: string;
-    action_button: TonendpoinFiatButton;
-    badge: null;
-    features: unknown[];
-    info_buttons: TonendpoinFiatButton[];
-    successUrlPattern: unknown;
-}
-
-export interface TonendpoinFiatCategory {
-    items: TonendpoinFiatItem[];
-    subtitle: string;
-    title: string;
-}
-
-export interface LayoutByCountry {
-    countryCode: string;
-    currency: string;
-    methods: string[];
-}
-
-export interface TonendpoinFiatMethods {
-    layoutByCountry: LayoutByCountry[];
-    defaultLayout: { methods: string[] };
-    categories: TonendpoinFiatCategory[];
-}
-
-export interface CarouselApp extends PromotedApp {
-    poster: string;
-}
-
-export interface PromotedApp {
-    name: string;
-    description: string;
-    icon: string;
-    url: string;
-    textColor?: string;
-}
-
-export interface PromotionCategory {
-    id: string;
-    title: string;
-    apps: PromotedApp[];
-}
-
-export interface Recommendations {
-    categories: PromotionCategory[];
-    apps: CarouselApp[];
-}

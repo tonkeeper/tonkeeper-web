@@ -247,11 +247,11 @@ export const BuyItemNotification: FC<{
     const { tonendpoint } = useAppContext();
 
     const onForceOpen = async () => {
-        track('Navigate_Buy', { kind: item.action_button.url });
+        track('Navigate_Buy', { kind: item.actionButton.url });
 
-        let urlToOpen = item.action_button.url;
+        let urlToOpen = item.actionButton.url;
         if (item.id === 'mercuryo_pro') {
-            urlToOpen = await createMercuryoProUrl(item.action_button.url);
+            urlToOpen = await createMercuryoProUrl(item.actionButton.url);
         }
         sdk.openPage(await replacePlaceholders(urlToOpen, config, tonendpoint, wallet, fiat, kind));
         setOpen(false);
@@ -269,7 +269,7 @@ export const BuyItemNotification: FC<{
             <ListItem key={item.title} onClick={onOpen}>
                 <ItemPayload>
                     <Description>
-                        <Logo src={item.icon_url} />
+                        <Logo src={item.iconUrl} />
                         <Text>
                             <Label1Styled>
                                 {item.title}
@@ -286,7 +286,7 @@ export const BuyItemNotification: FC<{
             <Notification isOpen={open} handleClose={() => setOpen(false)}>
                 {() => (
                     <NotificationBlock>
-                        <Logo large src={item.icon_url} />
+                        <Logo large src={item.iconUrl} />
                         <H3Styled>
                             {item.title}
                             {item.badge && <Badge>{item.badge}</Badge>}
@@ -294,9 +294,9 @@ export const BuyItemNotification: FC<{
                         <Center>
                             <Body>{item.description}</Body>
                         </Center>
-                        <Disclaimer buttons={item.info_buttons} />
+                        <Disclaimer buttons={item.infoButtons ?? []} />
                         <Button size="large" fullWidth primary onClick={onForceOpen}>
-                            {item.action_button.title}
+                            {item.actionButton.title}
                         </Button>
                         <CheckboxBlock>
                             <Checkbox checked={!!hided} onChange={mutate}>
