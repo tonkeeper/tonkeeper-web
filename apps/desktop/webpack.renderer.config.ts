@@ -1,6 +1,7 @@
 import type { Configuration } from 'webpack';
 
 import path from 'path';
+import NodePolyfillPlugin from 'node-polyfill-webpack-plugin';
 import { rules } from './webpack.rules';
 
 rules.push({
@@ -8,10 +9,21 @@ rules.push({
     use: [{ loader: 'style-loader' }, { loader: 'css-loader' }]
 });
 
+// webpack 5 strict-ESM mode requires fully-specified paths for .mjs imports;
+// node-stdlib-browser polyfills (used by node-polyfill-webpack-plugin) resolve
+// to directory paths that break this. Disable fullySpecified for all JS/MJS.
+rules.push({
+    test: /\.m?js$/,
+    resolve: {
+        fullySpecified: false
+    }
+});
+
 export const rendererConfig: Configuration = {
     module: {
         rules
     },
+    plugins: [new NodePolyfillPlugin({ excludeAliases: ['vm'] })],
     resolve: {
         extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
         alias: {
@@ -33,9 +45,6 @@ export const rendererConfig: Configuration = {
             '@ton/ton': path.resolve(__dirname, '../../packages/core/node_modules/@ton/ton')
         },
         fallback: {
-            stream: require.resolve('stream-browserify'),
-            crypto: require.resolve('crypto-browserify'),
-            process: require.resolve('process/browser'),
             vm: false
         }
     }

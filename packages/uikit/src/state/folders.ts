@@ -8,7 +8,8 @@ import {
     AccountsFolderStored,
     AccountTonMultisig
 } from '@tonkeeper/core/dist/entries/account';
-import { DropResult, ResponderProvided } from 'react-beautiful-dnd';
+import { DragEndEvent } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 
 export type AccountsFolder = Omit<AccountsFolderStored, 'accounts'> & {
     accounts: Account[];
@@ -191,63 +192,53 @@ export const useAccountsDNDDrop = (items: (Account | AccountsFolder)[]) => {
         setItemsOptimistic(items);
     }, [items]);
 
-    const _handleDrop = useCallback<
-        (result: DropResult, provided: ResponderProvided) => (Account | AccountsFolder)[]
-    >(
-        droppedItem => {
-            const updatedList = [...items];
-            if (!droppedItem.destination) {
-                return updatedList;
-            }
+    const handleSidebarDrop = useCallback(
+        (event: DragEndEvent) => {
+            const { active, over } = event;
+            if (!over || active.id === over.id) return;
 
-            const insideFolderId = droppedItem.source.droppableId.startsWith('folder_')
-                ? droppedItem.source.droppableId.split('folder_')[1]
-                : null;
-            if (insideFolderId) {
-                if (droppedItem.destination.droppableId !== droppedItem.source.droppableId) {
-                    throw new Error('Cannot move item from one folder to another');
-                }
-                const folder = folders.find(i => i.id === insideFolderId) as AccountsFolder;
-                if (!folder) {
-                    throw new Error(`Folder ${insideFolderId} not found`);
-                }
-                const newAccounts = folder.accounts.slice();
+            const oldIndex = items.findIndex(i => i.id === active.id);
+            const newIndex = items.findIndex(i => i.id === over.id);
+            if (oldIndex === -1 || newIndex === -1) return;
 
-                const [reorderedItem] = newAccounts.splice(droppedItem.source.index, 1);
-                newAccounts.splice(droppedItem.destination.index, 0, reorderedItem);
-
-                const folderIndex = folders.findIndex(i => i.id === insideFolderId);
-                const newFolders = folders.slice();
-                newFolders[folderIndex] = { ...folder, accounts: newAccounts };
-                mutate({ folders: newFolders.map(folderToStoredFolder) });
-
-                updatedList[updatedList.findIndex(i => i.id === insideFolderId)] = {
-                    ...folder,
-                    accounts: newAccounts
-                };
-                return updatedList;
-            }
-
-            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
-            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate({ sideBarOrder: updatedList.map(i => i.id) });
-            return updatedList;
+            const reordered = arrayMove([...items], oldIndex, newIndex);
+            mutate({ sideBarOrder: reordered.map(i => i.id) });
+            setItemsOptimistic(reordered);
         },
-        [items, mutate, folders, setItemsOptimistic]
+        [items, mutate]
     );
 
-    const handleDrop = useCallback(
-        (droppedItem: DropResult, provided: ResponderProvided) => {
-            const result = _handleDrop(droppedItem, provided);
-            if (result) {
-                setItemsOptimistic(result);
-            }
+    const handleFolderDrop = useCallback(
+        (event: DragEndEvent, folderId: string) => {
+            const { active, over } = event;
+            if (!over || active.id === over.id) return;
+
+            const folder = folders.find(i => i.id === folderId) as AccountsFolder;
+            if (!folder) return;
+
+            const oldIndex = folder.accounts.findIndex(a => a.id === active.id);
+            const newIndex = folder.accounts.findIndex(a => a.id === over.id);
+            if (oldIndex === -1 || newIndex === -1) return;
+
+            const newAccounts = arrayMove([...folder.accounts], oldIndex, newIndex);
+            const folderIndex = folders.findIndex(i => i.id === folderId);
+            const newFolders = folders.slice();
+            newFolders[folderIndex] = { ...folder, accounts: newAccounts };
+            mutate({ folders: newFolders.map(folderToStoredFolder) });
+
+            const updatedList = [...items];
+            updatedList[updatedList.findIndex(i => i.id === folderId)] = {
+                ...folder,
+                accounts: newAccounts
+            };
+            setItemsOptimistic(updatedList);
         },
-        [_handleDrop]
+        [items, folders, mutate]
     );
 
     return {
-        handleDrop,
+        handleSidebarDrop,
+        handleFolderDrop,
         itemsOptimistic
     };
 };
