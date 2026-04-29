@@ -1,12 +1,12 @@
 import { resolve } from 'path';
 import { UserConfig } from 'vite';
-import rollupNodePolyFill from 'rollup-plugin-node-polyfills';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 export const sharedConfig: UserConfig = {
     envPrefix: 'REACT_APP_',
-    plugins: [],
+    plugins: [nodePolyfills()],
     resolve: {
         alias: {
             react: resolve(__dirname, './node_modules/react'),
@@ -21,11 +21,7 @@ export const sharedConfig: UserConfig = {
             '@ton/crypto/dist/mnemonic/mnemonic': resolve(
                 __dirname,
                 '../../packages/core/node_modules/@ton/crypto/dist/mnemonic/mnemonic'
-            ),
-            buffer: 'buffer',
-            crypto: resolve(__dirname, './node_modules/crypto-browserify'),
-            stream: resolve(__dirname, './node_modules/stream-browserify'),
-            'process/browser': resolve(__dirname, './node_modules/process/browser')
+            )
         }
     },
     build: {
@@ -36,12 +32,7 @@ export const sharedConfig: UserConfig = {
         rollupOptions: {
             output: {
                 assetFileNames: 'static/[name].[hash][extname]'
-            },
-            plugins: [
-                rollupNodePolyFill({
-                    include: ['buffer', 'crypto', 'stream', 'process']
-                })
-            ]
+            }
         },
         target: 'esnext'
     }
