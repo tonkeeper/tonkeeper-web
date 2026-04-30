@@ -17,6 +17,7 @@ import { rendererConfig } from './webpack.renderer.config';
 import { mainWindowName } from './src/constants';
 
 const isDev = process.env.NODE_ENV === 'development';
+const isPrerelease = process.env.GITHUB_REF_NAME?.includes('-') ?? false;
 
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
 
@@ -142,7 +143,8 @@ const config: ForgeConfig = {
                 owner: 'tonkeeper',
                 name: 'tonkeeper-web'
             },
-            draft: true
+            draft: true,
+            prerelease: isPrerelease
         })
     ]
 };
