@@ -1,6 +1,8 @@
 import { Notification, NotificationFooter } from '../Notification';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { DragDropContext, Draggable, Droppable, OnDragEndResponder } from 'react-beautiful-dnd';
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { ListBlock, ListItemElement, ListItemPayload } from '../List';
 import { ReorderIcon } from '../Icon';
 import styled from 'styled-components';
@@ -90,6 +92,48 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     );
 };
 
+const SortableCategoryItem: FC<{
+    id: string;
+    isEnabled: boolean;
+    categories: DashboardColumn[];
+    isProEnabled: boolean;
+    onOpen: () => void;
+    onCheckboxChange: (id: string, checked: boolean) => void;
+}> = ({ id, isEnabled, categories, isProEnabled, onOpen, onCheckboxChange }) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition
+    };
+    const category = categories.find(c => c.id === id);
+    const isDisabled = category?.onlyPro && !isProEnabled;
+
+    return (
+        <ListItemElement
+            ios={true}
+            hover={false}
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+        >
+            <ListItemPayload>
+                <Row onClick={() => isDisabled && onOpen()}>
+                    <Icon {...listeners}>
+                        <ReorderIcon />
+                    </Icon>
+                    <Body1>{category?.name}</Body1>
+                    {category?.onlyPro && <Badge>PRO</Badge>}
+                    <CheckboxStyled
+                        checked={isEnabled}
+                        disabled={isDisabled}
+                        onChange={value => !isDisabled && onCheckboxChange(id, value)}
+                    />
+                </Row>
+            </ListItemPayload>
+        </ListItemElement>
+    );
+};
+
 const CategoriesModalContent: FC<{
     categories: DashboardColumn[];
     categoriesForm: DashboardColumnsForm;
@@ -100,82 +144,54 @@ const CategoriesModalContent: FC<{
     const { data: subscription } = useProState();
     const { onOpen } = useProFeaturesNotification();
     const isProEnabled = isValidSubscription(subscription);
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-    const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
-        const destination = droppedItem.destination;
-        if (!destination) return;
-
-        setCategoriesForm(_categories => {
-            const updatedList = [..._categories];
-            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
-            updatedList.splice(destination.index, 0, reorderedItem);
-            return updatedList;
-        });
-    }, []);
+    const handleDragEnd = useCallback(
+        (event: DragEndEvent) => {
+            const { active, over } = event;
+            if (!over || active.id === over.id) return;
+            setCategoriesForm(_categories => {
+                const oldIndex = _categories.findIndex(c => c.id === active.id);
+                const newIndex = _categories.findIndex(c => c.id === over.id);
+                if (oldIndex === -1 || newIndex === -1) return _categories;
+                return arrayMove([..._categories], oldIndex, newIndex);
+            });
+        },
+        [setCategoriesForm]
+    );
 
     const onCheckboxChange = (categoryId: string, checked: boolean) => {
         setCategoriesForm(form =>
             form.map(c => (c.id === categoryId ? { ...c, isEnabled: checked } : c))
         );
     };
+
     return (
         <>
-            <DragDropContext onDragEnd={handleDrop}>
-                <Droppable direction="vertical" droppableId="wallets">
-                    {provided => (
-                        <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
-                            {categoriesForm.map(({ id, isEnabled }, index) => (
-                                <Draggable key={id} draggableId={id} index={index}>
-                                    {(p, snapshotDrag) => {
-                                        let transform = p.draggableProps.style?.transform;
-
-                                        if (snapshotDrag.isDragging && transform) {
-                                            transform = transform.replace(/\(.+\,/, '(0,');
-                                        }
-
-                                        const style = {
-                                            ...p.draggableProps.style,
-                                            transform
-                                        };
-
-                                        const category = categories.find(c => c.id === id);
-                                        const isDisabled = category?.onlyPro && !isProEnabled;
-
-                                        return (
-                                            <ListItemElement
-                                                ios={true}
-                                                hover={false}
-                                                ref={p.innerRef}
-                                                {...p.draggableProps}
-                                                style={style}
-                                            >
-                                                <ListItemPayload>
-                                                    <Row onClick={() => isDisabled && onOpen()}>
-                                                        <Icon {...p.dragHandleProps}>
-                                                            <ReorderIcon />
-                                                        </Icon>
-                                                        <Body1>{category?.name}</Body1>
-                                                        {category?.onlyPro && <Badge>PRO</Badge>}
-                                                        <CheckboxStyled
-                                                            checked={isEnabled}
-                                                            disabled={isDisabled}
-                                                            onChange={value =>
-                                                                !isDisabled &&
-                                                                onCheckboxChange(id, value)
-                                                            }
-                                                        />
-                                                    </Row>
-                                                </ListItemPayload>
-                                            </ListItemElement>
-                                        );
-                                    }}
-                                </Draggable>
-                            ))}
-                            {provided.placeholder}
-                        </ListBlock>
-                    )}
-                </Droppable>
-            </DragDropContext>
+            <DndContext
+                sensors={sensors}
+                onDragEnd={handleDragEnd}
+                modifiers={[restrictToVerticalAxis]}
+            >
+                <SortableContext
+                    items={categoriesForm.map(c => c.id)}
+                    strategy={verticalListSortingStrategy}
+                >
+                    <ListBlock>
+                        {categoriesForm.map(({ id, isEnabled }) => (
+                            <SortableCategoryItem
+                                key={id}
+                                id={id}
+                                isEnabled={isEnabled}
+                                categories={categories}
+                                isProEnabled={isProEnabled}
+                                onOpen={onOpen}
+                                onCheckboxChange={onCheckboxChange}
+                            />
+                        ))}
+                    </ListBlock>
+                </SortableContext>
+            </DndContext>
         </>
     );
 };

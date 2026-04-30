@@ -5,8 +5,8 @@
     "description": "Your telegram mini app wallet on The Open Network",
     "dependencies": {
         "@tanstack/react-query": "4.3.4",
-        "@tma.js/sdk": "latest",
-        "@tma.js/sdk-react": "latest",
+        "@tma.js/sdk": "2.5.1",
+        "@tma.js/sdk-react": "2.2.5",
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",
         "@tonkeeper/uikit": "0.1.0",
@@ -44,7 +44,7 @@
         "source-map-explorer": "^2.5.3",
         "ts-node": "^10.9.1",
         "typescript": "^4.9.4",
-        "vite": "^5.0.11"
+        "vite": "^5.4.20"
     },
     "scripts": {
         "locales": "ts-node ./task/locales",

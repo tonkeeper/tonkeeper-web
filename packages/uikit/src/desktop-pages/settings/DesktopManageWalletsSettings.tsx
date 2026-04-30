@@ -1,12 +1,8 @@
 import { FC, forwardRef, Fragment, ReactNode } from 'react';
-import {
-    DragDropContext,
-    Draggable,
-    DraggableProvided,
-    DraggableProvidedDragHandleProps,
-    DraggableStateSnapshot,
-    Droppable
-} from 'react-beautiful-dnd';
+import React from 'react';
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import styled, { css } from 'styled-components';
 import { DropDownContent, DropDownItem } from '../../components/DropDown';
 import {
@@ -69,7 +65,6 @@ import {
 } from '../../state/folders';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
-import { useAppTargetEnv } from '../../hooks/appSdk';
 import { cardModalSwipe } from '../../hooks/ionic';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 
@@ -140,6 +135,56 @@ const BottomButtonContainer = styled.div`
     padding: 1rem;
 `;
 
+type DragHandleProps = React.HTMLAttributes<HTMLElement> | undefined;
+
+const SortableOuterItem: FC<{
+    item: Account | AccountsFolder;
+    handleFolderDrop: (event: DragEndEvent, folderId: string) => void;
+}> = ({ item, handleFolderDrop }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: item.id
+    });
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition
+    };
+    return (
+        <ListItemStyled
+            hover={false}
+            ref={setNodeRef}
+            style={style}
+            $isDragging={isDragging}
+            {...attributes}
+        >
+            <ItemRow
+                dragHandleProps={listeners as DragHandleProps}
+                handleFolderDrop={handleFolderDrop}
+                item={item}
+            />
+        </ListItemStyled>
+    );
+};
+
+const SortableFolderItem: FC<{ acc: Account; tabLevel: number }> = ({ acc, tabLevel }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: acc.id
+    });
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition
+    };
+    return (
+        <DraggingBlock
+            $isDragging={isDragging}
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+        >
+            <ItemRow item={acc} dragHandleProps={listeners as DragHandleProps} tabLevel={tabLevel} />
+        </DraggingBlock>
+    );
+};
+
 export const DesktopManageAccountsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { onOpen: addWallet } = useAddWalletNotification();
@@ -147,30 +192,8 @@ export const DesktopManageAccountsPage = () => {
     const { t } = useTranslation();
 
     const items = useSideBarItems();
-    const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
-
-    const env = useAppTargetEnv();
-
-    const patchDragItemStyle = (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
-        const transform = provided.draggableProps.style?.transform;
-        if (env === 'mobile') {
-            const shiftY = transform ? parseFloat(transform.split(',')[1]) : 0;
-            if (snapshot.isDragging) {
-                provided.draggableProps.style!.transform = 'translate(0px,' + (shiftY - 40) + 'px)';
-            } else if (transform) {
-                provided.draggableProps.style!.transform = 'translate(0px,' + shiftY + 'px)';
-            }
-        } else {
-            if (transform) {
-                try {
-                    const tr = transform.split(',')[1];
-                    provided.draggableProps.style!.transform = 'translate(0px,' + tr;
-                } catch (_) {
-                    //
-                }
-            }
-        }
-    };
+    const { handleSidebarDrop, handleFolderDrop, itemsOptimistic } = useAccountsDNDDrop(items);
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
@@ -193,46 +216,30 @@ export const DesktopManageAccountsPage = () => {
                     }
                 />
             </DesktopViewHeader>
-            <DragDropContext
-                onDragEnd={(...args) => {
-                    handleDrop(...args);
+            <DndContext
+                sensors={sensors}
+                onDragEnd={e => {
+                    handleSidebarDrop(e);
                     cardModalSwipe.unlock();
                 }}
-                onBeforeDragStart={cardModalSwipe.lock}
+                onDragStart={() => cardModalSwipe.lock()}
+                modifiers={[restrictToVerticalAxis]}
             >
-                <Droppable droppableId="settings_wallets" type="all_items">
-                    {provided => (
-                        <ListBlockDesktopAdaptive
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            margin={false}
-                        >
-                            {itemsOptimistic.map((item, index) => (
-                                <Draggable key={item.id} draggableId={item.id} index={index}>
-                                    {(p, snapshot) => {
-                                        patchDragItemStyle(p, snapshot);
-
-                                        return (
-                                            <ListItemStyled
-                                                hover={false}
-                                                ref={p.innerRef}
-                                                {...p.draggableProps}
-                                                $isDragging={snapshot.isDragging}
-                                            >
-                                                <ItemRow
-                                                    dragHandleProps={p.dragHandleProps}
-                                                    item={item}
-                                                />
-                                            </ListItemStyled>
-                                        );
-                                    }}
-                                </Draggable>
-                            ))}
-                            {provided.placeholder}
-                        </ListBlockDesktopAdaptive>
-                    )}
-                </Droppable>
-            </DragDropContext>
+                <SortableContext
+                    items={itemsOptimistic.map(i => i.id)}
+                    strategy={verticalListSortingStrategy}
+                >
+                    <ListBlockDesktopAdaptive margin={false}>
+                        {itemsOptimistic.map(item => (
+                            <SortableOuterItem
+                                key={item.id}
+                                item={item}
+                                handleFolderDrop={handleFolderDrop}
+                            />
+                        ))}
+                    </ListBlockDesktopAdaptive>
+                </SortableContext>
+            </DndContext>
 
             <BottomButtonContainer>
                 <Button secondary fullWidth onClick={() => addWallet()}>
@@ -360,7 +367,7 @@ const MultisigItemRow = forwardRef<
 
 const AccountMnemonicRow: FC<{
     account: AccountTonMnemonic | AccountTonTestnet | AccountTonSK;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
@@ -429,7 +436,7 @@ const AccountMnemonicRow: FC<{
 
 const AccountLedgerRow: FC<{
     account: AccountLedger;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
@@ -488,7 +495,7 @@ const AccountLedgerRow: FC<{
 
 const AccountTonOnlyRow: FC<{
     account: AccountTonOnly;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
@@ -545,7 +552,7 @@ const AccountTonOnlyRow: FC<{
 
 const AccountKeystoneRow: FC<{
     account: AccountKeystone;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
@@ -582,7 +589,7 @@ const AccountKeystoneRow: FC<{
 
 const AccountWatchOnlyRow: FC<{
     account: AccountTonWatchOnly;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
@@ -619,7 +626,7 @@ const AccountWatchOnlyRow: FC<{
 
 const AccountMAMRow: FC<{
     account: AccountMAM;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
     const { t } = useTranslation();
@@ -712,7 +719,7 @@ const AccountMultisigRow = () => {
 
 const AccountRow: FC<{
     account: Account;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
     tabLevel: number;
 }> = ({ account, ...rest }) => {
     switch (account.type) {
@@ -744,12 +751,14 @@ const FolderDropableWrapper = styled.div`
 
 const ItemRow: FC<{
     item: Account | AccountsFolder;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
+    handleFolderDrop?: (event: DragEndEvent, folderId: string) => void;
     tabLevel?: number;
-}> = ({ item, dragHandleProps, tabLevel = 0 }) => {
+}> = ({ item, dragHandleProps, handleFolderDrop, tabLevel = 0 }) => {
     const { t } = useTranslation();
     const { onOpen: onManageFolder } = useManageFolderNotification();
     const deleteFolder = useDeleteFolder();
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
     if (item.type === 'folder') {
         if (!item.accounts.length) {
@@ -784,47 +793,26 @@ const ItemRow: FC<{
                 {item.accounts.length === 1 ? (
                     <ItemRow item={item.accounts[0]} tabLevel={1} />
                 ) : (
-                    <Droppable droppableId={'folder_' + item.id} type="folder">
-                        {provided => (
-                            <FolderDropableWrapper
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                            >
-                                {item.accounts.map((acc, index) => (
-                                    <Draggable key={acc.id} draggableId={acc.id} index={index}>
-                                        {(p, snapshot) => {
-                                            const transform = p.draggableProps.style?.transform;
-                                            if (transform) {
-                                                try {
-                                                    const tr = transform.split(',')[1];
-                                                    p.draggableProps.style!.transform =
-                                                        'translate(0px,' + tr;
-                                                } catch (_) {
-                                                    //
-                                                }
-                                            }
-
-                                            return (
-                                                <DraggingBlock
-                                                    $isDragging={snapshot.isDragging}
-                                                    ref={p.innerRef}
-                                                    {...p.draggableProps}
-                                                >
-                                                    <ItemRow
-                                                        key={acc.id}
-                                                        item={acc}
-                                                        dragHandleProps={p.dragHandleProps}
-                                                        tabLevel={tabLevel + 1}
-                                                    />
-                                                </DraggingBlock>
-                                            );
-                                        }}
-                                    </Draggable>
+                    <DndContext
+                        sensors={sensors}
+                        onDragEnd={e => handleFolderDrop?.(e, item.id)}
+                        modifiers={[restrictToVerticalAxis]}
+                    >
+                        <SortableContext
+                            items={item.accounts.map(a => a.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <FolderDropableWrapper>
+                                {item.accounts.map(acc => (
+                                    <SortableFolderItem
+                                        key={acc.id}
+                                        acc={acc}
+                                        tabLevel={tabLevel + 1}
+                                    />
                                 ))}
-                                {provided.placeholder}
                             </FolderDropableWrapper>
-                        )}
-                    </Droppable>
+                        </SortableContext>
+                    </DndContext>
                 )}
             </>
         );
