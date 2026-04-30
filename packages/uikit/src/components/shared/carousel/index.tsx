@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useEffect, useMemo, WheelEvent } from 'react';
+import { FC, PropsWithChildren, useEffect, useMemo } from 'react';
 import { Carousel as ArkCarousel, useCarousel } from '@ark-ui/react';
 import styled from 'styled-components';
 import { ChevronLeftIcon, ChevronRightIcon } from '../../Icon';
