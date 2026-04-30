@@ -135,7 +135,7 @@ jobs:
               with:
                   name: 'Tonkeeper ${{ github.ref_name }}'
                   draft: true
-                  generate_release_notes: true
+                  prerelease: ${{ contains(github.ref_name, '-') }}
                   files: |
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
                           github.ref_name }}.zip
