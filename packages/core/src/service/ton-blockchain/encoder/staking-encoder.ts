@@ -7,6 +7,7 @@ import { getTonkeeperQueryId } from '../utils';
 const DEPOSIT_OP = 0x47d54391;
 const BURN_OP = 0x595f07bc;
 const WHALES_WITHDRAW_OP = 0xda803efd;
+const TONSTAKERS_REFERRAL_CODE = 0x000000000005b6ca;
 
 export const STAKE_GAS_RESERVE_TON = 1.05;
 export const UNSTAKE_LIQUID_GAS_TON = 1.05;
@@ -26,7 +27,7 @@ export class StakingEncoder {
         const body = beginCell()
             .storeUint(DEPOSIT_OP, 32)
             .storeUint(getTonkeeperQueryId(), 64)
-            .storeUint(0, 64) // partnerCode = 0
+            .storeUint(TONSTAKERS_REFERRAL_CODE, 64)
             .endCell();
 
         return {
