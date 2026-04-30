@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren, useEffect, useMemo, WheelEvent } from 'react';
+import { FC, PropsWithChildren, useEffect, useMemo } from 'react';
 import { Carousel as ArkCarousel, useCarousel } from '@ark-ui/react';
 import styled from 'styled-components';
 import { ChevronLeftIcon, ChevronRightIcon } from '../../Icon';
@@ -110,10 +110,6 @@ export const Carousel: FC<PropsWithChildren<CarouselProps>> = ({
                 slidesToShow={slidesToShow}
                 centerPadding={centerPadding}
                 className={className}
-                onWheel={(e: WheelEvent) => {
-                    if (e.deltaX > 0) carousel?.scrollNext();
-                    else if (e.deltaX < 0) carousel?.scrollPrev();
-                }}
             >
                 {canGoLeft && (
                     <SwipeButton position="left" onClick={() => carousel?.scrollPrev()}>
