@@ -9,6 +9,7 @@ import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useProState } from '../../state/pro';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -25,8 +26,9 @@ export const ProSettingsPartnersSection = () => {
     const { data: config } = useTrc20FreeTransfersConfig();
     const formatDate = useDateTimeFormat();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
+    const isFullWidthMode = useIsFullWidthMode();
 
-    if (!isTronEnabled || !isValidSubscription(subscription)) {
+    if (!isTronEnabled || !isValidSubscription(subscription) || !isFullWidthMode) {
         return null;
     }
 
