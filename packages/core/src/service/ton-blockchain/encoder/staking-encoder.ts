@@ -7,7 +7,7 @@ import { getTonkeeperQueryId } from '../utils';
 const DEPOSIT_OP = 0x47d54391;
 const BURN_OP = 0x595f07bc;
 const WHALES_WITHDRAW_OP = 0xda803efd;
-const TONSTAKERS_REFERRAL_CODE = 0x000000000005b6ca;
+const TONSTAKERS_REFERRAL_CODE = 0x000000000005b7c2;
 
 export const STAKE_GAS_RESERVE_TON = 1.05;
 export const UNSTAKE_LIQUID_GAS_TON = 1.05;
