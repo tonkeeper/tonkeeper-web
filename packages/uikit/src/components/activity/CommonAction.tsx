@@ -72,7 +72,7 @@ export const SecondaryText = styled(Body2)`
 
 const AddressTextContent = styled(SecondaryText)`
     cursor: pointer;
-
+    width: fit-content;
     transition: opacity 0.15s ease-in-out;
     opacity: 1;
 
@@ -94,11 +94,11 @@ export const AddressText: FC<{ children: AddressTextValue }> = ({ children }) =>
     const displayChildren =
         typeof children === 'string' ? toShortValue(children, 8) : children.value;
 
-    return (
-        <AddressTextContent onClick={() => sdk.copyToClipboard(childrenValue, t('copied'))}>
-            {displayChildren}
-        </AddressTextContent>
-    );
+    const handleClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+        e.stopPropagation();
+        sdk.copyToClipboard(childrenValue, t('copied'));
+    };
+    return <AddressTextContent onClick={handleClick}>{displayChildren}</AddressTextContent>;
 };
 
 const CommentMessage = styled(Body2)`
