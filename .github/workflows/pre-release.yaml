@@ -65,6 +65,11 @@ jobs:
             - name: Enable Corepack
               run: corepack enable
 
+            - name: Set version from tag
+              run: node scripts/set-version.js
+              env:
+                  RELEASE_TAG: ${{ env.RELEASE_TAG }}
+
             - name: Decode Apple API key
               if: runner.os == 'macOS'
               env:
@@ -102,11 +107,11 @@ jobs:
         uses: ./.github/workflows/ipad-build.yaml
         secrets: inherit
 
-    # Deploys to 'dev' environment — never touches prod
+    # Deploys to 'rc' Cloudflare preview — never touches prod
     web-build:
         uses: ./.github/workflows/web-build.yaml
         with:
-            environment: 'dev'
+            environment: 'rc'
         secrets: inherit
 
     extension-build:
@@ -127,6 +132,11 @@ jobs:
 
             - name: Enable Corepack
               run: corepack enable
+
+            - name: Set version from tag
+              run: node scripts/set-version.js
+              env:
+                  RELEASE_TAG: ${{ env.RELEASE_TAG }}
 
             - name: Install dependencies
               uses: borales/actions-yarn@v5
