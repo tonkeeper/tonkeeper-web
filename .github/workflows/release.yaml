@@ -1,17 +1,33 @@
-name: CD
+name: Release
+
 on:
     push:
         tags:
-            - v*
+            - 'v*'
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Tag to release (must already exist, e.g. v4.5.0)'
+                required: false
+                type: string
+
+# Prevent concurrent release runs; never cancel in-progress to avoid partial releases
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: false
+
 permissions:
     contents: write
 
 env:
     node-version: 20.11.1
+    RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
     desktop-build:
         name: desktop-build
+        # Skip if tag is a pre-release (contains '-'); manual dispatch always runs
+        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         strategy:
             matrix:
                 include:
@@ -38,8 +54,10 @@ jobs:
             DEBUG: electron*
 
         steps:
-            - name: Checkout to git repository
+            - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ env.RELEASE_TAG }}
 
             - name: Set up Node
               uses: actions/setup-node@v4
@@ -47,15 +65,13 @@ jobs:
                   node-version: ${{ env.node-version }}
 
             - name: Enable Corepack
-              run: |
-                  corepack enable
+              run: corepack enable
 
-            - name: Decode service account into a file
+            - name: Decode Apple API key
               if: runner.os == 'macOS'
               env:
                   CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
-              run: |
-                  echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
+              run: echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
 
             - name: Configure keychain
               if: runner.os == 'macOS'
@@ -64,52 +80,49 @@ jobs:
                   p12-file-base64: ${{ secrets.IDENTITY_P12_B64 }}
                   p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
 
-            - name: Run install
+            - name: Install dependencies
               uses: borales/actions-yarn@v5
               with:
                   cmd: install
 
-            - name: Run build packages
+            - name: Build packages
               uses: borales/actions-yarn@v5
               with:
                   cmd: build:pkg
 
-            - name: Run build distributive
+            - name: Publish desktop
               uses: borales/actions-yarn@v5
               with:
                   cmd: ${{ matrix.command }}
                   dir: 'apps/desktop'
 
-            - name: Clean-up credentials
+            - name: Clean up credentials
               if: always() && runner.os == 'macOS'
-              run: |
-                  rm ${{ github.workspace }}/AuthKey.p8
+              run: rm ${{ github.workspace }}/AuthKey.p8
+
     ipad-build:
+        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         uses: ./.github/workflows/ipad-build.yaml
         secrets: inherit
 
     web-build:
+        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: 'main'
         secrets: inherit
 
-    # web-tests:
-    #     needs: web-build
-    #     uses: ./.github/workflows/web-tests.yaml
-    #     with:
-    #         base-url: 'https://wallet.tonkeeper.com'
-    #         transaction: true
-    #     secrets: inherit
-
     extension-build:
         name: extension-build
+        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         runs-on: macos-14
         timeout-minutes: 10
 
         steps:
-            - name: Checkout to git repository
+            - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ env.RELEASE_TAG }}
 
             - name: Set up Node
               uses: actions/setup-node@v4
@@ -117,27 +130,45 @@ jobs:
                   node-version: ${{ env.node-version }}
 
             - name: Enable Corepack
-              run: |
-                  corepack enable
+              run: corepack enable
 
-            - name: Run install
+            - name: Install dependencies
               uses: borales/actions-yarn@v5
               with:
                   cmd: install
 
-            - name: Run build
+            - name: Build extension
               uses: borales/actions-yarn@v5
               with:
                   cmd: build:extension
 
-            - name: Upload Tonkeeper Extension to release
+            - name: Upload extension to draft release
               uses: softprops/action-gh-release@v2
               with:
-                  name: 'Tonkeeper ${{ github.ref_name }}'
+                  tag_name: ${{ env.RELEASE_TAG }}
+                  name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
                   draft: true
-                  prerelease: ${{ contains(github.ref_name, '-') }}
+                  prerelease: false
                   files: |
-                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
-                          github.ref_name }}.zip
-                      ${{ github.workspace
-                          }}/apps/extension/dist/tonkeeper_firefox_${{ github.ref_name }}.zip
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{ env.RELEASE_TAG }}.zip
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{ env.RELEASE_TAG }}.zip
+
+    # Runs after all builds succeed — publishes the draft and marks as latest
+    publish-release:
+        name: publish-release
+        needs: [desktop-build, ipad-build, web-build, extension-build]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Publish GitHub release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ env.RELEASE_TAG }}
+                  name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
+                  draft: false
+                  prerelease: false
+                  make_latest: true
+
+            - name: Summary
+              run: |
+                  echo "### Release ${{ env.RELEASE_TAG }} published 🚀" >> $GITHUB_STEP_SUMMARY
+                  echo "https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}" >> $GITHUB_STEP_SUMMARY
