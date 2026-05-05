@@ -11,11 +11,13 @@ import { TonConnectMessage } from '../../libs/message';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { useOpenSwapDeeplink } from '@tonkeeper/uikit/dist/state/swap/useSwapDeeplink';
 
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
+    const openSwapDeeplink = useOpenSwapDeeplink();
 
-    const { mutateAsync, reset } = useProcessOpenedLink();
+    const { mutateAsync, reset } = useProcessOpenedLink({ onSwapDeeplink: openSwapDeeplink });
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useCompleteHttpConnection();
 
@@ -45,7 +47,7 @@ export const DeepLinkSubscription = () => {
             reset();
             setParams(await mutateAsync(url));
         });
-    }, []);
+    }, [mutateAsync, reset]);
 
     return (
         <TonConnectNotification

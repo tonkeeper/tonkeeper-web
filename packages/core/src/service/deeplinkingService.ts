@@ -12,6 +12,7 @@ import {
 import { DNSApi } from '../tonApiV2';
 import { APIConfig } from '../entries/apis';
 import { JettonEncoder, JettonWalletNotFound } from './ton-blockchain/encoder/jetton-encoder';
+import { TonAsset, tonAssetAddressToString } from '../entries/crypto/asset/ton-asset';
 
 export function seeIfBringToFrontLink(options: { url: string }) {
     const { query } = queryString.parseUrl(options.url);
@@ -33,6 +34,53 @@ export interface TonTransferParams {
 export interface TronTransferParams {
     address?: string;
     amount?: string;
+}
+
+export interface SwapDeeplinkParams {
+    fromToken?: string;
+    toToken?: string;
+}
+
+const TETHER_SIGN = '\u20ae';
+
+export const normalizeSwapDeeplinkToken = (value: string) =>
+    value.trim().toUpperCase().replace(new RegExp(TETHER_SIGN, 'g'), 'T');
+
+export const findSwapAssetByDeeplinkToken = (assets: TonAsset[], token: string) => {
+    const trimmedToken = token.trim();
+    const normalizedToken = normalizeSwapDeeplinkToken(trimmedToken);
+    const tokenAddress = seeIfValidTonAddress(trimmedToken)
+        ? Address.parse(trimmedToken)
+        : undefined;
+
+    return assets.find(asset => {
+        const normalizedSymbol = normalizeSwapDeeplinkToken(asset.symbol);
+
+        return (
+            normalizedSymbol === normalizedToken ||
+            (tokenAddress !== undefined &&
+                Address.isAddress(asset.address) &&
+                tokenAddress.equals(asset.address))
+        );
+    });
+};
+
+export function parseSwapDeeplink(url: string): SwapDeeplinkParams | null {
+    try {
+        const data = queryString.parseUrl(url);
+        const paths = getUrlPaths(data.url);
+
+        if (paths.length !== 1 || paths[0] !== 'swap') {
+            return null;
+        }
+
+        const fromToken = typeof data.query.ft === 'string' ? data.query.ft : undefined;
+        const toToken = typeof data.query.tt === 'string' ? data.query.tt : undefined;
+
+        return { fromToken, toToken };
+    } catch (e) {
+        return null;
+    }
 }
 
 export function parseTonTransferWithAddress(options: { url: string }) {

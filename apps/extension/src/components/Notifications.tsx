@@ -23,6 +23,7 @@ import { SenderChoice } from '@tonkeeper/uikit/dist/hooks/blockchain/useSender';
 import { InterceptTonLinkNotification } from './InterceptTonLinkNotification';
 import { useGlobalPreferences } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useSubjectValue } from '@tonkeeper/uikit/dist/libs/useAtom';
+import { useOpenSwapDeeplink } from '@tonkeeper/uikit/dist/state/swap/useSwapDeeplink';
 
 const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
     if (e.event === 'connect') {
@@ -41,7 +42,10 @@ export const Notifications = () => {
     useTrackTonConnectActionRequest(data?.origin);
     const trackSendSuccess = useTrackerTonConnectSendSuccess();
 
-    const { mutateAsync: processOpenedLink } = useProcessOpenedLink();
+    const openSwapDeeplink = useOpenSwapDeeplink();
+    const { mutateAsync: processOpenedLink } = useProcessOpenedLink({
+        onSwapDeeplink: openSwapDeeplink
+    });
     const { interceptTonLinks } = useGlobalPreferences();
 
     const backgroundEvent = useSubjectValue(extensionBackgroundEvents$);

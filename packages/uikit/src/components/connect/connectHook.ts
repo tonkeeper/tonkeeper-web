@@ -7,8 +7,10 @@ import {
     WalletResponse
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
+    parseSwapDeeplink,
     parseTonTransaction,
     parseTronTransferWithAddress,
+    SwapDeeplinkParams,
     seeIfBringToFrontLink
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
@@ -40,6 +42,7 @@ import { useAppContext } from '../../hooks/appContext';
 export const useProcessOpenedLink = (options?: {
     hideLoadingToast?: boolean;
     hideErrorToast?: boolean;
+    onSwapDeeplink?: (params: SwapDeeplinkParams) => void;
 }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
@@ -104,6 +107,12 @@ export const useProcessOpenedLink = (options?: {
                     id: Date.now(),
                     params: { chain: BLOCKCHAIN_NAME.TRON, ...tronTransfer, from: 'qr-code' }
                 });
+                return null;
+            }
+
+            const swapDeeplinkParams = parseSwapDeeplink(url);
+            if (swapDeeplinkParams) {
+                options?.onSwapDeeplink?.(swapDeeplinkParams);
                 return null;
             }
 

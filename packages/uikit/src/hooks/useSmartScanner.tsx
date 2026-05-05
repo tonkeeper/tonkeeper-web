@@ -8,13 +8,15 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectNotification } from '../components/connect/TonConnectNotification';
 import { useTrackTonConnectConnectionRequest } from './analytics/events-hooks';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { useOpenSwapDeeplink } from '../state/swap/useSwapDeeplink';
 
 export const useSmartScanner = () => {
     const sdk = useAppSdk();
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
+    const openSwapDeeplink = useOpenSwapDeeplink();
 
-    const { mutateAsync, reset } = useProcessOpenedLink();
+    const { mutateAsync, reset } = useProcessOpenedLink({ onSwapDeeplink: openSwapDeeplink });
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useCompleteHttpConnection();
 

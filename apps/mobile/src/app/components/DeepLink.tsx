@@ -37,6 +37,7 @@ import { capacitorTonConnectInjectedConnector } from '../../libs/ton-connect/cap
 import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
 import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { useOpenSwapDeeplink } from '@tonkeeper/uikit/dist/state/swap/useSwapDeeplink';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -110,10 +111,12 @@ export const DeepLinkSubscription = () => {
         url: string;
         unsupportedLinkError?: string;
     } | null>(null);
+    const openSwapDeeplink = useOpenSwapDeeplink();
 
     const { mutateAsync, reset } = useProcessOpenedLink({
         hideLoadingToast: true,
-        hideErrorToast: true
+        hideErrorToast: true,
+        onSwapDeeplink: openSwapDeeplink
     });
     const { onClose: closeTonTransaction } = useTonTransactionNotification();
 
@@ -214,6 +217,10 @@ const modifyLinkScheme = (link: string) => {
         switch (protocol) {
             case 'tonkeeper':
             case 'ton':
+                if (body.startsWith('swap')) {
+                    return null;
+                }
+
                 return `${tonkeeperMobileTonDeeplinkScheme}://${body}`;
             case 'tonkeeper-tc':
             case 'tc':
@@ -225,6 +232,8 @@ const modifyLinkScheme = (link: string) => {
                     return `${tonkeeperMobileTonConnectDeeplinkScheme}://${
                         link.split('ton-connect')[1]
                     }`;
+                } else if (isSwapPath(u.pathname)) {
+                    return null;
                 } else {
                     return `${tonkeeperMobileTonDeeplinkScheme}://${u.pathname.slice(1)}${
                         u.search
@@ -239,4 +248,13 @@ const modifyLinkScheme = (link: string) => {
         console.error(e);
         return null;
     }
+};
+
+const isSwapPath = (pathname: string) => {
+    let paths = pathname.split('/').slice(1);
+    if (paths[0] === 'pro') {
+        paths = paths.slice(1);
+    }
+
+    return paths.length === 1 && paths[0] === 'swap';
 };
