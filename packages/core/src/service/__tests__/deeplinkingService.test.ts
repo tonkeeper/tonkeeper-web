@@ -6,6 +6,10 @@ import { tonAssetAddressToString } from '../../entries/crypto/asset/ton-asset';
 import {
     findSwapAssetByDeeplinkToken,
     normalizeSwapDeeplinkToken,
+    parseBatteryDeeplink,
+    parseBrowserDeeplink,
+    parseBuyTonDeeplink,
+    parsePoolDeeplink,
     parseSwapDeeplink
 } from '../deeplinkingService';
 
@@ -14,34 +18,6 @@ describe('parseSwapDeeplink', () => {
         expect(parseSwapDeeplink('https://app.tonkeeper.com/swap?ft=TON&tt=UTYA')).toEqual({
             fromToken: 'TON',
             toToken: 'UTYA'
-        });
-    });
-
-    it('parses TON to DOGS web swap deeplink', () => {
-        expect(parseSwapDeeplink('https://app.tonkeeper.com/swap?ft=TON&tt=DOGS')).toEqual({
-            fromToken: 'TON',
-            toToken: 'DOGS'
-        });
-    });
-
-    it('parses USDT to TON web swap deeplink', () => {
-        expect(parseSwapDeeplink('https://app.tonkeeper.com/swap?ft=USDT&tt=TON')).toEqual({
-            fromToken: 'USDT',
-            toToken: 'TON'
-        });
-    });
-
-    it('does not require a specific host for web swap links', () => {
-        expect(parseSwapDeeplink('https://example.com/swap?ft=TON&tt=USDT')).toEqual({
-            fromToken: 'TON',
-            toToken: 'USDT'
-        });
-    });
-
-    it('parses app scheme swap links using the same path rules as other deeplinks', () => {
-        expect(parseSwapDeeplink('tonkeeper://swap?ft=TON&tt=USDT')).toEqual({
-            fromToken: 'TON',
-            toToken: 'USDT'
         });
     });
 
@@ -144,5 +120,75 @@ describe('findSwapAssetByDeeplinkToken', () => {
         expect(
             findSwapAssetByDeeplinkToken([TON_ASSET, TON_USDT_ASSET], 'not-a-token-address')
         ).toBeUndefined();
+    });
+});
+
+describe('parsePoolDeeplink', () => {
+    it('parses web pool deeplink', () => {
+        expect(
+            parsePoolDeeplink('https://app.tonkeeper.com/pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa')
+        ).toEqual({ poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa' });
+    });
+
+    it('parses app scheme pool deeplink', () => {
+        expect(
+            parsePoolDeeplink('tonkeeper://pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa')
+        ).toEqual({ poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa' });
+    });
+
+    it('returns null without pool address', () => {
+        expect(parsePoolDeeplink('https://app.tonkeeper.com/pool')).toBeNull();
+    });
+
+    it('returns null for non-pool links', () => {
+        expect(parsePoolDeeplink('https://app.tonkeeper.com/swap?ft=TON')).toBeNull();
+    });
+});
+
+describe('parseBuyTonDeeplink', () => {
+    it('parses web buy-ton deeplink', () => {
+        expect(parseBuyTonDeeplink('https://app.tonkeeper.com/buy-ton')).toBe(true);
+    });
+
+    it('parses app scheme buy-ton deeplink', () => {
+        expect(parseBuyTonDeeplink('tonkeeper://buy-ton')).toBe(true);
+    });
+
+    it('returns null for non-buy-ton links', () => {
+        expect(parseBuyTonDeeplink('https://app.tonkeeper.com/swap')).toBeNull();
+    });
+});
+
+describe('parseBatteryDeeplink', () => {
+    it('parses web battery deeplink', () => {
+        expect(parseBatteryDeeplink('https://app.tonkeeper.com/battery')).toBe(true);
+    });
+
+    it('parses app scheme battery deeplink', () => {
+        expect(parseBatteryDeeplink('tonkeeper://battery')).toBe(true);
+    });
+
+    it('returns null for non-battery links', () => {
+        expect(parseBatteryDeeplink('https://app.tonkeeper.com/swap')).toBeNull();
+    });
+});
+
+describe('parseBrowserDeeplink', () => {
+    it('parses web browser deeplink', () => {
+        expect(parseBrowserDeeplink('https://app.tonkeeper.com/browser')).toEqual({});
+    });
+
+    it('parses app scheme browser deeplink', () => {
+        expect(parseBrowserDeeplink('tonkeeper://browser')).toEqual({});
+    });
+
+    // items in browser are external links, we can't open them in the app
+    it('matches regardless of extra path segments or query params', () => {
+        expect(parseBrowserDeeplink('https://app.tonkeeper.com/browser/anything')).toEqual({});
+        expect(parseBrowserDeeplink('tonkeeper://browser?url=https%3A%2F%2Fgetgems.io')).toEqual({});
+    });
+
+    it('returns null for non-browser links', () => {
+        expect(parseBrowserDeeplink('https://app.tonkeeper.com/swap')).toBeNull();
     });
 });

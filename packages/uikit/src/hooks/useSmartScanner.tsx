@@ -1,22 +1,21 @@
 import { useAppSdk } from './appSdk';
 import React, { useCallback, useEffect, useState } from 'react';
 import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { useProcessOpenedLink, useCompleteHttpConnection } from '../components/connect/connectHook';
+import { useCompleteHttpConnection } from '../components/connect/connectHook';
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectNotification } from '../components/connect/TonConnectNotification';
 import { useTrackTonConnectConnectionRequest } from './analytics/events-hooks';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
-import { useOpenSwapDeeplink } from '../state/swap/useSwapDeeplink';
+import { useDeeplinkHandlers } from './deeplinks/useDeeplinkHandlers';
 
 export const useSmartScanner = () => {
     const sdk = useAppSdk();
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
-    const openSwapDeeplink = useOpenSwapDeeplink();
 
-    const { mutateAsync, reset } = useProcessOpenedLink({ onSwapDeeplink: openSwapDeeplink });
+    const { mutateAsync, reset } = useDeeplinkHandlers();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useCompleteHttpConnection();
 

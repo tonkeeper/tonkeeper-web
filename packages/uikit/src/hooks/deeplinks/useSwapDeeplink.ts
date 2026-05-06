@@ -6,9 +6,9 @@ import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useCallback, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
-import { useNavigate } from '../../hooks/router/useNavigate';
-import { useAllSwapAssets } from './useSwapAssets';
-import { useSwapFromAsset, useSwapToAsset } from './useSwapForm';
+import { useNavigate } from '../router/useNavigate';
+import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
+import { useSwapFromAsset, useSwapToAsset } from '../../state/swap/useSwapForm';
 
 const pendingSwapDeeplinkParams$ = atom<SwapDeeplinkParams | undefined>(undefined);
 

@@ -1,6 +1,6 @@
 import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
 import { Navigate } from '../../components/shared/Navigate';
-import { useApplySwapDeeplinkParams } from '../../state/swap/useSwapDeeplink';
+import { useApplySwapDeeplinkParams } from '../../hooks/deeplinks/useSwapDeeplink';
 import { useEffect, useState } from 'react';
 
 export default () => {

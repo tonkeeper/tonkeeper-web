@@ -8,7 +8,6 @@ import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConn
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
     useCompleteHttpConnection,
-    useProcessOpenedLink,
     useCompleteInjectedConnection
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -37,7 +36,7 @@ import { capacitorTonConnectInjectedConnector } from '../../libs/ton-connect/cap
 import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
 import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
-import { useOpenSwapDeeplink } from '@tonkeeper/uikit/dist/state/swap/useSwapDeeplink';
+import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -111,12 +110,10 @@ export const DeepLinkSubscription = () => {
         url: string;
         unsupportedLinkError?: string;
     } | null>(null);
-    const openSwapDeeplink = useOpenSwapDeeplink();
-
-    const { mutateAsync, reset } = useProcessOpenedLink({
+    const { mutateAsync, reset } = useDeeplinkHandlers({
         hideLoadingToast: true,
         hideErrorToast: true,
-        onSwapDeeplink: openSwapDeeplink
+        withBattery: true
     });
     const { onClose: closeTonTransaction } = useTonTransactionNotification();
 

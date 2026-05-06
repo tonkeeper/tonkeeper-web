@@ -1,23 +1,19 @@
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
-import {
-    useCompleteHttpConnection,
-    useProcessOpenedLink
-} from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { useCompleteHttpConnection } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
 import { sendBackground } from '../../libs/backgroudService';
 import { TonConnectMessage } from '../../libs/message';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
-import { useOpenSwapDeeplink } from '@tonkeeper/uikit/dist/state/swap/useSwapDeeplink';
+import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
 
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
-    const openSwapDeeplink = useOpenSwapDeeplink();
 
-    const { mutateAsync, reset } = useProcessOpenedLink({ onSwapDeeplink: openSwapDeeplink });
+    const { mutateAsync, reset } = useDeeplinkHandlers({ withBattery: true });
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useCompleteHttpConnection();
 

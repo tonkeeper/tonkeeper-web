@@ -10,10 +10,7 @@ import { useEffect, useState } from 'react';
 import { extensionBackgroundEvents$, sendBackground } from '../event';
 import { NotificationData } from '../libs/event';
 import { tonConnectTonkeeperAppName } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import {
-    useCompleteInjectedConnection,
-    useProcessOpenedLink
-} from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { useCompleteInjectedConnection } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { tonConnectProtocolVersion } from '../constants';
 import {
     useTrackerTonConnectSendSuccess,
@@ -23,7 +20,7 @@ import { SenderChoice } from '@tonkeeper/uikit/dist/hooks/blockchain/useSender';
 import { InterceptTonLinkNotification } from './InterceptTonLinkNotification';
 import { useGlobalPreferences } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useSubjectValue } from '@tonkeeper/uikit/dist/libs/useAtom';
-import { useOpenSwapDeeplink } from '@tonkeeper/uikit/dist/state/swap/useSwapDeeplink';
+import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
 
 const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
     if (e.event === 'connect') {
@@ -42,10 +39,7 @@ export const Notifications = () => {
     useTrackTonConnectActionRequest(data?.origin);
     const trackSendSuccess = useTrackerTonConnectSendSuccess();
 
-    const openSwapDeeplink = useOpenSwapDeeplink();
-    const { mutateAsync: processOpenedLink } = useProcessOpenedLink({
-        onSwapDeeplink: openSwapDeeplink
-    });
+    const { mutateAsync: processOpenedLink } = useDeeplinkHandlers();
     const { interceptTonLinks } = useGlobalPreferences();
 
     const backgroundEvent = useSubjectValue(extensionBackgroundEvents$);

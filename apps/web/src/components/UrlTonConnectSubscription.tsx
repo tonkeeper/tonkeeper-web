@@ -1,10 +1,7 @@
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
-import {
-    useCompleteHttpConnection,
-    useProcessOpenedLink
-} from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { useCompleteHttpConnection } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
@@ -12,17 +9,14 @@ import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
-import { useOpenSwapDeeplink } from '@tonkeeper/uikit/dist/state/swap/useSwapDeeplink';
+import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
 
 const TON_CONNECT_TRIGGER_PATH = '/ton-connect';
 
 export const UrlTonConnectSubscription = () => {
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
-    const openSwapDeeplink = useOpenSwapDeeplink();
 
-    const { mutateAsync: parseParams, reset } = useProcessOpenedLink({
-        onSwapDeeplink: openSwapDeeplink
-    });
+    const { mutateAsync: parseParams, reset } = useDeeplinkHandlers();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useCompleteHttpConnection();
 

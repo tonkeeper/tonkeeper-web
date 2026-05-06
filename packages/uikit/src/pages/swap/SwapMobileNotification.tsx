@@ -10,7 +10,7 @@ import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 import { SwapSettingsButton } from '../../components/swap/SwapSettingsButton';
 import { Label2 } from '../../components/Text';
-import { useApplySwapDeeplinkParams } from '../../state/swap/useSwapDeeplink';
+import { useApplySwapDeeplinkParams } from '../../hooks/deeplinks/useSwapDeeplink';
 
 const NotificationHeaderContainer = styled.div`
     position: relative;
