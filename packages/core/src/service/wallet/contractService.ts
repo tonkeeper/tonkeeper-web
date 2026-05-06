@@ -171,7 +171,7 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
     const gasFee = computeGasFee(walletVersion);
     const importFee = computeImportFee(msgBits, msgCells);
 
-    const base = BigInt(msgFwdFee + gasFee + importFee);
+    const base = BigInt(Math.ceil(msgFwdFee + gasFee + importFee));
 
     return (base * GAS_SAFETY_MULTIPLIER) / GAS_SAFETY_MULTIPLIER_DENOMINATOR;
 };
