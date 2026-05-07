@@ -90,6 +90,7 @@ import { useIsTronEnabledGlobally, useTronApi } from './tron/tron';
 import { useNavigate } from '../hooks/router/useNavigate';
 import { AppRoute } from '../libs/routes';
 import { isSignerLink } from './signer';
+import { useSyncPubkeysBulk } from './pubkeysBulkSync';
 import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
 import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
@@ -996,9 +997,11 @@ export const useRemoveTonWalletVersionFromAccount = () => {
 export const useAddAccountToStateMutation = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
+    const syncPubkeys = useSyncPubkeysBulk();
     return useMutation<void, Error, Account>(async account => {
         await storage.addAccountToState(account);
         await client.invalidateQueries([QueryKey.account]);
+        syncPubkeys([account]).catch(console.warn);
     });
 };
 
