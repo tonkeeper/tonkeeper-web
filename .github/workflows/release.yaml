@@ -4,11 +4,12 @@ on:
     push:
         tags:
             - 'v*'
+            - '!v*-*'
     workflow_dispatch:
         inputs:
             tag:
                 description: 'Tag to release (must already exist, e.g. v4.5.0)'
-                required: false
+                required: true
                 type: string
 
 # Prevent concurrent release runs; never cancel in-progress to avoid partial releases
@@ -115,6 +116,7 @@ jobs:
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: 'main'
+            release_tag: ${{ env.RELEASE_TAG }}
         secrets: inherit
 
     extension-build:
@@ -167,6 +169,7 @@ jobs:
     publish-release:
         name: publish-release
         needs: [desktop-build, ipad-build, web-build, extension-build]
+        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         runs-on: ubuntu-latest
         steps:
             - name: Publish GitHub release
