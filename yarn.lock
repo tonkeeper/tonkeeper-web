@@ -116,6 +116,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aptabase/web@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@aptabase/web@npm:0.5.0"
+  checksum: 10/f40501d30492f782236f29c854b12f0ee14614a14e3190278ed30785b52a2257119b7aeae5a23c5931a7445f5c500e7f3c9499f6edeaa226582253565bde7fa8
+  languageName: node
+  linkType: hard
+
 "@ark-ui/react@npm:^5.9.1":
   version: 5.9.1
   resolution: "@ark-ui/react@npm:5.9.1"
@@ -4635,6 +4642,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
+    "@aptabase/web": "npm:^0.5.0"
     "@ark-ui/react": "npm:^5.9.1"
     "@ionic/core": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch"
     "@ionic/react": "npm:^8.4.2"
