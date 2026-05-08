@@ -42,8 +42,10 @@ export interface PupUpEvents {
     proxyChanged: ProxyConfiguration;
 
     userProperties: UserProperties;
+    userPropertiesSdk: UserProperties;
     locations: string;
     trackEvent: TrackEvent;
+    trackEventSdk: TrackEvent;
 }
 
 export interface PayloadRequest<P = any> {

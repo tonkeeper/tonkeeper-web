@@ -8,6 +8,7 @@ import { backgroundEventsEmitter, NotificationData, popUpEventEmitter } from '..
 import { Aptabase } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { ExtensionStorage } from '../storage';
+import { AptabaseSdkBackground } from '../aptabase-sdk-background';
 
 let popUpPort: browser.Runtime.Port;
 const portMessagesQueue: any[] = [];
@@ -76,4 +77,22 @@ popUpEventEmitter.on('userProperties', message => {
 
 popUpEventEmitter.on('trackEvent', message => {
     aptabase?.track(message.params.name, message.params.params);
+});
+
+let aptabaseSdk: AptabaseSdkBackground;
+
+popUpEventEmitter.on('userPropertiesSdk', message => {
+    const { aptabaseEndpoint, aptabaseKey, ...restParams } = message.params;
+    aptabaseSdk = new AptabaseSdkBackground({
+        host: aptabaseEndpoint,
+        key: aptabaseKey,
+        appVersion: browser.runtime.getManifest().version,
+        userIdentity
+    });
+
+    aptabaseSdk.init(restParams);
+});
+
+popUpEventEmitter.on('trackEventSdk', message => {
+    aptabaseSdk?.track(message.params.name, message.params.params);
 });
