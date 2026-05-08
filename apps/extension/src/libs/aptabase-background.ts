@@ -1,11 +1,11 @@
-import { init, trackEvent } from '@aptabase/web';
+import { init, trackEvent } from '@aptabase/browser';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
 import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
-import { Analytics, getUserIdentityProps } from './common';
+import { Analytics } from '@tonkeeper/uikit/dist/hooks/analytics';
 
-export class AptabaseSdk implements Analytics {
+export class AptabaseBackground implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
 
     private readonly userIdentity: UserIdentity;
@@ -56,13 +56,20 @@ export class AptabaseSdk implements Analytics {
                       return rest as Record<string, string | number | boolean>;
                   })();
 
-        const { sessionId, ...identityProps } = await getUserIdentityProps(this.userIdentity);
+        const uuid_persistent = await this.userIdentity.getPersistentUserId();
+        const appSessionId = await this.userIdentity.getSessionId();
+        const identity: Record<string, string | number | boolean> = {
+            uuid_persistent,
+            app_session_id: appSessionId
+        };
+        if (this.userIdentity.getFirebaseUserId) {
+            identity.firebase_user_id = await this.userIdentity.getFirebaseUserId();
+        }
 
         return trackEvent(eventName, {
             ...this.user_properties,
             ...eventProps,
-            ...identityProps,
-            app_session_id: sessionId
+            ...identity
         });
     }
 }

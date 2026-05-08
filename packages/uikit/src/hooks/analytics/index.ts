@@ -4,7 +4,6 @@ import { useAppContext } from '../appContext';
 import { AnalyticsTracker } from './common';
 
 export { Aptabase } from './aptabase';
-export { AptabaseSdk } from './aptabase-sdk';
 export { type Analytics, toWalletType } from './common';
 
 export const useAnalyticsTrack = () => {
