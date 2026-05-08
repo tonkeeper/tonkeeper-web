@@ -8,7 +8,7 @@ on:
         inputs:
             tag:
                 description: 'Pre-release tag (must already exist, e.g. v4.5.0-beta.1)'
-                required: false
+                required: true
                 type: string
 
 # Prevent concurrent pre-release runs; cancel stale runs when a new one starts
@@ -112,6 +112,7 @@ jobs:
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: 'rc'
+            release_tag: ${{ inputs.tag || github.ref_name }}
         secrets: inherit
 
     extension-build:

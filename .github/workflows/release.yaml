@@ -1,14 +1,16 @@
 name: Release
 
 on:
-    push:
-        tags:
-            - 'v*'
+    # Fires when a GitHub Release is published as stable (prerelease unchecked).
+    # This is the primary trigger: create tag → pre-release → verify → promote to release.
+    release:
+        types: [released]
+    # Manual fallback: provide an existing stable tag to re-run or recover a release.
     workflow_dispatch:
         inputs:
             tag:
                 description: 'Tag to release (must already exist, e.g. v4.5.0)'
-                required: false
+                required: true
                 type: string
 
 # Prevent concurrent release runs; never cancel in-progress to avoid partial releases
@@ -21,13 +23,11 @@ permissions:
 
 env:
     node-version: 20.11.1
-    RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
 
 jobs:
     desktop-build:
         name: desktop-build
-        # Skip if tag is a pre-release (contains '-'); manual dispatch always runs
-        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         strategy:
             matrix:
                 include:
@@ -106,20 +106,18 @@ jobs:
               run: rm ${{ github.workspace }}/AuthKey.p8
 
     ipad-build:
-        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         uses: ./.github/workflows/ipad-build.yaml
         secrets: inherit
 
     web-build:
-        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: 'main'
+            release_tag: ${{ inputs.tag || github.event.release.tag_name }}
         secrets: inherit
 
     extension-build:
         name: extension-build
-        if: github.event_name == 'workflow_dispatch' || !contains(github.ref_name, '-')
         runs-on: macos-14
         timeout-minutes: 10
 
@@ -152,24 +150,24 @@ jobs:
               with:
                   cmd: build:extension
 
-            - name: Upload extension to draft release
+            - name: Upload extension to release
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ env.RELEASE_TAG }}
                   name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
-                  draft: true
+                  draft: false
                   prerelease: false
                   files: |
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{ env.RELEASE_TAG }}.zip
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{ env.RELEASE_TAG }}.zip
 
-    # Runs after all builds succeed — publishes the draft and marks as latest
+    # Runs after all builds succeed — marks the release as latest
     publish-release:
         name: publish-release
         needs: [desktop-build, ipad-build, web-build, extension-build]
         runs-on: ubuntu-latest
         steps:
-            - name: Publish GitHub release
+            - name: Mark release as latest
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ env.RELEASE_TAG }}
