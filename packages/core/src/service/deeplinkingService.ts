@@ -158,7 +158,7 @@ export function parseTonTransferWithAddress(options: { url: string }) {
     try {
         const data = queryString.parseUrl(options.url);
 
-        const paths = data.url.split('/');
+        const paths = trimTrailingEmptyPathSegments(data.url.split('/'));
 
         let linkAddress: string;
         if (paths.length === 0) {
@@ -464,8 +464,16 @@ const getUrlPaths = (url: string) => {
             sliced = sliced.slice(1);
         }
 
-        return sliced;
+        return trimTrailingEmptyPathSegments(sliced);
     }
 
-    return paths.slice(2);
+    return trimTrailingEmptyPathSegments(paths.slice(2));
+};
+
+const trimTrailingEmptyPathSegments = (paths: string[]) => {
+    const result = [...paths];
+    while (result.length > 0 && result[result.length - 1] === '') {
+        result.pop();
+    }
+    return result;
 };

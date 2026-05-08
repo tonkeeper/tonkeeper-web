@@ -44,6 +44,13 @@ describe('parseSwapDeeplink', () => {
         });
     });
 
+    it('ignores a trailing slash added by custom protocol handlers', () => {
+        expect(parseSwapDeeplink('tonkeeper://swap/?ft=TON&tt=USDT')).toEqual({
+            fromToken: 'TON',
+            toToken: 'USDT'
+        });
+    });
+
     it('returns null for malformed urls', () => {
         expect(parseSwapDeeplink('not a url')).toBeNull();
     });
@@ -136,6 +143,12 @@ describe('parsePoolDeeplink', () => {
         ).toEqual({ poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa' });
     });
 
+    it('ignores a trailing slash added by custom protocol handlers', () => {
+        expect(
+            parsePoolDeeplink('tonkeeper://pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa/')
+        ).toEqual({ poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa' });
+    });
+
     it('returns null without pool address', () => {
         expect(parsePoolDeeplink('https://app.tonkeeper.com/pool')).toBeNull();
     });
@@ -154,6 +167,10 @@ describe('parseBuyTonDeeplink', () => {
         expect(parseBuyTonDeeplink('tonkeeper://buy-ton')).toBe(true);
     });
 
+    it('ignores a trailing slash added by custom protocol handlers', () => {
+        expect(parseBuyTonDeeplink('tonkeeper://buy-ton/')).toBe(true);
+    });
+
     it('returns null for non-buy-ton links', () => {
         expect(parseBuyTonDeeplink('https://app.tonkeeper.com/swap')).toBeNull();
     });
@@ -166,6 +183,10 @@ describe('parseBatteryDeeplink', () => {
 
     it('parses app scheme battery deeplink', () => {
         expect(parseBatteryDeeplink('tonkeeper://battery')).toBe(true);
+    });
+
+    it('ignores a trailing slash added by custom protocol handlers', () => {
+        expect(parseBatteryDeeplink('tonkeeper://battery/')).toBe(true);
     });
 
     it('returns null for non-battery links', () => {
