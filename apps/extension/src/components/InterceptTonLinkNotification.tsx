@@ -5,7 +5,7 @@ import { Body1, Button, H2 } from '@tonkeeper/uikit';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { Checkbox } from '@tonkeeper/uikit/dist/components/fields/Checkbox';
 import { useMutateGlobalPreferences } from '@tonkeeper/uikit/dist/state/global-preferences';
-import { useProcessOpenedLink } from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -61,7 +61,7 @@ export const InterceptTonLinkNotification: FC<{
     url: string | null;
 }> = ({ url, handleClose }) => {
     const { mutateAsync: saveGlobalPreferences } = useMutateGlobalPreferences();
-    const { mutateAsync: processOpenedLink } = useProcessOpenedLink();
+    const { mutateAsync: processOpenedLink } = useDeeplinkHandlers();
 
     const onSubmit = async ({ rememberChoice, processInExtension }: TonLinkForm) => {
         if (!url) return;

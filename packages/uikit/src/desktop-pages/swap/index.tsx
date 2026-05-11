@@ -18,6 +18,7 @@ import { Navigate } from '../../components/shared/Navigate';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
+import { useApplySwapDeeplinkParams } from '../../hooks/deeplinks/useSwapDeeplink';
 
 const HeaderButtons = styled.div`
     margin-left: auto;
@@ -52,6 +53,7 @@ const DesktopSwapPageContent = () => {
     const swapLink = useStonfiSwapLink(swapFromAsset$.value.address, swapToAsset$.value.address);
 
     useSwapStreamEffect();
+    useApplySwapDeeplinkParams();
 
     if (!isSwapsEnabled) {
         sdk.openPage(swapLink);

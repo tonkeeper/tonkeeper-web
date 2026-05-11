@@ -7,8 +7,16 @@ import {
     WalletResponse
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
+    parseBatteryDeeplink,
+    parseBrowserDeeplink,
+    parseBuyTonDeeplink,
+    parsePoolDeeplink,
+    parseSwapDeeplink,
     parseTonTransaction,
     parseTronTransferWithAddress,
+    BrowserDeeplinkParams,
+    PoolDeeplinkParams,
+    SwapDeeplinkParams,
     seeIfBringToFrontLink
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
@@ -40,6 +48,11 @@ import { useAppContext } from '../../hooks/appContext';
 export const useProcessOpenedLink = (options?: {
     hideLoadingToast?: boolean;
     hideErrorToast?: boolean;
+    onSwapDeeplink?: (params: SwapDeeplinkParams) => void;
+    onPoolDeeplink?: (params: PoolDeeplinkParams) => void;
+    onBuyTonDeeplink?: () => void;
+    onBatteryDeeplink?: () => void;
+    onBrowserDeeplink?: (params: BrowserDeeplinkParams) => void;
 }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
@@ -104,6 +117,34 @@ export const useProcessOpenedLink = (options?: {
                     id: Date.now(),
                     params: { chain: BLOCKCHAIN_NAME.TRON, ...tronTransfer, from: 'qr-code' }
                 });
+                return null;
+            }
+
+            const swapDeeplinkParams = parseSwapDeeplink(url);
+            if (swapDeeplinkParams) {
+                options?.onSwapDeeplink?.(swapDeeplinkParams);
+                return null;
+            }
+
+            const poolDeeplinkParams = parsePoolDeeplink(url);
+            if (poolDeeplinkParams) {
+                options?.onPoolDeeplink?.(poolDeeplinkParams);
+                return null;
+            }
+
+            if (parseBuyTonDeeplink(url)) {
+                options?.onBuyTonDeeplink?.();
+                return null;
+            }
+
+            if (parseBatteryDeeplink(url)) {
+                options?.onBatteryDeeplink?.();
+                return null;
+            }
+
+            const browserDeeplinkParams = parseBrowserDeeplink(url);
+            if (browserDeeplinkParams) {
+                options?.onBrowserDeeplink?.(browserDeeplinkParams);
                 return null;
             }
 

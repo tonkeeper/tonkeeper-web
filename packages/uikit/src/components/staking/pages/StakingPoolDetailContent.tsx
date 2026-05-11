@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { FC, ReactNode, useMemo, useState } from 'react';
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react';
 import { css, styled } from 'styled-components';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
@@ -381,6 +381,13 @@ export const StakingPoolDetailContent = ({
     }, [portfolio]);
 
     const { data: pool, isError: isPoolError } = usePoolInfo(address);
+
+    useEffect(() => {
+        if (isPoolError) {
+            navigate(AppRoute.staking);
+        }
+    }, [isPoolError, navigate]);
+
     const { tonAmount: stakedAmount, position, isLiquid } = usePoolStakedBalance(pool);
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const countdown = useStakingCycleCountdown(pool);

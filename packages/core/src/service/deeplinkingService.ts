@@ -12,6 +12,7 @@ import {
 import { DNSApi } from '../tonApiV2';
 import { APIConfig } from '../entries/apis';
 import { JettonEncoder, JettonWalletNotFound } from './ton-blockchain/encoder/jetton-encoder';
+import { TonAsset, tonAssetAddressToString } from '../entries/crypto/asset/ton-asset';
 
 export function seeIfBringToFrontLink(options: { url: string }) {
     const { query } = queryString.parseUrl(options.url);
@@ -33,6 +34,124 @@ export interface TonTransferParams {
 export interface TronTransferParams {
     address?: string;
     amount?: string;
+}
+
+export interface SwapDeeplinkParams {
+    fromToken?: string;
+    toToken?: string;
+}
+
+export interface PoolDeeplinkParams {
+    poolAddress: string;
+}
+
+export type BrowserDeeplinkParams = Record<string, never>;
+
+const TETHER_SIGN = '\u20ae';
+
+export const normalizeSwapDeeplinkToken = (value: string) =>
+    value.trim().toUpperCase().replace(new RegExp(TETHER_SIGN, 'g'), 'T');
+
+export const findSwapAssetByDeeplinkToken = (assets: TonAsset[], token: string) => {
+    const trimmedToken = token.trim();
+    const normalizedToken = normalizeSwapDeeplinkToken(trimmedToken);
+    const tokenAddress = seeIfValidTonAddress(trimmedToken)
+        ? Address.parse(trimmedToken)
+        : undefined;
+
+    return assets.find(asset => {
+        const normalizedSymbol = normalizeSwapDeeplinkToken(asset.symbol);
+
+        return (
+            normalizedSymbol === normalizedToken ||
+            (tokenAddress !== undefined &&
+                Address.isAddress(asset.address) &&
+                tokenAddress.equals(asset.address))
+        );
+    });
+};
+
+export function parseSwapDeeplink(url: string): SwapDeeplinkParams | null {
+    try {
+        const data = queryString.parseUrl(url);
+        const paths = getUrlPaths(data.url);
+
+        if (paths.length !== 1 || paths[0] !== 'swap') {
+            return null;
+        }
+
+        const fromToken = typeof data.query.ft === 'string' ? data.query.ft : undefined;
+        const toToken = typeof data.query.tt === 'string' ? data.query.tt : undefined;
+
+        return { fromToken, toToken };
+    } catch (e) {
+        return null;
+    }
+}
+
+export function parsePoolDeeplink(url: string): PoolDeeplinkParams | null {
+    try {
+        const data = queryString.parseUrl(url);
+        const paths = getUrlPaths(data.url);
+
+        if (paths.length !== 2 || paths[0] !== 'pool') {
+            return null;
+        }
+
+        const poolAddress = paths[1];
+        if (!poolAddress) {
+            return null;
+        }
+
+        return { poolAddress };
+    } catch (e) {
+        return null;
+    }
+}
+
+export function parseBuyTonDeeplink(url: string): true | null {
+    try {
+        const data = queryString.parseUrl(url);
+        const paths = getUrlPaths(data.url);
+
+        if (paths.length !== 1 || paths[0] !== 'buy-ton') {
+            return null;
+        }
+
+        return true;
+    } catch (e) {
+        return null;
+    }
+}
+
+export function parseBatteryDeeplink(url: string): true | null {
+    try {
+        const data = queryString.parseUrl(url);
+        const paths = getUrlPaths(data.url);
+
+        if (paths.length !== 1 || paths[0] !== 'battery') {
+            return null;
+        }
+
+        return true;
+    } catch (e) {
+        return null;
+    }
+}
+
+export function parseBrowserDeeplink(url: string): BrowserDeeplinkParams | null {
+    try {
+        const data = queryString.parseUrl(url);
+        const paths = getUrlPaths(data.url);
+
+        if (paths.length === 0 || paths[0] !== 'browser') {
+            return null;
+        }
+
+        return {};
+    } catch (e) {
+        return null;
+    }
 }
 
 export function parseTonTransferWithAddress(options: { url: string }) {
