@@ -2,8 +2,7 @@ import { init, trackEvent } from '@aptabase/browser';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
-import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
-import { Analytics } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Analytics, TrackableEvent } from '@tonkeeper/uikit/dist/hooks/analytics/common';
 
 export class AptabaseBackground implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
@@ -41,20 +40,22 @@ export class AptabaseBackground implements Analytics {
         }
     };
 
+    track(event: TrackableEvent): Promise<void>;
     track(name: string, params?: Record<string, string | number | boolean>): Promise<void>;
-    track(event: AnalyticsEvent): Promise<void>;
     async track(
-        arg1: string | AnalyticsEvent,
+        arg1: TrackableEvent | string,
         arg2?: Record<string, string | number | boolean>
     ): Promise<void> {
-        const eventName = typeof arg1 === 'string' ? arg1.toLowerCase() : arg1.name;
-        const eventProps =
-            typeof arg1 === 'string'
-                ? arg2 ?? {}
-                : (() => {
-                      const { name, ...rest } = arg1;
-                      return rest as Record<string, string | number | boolean>;
-                  })();
+        const { eventName, eventProps } = (() => {
+            if (typeof arg1 === 'string') {
+                return { eventName: arg1, eventProps: arg2 ?? {} };
+            }
+            const { eventName: name, ...rest } = arg1;
+            return {
+                eventName: name,
+                eventProps: rest as Record<string, string | number | boolean>
+            };
+        })();
 
         const uuid_persistent = await this.userIdentity.getPersistentUserId();
         const appSessionId = await this.userIdentity.getSessionId();

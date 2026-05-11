@@ -2,8 +2,7 @@ import { init, trackEvent } from '@aptabase/web';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
-import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
-import { Analytics, getUserIdentityProps } from './common';
+import { Analytics, TrackableEvent, getUserIdentityProps } from './common';
 
 export class Aptabase implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
@@ -41,28 +40,31 @@ export class Aptabase implements Analytics {
         }
     };
 
+    track(event: TrackableEvent): Promise<void>;
     track(name: string, params?: Record<string, string | number | boolean>): Promise<void>;
-    track(event: AnalyticsEvent): Promise<void>;
     async track(
-        arg1: string | AnalyticsEvent,
+        arg1: TrackableEvent | string,
         arg2?: Record<string, string | number | boolean>
     ): Promise<void> {
-        const eventName = typeof arg1 === 'string' ? arg1.toLowerCase() : arg1.name;
-        const eventProps =
-            typeof arg1 === 'string'
-                ? arg2 ?? {}
-                : (() => {
-                      const { name, ...rest } = arg1;
-                      return rest as Record<string, string | number | boolean>;
-                  })();
-
+        const { eventName, props } = normalizeTrackArgs(arg1, arg2);
         const { sessionId, ...identityProps } = await getUserIdentityProps(this.userIdentity);
 
         return trackEvent(eventName, {
             ...this.user_properties,
-            ...eventProps,
+            ...props,
             ...identityProps,
             app_session_id: sessionId
         });
     }
+}
+
+function normalizeTrackArgs(
+    arg1: TrackableEvent | string,
+    arg2?: Record<string, string | number | boolean>
+): { eventName: string; props: Record<string, string | number | boolean> } {
+    if (typeof arg1 === 'string') {
+        return { eventName: arg1, props: arg2 ?? {} };
+    }
+    const { eventName, ...rest } = arg1;
+    return { eventName, props: rest as Record<string, string | number | boolean> };
 }

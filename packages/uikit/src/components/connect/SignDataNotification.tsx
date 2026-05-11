@@ -28,7 +28,6 @@ import { handleSubmit } from '../../libs/form';
 import { ErrorIcon } from '../Icon';
 import { Cell } from '@ton/core';
 import { useAnalyticsTrack } from '../../hooks/analytics';
-import { AnalyticsEventTcSignDataSuccess } from '@tonkeeper/core/dist/analytics';
 
 const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const activeAccount = useActiveAccount();
@@ -350,12 +349,11 @@ export const SignDataNotification: FC<{
     const onClose = useCallback(
         (result?: SignDataResponse) => {
             handleClose(result);
-            track(
-                new AnalyticsEventTcSignDataSuccess({
-                    dapp_url: origin!,
-                    payload_type: params!.type
-                })
-            );
+            track({
+                eventName: 'tc_sign_data_success',
+                dapp_url: origin!,
+                payload_type: params!.type
+            });
         },
         [handleClose]
     );

@@ -1,11 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import {
-    AnalyticsEvent,
-    AnalyticsEventDappBrowserOpen,
-    AnalyticsEventTcRequest,
-    AnalyticsEventTcSendSuccess,
-    AnalyticsEventTcViewConfirm
-} from '@tonkeeper/core/dist/analytics';
+import { TrackableEvent } from './common';
 import { useAnalyticsTrack } from './index';
 import { SenderChoice } from '../blockchain/useSender';
 import { useQueryClient } from '@tanstack/react-query';
@@ -15,12 +9,11 @@ export const useTrackTonConnectActionRequest = (dappUrl: string | undefined) => 
     const track = useAnalyticsTrack();
     useEffect(() => {
         if (dappUrl) {
-            track(
-                new AnalyticsEventTcViewConfirm({
-                    dapp_url: dappUrl,
-                    address_type: 'raw'
-                })
-            );
+            track({
+                eventName: 'tc_view_confirm',
+                dapp_url: dappUrl,
+                address_type: 'raw'
+            });
         }
     }, [track, dappUrl]);
 };
@@ -29,11 +22,7 @@ export const useTrackTonConnectConnectionRequest = (dappUrl: string | undefined)
     const track = useAnalyticsTrack();
     useEffect(() => {
         if (dappUrl) {
-            track(
-                new AnalyticsEventTcRequest({
-                    dapp_url: dappUrl
-                })
-            );
+            track({ eventName: 'tc_request', dapp_url: dappUrl });
         }
     }, [track, dappUrl]);
 };
@@ -42,7 +31,7 @@ export const useCountryContextTracker = () => {
     const client = useQueryClient();
     const track = useAnalyticsTrack();
     return useCallback(
-        async (map: (country: string) => AnalyticsEvent) => {
+        async (map: (country: string) => TrackableEvent) => {
             const country: string = await client.fetchQuery([QueryKey.country]);
             track(map(country));
         },
@@ -53,31 +42,28 @@ export const useCountryContextTracker = () => {
 export const useTrackDappBrowserOpened = () => {
     const track = useCountryContextTracker();
     useEffect(() => {
-        track(
-            location =>
-                new AnalyticsEventDappBrowserOpen({
-                    from: 'wallet',
-                    type: 'explore',
-                    location
-                })
-        );
+        track(location => ({
+            eventName: 'dapp_browser_open',
+            from: 'wallet',
+            type: 'explore',
+            location
+        }));
     }, []);
 };
 
 export const useTrackerTonConnectSendSuccess = () => {
     const track = useAnalyticsTrack();
     return useCallback((params: { dappUrl: string; sender: SenderChoice }) => {
-        track(
-            new AnalyticsEventTcSendSuccess({
-                dapp_url: params.dappUrl,
-                address_type: 'raw',
-                network_fee_paid:
-                    params.sender.type === 'battery'
-                        ? 'battery'
-                        : params.sender.type === 'gasless'
-                        ? 'gasless'
-                        : 'ton'
-            })
-        );
+        track({
+            eventName: 'tc_send_success',
+            dapp_url: params.dappUrl,
+            address_type: 'raw',
+            network_fee_paid:
+                params.sender.type === 'battery'
+                    ? 'battery'
+                    : params.sender.type === 'gasless'
+                    ? 'gasless'
+                    : 'ton'
+        });
     }, []);
 };

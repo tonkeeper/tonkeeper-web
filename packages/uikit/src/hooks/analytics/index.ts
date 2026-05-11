@@ -1,26 +1,42 @@
 import { useLocation } from 'react-router-dom';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useAppContext } from '../appContext';
-import { AnalyticsTracker } from './common';
+import { AnalyticsTracker, AnalyticsTransactionType, TrackableEvent } from './common';
 
 export { Aptabase } from './aptabase';
-export { type Analytics, toWalletType } from './common';
+export { type Analytics, type AnalyticsTransactionType, toWalletType } from './common';
 
-export const useAnalyticsTrack = () => {
+// Temporary: the useMemo + overloaded `function track` shape exists only to
+// support the deprecated 2-arg `track(name, params)` call signature. Once the
+// remaining legacy call sites are migrated to typed object events, drop the
+// string overload from AnalyticsTracker and collapse this back to a plain
+// `useCallback` returning `(event: TrackableEvent) => Promise<void>`.
+export const useAnalyticsTrack = (): AnalyticsTracker => {
     const { tracker } = useAppContext();
 
-    return useCallback<AnalyticsTracker>(
-        async (...args) => {
-            if (tracker) {
-                try {
-                    await tracker(...(args as Parameters<AnalyticsTracker>));
-                } catch (e) {
-                    console.error(e);
+    return useMemo<AnalyticsTracker>(() => {
+        function track(event: TrackableEvent): Promise<void>;
+        function track(
+            name: string,
+            params?: Record<string, string | number | boolean>
+        ): Promise<void>;
+        async function track(
+            arg1: TrackableEvent | string,
+            arg2?: Record<string, string | number | boolean>
+        ): Promise<void> {
+            if (!tracker) return;
+            try {
+                if (typeof arg1 === 'string') {
+                    await tracker(arg1, arg2);
+                } else {
+                    await tracker(arg1);
                 }
+            } catch (e) {
+                console.error(e);
             }
-        },
-        [tracker]
-    );
+        }
+        return track;
+    }, [tracker]);
 };
 
 export const useTrackLocation = () => {
@@ -28,28 +44,16 @@ export const useTrackLocation = () => {
     const track = useAnalyticsTrack();
 
     useEffect(() => {
-        track('page_view', { location: location.pathname });
+        track({ eventName: 'page_view', location: location.pathname });
     }, [track, location.pathname]);
 };
-
-export type AnalyticsTransactionType =
-    | 'send-ton'
-    | 'send-jetton'
-    | 'send-nft'
-    | 'renew-dns'
-    | 'link-dns'
-    | 'send-trc20'
-    | 'multi-send-ton'
-    | 'multi-send-jetton';
 
 export const useTransactionAnalytics = () => {
     const track = useAnalyticsTrack();
 
     return useCallback(
         (kind: AnalyticsTransactionType) => {
-            track('Send_Transaction', {
-                kind
-            });
+            track({ eventName: 'Send_Transaction', kind });
         },
         [track]
     );

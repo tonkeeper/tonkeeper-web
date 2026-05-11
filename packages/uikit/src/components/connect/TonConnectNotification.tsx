@@ -31,7 +31,6 @@ import { isStandardTonWallet, WalletId, WalletVersion } from '@tonkeeper/core/di
 import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/events-hooks';
 import { useAnalyticsTrack } from '../../hooks/analytics';
-import { AnalyticsEventTcConnect } from '@tonkeeper/core/dist/analytics';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { originFromUrl } from '@tonkeeper/core/dist/utils/url';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
@@ -161,9 +160,11 @@ const ConnectContent: FC<{
                     }),
                 300
             );
-            track(
-                new AnalyticsEventTcConnect({ dapp_url: manifest.url, allow_notifications: false })
-            );
+            track({
+                eventName: 'tc_connect',
+                dapp_url: manifest.url,
+                allow_notifications: false
+            });
         } catch (err) {
             setDone(true);
             console.error(err);
