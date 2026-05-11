@@ -49,6 +49,11 @@ export interface GetWalletsByPublicKeyRequest {
     publicKey: string;
 }
 
+export interface GetWalletsByPublicKeysBulkRequest {
+    publicKeys: string[];
+    persistentUserId: string;
+}
+
 export interface TonConnectProofOperationRequest {
     tonConnectProofRequest: TonConnectProofRequest;
 }
@@ -101,6 +106,16 @@ export interface WalletApiInterface {
      * Get wallets by public key
      */
     getWalletsByPublicKey(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallets>;
+
+    /**
+     * Get wallets for multiple public keys in bulk
+     */
+    getWalletsByPublicKeysBulkRaw(requestParameters: GetWalletsByPublicKeysBulkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Wallets>>;
+
+    /**
+     * Get wallets for multiple public keys in bulk
+     */
+    getWalletsByPublicKeysBulk(requestParameters: GetWalletsByPublicKeysBulkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallets>;
 
     /**
      * Account verification and token issuance
@@ -219,6 +234,40 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
      */
     async getWalletsByPublicKey(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallets> {
         const response = await this.getWalletsByPublicKeyRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get wallets for multiple public keys in bulk
+     */
+    async getWalletsByPublicKeysBulkRaw(requestParameters: GetWalletsByPublicKeysBulkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Wallets>> {
+        if (!requestParameters['publicKeys']?.length) {
+            throw new runtime.RequiredError(
+                'publicKeys',
+                'Required parameter "publicKeys" was null or empty when calling getWalletsByPublicKeysBulk().'
+            );
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['F'] = requestParameters['persistentUserId'];
+
+        const response = await this.request({
+            path: `/v2/pubkeys/wallets/_bulk`,
+            method: 'POST',
+            headers: headerParameters,
+            query: {},
+            body: { public_keys: requestParameters['publicKeys'] },
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WalletsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get wallets for multiple public keys in bulk
+     */
+    async getWalletsByPublicKeysBulk(requestParameters: GetWalletsByPublicKeysBulkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallets> {
+        const response = await this.getWalletsByPublicKeysBulkRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
