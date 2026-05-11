@@ -70,7 +70,10 @@ platform :ios do
     
     lane :bump_build_number do
       package = read_json(json_path: "./package.json")
-      version_number = resolve_ipad_version(package[:version])
+      package_marketing_version = package[:version].to_s[/^\d+\.\d+\.\d+/]
+      UI.user_error!("Invalid package version for iOS: #{package[:version]}") unless package_marketing_version
+
+      version_number = resolve_ipad_version(package_marketing_version)
       increment_version_number(
         xcodeproj: xcodeproj,
         version_number: version_number
@@ -94,7 +97,7 @@ platform :ios do
         xcodeproj: xcodeproj,
         build_number: build_number
       )
-      
+
       UI.message("Bumped version to #{current_version} and build number to #{build_number}")
       sh("echo VERSION_CODE=#{current_version} >> $GITHUB_ENV")
       sh("echo BUILD_CODE=#{build_number} >> $GITHUB_ENV")

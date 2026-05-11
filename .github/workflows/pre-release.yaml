@@ -105,6 +105,8 @@ jobs:
 
     ipad-build:
         uses: ./.github/workflows/ipad-build.yaml
+        with:
+            release_tag: ${{ inputs.tag || github.ref_name }}
         secrets: inherit
 
     # Deploys to 'rc' Cloudflare preview — never touches prod

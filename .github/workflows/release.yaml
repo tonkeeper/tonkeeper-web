@@ -107,6 +107,8 @@ jobs:
 
     ipad-build:
         uses: ./.github/workflows/ipad-build.yaml
+        with:
+            release_tag: ${{ inputs.tag || github.event.release.tag_name }}
         secrets: inherit
 
     web-build:
