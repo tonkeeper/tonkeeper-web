@@ -3,6 +3,8 @@ import { useNavigate } from '../router/useNavigate';
 import { AppRoute, StakingRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useBuyNotification } from '../../components/modals/BuyNotificationControlled';
 import { PoolDeeplinkParams } from '@tonkeeper/core/dist/service/deeplinkingService';
+import { useOpenBrowserTab } from '../../state/dapp-browser';
+import { useAppSdk } from '../appSdk';
 
 export const useOpenPoolDeeplink = () => {
     const navigate = useNavigate();
@@ -30,7 +32,13 @@ export const useOpenBatteryDeeplink = () => {
 
 export const useOpenBrowserDeeplink = () => {
     const navigate = useNavigate();
+    const { mutate: openBrowserTab } = useOpenBrowserTab();
+    const sdk = useAppSdk();
     return useCallback(() => {
-        navigate(AppRoute.browser);
-    }, [navigate]);
+        if (sdk.dappBrowser) {
+            openBrowserTab('blanc');
+        } else {
+            navigate(AppRoute.browser);
+        }
+    }, [navigate, openBrowserTab, sdk]);
 };
