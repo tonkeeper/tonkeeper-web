@@ -3,7 +3,12 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
 import { getOsName } from '@tonkeeper/core/dist/analytics/os';
-import { Analytics, TrackableEvent, getUserIdentityProps } from './common';
+import {
+    Analytics,
+    TrackableEvent,
+    getUserIdentityProps,
+    normalizeDeprecatedEventName
+} from './common';
 
 export class Aptabase implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
@@ -66,8 +71,11 @@ function normalizeTrackArgs(
     arg2?: Record<string, string | number | boolean>
 ): { eventName: string; props: Record<string, string | number | boolean> } {
     if (typeof arg1 === 'string') {
-        return { eventName: arg1, props: arg2 ?? {} };
+        return { eventName: normalizeDeprecatedEventName(arg1), props: arg2 ?? {} };
     }
     const { eventName, ...rest } = arg1;
-    return { eventName, props: rest as Record<string, string | number | boolean> };
+    return {
+        eventName,
+        props: rest as Record<string, string | number | boolean>
+    };
 }

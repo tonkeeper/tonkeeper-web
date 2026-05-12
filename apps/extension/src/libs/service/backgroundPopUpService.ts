@@ -75,5 +75,7 @@ popUpEventEmitter.on('userProperties', message => {
 });
 
 popUpEventEmitter.on('trackEvent', message => {
-    aptabase?.track(message.params.name, message.params.params);
+    aptabase
+        ?.track(message.params.name, message.params.params)
+        .catch(e => console.warn('Failed to send Aptabase event', e));
 });

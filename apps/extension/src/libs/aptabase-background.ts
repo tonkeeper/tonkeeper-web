@@ -3,12 +3,18 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
 import { getOsName } from '@tonkeeper/core/dist/analytics/os';
-import { Analytics, TrackableEvent } from '@tonkeeper/uikit/dist/hooks/analytics/common';
+import {
+    Analytics,
+    TrackableEvent,
+    normalizeDeprecatedEventName
+} from '@tonkeeper/uikit/dist/hooks/analytics/common';
 
 export class AptabaseBackground implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
 
     private readonly userIdentity: UserIdentity;
+
+    private readonly aptabaseInitPromise: Promise<void>;
 
     constructor(options: {
         host: string;
@@ -16,7 +22,7 @@ export class AptabaseBackground implements Analytics {
         appVersion: string;
         userIdentity: UserIdentity;
     }) {
-        init(options.key, {
+        this.aptabaseInitPromise = init(options.key, {
             apiUrl: `${options.host}/api/v0/event`,
             appVersion: options.appVersion
         });
@@ -51,7 +57,7 @@ export class AptabaseBackground implements Analytics {
     ): Promise<void> {
         const { eventName, eventProps } = (() => {
             if (typeof arg1 === 'string') {
-                return { eventName: arg1, eventProps: arg2 ?? {} };
+                return { eventName: normalizeDeprecatedEventName(arg1), eventProps: arg2 ?? {} };
             }
             const { eventName: name, ...rest } = arg1;
             return {
@@ -59,6 +65,8 @@ export class AptabaseBackground implements Analytics {
                 eventProps: rest as Record<string, string | number | boolean>
             };
         })();
+
+        await this.aptabaseInitPromise;
 
         const uuid_persistent = await this.userIdentity.getPersistentUserId();
         const appSessionId = await this.userIdentity.getSessionId();

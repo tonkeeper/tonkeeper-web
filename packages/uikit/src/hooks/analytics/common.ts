@@ -20,7 +20,7 @@ export type AnalyticsTransactionType =
 
 /**
  * Events still tracked from app code but not defined in
- * tonkeeper/analytics-schemas. 
+ * tonkeeper/analytics-schemas.
  * @deprecated
  */
 export type LegacyAnalyticsEvent =
@@ -46,6 +46,8 @@ export type AnalyticsTracker = {
      */
     (name: string, params?: Record<string, string | number | boolean>): Promise<void>;
 };
+
+export const normalizeDeprecatedEventName = (eventName: string): string => eventName.toLowerCase();
 
 export type AnalyticsIdentityProps = {
     uuid_persistent: string;
