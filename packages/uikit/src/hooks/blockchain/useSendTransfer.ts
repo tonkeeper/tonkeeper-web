@@ -9,6 +9,7 @@ import {
     TronRecipientData
 } from '@tonkeeper/core/dist/entries/send';
 import { useAnalyticsTrack } from '../analytics';
+import { useTrackTransactionSent } from '../analytics/events-hooks';
 import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
 import { BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE, useGetSender } from './useSender';
@@ -34,6 +35,7 @@ export function useSendTransfer<T extends Asset>({
     senderType: AllChainsSenderType;
 }) {
     const track = useAnalyticsTrack();
+    const trackTransactionSent = useTrackTransactionSent();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
     const notifyError = useNotifyErrorHandle();
     const getSender = useGetSender();
@@ -84,6 +86,7 @@ export function useSendTransfer<T extends Asset>({
                     from: 'send_confirm',
                     token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
                 });
+                trackTransactionSent(isTon(amount.asset.address) ? 'TonTransfer' : 'JettonTransfer');
             } else if (amount.asset.id === TRON_USDT_ASSET.id) {
                 const tronSender = await getTronSender(senderType as TronSenderType);
                 await tronSender.send(
@@ -91,6 +94,8 @@ export function useSendTransfer<T extends Asset>({
                     amount as AssetAmount<TronAsset>,
                     estimation as TronEstimation
                 );
+                // We don't have a specific event type for Tron transfers, so we use Unknown.
+                trackTransactionSent('Unknown');
             } else {
                 throw new Error('Unexpected asset');
             }

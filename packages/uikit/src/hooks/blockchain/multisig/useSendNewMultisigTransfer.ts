@@ -4,7 +4,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
-import { useTransactionAnalytics } from '../../analytics';
+import { useTrackTransactionSent } from '../../analytics/events-hooks';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { useTonAssetTransferService } from '../useBlockchainService';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -21,7 +21,7 @@ export function useSendNewMultisigTransfer(
     const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
     const getSender = useGetSender();
-    const track2 = useTransactionAnalytics();
+    const trackTransactionSent = useTrackTransactionSent();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     return useMutation<boolean, Error>(async () => {
@@ -40,11 +40,9 @@ export function useSendNewMultisigTransfer(
                 payload: comment ? { type: 'comment', value: comment } : undefined
             });
 
-            if (amount.asset.id === TON_ASSET.id) {
-                track2('send-ton');
-            } else {
-                track2('send-jetton');
-            }
+            trackTransactionSent(
+                amount.asset.id === TON_ASSET.id ? 'TonTransfer' : 'JettonTransfer'
+            );
         } catch (e) {
             await notifyError(e);
         }

@@ -1,22 +1,8 @@
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import {
-    isStandardTonWallet,
-    TonContract,
-    walletVersionText
-} from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonContract, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
-
-export type AnalyticsTransactionType =
-    | 'send-ton'
-    | 'send-jetton'
-    | 'send-nft'
-    | 'renew-dns'
-    | 'link-dns'
-    | 'send-trc20'
-    | 'multi-send-ton'
-    | 'multi-send-jetton';
 
 /**
  * Events still tracked from app code but not defined in
@@ -25,7 +11,6 @@ export type AnalyticsTransactionType =
  */
 export type LegacyAnalyticsEvent =
     | { eventName: 'page_view'; location: string }
-    | { eventName: 'Send_Transaction'; kind: AnalyticsTransactionType }
     | {
           eventName: 'dapp_click';
           url: string;

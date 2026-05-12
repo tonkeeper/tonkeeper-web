@@ -1,10 +1,10 @@
 import { useLocation } from 'react-router-dom';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAppContext } from '../appContext';
-import { AnalyticsTracker, AnalyticsTransactionType, TrackableEvent } from './common';
+import { AnalyticsTracker, TrackableEvent } from './common';
 
 export { Aptabase } from './aptabase';
-export { type Analytics, type AnalyticsTransactionType, toWalletType } from './common';
+export { type Analytics, toWalletType } from './common';
 
 // Temporary: the useMemo + overloaded `function track` shape exists only to
 // support the deprecated 2-arg `track(name, params)` call signature. Once the
@@ -48,13 +48,3 @@ export const useTrackLocation = () => {
     }, [track, location.pathname]);
 };
 
-export const useTransactionAnalytics = () => {
-    const track = useAnalyticsTrack();
-
-    return useCallback(
-        (kind: AnalyticsTransactionType) => {
-            track({ eventName: 'Send_Transaction', kind });
-        },
-        [track]
-    );
-};
