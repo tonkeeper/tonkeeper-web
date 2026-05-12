@@ -2,6 +2,7 @@ import { init, trackEvent } from '@aptabase/web';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
+import { getOsName } from '@tonkeeper/core/dist/analytics/os';
 import { Analytics, TrackableEvent, getUserIdentityProps } from './common';
 
 export class Aptabase implements Analytics {
@@ -20,6 +21,8 @@ export class Aptabase implements Analytics {
             appVersion: options.appVersion
         });
         this.userIdentity = options.userIdentity;
+        const osName = getOsName();
+        if (osName) this.user_properties.osName = osName;
         this.track = this.track.bind(this);
     }
 
