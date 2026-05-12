@@ -6,7 +6,8 @@
 #   2. patch broken local $refs (see preprocess-analytics-schemas.js)
 #   3. bundle the multi-file OpenAPI doc with @redocly/cli
 #   4. run openapi-typescript-codegen to produce ./src/analytics/generated/
-#   5. emit ./src/analytics/events.ts with the discriminated union
+#   5. prune the 1:1 Xxx -> XxxSchema alias files (prune-redundant-aliases.js)
+#   6. emit ./src/analytics/events.ts with the discriminated union
 #
 # Run from packages/core (matches the other generate:* yarn scripts).
 set -eu
@@ -48,6 +49,8 @@ npx openapi-typescript-codegen \
     --input "$TMP/bundled.yaml" \
     --output "$GENERATED_DIR" \
     --useUnionTypes
+
+node "$SCRIPT_DIR/prune-redundant-aliases.js" "$GENERATED_DIR"
 
 node "$SCRIPT_DIR/generate-analytics-wrapper.js" \
     "$TMP/schemas/openapi" \
