@@ -38,7 +38,7 @@ import {
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 import { Account, getAccountByWalletById, isAccountSupportTonConnect } from '../../entries/account';
-import { eqOrigins, isLocalhost, originFromUrl } from '../../utils/url';
+import { eqOrigins, originFromUrl } from '../../utils/url';
 
 export const tonConnectTonkeeperAppName = 'tonkeeper';
 export const tonConnectTonkeeperProAppName = 'tonkeeper-pro';
@@ -571,10 +571,6 @@ export function checkDappOriginMatchesManifest(params: {
     const manifestOrigin = originFromUrl(params.manifestUrl);
     if (!manifestOrigin) {
         return false;
-    }
-
-    if (isLocalhost(params.origin)) {
-        return true;
     }
 
     return eqOrigins(params.origin, manifestOrigin);

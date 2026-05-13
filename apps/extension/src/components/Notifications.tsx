@@ -108,7 +108,7 @@ export const Notifications = () => {
                 }}
             />
             <SignDataNotification
-                origin={data?.kind === 'tonConnectSign' ? data.manifest.url : undefined}
+                origin={data?.kind === 'tonConnectSign' ? data.origin : undefined}
                 params={data?.kind === 'tonConnectSign' ? data.data : null}
                 handleClose={(payload?: SignDataResponse) => {
                     if (!data) return;
