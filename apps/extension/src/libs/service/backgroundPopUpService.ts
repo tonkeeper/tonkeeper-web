@@ -5,9 +5,9 @@
 
 import browser from 'webextension-polyfill';
 import { backgroundEventsEmitter, NotificationData, popUpEventEmitter } from '../event';
-import { Aptabase } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { ExtensionStorage } from '../storage';
+import { AptabaseBackground } from '../aptabase-background';
 
 let popUpPort: browser.Runtime.Port;
 const portMessagesQueue: any[] = [];
@@ -59,12 +59,12 @@ popUpEventEmitter.on('proxyChanged', message => {
 
 // End of proxy messages
 
-let aptabase: Aptabase;
+let aptabase: AptabaseBackground;
 const userIdentity = new UserIdentityService(new ExtensionStorage());
 
 popUpEventEmitter.on('userProperties', message => {
     const { aptabaseEndpoint, aptabaseKey, ...restParams } = message.params;
-    aptabase = new Aptabase({
+    aptabase = new AptabaseBackground({
         host: aptabaseEndpoint,
         key: aptabaseKey,
         appVersion: browser.runtime.getManifest().version,

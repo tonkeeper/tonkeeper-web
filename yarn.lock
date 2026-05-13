@@ -116,6 +116,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aptabase/browser@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "@aptabase/browser@npm:0.1.2"
+  checksum: 10/053c84e16ba1685c69e46293dff2be0d5e24d0c08f02d5f040ede11bbbd69edfcc7c37c1930392e0fefcb9292aa800470f46dcdb641dcc970e383a499afce3f1
+  languageName: node
+  linkType: hard
+
+"@aptabase/web@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "@aptabase/web@npm:0.5.0"
+  checksum: 10/f40501d30492f782236f29c854b12f0ee14614a14e3190278ed30785b52a2257119b7aeae5a23c5931a7445f5c500e7f3c9499f6edeaa226582253565bde7fa8
+  languageName: node
+  linkType: hard
+
 "@ark-ui/react@npm:^5.9.1":
   version: 5.9.1
   resolution: "@ark-ui/react@npm:5.9.1"
@@ -4476,6 +4490,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/extension@workspace:apps/extension"
   dependencies:
+    "@aptabase/browser": "npm:^0.1.2"
     "@tanstack/react-query": "npm:4.3.4"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
@@ -4635,6 +4650,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
+    "@aptabase/web": "npm:^0.5.0"
     "@ark-ui/react": "npm:^5.9.1"
     "@ionic/core": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch"
     "@ionic/react": "npm:^8.4.2"
