@@ -394,5 +394,4 @@ export type TargetEnv =
     | 'desktop'
     | 'twa'
     | 'tablet'
-    | 'swap_widget_web'
     | 'mobile';

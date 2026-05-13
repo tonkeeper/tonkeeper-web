@@ -49,7 +49,7 @@ export const ExternalLink: FC<
     const platform = useAppTargetEnv();
     const sdk = useAppSdk();
 
-    if (platform === 'web' || platform === 'swap_widget_web') {
+    if (platform === 'web') {
         if (!isValidUrlProtocol(href, sdk.authorizedOpenUrlProtocols)) {
             return null;
         }

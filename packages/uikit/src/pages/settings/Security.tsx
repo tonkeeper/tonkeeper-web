@@ -111,8 +111,6 @@ const Password = () => {
         case 'web':
         case 'twa':
             return <WebPassword />;
-        case 'swap_widget_web':
-            return null;
         default:
             assertUnreachable(env);
     }

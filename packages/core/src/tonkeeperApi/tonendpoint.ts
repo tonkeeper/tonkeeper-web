@@ -20,7 +20,7 @@ import type {
 export interface BootParams {
     platform: Extract<
         Platform,
-        'web' | 'desktop' | 'tablet' | 'extension' | 'pro_mobile_ios' | 'swap_widget_web' | 'twa'
+        'web' | 'desktop' | 'tablet' | 'extension' | 'pro_mobile_ios' | 'twa'
     >;
     lang: 'en' | 'ru' | string;
     build: string;
