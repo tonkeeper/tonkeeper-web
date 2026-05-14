@@ -136,11 +136,15 @@ export const Balance: FC<{
         };
     }, [total]);
 
+    if (total === undefined) {
+        return <BalanceSkeleton />;
+    }
+
     return (
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
             <Amount>
-                <span>{formatFiatCurrency(fiat, total || 0)}</span>
+                <span>{formatFiatCurrency(fiat, total)}</span>
                 <NetworkBadge network={network} />
                 {!!batteryBalance && canSeeBattery && (
                     <BatteryBalanceIconStyled
