@@ -4323,12 +4323,14 @@ __metadata:
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "npm:^16.0.0"
     "@types/aes-js": "npm:^3.1.4"
+    "@types/js-yaml": "npm:^4.0.9"
     "@types/punycode": "npm:^2"
     aes-js: "npm:^3.1.2"
     bignumber.js: "npm:^9.1.1"
     bip39: "npm:^3.1.0"
     crc-32: "npm:^1.2.2"
     ethers: "npm:^6.13.4"
+    js-yaml: "npm:^4.1.0"
     punycode: "npm:^2.3.1"
     query-string: "npm:^8.1.0"
     tronweb: "npm:^6.0.0"
@@ -5086,6 +5088,13 @@ __metadata:
     jest-matcher-utils: "npm:^27.0.0"
     pretty-format: "npm:^27.0.0"
   checksum: 10/8608696fbdea81bc9a600d1c5aeb290063357eaa55c0174e7db15087c4f483113b35f8b4c4ae364d2632cfed15a4dd674786254826b946c896de5612c8cb1a26
+  languageName: node
+  linkType: hard
+
+"@types/js-yaml@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "@types/js-yaml@npm:4.0.9"
+  checksum: 10/a0ce595db8a987904badd21fc50f9f444cb73069f4b95a76cc222e0a17b3ff180669059c763ec314bc4c3ce284379177a9da80e83c5f650c6c1310cafbfaa8e6
   languageName: node
   linkType: hard
 

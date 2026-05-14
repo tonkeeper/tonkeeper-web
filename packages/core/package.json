@@ -13,13 +13,15 @@
         "generate:batteryApi": "./resource/check_github_token.sh && rm -fr ./src/batteryApi && docker build --no-cache --build-arg GITHUB_TOKEN=\"$GITHUB_TOKEN\" -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
         "generate:2faApi": "./resource/check_github_token.sh && rm -fr src/2faApi && docker build -f resource/Dockerfile.2faApi . -t 2faapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local -e GITHUB_TOKEN 2faapi",
         "generate:tonkeeperApi": "./resource/check_github_token.sh && rm -fr src/tonkeeperApiGenerated && docker build -f resource/Dockerfile.tonkeeperApi . -t tonkeeperapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local -e GITHUB_TOKEN tonkeeperapi",
+        "generate:analytics": "./resource/generate_analytics_client.sh",
         "build:pkg": "yarn build",
-        "build:analytics": "ts-node --project ./tsconfig.task.json ./task/build-analytics.ts",
         "test": "vitest run"
     },
     "devDependencies": {
         "@types/aes-js": "^3.1.4",
+        "@types/js-yaml": "^4.0.9",
         "@types/punycode": "^2",
+        "js-yaml": "^4.1.0",
         "typescript": "^4.9.4",
         "vitest": "^3.2.4"
     },

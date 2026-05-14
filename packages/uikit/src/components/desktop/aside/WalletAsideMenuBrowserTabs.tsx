@@ -27,11 +27,6 @@ import { CloseIcon, PinIconOutline, ReorderIcon16, UnpinIconOutline } from '../.
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import {
-    AnalyticsEventDappClick,
-    AnalyticsEventDappPin,
-    AnalyticsEventDappUnpin
-} from '@tonkeeper/core/dist/analytics';
 import { useCountryContextTracker } from '../../../hooks/analytics/events-hooks';
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
@@ -116,14 +111,12 @@ const useEditMode = () => {
     const onClickTab = (tab: BrowserTab) => {
         if (!isEditMode) {
             closeWalletMenu();
-            trackDappOpened(
-                country =>
-                    new AnalyticsEventDappClick({
-                        location: country,
-                        url: tab.url,
-                        from: 'sidebar'
-                    })
-            );
+            trackDappOpened(country => ({
+                eventName: 'dapp_click',
+                location: country,
+                url: tab.url,
+                from: 'sidebar'
+            }));
             openTab(tab);
         }
     };
@@ -193,7 +186,7 @@ const BrowserTabsPinned: FC<{
 
     const unpinTab = (tab: BrowserTab) => {
         changeBrowserTab({ ...tab, isPinned: false });
-        track(country => new AnalyticsEventDappUnpin({ url: tab.url, location: country }));
+        track(country => ({ eventName: 'dapp_unpin', url: tab.url, location: country }));
     };
 
     if (!tabs) {
@@ -300,7 +293,7 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
 
     const pinTab = (tab: BrowserTab) => {
         changeBrowserTab({ ...tab, isPinned: true });
-        track(country => new AnalyticsEventDappPin({ url: tab.url, location: country }));
+        track(country => ({ eventName: 'dapp_pin', url: tab.url, location: country }));
     };
 
     if (!tabs) {

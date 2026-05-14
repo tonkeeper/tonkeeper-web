@@ -31,7 +31,6 @@ import {
     useCountryContextTracker,
     useTrackDappBrowserOpened
 } from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
-import { AnalyticsEventDappClick } from '@tonkeeper/core/dist/analytics';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 import { FLAGGED_FEATURE } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { IfFeatureEnabled } from '@tonkeeper/uikit/dist/components/shared/IfFeatureEnabled';
@@ -161,14 +160,12 @@ export const MobileDappBrowserNewTab = () => {
 
     const onSelectApp = useCallback(
         (app: PromotedApp, from: 'banner' | 'browser' = 'browser') => {
-            trackDappOpened(
-                country =>
-                    new AnalyticsEventDappClick({
-                        location: country,
-                        url: app.url,
-                        from
-                    })
-            );
+            trackDappOpened(country => ({
+                eventName: 'dapp_click',
+                location: country,
+                url: app.url,
+                from
+            }));
             openTab({
                 url: app.url,
                 title: app.name,
@@ -181,14 +178,12 @@ export const MobileDappBrowserNewTab = () => {
     const onSubmit = () => {
         if (relevantApps?.length) {
             const relevantApp = relevantApps[0];
-            trackDappOpened(
-                country =>
-                    new AnalyticsEventDappClick({
-                        location: country,
-                        url: relevantApp.url,
-                        from: 'browser_search'
-                    })
-            );
+            trackDappOpened(country => ({
+                eventName: 'dapp_click',
+                location: country,
+                url: relevantApp.url,
+                from: 'browser_search'
+            }));
             return onSelectApp(relevantApp);
         }
 
