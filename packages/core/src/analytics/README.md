@@ -24,6 +24,6 @@ track({ eventName: 'tc_request', dapp_url: 'https://example.com' });
 
 ## Legacy events
 
-`LegacyAnalyticsEvent` (in `packages/uikit/src/hooks/analytics/common.ts`) is a typed carve-out for events not yet defined upstream (`page_view`, `Send_Transaction`, `dapp_click`). The deprecated 2-arg `track(name, params)` form is the escape hatch for call sites whose payload shape doesn't yet match a schema event (e.g. `send_open` / `send_click` / `send_confirm` / `send_success` — schema exists but requires fields the call sites don't currently provide).
+`LegacyAnalyticsEvent` (in `packages/uikit/src/hooks/analytics/common.ts`) is a typed carve-out for events not yet defined upstream (`page_view`, `dapp_click`). The deprecated 2-arg `track(name, params)` form is the escape hatch for call sites whose payload shape doesn't yet match a schema event (e.g. `send_open` / `send_click` / `send_confirm` / `send_success` — schema exists but requires fields the call sites don't currently provide).
 
 Both are marked `@deprecated`. Migrate to typed object events when feasible, then remove the carve-out / overload.

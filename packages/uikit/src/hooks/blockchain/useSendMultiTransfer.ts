@@ -4,7 +4,7 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonEstimation, TonRecipient } from "@tonkeeper/core/dist/entries/send";
 
 import BigNumber from 'bignumber.js';
-import { useTransactionAnalytics } from '../analytics';
+import { useTrackTransactionSent } from '../analytics/events-hooks';
 import { useActiveAccount } from '../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -40,7 +40,7 @@ export function multiSendFormToTransferMessages(
 export function useSendMultiTransfer() {
     const account = useActiveAccount();
     const client = useQueryClient();
-    const track2 = useTransactionAnalytics();
+    const trackTransactionSent = useTrackTransactionSent();
 
     const notifyError = useNotifyErrorHandle();
     const getSender = useGetSender();
@@ -72,11 +72,7 @@ export function useSendMultiTransfer() {
                 multiSendFormToTransferMessages(asset, form)
             );
 
-            if (asset.id === TON_ASSET.id) {
-                track2('multi-send-ton');
-            } else {
-                track2('multi-send-jetton');
-            }
+            trackTransactionSent(asset.id === TON_ASSET.id ? 'TonTransfer' : 'JettonTransfer');
         } catch (e) {
             await notifyError(e);
         }

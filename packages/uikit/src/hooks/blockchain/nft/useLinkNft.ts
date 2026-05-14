@@ -4,13 +4,13 @@ import { useActiveAccount } from '../../../state/wallet';
 import { useMutation } from '@tanstack/react-query';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { useTransactionAnalytics } from '../../analytics';
+import { useTrackTransactionSent } from '../../analytics/events-hooks';
 
 export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) => {
     const getSender = useGetSender();
     const rawTransactionService = useTonRawTransactionService();
     const activeAccount = useActiveAccount();
-    const track2 = useTransactionAnalytics();
+    const trackTransactionSent = useTrackTransactionSent();
 
     const walletAddress = activeAccount.activeTonWallet.rawAddress;
 
@@ -21,7 +21,7 @@ export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) 
             zeroFeeEstimation,
             nftEncoder.encodeNftLink(args)
         );
-        track2('link-dns');
+        trackTransactionSent('DomainRenew');
         return true;
     });
 };

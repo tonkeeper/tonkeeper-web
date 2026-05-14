@@ -1,7 +1,7 @@
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { useActiveAccount } from '../../../state/wallet';
-import { useTransactionAnalytics } from '../../analytics';
+import { useTrackTransactionSent } from '../../analytics/events-hooks';
 import { useMutation } from '@tanstack/react-query';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
@@ -10,7 +10,7 @@ export const useRenewNft = (args: { nftAddress: string }) => {
     const getSender = useGetSender();
     const rawTransactionService = useTonRawTransactionService();
     const activeAccount = useActiveAccount();
-    const track2 = useTransactionAnalytics();
+    const trackTransactionSent = useTrackTransactionSent();
 
     const walletAddress = activeAccount.activeTonWallet.rawAddress;
 
@@ -21,7 +21,7 @@ export const useRenewNft = (args: { nftAddress: string }) => {
             zeroFeeEstimation,
             nftEncoder.encodeNftRenew(args)
         );
-        track2('renew-dns');
+        trackTransactionSent('DomainRenew');
         return true;
     });
 };

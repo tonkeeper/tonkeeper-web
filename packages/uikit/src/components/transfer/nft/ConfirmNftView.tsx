@@ -11,7 +11,7 @@ import { FullHeightBlock, NotificationFooter, NotificationFooterPortal } from '.
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { useTransactionAnalytics } from '../../../hooks/analytics';
+import { useTrackTransactionSent } from '../../../hooks/analytics/events-hooks';
 import { QueryKey } from '../../../libs/queryKey';
 import { ConfirmViewImage, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {
@@ -130,7 +130,7 @@ const useSendNft = (
     }
 ) => {
     const account = useActiveAccount();
-    const track2 = useTransactionAnalytics();
+    const trackTransactionSent = useTrackTransactionSent();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     const getSender = useGetSender();
@@ -197,7 +197,7 @@ const useSendNft = (
                 });
                 await rawTransactionService.send(sender, zeroFeeEstimation, nftTransferMsg);
             }
-            track2('send-nft');
+            trackTransactionSent('NftItemTransfer');
         } catch (e) {
             await notifyError(e);
         }
