@@ -49,7 +49,12 @@ export const tReplace = (product: string, replaces?: Record<string, string | num
 export const useTWithReplaces = (tSimple: Translation) => {
     return useCallback(
         (val: string, replaces?: Record<string, string | number>) =>
-            tReplace(tSimple(val), replaces),
+            // Forward replaces so i18next can pick the correct plural variant
+            // (`key_one` / `key_few` / `key_many` / `key_other`, etc.) per CLDR
+            // rules when `count` is provided. Our `%{var}` interpolation is
+            // still handled below by `tReplace`; i18next's `{{var}}` syntax is
+            // left untouched because we don't use it in our source strings.
+            tReplace(tSimple(val, replaces), replaces),
         [tSimple]
     );
 };
