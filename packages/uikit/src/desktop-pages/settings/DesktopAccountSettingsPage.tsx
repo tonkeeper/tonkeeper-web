@@ -134,10 +134,9 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
                         <SettingsListText>
                             <Label2>{t('settings_mam_indexes')}</Label2>
                             <Body3>
-                                {t('settings_mam_number_wallets').replace(
-                                    '%{number}',
-                                    account.derivations.length.toString()
-                                )}
+                                {t('settings_mam_number_wallets', {
+                                    count: account.derivations.length
+                                })}
                             </Body3>
                         </SettingsListText>
                     </SettingsListItem>

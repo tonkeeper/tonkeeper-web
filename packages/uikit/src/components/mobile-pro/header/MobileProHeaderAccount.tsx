@@ -55,7 +55,7 @@ export const MobileProHeaderAccount = () => {
                     <AccountBadge size="s" accountType={account.type} />
                 </LabelWrapper>
                 <Body3Secondary>
-                    {t('aside_header_number_wallets', { number: account.derivations.length })}
+                    {t('aside_header_number_wallets', { count: account.derivations.length })}
                 </Body3Secondary>
             </TextContainer>
             <WalletEmoji emoji={account.emoji} emojiSize="24px" containerSize="24px" />
