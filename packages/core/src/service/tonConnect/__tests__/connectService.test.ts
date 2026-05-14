@@ -30,9 +30,8 @@ vi.mock('../../../entries/account', async () => {
     };
 });
 
-const { sendBadRequestResponse, checkTonConnectFromAndNetwork } = await import(
-    '../connectService'
-);
+const { sendBadRequestResponse, checkTonConnectFromAndNetwork, checkDappOriginMatchesManifest } =
+    await import('../connectService');
 
 const fakeStorage = {} as IStorage;
 
@@ -185,4 +184,42 @@ describe('checkTonConnectFromAndNetwork', () => {
         ).rejects.toThrow('Unknown account provided');
     });
 
+});
+
+describe('checkDappOriginMatchesManifest', () => {
+    it('returns true when origin matches the manifest origin', () => {
+        expect(
+            checkDappOriginMatchesManifest({
+                origin: 'https://dedust.io',
+                manifestUrl: 'https://dedust.io/tonconnect-manifest.json'
+            })
+        ).toBe(true);
+    });
+
+    it('returns false when localhost origin tries to use a non-localhost manifest', () => {
+        expect(
+            checkDappOriginMatchesManifest({
+                origin: 'http://localhost:3000',
+                manifestUrl: 'https://dedust.io'
+            })
+        ).toBe(false);
+    });
+
+    it('returns false when 127.0.0.1 origin tries to use a non-localhost manifest', () => {
+        expect(
+            checkDappOriginMatchesManifest({
+                origin: 'http://127.0.0.1:3000',
+                manifestUrl: 'https://dedust.io'
+            })
+        ).toBe(false);
+    });
+
+    it('returns false when the manifest URL is unparseable', () => {
+        expect(
+            checkDappOriginMatchesManifest({
+                origin: 'https://dedust.io',
+                manifestUrl: 'not-a-url'
+            })
+        ).toBe(false);
+    });
 });
