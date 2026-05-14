@@ -2,6 +2,7 @@ import { IStorage } from '../Storage';
 import { AccountTonMnemonic, isMnemonicAndPassword } from '../entries/account';
 import { AuthPassword } from '../entries/password';
 import { AccountsStorage } from './accountsStorage';
+import { isLegacyEncryptedSecret } from './cryptoService';
 import { decryptWalletSecret, encryptWalletSecret } from './mnemonicService';
 
 export class PasswordStorage {
@@ -24,11 +25,44 @@ export class PasswordStorage {
             }
 
             await decryptWalletSecret((accToCheck.auth as AuthPassword).encryptedSecret, password);
+
+            try {
+                await this.upgradeLegacyEncryptedSecrets(password);
+            } catch (e) {
+                console.error('Failed to upgrade legacy encrypted wallet secrets', e);
+            }
+
             return true;
         } catch (e) {
             console.error(e);
             return false;
         }
+    }
+
+    private async upgradeLegacyEncryptedSecrets(password: string): Promise<void> {
+        const accounts = await this.getPasswordAuthAccounts();
+        const legacy = accounts.filter(a =>
+            isLegacyEncryptedSecret((a.auth as AuthPassword).encryptedSecret)
+        );
+        if (legacy.length === 0) {
+            return;
+        }
+
+        const upgraded = await Promise.all(
+            legacy.map(async acc => {
+                const secret = await decryptWalletSecret(
+                    (acc.auth as AuthPassword).encryptedSecret,
+                    password
+                );
+                (acc.auth as AuthPassword).encryptedSecret = await encryptWalletSecret(
+                    secret,
+                    password
+                );
+                return acc.clone();
+            })
+        );
+
+        await this.accountsStorage.updateAccountsInState(upgraded);
     }
 
     async checkPassword(password: string): Promise<void> {

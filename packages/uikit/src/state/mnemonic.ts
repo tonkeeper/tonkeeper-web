@@ -30,10 +30,12 @@ import {
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import {
     decryptWalletSecret,
+    encryptWalletSecret,
     mnemonicToEd25519Seed,
     mnemonicToKeypair,
     walletSecretFromString
 } from '@tonkeeper/core/dist/service/mnemonicService';
+import { isLegacyEncryptedSecret } from '@tonkeeper/core/dist/service/cryptoService';
 import {
     createSignerTxDeepLink,
     parseSignerSignature
@@ -606,10 +608,19 @@ export const getSecretAndPassword = async (
     switch (account.auth.kind) {
         case 'password': {
             const password = await getPasswordByNotification(sdk);
-            const secret = await decryptWalletSecret(
-                (account.auth as AuthPassword).encryptedSecret,
-                password
-            );
+            const encryptedSecret = account.auth.encryptedSecret;
+            const secret = await decryptWalletSecret(encryptedSecret, password);
+
+            if (isLegacyEncryptedSecret(encryptedSecret)) {
+                try {
+                    const upgraded = await encryptWalletSecret(secret, password);
+                    account.auth.encryptedSecret = upgraded;
+                    await accountsStorage(sdk.storage).updateAccountInState(account);
+                } catch (e) {
+                    console.error('Failed to upgrade encrypted wallet secret to v2 KDF', e);
+                }
+            }
+
             return {
                 password,
                 secret
