@@ -20,6 +20,13 @@ import {
     PoolImplementationTypeToJSON,
     PoolImplementationTypeToJSONTyped,
 } from './PoolImplementationType';
+import type { Price } from './Price';
+import {
+    PriceFromJSON,
+    PriceFromJSONTyped,
+    PriceToJSON,
+    PriceToJSONTyped,
+} from './Price';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -53,11 +60,17 @@ export interface WithdrawStakeRequestAction {
      */
     pool: AccountAddress;
     /**
-     * 
+     *
      * @type {PoolImplementationType}
      * @memberof WithdrawStakeRequestAction
      */
     implementation: PoolImplementationType;
+    /**
+     * If present, should be used instead of amount
+     * @type {Price}
+     * @memberof WithdrawStakeRequestAction
+     */
+    stakeMeta?: Price;
 }
 
 
@@ -81,11 +94,12 @@ export function WithdrawStakeRequestActionFromJSONTyped(json: any, ignoreDiscrim
         return json;
     }
     return {
-        
+
         'amount': json['amount'] == null ? undefined : json['amount'],
         'staker': AccountAddressFromJSON(json['staker']),
         'pool': AccountAddressFromJSON(json['pool']),
         'implementation': PoolImplementationTypeFromJSON(json['implementation']),
+        'stakeMeta': json['stake_meta'] == null ? undefined : PriceFromJSON(json['stake_meta']),
     };
 }
 
@@ -99,11 +113,12 @@ export function WithdrawStakeRequestActionFromJSONTyped(json: any, ignoreDiscrim
     }
 
     return {
-        
+
         'amount': value['amount'],
         'staker': AccountAddressToJSON(value['staker']),
         'pool': AccountAddressToJSON(value['pool']),
         'implementation': PoolImplementationTypeToJSON(value['implementation']),
+        'stake_meta': PriceToJSON(value['stakeMeta']),
     };
 }
 
