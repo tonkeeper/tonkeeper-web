@@ -145,18 +145,25 @@ const WithdrawRequestStakeActionContent: FC<{
     const { data } = useRate(CryptoCurrency.TON);
     const format = useFormatCoinValue();
     const { fiatAmount } = useFormatFiat(data, formatDecimals(withdrawStakeRequest.amount ?? 0));
+    const stakeMeta = withdrawStakeRequest.stakeMeta;
 
     return (
         <ActionDetailsBlock event={event}>
             <div>
                 <Title>{t('activityActionModal_withdrawal_request')}</Title>
-                {withdrawStakeRequest.amount && (
-                    <>
-                        <Amount>
-                            +&thinsp;{format(withdrawStakeRequest.amount)} {CryptoCurrency.TON}
-                        </Amount>
-                        <Amount>≈&thinsp;{fiatAmount}</Amount>
-                    </>
+                {stakeMeta ? (
+                    <Amount>
+                        -&thinsp;{format(stakeMeta.value, stakeMeta.decimals)} {stakeMeta.tokenName}
+                    </Amount>
+                ) : (
+                    withdrawStakeRequest.amount && (
+                        <>
+                            <Amount>
+                                +&thinsp;{format(withdrawStakeRequest.amount)} {CryptoCurrency.TON}
+                            </Amount>
+                            <Amount>≈&thinsp;{fiatAmount}</Amount>
+                        </>
+                    )
                 )}
                 <ActionDate kind="send" timestamp={timestamp} />
                 <FailedDetail status={status} />
