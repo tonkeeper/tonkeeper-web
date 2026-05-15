@@ -228,7 +228,7 @@ const disconnectInjectedDappFromAllWallets = async (storage: IStorage, webViewOr
  */
 export const disconnectHttpAccountConnection = async (options: {
     storage: IStorage;
-    wallet: Pick<TonWalletStandard, 'id' | 'publicKey'>;
+    wallet: Pick<TonWalletStandard, 'id'> & Partial<Pick<TonWalletStandard, 'publicKey'>>;
     clientSessionId: string;
 }) => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
