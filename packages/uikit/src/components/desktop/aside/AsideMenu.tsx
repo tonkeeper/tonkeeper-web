@@ -31,7 +31,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
 import { useAddWalletNotification } from '../../modals/AddWalletNotificationControlled';
-import { DndContext } from '@dnd-kit/core';
+import { closestCenter, DndContext, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { AsideMenuAccount } from './AsideMenuAccount';
@@ -249,14 +249,15 @@ const SortableAsideMenuDNDItem: FC<{ item: Account | AccountsFolder }> = ({ item
 
     const style: React.CSSProperties = {
         transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
-        transition
+        transition,
+        opacity: isDragging ? 0 : undefined
     };
 
     return (
         <AsideMenuDNDItem
             ref={setNodeRef}
             item={item}
-            isDragging={isDragging}
+            isDragging={false}
             style={style}
             {...attributes}
             {...listeners}
@@ -270,12 +271,27 @@ const AccountDNDBlock: FC<{
     const { handleSidebarDrop, itemsOptimistic } = useAccountsDNDDrop(items);
     const sdk = useAppSdk();
     const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
+
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(String(event.active.id));
+        sdk.hapticNotification('impact_medium');
+    };
+
+    const handleDragEnd: typeof handleSidebarDrop = event => {
+        setActiveId(null);
+        handleSidebarDrop(event);
+    };
+
+    const activeItem = activeId ? itemsOptimistic.find(i => i.id === activeId) : null;
 
     return (
         <DndContext
             sensors={sensors}
-            onDragEnd={handleSidebarDrop}
-            onDragStart={() => sdk.hapticNotification('impact_medium')}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+            onDragCancel={() => setActiveId(null)}
             modifiers={[restrictToVerticalAxis]}
         >
             <SortableContext
@@ -286,6 +302,9 @@ const AccountDNDBlock: FC<{
                     <SortableAsideMenuDNDItem key={account.id} item={account} />
                 ))}
             </SortableContext>
+            <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                {activeItem ? <AsideMenuDNDItem item={activeItem} isDragging /> : null}
+            </DragOverlay>
         </DndContext>
     );
 };

@@ -1,6 +1,6 @@
 import { FC, useMemo, useState } from 'react';
 import React from 'react';
-import { DndContext } from '@dnd-kit/core';
+import { closestCenter, DndContext, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import styled from 'styled-components';
@@ -168,19 +168,13 @@ const ListBlockStyled = styled(ListBlock)`
     }
 `;
 
-const SortableItem: FC<{ account: AccountType | AccountsFolder }> = ({ account }) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-        id: account.id
-    });
-    const style: React.CSSProperties = {
-        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
-        transition
-    };
-    const dragHandleProps = { ...attributes, ...listeners } as DragHandleProps;
-
+const ItemContent: FC<{
+    account: AccountType | AccountsFolder;
+    dragHandleProps?: DragHandleProps;
+}> = ({ account, dragHandleProps }) => {
     if (account.type === 'folder') {
         return (
-            <div ref={setNodeRef} style={style}>
+            <>
                 {account.accounts.map((a, i) => {
                     if (i === 0) {
                         return (
@@ -195,6 +189,32 @@ const SortableItem: FC<{ account: AccountType | AccountsFolder }> = ({ account }
                         </ListItemElementInGroup>
                     );
                 })}
+            </>
+        );
+    }
+
+    return (
+        <ListItemElementStyled ios={true} hover={false}>
+            <WalletRow dragHandleProps={dragHandleProps} account={account} />
+        </ListItemElementStyled>
+    );
+};
+
+const SortableItem: FC<{ account: AccountType | AccountsFolder }> = ({ account }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: account.id
+    });
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition,
+        opacity: isDragging ? 0 : undefined
+    };
+    const dragHandleProps = { ...attributes, ...listeners } as DragHandleProps;
+
+    if (account.type === 'folder') {
+        return (
+            <div ref={setNodeRef} style={style}>
+                <ItemContent account={account} dragHandleProps={dragHandleProps} />
             </div>
         );
     }
@@ -214,6 +234,7 @@ export const Account = () => {
     const items = useSideBarItems();
     const { handleSidebarDrop, itemsOptimistic } = useAccountsDNDDrop(items);
     const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
 
     const createItems = useMemo(() => {
         return [
@@ -225,14 +246,24 @@ export const Account = () => {
         ];
     }, []);
 
+    const activeItem = activeId ? itemsOptimistic.find(i => i.id === activeId) : null;
+
     return (
         <>
             <SubHeader title={t('Manage_wallets')} />
             <InnerBody>
                 <DndContext
                     sensors={sensors}
-                    onDragEnd={handleSidebarDrop}
-                    onDragStart={() => sdk.hapticNotification('impact_medium')}
+                    collisionDetection={closestCenter}
+                    onDragEnd={e => {
+                        setActiveId(null);
+                        handleSidebarDrop(e);
+                    }}
+                    onDragStart={(e: DragStartEvent) => {
+                        setActiveId(String(e.active.id));
+                        sdk.hapticNotification('impact_medium');
+                    }}
+                    onDragCancel={() => setActiveId(null)}
                     modifiers={[restrictToVerticalAxis]}
                 >
                     <SortableContext
@@ -245,6 +276,13 @@ export const Account = () => {
                             ))}
                         </ListBlockStyled>
                     </SortableContext>
+                    <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                        {activeItem ? (
+                            <ListBlockStyled>
+                                <ItemContent account={activeItem} />
+                            </ListBlockStyled>
+                        ) : null}
+                    </DragOverlay>
                 </DndContext>
 
                 <SettingsList items={createItems} />

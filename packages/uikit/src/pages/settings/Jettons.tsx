@@ -1,6 +1,12 @@
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
-import React, { FC, useCallback, useMemo } from 'react';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import React, { FC, useCallback, useMemo, useState } from 'react';
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent
+} from '@dnd-kit/core';
 import {
     SortableContext,
     useSortable,
@@ -151,12 +157,13 @@ const SortablePinnedJettonItem: FC<{ jetton: AssetAmount; config: TonWalletConfi
     jetton,
     config
 }) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: jetton.asset.id
     });
     const style: React.CSSProperties = {
         transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
-        transition
+        transition,
+        opacity: isDragging ? 0 : undefined
     };
     const dragHandleProps = { ...attributes, ...listeners } as DragHandleProps;
 
@@ -173,6 +180,7 @@ export const PinnedJettonList: FC<{
 }> = ({ config, jettons }) => {
     const { mutate } = useSavePinnedJettonOrderMutation();
     const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
 
     const list = useMemo(
         () =>
@@ -188,6 +196,7 @@ export const PinnedJettonList: FC<{
 
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
+            setActiveId(null);
             const { active, over } = event;
             if (!over || active.id === over.id) return;
             const oldIndex = list.findIndex(j => j.asset.id === String(active.id));
@@ -200,10 +209,15 @@ export const PinnedJettonList: FC<{
         [config, list, mutate]
     );
 
+    const activeJetton = activeId ? list.find(j => j.asset.id === activeId) : null;
+
     return (
         <DndContext
             sensors={sensors}
+            collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
+            onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
+            onDragCancel={() => setActiveId(null)}
             modifiers={[restrictToVerticalAxis]}
         >
             <SortableContext
@@ -220,6 +234,15 @@ export const PinnedJettonList: FC<{
                     ))}
                 </ListBlock>
             </SortableContext>
+            <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                {activeJetton ? (
+                    <ListBlock noUserSelect>
+                        <ListItemElement hover={false} ios={true}>
+                            <JettonRow config={config} jetton={activeJetton} dragHandleProps={{}} />
+                        </ListItemElement>
+                    </ListBlock>
+                ) : null}
+            </DragOverlay>
         </DndContext>
     );
 };

@@ -1,6 +1,12 @@
 import { Notification, NotificationFooter } from '../Notification';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent
+} from '@dnd-kit/core';
 import {
     SortableContext,
     useSortable,
@@ -98,6 +104,30 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     );
 };
 
+const CategoryItemContent: FC<{
+    category: DashboardColumn | undefined;
+    isEnabled: boolean;
+    isDisabled: boolean;
+    onOpen: () => void;
+    onCheckboxChange: (checked: boolean) => void;
+    dragHandleProps?: React.HTMLAttributes<HTMLElement>;
+}> = ({ category, isEnabled, isDisabled, onOpen, onCheckboxChange, dragHandleProps }) => (
+    <ListItemPayload>
+        <Row onClick={() => isDisabled && onOpen()}>
+            <Icon {...dragHandleProps}>
+                <ReorderIcon />
+            </Icon>
+            <Body1>{category?.name}</Body1>
+            {category?.onlyPro && <Badge>PRO</Badge>}
+            <CheckboxStyled
+                checked={isEnabled}
+                disabled={isDisabled}
+                onChange={value => !isDisabled && onCheckboxChange(value)}
+            />
+        </Row>
+    </ListItemPayload>
+);
+
 const SortableCategoryItem: FC<{
     id: string;
     isEnabled: boolean;
@@ -106,30 +136,27 @@ const SortableCategoryItem: FC<{
     onOpen: () => void;
     onCheckboxChange: (id: string, checked: boolean) => void;
 }> = ({ id, isEnabled, categories, isProEnabled, onOpen, onCheckboxChange }) => {
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id
+    });
     const style: React.CSSProperties = {
         transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
-        transition
+        transition,
+        opacity: isDragging ? 0 : undefined
     };
     const category = categories.find(c => c.id === id);
-    const isDisabled = category?.onlyPro && !isProEnabled;
+    const isDisabled = !!(category?.onlyPro && !isProEnabled);
 
     return (
         <ListItemElement ios={true} hover={false} ref={setNodeRef} style={style}>
-            <ListItemPayload>
-                <Row onClick={() => isDisabled && onOpen()}>
-                    <Icon {...attributes} {...listeners}>
-                        <ReorderIcon />
-                    </Icon>
-                    <Body1>{category?.name}</Body1>
-                    {category?.onlyPro && <Badge>PRO</Badge>}
-                    <CheckboxStyled
-                        checked={isEnabled}
-                        disabled={isDisabled}
-                        onChange={value => !isDisabled && onCheckboxChange(id, value)}
-                    />
-                </Row>
-            </ListItemPayload>
+            <CategoryItemContent
+                category={category}
+                isEnabled={isEnabled}
+                isDisabled={isDisabled}
+                onOpen={onOpen}
+                onCheckboxChange={checked => onCheckboxChange(id, checked)}
+                dragHandleProps={{ ...attributes, ...listeners }}
+            />
         </ListItemElement>
     );
 };
@@ -145,9 +172,11 @@ const CategoriesModalContent: FC<{
     const { onOpen } = useProFeaturesNotification();
     const isProEnabled = isValidSubscription(subscription);
     const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
 
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
+            setActiveId(null);
             const { active, over } = event;
             if (!over || active.id === over.id) return;
             setCategoriesForm(_categories => {
@@ -166,11 +195,17 @@ const CategoriesModalContent: FC<{
         );
     };
 
+    const activeEntry = activeId ? categoriesForm.find(c => c.id === activeId) : null;
+    const activeCategory = activeEntry ? categories.find(c => c.id === activeEntry.id) : undefined;
+
     return (
         <>
             <DndContext
                 sensors={sensors}
+                collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
+                onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
+                onDragCancel={() => setActiveId(null)}
                 modifiers={[restrictToVerticalAxis]}
             >
                 <SortableContext
@@ -191,6 +226,23 @@ const CategoriesModalContent: FC<{
                         ))}
                     </ListBlock>
                 </SortableContext>
+                <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                    {activeEntry ? (
+                        <ListBlock>
+                            <ListItemElement ios={true} hover={false}>
+                                <CategoryItemContent
+                                    category={activeCategory}
+                                    isEnabled={activeEntry.isEnabled}
+                                    isDisabled={
+                                        !!(activeCategory?.onlyPro && !isProEnabled)
+                                    }
+                                    onOpen={onOpen}
+                                    onCheckboxChange={() => undefined}
+                                />
+                            </ListItemElement>
+                        </ListBlock>
+                    ) : null}
+                </DragOverlay>
             </DndContext>
         </>
     );

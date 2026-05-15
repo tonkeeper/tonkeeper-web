@@ -1,6 +1,12 @@
-import { FC, forwardRef, Fragment, ReactNode } from 'react';
+import { FC, forwardRef, Fragment, ReactNode, useState } from 'react';
 import React from 'react';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent
+} from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import styled, { css } from 'styled-components';
@@ -147,12 +153,13 @@ const SortableOuterItem: FC<{
     });
     const style: React.CSSProperties = {
         transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
-        transition
+        transition,
+        opacity: isDragging ? 0 : undefined
     };
     const dragHandleProps = { ...attributes, ...listeners } as DragHandleProps;
 
     return (
-        <ListItemStyled hover={false} ref={setNodeRef} style={style} $isDragging={isDragging}>
+        <ListItemStyled hover={false} ref={setNodeRef} style={style} $isDragging={false}>
             <ItemRow
                 dragHandleProps={dragHandleProps}
                 handleFolderDrop={handleFolderDrop}
@@ -162,22 +169,35 @@ const SortableOuterItem: FC<{
     );
 };
 
+const OuterItemOverlay: FC<{ item: Account | AccountsFolder }> = ({ item }) => (
+    <ListItemStyled hover={false} $isDragging={true}>
+        <ItemRow item={item} dragHandleProps={{}} />
+    </ListItemStyled>
+);
+
 const SortableFolderItem: FC<{ acc: Account; tabLevel: number }> = ({ acc, tabLevel }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: acc.id
     });
     const style: React.CSSProperties = {
         transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
-        transition
+        transition,
+        opacity: isDragging ? 0 : undefined
     };
     const dragHandleProps = { ...attributes, ...listeners } as DragHandleProps;
 
     return (
-        <DraggingBlock $isDragging={isDragging} ref={setNodeRef} style={style}>
+        <DraggingBlock $isDragging={false} ref={setNodeRef} style={style}>
             <ItemRow item={acc} dragHandleProps={dragHandleProps} tabLevel={tabLevel} />
         </DraggingBlock>
     );
 };
+
+const FolderItemOverlay: FC<{ acc: Account; tabLevel: number }> = ({ acc, tabLevel }) => (
+    <DraggingBlock $isDragging={true}>
+        <ItemRow item={acc} dragHandleProps={{}} tabLevel={tabLevel} />
+    </DraggingBlock>
+);
 
 export const DesktopManageAccountsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
@@ -188,6 +208,9 @@ export const DesktopManageAccountsPage = () => {
     const items = useSideBarItems();
     const { handleSidebarDrop, handleFolderDrop, itemsOptimistic } = useAccountsDNDDrop(items);
     const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
+
+    const activeItem = activeId ? itemsOptimistic.find(i => i.id === activeId) : null;
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
@@ -212,12 +235,20 @@ export const DesktopManageAccountsPage = () => {
             </DesktopViewHeader>
             <DndContext
                 sensors={sensors}
+                collisionDetection={closestCenter}
                 onDragEnd={e => {
+                    setActiveId(null);
                     handleSidebarDrop(e);
                     cardModalSwipe.unlock();
                 }}
-                onDragStart={() => cardModalSwipe.lock()}
-                onDragCancel={() => cardModalSwipe.unlock()}
+                onDragStart={(e: DragStartEvent) => {
+                    setActiveId(String(e.active.id));
+                    cardModalSwipe.lock();
+                }}
+                onDragCancel={() => {
+                    setActiveId(null);
+                    cardModalSwipe.unlock();
+                }}
                 modifiers={[restrictToVerticalAxis]}
             >
                 <SortableContext
@@ -234,6 +265,9 @@ export const DesktopManageAccountsPage = () => {
                         ))}
                     </ListBlockDesktopAdaptive>
                 </SortableContext>
+                <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                    {activeItem ? <OuterItemOverlay item={activeItem} /> : null}
+                </DragOverlay>
             </DndContext>
 
             <BottomButtonContainer>
@@ -744,6 +778,47 @@ const FolderDropableWrapper = styled.div`
     border: none !important;
 `;
 
+const FolderAccountsDnD: FC<{
+    folder: AccountsFolder;
+    tabLevel: number;
+    handleFolderDrop?: (event: DragEndEvent, folderId: string) => void;
+}> = ({ folder, tabLevel, handleFolderDrop }) => {
+    const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
+
+    const activeAccount = activeId ? folder.accounts.find(a => a.id === activeId) : null;
+
+    return (
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
+            onDragEnd={e => {
+                setActiveId(null);
+                handleFolderDrop?.(e, folder.id);
+            }}
+            onDragCancel={() => setActiveId(null)}
+            modifiers={[restrictToVerticalAxis]}
+        >
+            <SortableContext
+                items={folder.accounts.map(a => a.id)}
+                strategy={verticalListSortingStrategy}
+            >
+                <FolderDropableWrapper>
+                    {folder.accounts.map(acc => (
+                        <SortableFolderItem key={acc.id} acc={acc} tabLevel={tabLevel + 1} />
+                    ))}
+                </FolderDropableWrapper>
+            </SortableContext>
+            <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                {activeAccount ? (
+                    <FolderItemOverlay acc={activeAccount} tabLevel={tabLevel + 1} />
+                ) : null}
+            </DragOverlay>
+        </DndContext>
+    );
+};
+
 const ItemRow: FC<{
     item: Account | AccountsFolder;
     dragHandleProps?: DragHandleProps;
@@ -753,7 +828,6 @@ const ItemRow: FC<{
     const { t } = useTranslation();
     const { onOpen: onManageFolder } = useManageFolderNotification();
     const deleteFolder = useDeleteFolder();
-    const sensors = useSortableDndSensors();
 
     if (item.type === 'folder') {
         if (!item.accounts.length) {
@@ -788,26 +862,11 @@ const ItemRow: FC<{
                 {item.accounts.length === 1 ? (
                     <ItemRow item={item.accounts[0]} tabLevel={1} />
                 ) : (
-                    <DndContext
-                        sensors={sensors}
-                        onDragEnd={e => handleFolderDrop?.(e, item.id)}
-                        modifiers={[restrictToVerticalAxis]}
-                    >
-                        <SortableContext
-                            items={item.accounts.map(a => a.id)}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            <FolderDropableWrapper>
-                                {item.accounts.map(acc => (
-                                    <SortableFolderItem
-                                        key={acc.id}
-                                        acc={acc}
-                                        tabLevel={tabLevel + 1}
-                                    />
-                                ))}
-                            </FolderDropableWrapper>
-                        </SortableContext>
-                    </DndContext>
+                    <FolderAccountsDnD
+                        folder={item}
+                        tabLevel={tabLevel}
+                        handleFolderDrop={handleFolderDrop}
+                    />
                 )}
             </>
         );
