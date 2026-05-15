@@ -86,6 +86,17 @@ export const WithdrawRequestStakeAction: FC<{
         return <ErrorAction />;
     }
 
+    const stakeMeta = withdrawStakeRequest.stakeMeta;
+    let amountNode: React.ReactNode | undefined;
+    let entry = '';
+    if (stakeMeta) {
+        amountNode = <>-&thinsp;{format(stakeMeta.value, stakeMeta.decimals)}</>;
+        entry = stakeMeta.tokenName;
+    } else if (withdrawStakeRequest.amount) {
+        amountNode = <>+&thinsp;{format(withdrawStakeRequest.amount)}</>;
+        entry = CryptoCurrency.TON;
+    }
+
     return (
         <ListItemGrid>
             <ActivityIcon status={action.status}>
@@ -93,12 +104,8 @@ export const WithdrawRequestStakeAction: FC<{
             </ActivityIcon>
             <ColumnLayout
                 title={t('activityActionModal_withdrawal_request')}
-                amount={
-                    withdrawStakeRequest.amount ? (
-                        <>+&thinsp;{format(withdrawStakeRequest.amount)}</>
-                    ) : undefined
-                }
-                entry={withdrawStakeRequest.amount ? CryptoCurrency.TON : ''}
+                amount={amountNode}
+                entry={entry}
                 address={toAddressTextValue(
                     withdrawStakeRequest.pool.name,
                     formatAddress(withdrawStakeRequest.pool.address, network, true)
