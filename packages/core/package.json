@@ -15,7 +15,8 @@
         "generate:tonkeeperApi": "./resource/check_github_token.sh && rm -fr src/tonkeeperApiGenerated && docker build -f resource/Dockerfile.tonkeeperApi . -t tonkeeperapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local -e GITHUB_TOKEN tonkeeperapi",
         "generate:analytics": "./resource/generate_analytics_client.sh",
         "build:pkg": "yarn build",
-        "test": "vitest run"
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
         "@types/aes-js": "^3.1.4",

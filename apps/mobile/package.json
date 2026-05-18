@@ -19,7 +19,8 @@
         "web": "vite",
         "preview": "vite preview",
         "sync": "cap sync",
-        "build:ipad": "./build.sh"
+        "build:ipad": "./build.sh",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "@capacitor/app": "^6.0.1",

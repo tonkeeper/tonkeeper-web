@@ -15,6 +15,9 @@
         "build:desktop": "npx turbo build:desktop",
         "build:ipad": "npx turbo build:ipad",
         "build:pkg": "npx turbo build:pkg",
+        "lint": "eslint --ext .ts,.tsx .",
+        "lint:fix": "eslint --ext .ts,.tsx . --fix",
+        "typecheck": "npx turbo typecheck",
         "prepare-release": "node scripts/prepare-release.js"
     },
     "private": true,

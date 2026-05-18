@@ -68,7 +68,7 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
         const cancelButton = options.cancelButtonTitle || 'Cancel';
         const okButton = options.okButtonTitle || 'OK';
 
-        return sendBackground<number>({
+        const clickedIndex = await sendBackground<number>({
             king: 'show-confirm-dialog',
             options: {
                 message: options.message,
@@ -79,6 +79,7 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
                 cancelId: 0
             }
         });
+        return clickedIndex === 1;
     }
 
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];

@@ -153,11 +153,7 @@ const ViewMenu: Electron.MenuItemConstructorOptions = {
         {
             label: dist.translation.Reload,
             accelerator: 'CmdOrCtrl+R',
-            click: function (item, focusedWindow) {
-                if (focusedWindow) {
-                    focusedWindow.reload();
-                }
-            }
+            role: 'reload'
         },
         {
             label: dist.translation.force_reload,
@@ -185,11 +181,7 @@ const ViewMenu: Electron.MenuItemConstructorOptions = {
                 if (process.platform === 'darwin') return 'Alt+Command+I';
                 else return 'Ctrl+Shift+I';
             })(),
-            click: function (item, focusedWindow) {
-                if (focusedWindow) {
-                    focusedWindow.webContents.toggleDevTools();
-                }
-            }
+            role: 'toggleDevTools'
         }
     ]
 };
