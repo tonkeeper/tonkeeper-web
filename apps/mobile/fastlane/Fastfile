@@ -10,14 +10,25 @@ def next_patch_version(version)
   parts.join(".")
 end
 
-def resolve_ipad_version(package_version)
+def latest_live_app_store_version(app_identifier)
+  require 'spaceship'
+  app = Spaceship::ConnectAPI::App.find(app_identifier)
+  UI.user_error!("App not found on App Store Connect: #{app_identifier}") unless app
+
+  live = app.get_live_app_store_version(platform: "IOS")
+  UI.user_error!("No live App Store version found for #{app_identifier}") unless live && live.version_string
+
+  live.version_string
+end
+
+def resolve_ipad_version(package_version, app_identifier)
   mode = ENV.fetch("IPAD_VERSION_MODE", "package")
 
   case mode
   when "package"
     package_version
   when "next-patch"
-    next_patch_version(package_version)
+    next_patch_version(latest_live_app_store_version(app_identifier))
   else
     UI.user_error!("Unknown IPAD_VERSION_MODE=#{mode}. Expected package or next-patch.")
   end
@@ -73,14 +84,14 @@ platform :ios do
       package_marketing_version = package[:version].to_s[/^\d+\.\d+\.\d+/]
       UI.user_error!("Invalid package version for iOS: #{package[:version]}") unless package_marketing_version
 
-      version_number = resolve_ipad_version(package_marketing_version)
+      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+
+      version_number = resolve_ipad_version(package_marketing_version, app_identifier)
       increment_version_number(
         xcodeproj: xcodeproj,
         version_number: version_number
       )
-
-      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
       current_version = get_version_number(xcodeproj: xcodeproj)
       latest_build_number = app_store_build_number(
