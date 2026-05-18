@@ -17,7 +17,7 @@ assignees: ''
 ### Build Verification
 
 **Web**
-- [ ] Demo deploys successfully to `rc` environment
+- [ ] Demo deploys successfully
 
 **Desktop** — download from GitHub pre-release
 - [ ] macOS Intel
@@ -73,7 +73,7 @@ assignees: ''
 - [ ] Approved and live
 
 **App Store (iPad)** — manual submission, Apple review takes 1–3 days
-- [ ] Build submitted from TestFlight to App Store Connect
+- [ ] Build submitted to App Store Connect
 - [ ] Submitted for review
 - [ ] Approved and live
 
