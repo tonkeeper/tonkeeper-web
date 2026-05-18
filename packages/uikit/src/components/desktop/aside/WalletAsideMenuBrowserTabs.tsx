@@ -13,21 +13,36 @@ import styled, { useTheme } from 'styled-components';
 import { Label2 } from '../../Text';
 import { useMenuController } from '../../../hooks/ionic';
 import { Button, ButtonFlat } from '../../fields/Button';
-import {
+import React, {
     createContext,
     Dispatch,
     FC,
+    forwardRef,
     SetStateAction,
     useContext,
     useEffect,
     useState
 } from 'react';
-import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent
+} from '@dnd-kit/core';
+import {
+    SortableContext,
+    useSortable,
+    verticalListSortingStrategy,
+    arrayMove
+} from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { CloseIcon, PinIconOutline, ReorderIcon16, UnpinIconOutline } from '../../Icon';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 import { useCountryContextTracker } from '../../../hooks/analytics/events-hooks';
+import { useSortableDndSensors } from '../../../hooks/useSortableDndSensors';
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundPage)};
@@ -165,6 +180,67 @@ export const WalletAsideMenuBrowserTabs = () => {
     );
 };
 
+type BrowserTabRowProps = {
+    tab: BrowserTab;
+    isEditMode: boolean;
+    openedTabId: string | undefined;
+    onClickTab: (tab: BrowserTab) => void;
+    unpinTab: (tab: BrowserTab) => void;
+};
+
+const BrowserTabRow = forwardRef<
+    HTMLDivElement,
+    BrowserTabRowProps & React.HTMLAttributes<HTMLDivElement>
+>(({ tab, isEditMode, openedTabId, onClickTab, unpinTab, ...rest }, ref) => {
+    return (
+        <AsideMenuItemStyled
+            ref={ref}
+            isSelected={tab.id === openedTabId}
+            onClick={() => onClickTab(tab)}
+            {...rest}
+        >
+            <LeftIconButton $hidden={!isEditMode}>
+                <ReorderIcon16 />
+            </LeftIconButton>
+            <img
+                src={tab.iconUrl}
+                onError={e => {
+                    e.currentTarget.style.visibility = 'hidden';
+                }}
+            />
+            <Label2>{tab.title}</Label2>
+            {isEditMode && (
+                <RightIconButton onClick={() => unpinTab(tab)}>
+                    <UnpinIconOutline />
+                </RightIconButton>
+            )}
+        </AsideMenuItemStyled>
+    );
+});
+
+const SortableBrowserTab: FC<BrowserTabRowProps> = props => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: props.tab.id
+    });
+
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition,
+        left: '8px',
+        opacity: isDragging ? 0 : undefined
+    };
+
+    return (
+        <BrowserTabRow
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...(props.isEditMode ? listeners : {})}
+            {...props}
+        />
+    );
+};
+
 const BrowserTabsPinned: FC<{
     tabs: BrowserTab[];
     onUpdateOrder: (tabs: BrowserTab[]) => void;
@@ -175,13 +251,22 @@ const BrowserTabsPinned: FC<{
     const { mutate: changeBrowserTab } = useChangeBrowserTab();
     const sdk = useAppSdk();
     const track = useCountryContextTracker();
+    const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
 
-    const handleDragEnd = (result: DropResult) => {
-        if (!result.destination || !tabs) return;
-        const updated = [...tabs];
-        const [moved] = updated.splice(result.source.index, 1);
-        updated.splice(result.destination.index, 0, moved);
-        onUpdateOrder(updated);
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(String(event.active.id));
+        sdk.hapticNotification('impact_medium');
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        setActiveId(null);
+        const { active, over } = event;
+        if (!over || !tabs || active.id === over.id) return;
+        const oldIndex = tabs.findIndex(t => t.id === active.id);
+        const newIndex = tabs.findIndex(t => t.id === over.id);
+        if (oldIndex === -1 || newIndex === -1) return;
+        onUpdateOrder(arrayMove([...tabs], oldIndex, newIndex));
     };
 
     const unpinTab = (tab: BrowserTab) => {
@@ -193,50 +278,7 @@ const BrowserTabsPinned: FC<{
         return null;
     }
 
-    const renderTabItem = (tab: BrowserTab, index: number) => (
-        <Draggable key={tab.id} draggableId={tab.id} index={index}>
-            {(provided, snapshotDrag) => {
-                let transform = provided.draggableProps.style?.transform;
-
-                if (snapshotDrag.isDragging && transform) {
-                    transform = transform.replace(/\(.+\,/, '(0,');
-                }
-
-                const style: Record<string, unknown> = {
-                    ...provided.draggableProps.style,
-                    transform,
-                    left: '8px'
-                };
-
-                return (
-                    <AsideMenuItemStyled
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        style={style}
-                        isSelected={tab.id === openedTabId}
-                        onClick={() => onClickTab(tab)}
-                        {...(isEditMode && provided.dragHandleProps)}
-                    >
-                        <LeftIconButton $hidden={!isEditMode}>
-                            <ReorderIcon16 />
-                        </LeftIconButton>
-                        <img
-                            src={tab.iconUrl}
-                            onError={e => {
-                                e.currentTarget.style.visibility = 'hidden';
-                            }}
-                        />
-                        <Label2>{tab.title}</Label2>
-                        {isEditMode && (
-                            <RightIconButton onClick={() => unpinTab(tab)}>
-                                <UnpinIconOutline />
-                            </RightIconButton>
-                        )}
-                    </AsideMenuItemStyled>
-                );
-            }}
-        </Draggable>
-    );
+    const activeTab = activeId ? tabs.find(t => t.id === activeId) : null;
 
     return (
         <GroupWrapper>
@@ -250,19 +292,38 @@ const BrowserTabsPinned: FC<{
                 </EditButton>
             </HeadingWrapper>
 
-            <DragDropContext
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
-                onDragStart={() => sdk.hapticNotification('impact_medium')}
+                onDragStart={handleDragStart}
+                onDragCancel={() => setActiveId(null)}
+                modifiers={[restrictToVerticalAxis]}
             >
-                <Droppable droppableId="browserTabs" direction="vertical">
-                    {provided => (
-                        <div ref={provided.innerRef} {...provided.droppableProps}>
-                            {tabs?.map((tab, index) => renderTabItem(tab, index))}
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
+                <SortableContext items={tabs.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                    {tabs.map(tab => (
+                        <SortableBrowserTab
+                            key={tab.id}
+                            tab={tab}
+                            isEditMode={isEditMode}
+                            openedTabId={openedTabId}
+                            onClickTab={onClickTab}
+                            unpinTab={unpinTab}
+                        />
+                    ))}
+                </SortableContext>
+                <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                    {activeTab ? (
+                        <BrowserTabRow
+                            tab={activeTab}
+                            isEditMode={isEditMode}
+                            openedTabId={openedTabId}
+                            onClickTab={onClickTab}
+                            unpinTab={unpinTab}
+                        />
+                    ) : null}
+                </DragOverlay>
+            </DndContext>
         </GroupWrapper>
     );
 };

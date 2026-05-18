@@ -1,10 +1,8 @@
 import { FC, useMemo, useState } from 'react';
-import {
-    DragDropContext,
-    Draggable,
-    DraggableProvidedDragHandleProps,
-    Droppable
-} from 'react-beautiful-dnd';
+import React from 'react';
+import { closestCenter, DndContext, DragOverlay, DragStartEvent } from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { DropDown } from '../../components/DropDown';
@@ -25,9 +23,10 @@ import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 
-import { useAccountsDNDDrop, useSideBarItems } from '../../state/folders';
+import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../state/folders';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useAppSdk } from '../../hooks/appSdk';
+import { useSortableDndSensors } from '../../hooks/useSortableDndSensors';
 
 const Row = styled.div`
     display: flex;
@@ -47,9 +46,11 @@ const IconMock = styled.div`
     width: 28px;
 `;
 
+type DragHandleProps = React.HTMLAttributes<HTMLElement> | undefined;
+
 const WalletRow: FC<{
     account: AccountType;
-    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DragHandleProps;
 }> = ({ account, dragHandleProps }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -167,13 +168,73 @@ const ListBlockStyled = styled(ListBlock)`
     }
 `;
 
+const ItemContent: FC<{
+    account: AccountType | AccountsFolder;
+    dragHandleProps?: DragHandleProps;
+}> = ({ account, dragHandleProps }) => {
+    if (account.type === 'folder') {
+        return (
+            <>
+                {account.accounts.map((a, i) => {
+                    if (i === 0) {
+                        return (
+                            <ListItemElementStyled ios={true} hover={false} key={a.id}>
+                                <WalletRow account={a} dragHandleProps={dragHandleProps} />
+                            </ListItemElementStyled>
+                        );
+                    }
+                    return (
+                        <ListItemElementInGroup ios={true} hover={false} key={a.id}>
+                            <WalletRow account={a} />
+                        </ListItemElementInGroup>
+                    );
+                })}
+            </>
+        );
+    }
+
+    return (
+        <ListItemElementStyled ios={true} hover={false}>
+            <WalletRow dragHandleProps={dragHandleProps} account={account} />
+        </ListItemElementStyled>
+    );
+};
+
+const SortableItem: FC<{ account: AccountType | AccountsFolder }> = ({ account }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: account.id
+    });
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition,
+        opacity: isDragging ? 0 : undefined
+    };
+    const dragHandleProps = { ...attributes, ...listeners } as DragHandleProps;
+
+    if (account.type === 'folder') {
+        return (
+            <div ref={setNodeRef} style={style}>
+                <ItemContent account={account} dragHandleProps={dragHandleProps} />
+            </div>
+        );
+    }
+
+    return (
+        <ListItemElementStyled ios={true} hover={false} ref={setNodeRef} style={style}>
+            <WalletRow dragHandleProps={dragHandleProps} account={account} />
+        </ListItemElementStyled>
+    );
+};
+
 export const Account = () => {
     const { onOpen: addWallet } = useAddWalletNotification();
     const { t } = useTranslation();
     const sdk = useAppSdk();
 
     const items = useSideBarItems();
-    const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
+    const { handleSidebarDrop, itemsOptimistic } = useAccountsDNDDrop(items);
+    const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
 
     const createItems = useMemo(() => {
         return [
@@ -185,91 +246,44 @@ export const Account = () => {
         ];
     }, []);
 
+    const activeItem = activeId ? itemsOptimistic.find(i => i.id === activeId) : null;
+
     return (
         <>
             <SubHeader title={t('Manage_wallets')} />
             <InnerBody>
-                <DragDropContext
-                    onDragEnd={handleDrop}
-                    onDragStart={() => sdk.hapticNotification('impact_medium')}
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={e => {
+                        setActiveId(null);
+                        handleSidebarDrop(e);
+                    }}
+                    onDragStart={(e: DragStartEvent) => {
+                        setActiveId(String(e.active.id));
+                        sdk.hapticNotification('impact_medium');
+                    }}
+                    onDragCancel={() => setActiveId(null)}
+                    modifiers={[restrictToVerticalAxis]}
                 >
-                    <Droppable droppableId="wallets">
-                        {provided => (
-                            <ListBlockStyled {...provided.droppableProps} ref={provided.innerRef}>
-                                {itemsOptimistic.map((account, index) => {
-                                    if (account.type === 'folder') {
-                                        return (
-                                            <Draggable
-                                                key={account.id}
-                                                draggableId={account.id}
-                                                index={index}
-                                            >
-                                                {p => (
-                                                    <div ref={p.innerRef} {...p.draggableProps}>
-                                                        {account.accounts.map((a, i) => {
-                                                            if (i === 0) {
-                                                                return (
-                                                                    <ListItemElementStyled
-                                                                        ios={true}
-                                                                        hover={false}
-                                                                        key={account.id}
-                                                                    >
-                                                                        <WalletRow
-                                                                            key={a.id}
-                                                                            account={a}
-                                                                            dragHandleProps={
-                                                                                p.dragHandleProps
-                                                                            }
-                                                                        />
-                                                                    </ListItemElementStyled>
-                                                                );
-                                                            }
-                                                            return (
-                                                                <ListItemElementInGroup
-                                                                    ios={true}
-                                                                    hover={false}
-                                                                    key={account.id}
-                                                                >
-                                                                    <WalletRow
-                                                                        key={a.id}
-                                                                        account={a}
-                                                                    />
-                                                                </ListItemElementInGroup>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        );
-                                    }
-
-                                    return (
-                                        <Draggable
-                                            key={account.id}
-                                            draggableId={account.id}
-                                            index={index}
-                                        >
-                                            {p => (
-                                                <ListItemElementStyled
-                                                    ios={true}
-                                                    hover={false}
-                                                    ref={p.innerRef}
-                                                    {...p.draggableProps}
-                                                >
-                                                    <WalletRow
-                                                        dragHandleProps={p.dragHandleProps}
-                                                        account={account}
-                                                    />
-                                                </ListItemElementStyled>
-                                            )}
-                                        </Draggable>
-                                    );
-                                })}
-                                {provided.placeholder}
+                    <SortableContext
+                        items={itemsOptimistic.map(i => i.id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        <ListBlockStyled>
+                            {itemsOptimistic.map(account => (
+                                <SortableItem key={account.id} account={account} />
+                            ))}
+                        </ListBlockStyled>
+                    </SortableContext>
+                    <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                        {activeItem ? (
+                            <ListBlockStyled>
+                                <ItemContent account={activeItem} />
                             </ListBlockStyled>
-                        )}
-                    </Droppable>
-                </DragDropContext>
+                        ) : null}
+                    </DragOverlay>
+                </DndContext>
 
                 <SettingsList items={createItems} />
             </InnerBody>

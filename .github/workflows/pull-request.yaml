@@ -180,4 +180,6 @@ jobs:
 
     ipad-build:
         uses: ./.github/workflows/ipad-build.yaml
+        with:
+            version-mode: next-patch
         secrets: inherit

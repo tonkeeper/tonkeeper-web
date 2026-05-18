@@ -1,6 +1,14 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { FC, forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+    FC,
+    forwardRef,
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
@@ -23,12 +31,9 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
 import { useAddWalletNotification } from '../../modals/AddWalletNotificationControlled';
-import {
-    DragDropContext,
-    Draggable,
-    DraggableProvidedDraggableProps,
-    Droppable
-} from 'react-beautiful-dnd';
+import { closestCenter, DndContext, DragOverlay, DragStartEvent } from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { AsideMenuAccount } from './AsideMenuAccount';
 import { AsideMenuFolder } from './AsideMenuFolder';
 
@@ -41,6 +46,7 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 import { useManageFolderNotification } from '../../modals/ManageFolderNotificationControlled';
+import { useSortableDndSensors } from '../../../hooks/useSortableDndSensors';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -169,7 +175,7 @@ export const AsideMenuDNDItem = forwardRef<
     {
         item: Account | AccountsFolder;
         isDragging: boolean;
-    } & DraggableProvidedDraggableProps
+    } & React.HTMLAttributes<HTMLDivElement>
 >(({ item, isDragging, ...rest }, fRef) => {
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
@@ -236,50 +242,70 @@ export const AsideMenuDNDItem = forwardRef<
     );
 });
 
+const SortableAsideMenuDNDItem: FC<{ item: Account | AccountsFolder }> = ({ item }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: item.id
+    });
+
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition,
+        opacity: isDragging ? 0 : undefined
+    };
+
+    return (
+        <AsideMenuDNDItem
+            ref={setNodeRef}
+            item={item}
+            isDragging={false}
+            style={style}
+            {...attributes}
+            {...listeners}
+        />
+    );
+};
+
 const AccountDNDBlock: FC<{
     items: (Account | AccountsFolder)[];
 }> = ({ items }) => {
-    const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
+    const { handleSidebarDrop, itemsOptimistic } = useAccountsDNDDrop(items);
     const sdk = useAppSdk();
+    const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
+
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(String(event.active.id));
+        sdk.hapticNotification('impact_medium');
+    };
+
+    const handleDragEnd: typeof handleSidebarDrop = event => {
+        setActiveId(null);
+        handleSidebarDrop(event);
+    };
+
+    const activeItem = activeId ? itemsOptimistic.find(i => i.id === activeId) : null;
 
     return (
-        <DragDropContext
-            onDragEnd={handleDrop}
-            onDragStart={() => sdk.hapticNotification('impact_medium')}
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+            onDragCancel={() => setActiveId(null)}
+            modifiers={[restrictToVerticalAxis]}
         >
-            <Droppable direction="vertical" droppableId="droppable-1">
-                {provided => (
-                    <div {...provided.droppableProps} ref={provided.innerRef}>
-                        {itemsOptimistic.map((account, index) => (
-                            <Draggable key={account.id} draggableId={account.id} index={index}>
-                                {(p, snapshot) => {
-                                    const transform = p.draggableProps.style?.transform;
-                                    if (transform) {
-                                        try {
-                                            const t = transform.split(',')[1];
-                                            p.draggableProps.style!.transform =
-                                                'translate(0px,' + t;
-                                        } catch (_) {
-                                            //
-                                        }
-                                    }
-                                    return (
-                                        <AsideMenuDNDItem
-                                            ref={p.innerRef}
-                                            item={account}
-                                            isDragging={snapshot.isDragging}
-                                            {...p.draggableProps}
-                                            {...p.dragHandleProps}
-                                        />
-                                    );
-                                }}
-                            </Draggable>
-                        ))}
-                        {provided.placeholder}
-                    </div>
-                )}
-            </Droppable>
-        </DragDropContext>
+            <SortableContext
+                items={itemsOptimistic.map(i => i.id)}
+                strategy={verticalListSortingStrategy}
+            >
+                {itemsOptimistic.map(account => (
+                    <SortableAsideMenuDNDItem key={account.id} item={account} />
+                ))}
+            </SortableContext>
+            <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                {activeItem ? <AsideMenuDNDItem item={activeItem} isDragging /> : null}
+            </DragOverlay>
+        </DndContext>
     );
 };
 

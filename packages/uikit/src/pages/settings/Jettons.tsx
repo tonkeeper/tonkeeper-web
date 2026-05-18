@@ -1,12 +1,19 @@
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import {
-    DragDropContext,
-    Draggable,
-    DraggableProvidedDragHandleProps,
-    Droppable,
-    OnDragEndResponder
-} from 'react-beautiful-dnd';
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent
+} from '@dnd-kit/core';
+import {
+    SortableContext,
+    useSortable,
+    verticalListSortingStrategy,
+    arrayMove
+} from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { InvisibleIcon, PinIcon, ReorderIcon, VisibleIcon } from '../../components/Icon';
@@ -38,6 +45,7 @@ import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Image } from '../../components/shared/Image';
+import { useSortableDndSensors } from '../../hooks/useSortableDndSensors';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};
@@ -143,11 +151,36 @@ const SampleJettonRow: FC<{ jetton: AssetAmount; config: TonWalletConfig }> = ({
     );
 };
 
+type DragHandleProps = React.HTMLAttributes<HTMLElement> | undefined;
+
+const SortablePinnedJettonItem: FC<{ jetton: AssetAmount; config: TonWalletConfig }> = ({
+    jetton,
+    config
+}) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+        id: jetton.asset.id
+    });
+    const style: React.CSSProperties = {
+        transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+        transition,
+        opacity: isDragging ? 0 : undefined
+    };
+    const dragHandleProps = { ...attributes, ...listeners } as DragHandleProps;
+
+    return (
+        <ListItemElement ref={setNodeRef} style={style} hover={false} ios={true}>
+            <JettonRow config={config} dragHandleProps={dragHandleProps} jetton={jetton} />
+        </ListItemElement>
+    );
+};
+
 export const PinnedJettonList: FC<{
     config: TonWalletConfig;
     jettons: AssetAmount[];
 }> = ({ config, jettons }) => {
     const { mutate } = useSavePinnedJettonOrderMutation();
+    const sensors = useSortableDndSensors();
+    const [activeId, setActiveId] = useState<string | null>(null);
 
     const list = useMemo(
         () =>
@@ -161,58 +194,63 @@ export const PinnedJettonList: FC<{
         [jettons, config]
     );
 
-    const handleDrop: OnDragEndResponder = useCallback(
-        droppedItem => {
-            if (!droppedItem.destination) return;
-            const updatedList = [...list];
-            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
-            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-
+    const handleDragEnd = useCallback(
+        (event: DragEndEvent) => {
+            setActiveId(null);
+            const { active, over } = event;
+            if (!over || active.id === over.id) return;
+            const oldIndex = list.findIndex(j => j.asset.id === String(active.id));
+            const newIndex = list.findIndex(j => j.asset.id === String(over.id));
+            if (oldIndex === -1 || newIndex === -1) return;
+            const updatedList = arrayMove([...list], oldIndex, newIndex);
             const pinnedTokens = updatedList.map(item => assetAddressToString(item.asset.address));
             mutate({ config, pinnedTokens });
         },
         [config, list, mutate]
     );
 
+    const activeJetton = activeId ? list.find(j => j.asset.id === activeId) : null;
+
     return (
-        <DragDropContext onDragEnd={handleDrop}>
-            <Droppable droppableId="jettons">
-                {provided => (
-                    <ListBlock {...provided.droppableProps} ref={provided.innerRef} noUserSelect>
-                        {list.map((jetton, index) => (
-                            <Draggable
-                                key={jetton.asset.id}
-                                draggableId={jetton.asset.id}
-                                index={index}
-                            >
-                                {p => (
-                                    <ListItemElement
-                                        ref={p.innerRef}
-                                        {...p.draggableProps}
-                                        hover={false}
-                                        ios={true}
-                                    >
-                                        <JettonRow
-                                            config={config}
-                                            dragHandleProps={p.dragHandleProps}
-                                            jetton={jetton}
-                                        />
-                                    </ListItemElement>
-                                )}
-                            </Draggable>
-                        ))}
-                        {provided.placeholder}
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            onDragStart={(e: DragStartEvent) => setActiveId(String(e.active.id))}
+            onDragCancel={() => setActiveId(null)}
+            modifiers={[restrictToVerticalAxis]}
+        >
+            <SortableContext
+                items={list.map(j => j.asset.id)}
+                strategy={verticalListSortingStrategy}
+            >
+                <ListBlock noUserSelect>
+                    {list.map(jetton => (
+                        <SortablePinnedJettonItem
+                            key={jetton.asset.id}
+                            jetton={jetton}
+                            config={config}
+                        />
+                    ))}
+                </ListBlock>
+            </SortableContext>
+            <DragOverlay modifiers={[restrictToVerticalAxis]}>
+                {activeJetton ? (
+                    <ListBlock noUserSelect>
+                        <ListItemElement hover={false} ios={true}>
+                            <JettonRow config={config} jetton={activeJetton} dragHandleProps={{}} />
+                        </ListItemElement>
                     </ListBlock>
-                )}
-            </Droppable>{' '}
-        </DragDropContext>
+                ) : null}
+            </DragOverlay>
+        </DndContext>
     );
 };
 
 const JettonRow: FC<{
     jetton: AssetAmount;
     config: TonWalletConfig;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps: DragHandleProps;
 }> = ({ jetton, config, dragHandleProps }) => {
     const { t } = useTranslation();
 

@@ -1,6 +1,12 @@
 name: Tonkeeper iPad Build
 on:
     workflow_call:
+        inputs:
+            version-mode:
+                description: 'How to derive the iPad marketing version'
+                required: false
+                type: string
+                default: package
         secrets:
             APP_STORE_CONNECT_TEAM_ID:
                 required: true
@@ -96,6 +102,7 @@ jobs:
                   APPLE_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
                   APPLE_PROFILE_NAME: GitHub CI/CD iPad
                   BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+                  IPAD_VERSION_MODE: ${{ inputs.version-mode }}
 
             - name: Summary
               run: |
