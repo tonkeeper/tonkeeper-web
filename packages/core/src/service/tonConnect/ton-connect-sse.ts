@@ -3,7 +3,7 @@ import {
     disconnectHttpAccountConnection,
     getTonWalletConnections
 } from './connectionService';
-import { isStandardTonWallet, WalletId } from '../../entries/wallet';
+import { WalletId } from '../../entries/wallet';
 import { getLastEventId, subscribeTonConnect } from './httpBridge';
 import { accountsStorage } from '../accountsStorage';
 import { IStorage } from '../../Storage';
@@ -144,19 +144,13 @@ export class TonConnectSSE {
         await this.reconnect();
     };
 
-    private getStandardWalletByClientSessionId = async (clientSessionId: string) => {
+    private getWalletByClientSessionId = async (clientSessionId: string) => {
         const accounts = await accountsStorage(this.storage).getAccounts();
-        const wallet = getWalletById(accounts, this.dist[clientSessionId]);
-
-        if (!wallet || !isStandardTonWallet(wallet)) {
-            return null;
-        }
-
-        return wallet;
+        return getWalletById(accounts, this.dist[clientSessionId]) ?? null;
     };
 
     private onDisconnect = async ({ connection, request }: TonConnectAppRequest<'http'>) => {
-        const wallet = await this.getStandardWalletByClientSessionId(connection.clientSessionId);
+        const wallet = await this.getWalletByClientSessionId(connection.clientSessionId);
         if (!wallet) {
             return;
         }
@@ -202,7 +196,7 @@ export class TonConnectSSE {
         const validatePayload = async (
             payload: TonConnectAppRequestPayload['payload']
         ): Promise<boolean> => {
-            const wallet = await this.getStandardWalletByClientSessionId(
+            const wallet = await this.getWalletByClientSessionId(
                 params.connection.clientSessionId
             );
             if (!wallet) {

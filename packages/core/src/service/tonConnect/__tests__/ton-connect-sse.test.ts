@@ -144,6 +144,23 @@ const makeSignDataRequest = (
     }
 });
 
+const makeDisconnectRequest = (): TonConnectAppRequest<'http'> =>
+    ({
+        connection: makeConnection(),
+        request: {
+            id: 'req-disc',
+            method: 'disconnect',
+            params: [] as never
+        }
+    } as TonConnectAppRequest<'http'>);
+
+// A multisig wallet is a smart-contract wallet: it has id + rawAddress but no
+// publicKey/version, so `isStandardTonWallet` returns false for it.
+const makeMultisigWallet = () => ({
+    id: walletId,
+    rawAddress: '0:multisig'
+});
+
 const fakeStorage = {} as IStorage;
 
 const setupSse = async ({
@@ -283,6 +300,28 @@ describe('TonConnectSSE.handleMessage', () => {
             );
         });
 
+        // Regression: PR #596 introduced `validatePayload` and reused a helper
+        // intended for the disconnect path that filters out non-standard
+        // wallets via `isStandardTonWallet`. Multisig wallets are
+        // smart-contract wallets without a publicKey/version, so they used to
+        // always be rejected here with `Unknown session`. This test makes sure
+        // multisig requests are forwarded like any other connection.
+        it('forwards requests from multisig wallets (regression for #625)', async () => {
+            mocks.getWalletById.mockReturnValue(makeMultisigWallet());
+            mocks.isStandardTonWallet.mockReturnValue(false);
+
+            const { handleMessage, onRequest } = await setupSse();
+            const payload = { messages: [{ address: '0:dead', amount: '1' }] };
+
+            await handleMessage(makeSendTransactionRequest(payload));
+
+            expect(mocks.replyHttpBadRequestResponse).not.toHaveBeenCalled();
+            expect(onRequest).toHaveBeenCalledTimes(1);
+            expect(onRequest).toHaveBeenCalledWith(
+                expect.objectContaining({ kind: 'sendTransaction', payload })
+            );
+        });
+
     });
 
     describe('signData', () => {
@@ -341,6 +380,61 @@ describe('TonConnectSSE.handleMessage', () => {
             expect(mocks.replyHttpBadRequestResponse).toHaveBeenCalledWith(
                 expect.objectContaining({ message: 'Unknown session' })
             );
+        });
+
+        it('forwards signData from multisig wallets (regression for #625)', async () => {
+            mocks.getWalletById.mockReturnValue(makeMultisigWallet());
+            mocks.isStandardTonWallet.mockReturnValue(false);
+
+            const { handleMessage, onRequest } = await setupSse();
+
+            await handleMessage(makeSignDataRequest());
+
+            expect(mocks.replyHttpBadRequestResponse).not.toHaveBeenCalled();
+            expect(onRequest).toHaveBeenCalledTimes(1);
+            expect(onRequest).toHaveBeenCalledWith(
+                expect.objectContaining({ kind: 'signData' })
+            );
+        });
+    });
+
+    describe('disconnect', () => {
+        it('clears storage and notifies listeners for standard wallets', async () => {
+            const { handleMessage, onDisconnect } = await setupSse();
+
+            await handleMessage(makeDisconnectRequest());
+
+            expect(mocks.disconnectHttpAccountConnection).toHaveBeenCalledTimes(1);
+            expect(mocks.replyHttpDisconnectResponse).toHaveBeenCalledTimes(1);
+            expect(onDisconnect).toHaveBeenCalledTimes(1);
+        });
+
+        // Before this fix, multisig disconnects via the bridge were silently
+        // dropped because the helper filtered out non-standard wallets, so
+        // the dApp could not detach itself from a multisig account.
+        it('processes disconnects from multisig wallets (regression for #625)', async () => {
+            mocks.getWalletById.mockReturnValue(makeMultisigWallet());
+            mocks.isStandardTonWallet.mockReturnValue(false);
+
+            const { handleMessage, onDisconnect } = await setupSse();
+
+            await handleMessage(makeDisconnectRequest());
+
+            expect(mocks.disconnectHttpAccountConnection).toHaveBeenCalledTimes(1);
+            expect(mocks.replyHttpDisconnectResponse).toHaveBeenCalledTimes(1);
+            expect(onDisconnect).toHaveBeenCalledTimes(1);
+        });
+
+        it('returns silently when the client session id is unknown', async () => {
+            mocks.getWalletById.mockReturnValue(undefined);
+
+            const { handleMessage, onDisconnect } = await setupSse();
+
+            await handleMessage(makeDisconnectRequest());
+
+            expect(mocks.disconnectHttpAccountConnection).not.toHaveBeenCalled();
+            expect(mocks.replyHttpDisconnectResponse).not.toHaveBeenCalled();
+            expect(onDisconnect).not.toHaveBeenCalled();
         });
     });
 
