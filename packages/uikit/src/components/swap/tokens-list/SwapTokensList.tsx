@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import React, { FC, Fragment, MouseEventHandler, useEffect, useRef, useState } from 'react';
+import React, { FC, Fragment, MouseEventHandler, useRef, useState } from 'react';
 import { Body2, Body3, Label2 } from '../../Text';
 import {
     useAddUserCustomSwapAsset,
@@ -39,13 +39,10 @@ const Divider = styled.div`
 export const SwapTokensList: FC<{
     walletSwapAssets: WalletSwapAsset[];
     onSelect: (asset: TonAsset) => void;
-}> = ({ walletSwapAssets, onSelect }) => {
-    const [displayingAssets, setDisplayingAssets] = useState(walletSwapAssets.slice(0, 25));
+    onLoadMore?: () => void;
+    isLoadingMore?: boolean;
+}> = ({ walletSwapAssets, onSelect, onLoadMore, isLoadingMore }) => {
     const ref = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-        setDisplayingAssets(walletSwapAssets.slice(0, 25));
-    }, [walletSwapAssets]);
 
     const onScroll = () => {
         if (!ref?.current) {
@@ -55,28 +52,42 @@ export const SwapTokensList: FC<{
             ref.current.scrollHeight - ref.current.clientHeight - ref.current.scrollTop;
 
         if (scrollHeightLeft < 300) {
-            setDisplayingAssets(d => walletSwapAssets.slice(0, d.length + 25));
+            onLoadMore?.();
         }
     };
 
     return (
         <SwapTokensListWrapper ref={ref} onScroll={throttle(onScroll, 100)}>
             {walletSwapAssets.length ? (
-                displayingAssets.map((swapAsset, index) => (
-                    <Fragment key={swapAsset.assetAmount.asset.id}>
-                        <TokenListItem
-                            onClick={() => onSelect(swapAsset.assetAmount.asset)}
-                            swapAsset={swapAsset}
-                        />
-                        {index !== walletSwapAssets.length - 1 && <Divider />}
-                    </Fragment>
-                ))
+                <>
+                    {walletSwapAssets.map((swapAsset, index) => (
+                        <Fragment key={swapAsset.assetAmount.asset.id}>
+                            <TokenListItem
+                                onClick={() => onSelect(swapAsset.assetAmount.asset)}
+                                swapAsset={swapAsset}
+                            />
+                            {index !== walletSwapAssets.length - 1 && <Divider />}
+                        </Fragment>
+                    ))}
+                    {isLoadingMore && (
+                        <LoadingMoreContainer>
+                            <SpinnerIcon />
+                        </LoadingMoreContainer>
+                    )}
+                </>
             ) : (
                 <TokenNotFound onSelect={onSelect} />
             )}
         </SwapTokensListWrapper>
     );
 };
+
+const LoadingMoreContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    padding: 12px 0;
+    color: ${p => p.theme.iconSecondary};
+`;
 
 const TokensNotFoundContainer = styled.div`
     height: 100%;

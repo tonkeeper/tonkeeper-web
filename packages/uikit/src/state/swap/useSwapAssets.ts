@@ -4,6 +4,8 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { normalizeSwapDeeplinkToken } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
     isTon,
     shouldHideTonJettonImageCorners,
@@ -22,8 +24,9 @@ import { useAtom } from '../../libs/useAtom';
 import { QueryKey } from '../../libs/queryKey';
 import { useAssets } from '../home';
 import { patchedTokenImage, useJettonList } from '../jetton';
-import { useRate } from '../rates';
+import { TokenRate, useRate } from '../rates';
 import { fetchSwapAssets } from '@tonkeeper/core/dist/swapsApi';
+import type { SwapAsset } from '@tonkeeper/core/dist/swapsApi';
 import { useSwapsConfig } from './useSwapsConfig';
 import { useActiveApi } from '../wallet';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
@@ -35,55 +38,92 @@ import {
     ScaledUIMultiplier
 } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 
-export function useAllSwapAssets() {
+export const SWAP_ASSETS_SEARCH_LIMIT = 25;
+
+const toTonAsset = (asset: SwapAsset): TonAsset => {
+    const address = asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
+
+    return {
+        id: packAssetId(BLOCKCHAIN_NAME.TON, address),
+        symbol: asset.symbol,
+        decimals: asset.decimals,
+        name: asset.name,
+        image: patchedTokenImage(tonAssetAddressToString(address), asset.image),
+        blockchain: BLOCKCHAIN_NAME.TON,
+        noImageCorners: shouldHideTonJettonImageCorners(tonAssetAddressToString(address)),
+        scaledUIMultiplier: {
+            numerator: '1',
+            denominator: '1'
+        },
+        verification: JettonVerificationType.Whitelist,
+        address
+    };
+};
+
+const filterDisabledAssets = (assets: TonAsset[], enabledUSDe: boolean) => {
+    if (enabledUSDe) {
+        return assets;
+    }
+
+    return assets.filter(
+        asset =>
+            !eqAddresses(KNOWN_TON_ASSETS.USDe, asset.address) &&
+            !eqAddresses(KNOWN_TON_ASSETS.tsUSDe, asset.address)
+    );
+};
+
+const customAssetMatchesQuery = (asset: TonAsset, query: string) => {
+    if (!query) {
+        return true;
+    }
+
+    if (seeIfValidTonAddress(query)) {
+        return Address.isAddress(asset.address) && Address.parse(query).equals(asset.address);
+    }
+
+    const upperCaseQuery = query.toUpperCase();
+    return (
+        asset.symbol.toUpperCase().includes(upperCaseQuery) ||
+        asset.name?.toUpperCase().includes(upperCaseQuery)
+    );
+};
+
+export function useSwapAssetsSearch(
+    query: string,
+    limit?: number,
+    options: { enabled?: boolean; keepPreviousData?: boolean } = {}
+) {
     const { baseUrl } = useSwapsConfig();
     const { data: customAssets } = useUserCustomSwapAssets();
     const enabledUSDe = useIsFeatureEnabled(FLAGGED_FEATURE.ETHENA);
+    const normalizedQuery = query.trim();
 
     return useQuery<TonAsset[]>({
-        queryKey: [QueryKey.swapAllAssets, customAssets, enabledUSDe],
+        queryKey: [QueryKey.swapAllAssets, normalizedQuery, limit, customAssets, enabledUSDe],
         queryFn: async () => {
             try {
-                const assets = await fetchSwapAssets(baseUrl);
+                const assets = await fetchSwapAssets(baseUrl, {
+                    q: normalizedQuery || undefined,
+                    limit
+                });
                 const fetchedAssets = assets
-                    .map(asset => {
-                        const address =
-                            asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
-
-                        return {
-                            id: packAssetId(BLOCKCHAIN_NAME.TON, address),
-                            symbol: asset.symbol,
-                            decimals: asset.decimals,
-                            name: asset.name,
-                            image: patchedTokenImage(tonAssetAddressToString(address), asset.image),
-                            blockchain: BLOCKCHAIN_NAME.TON,
-                            noImageCorners: shouldHideTonJettonImageCorners(
-                                tonAssetAddressToString(address)
-                            ),
-                            scaledUIMultiplier: {
-                                numerator: '1',
-                                denominator: '1'
-                            },
-                            address
-                        };
-                    })
+                    .map(toTonAsset)
                     .filter(asset => !(customAssets || []).some(ca => ca.id === asset.id));
+                const matchingCustomAssets = (customAssets || []).filter(asset =>
+                    customAssetMatchesQuery(asset, normalizedQuery)
+                );
 
-                let result = (fetchedAssets as TonAsset[]).concat(customAssets || []);
-                if (!enabledUSDe) {
-                    result = result.filter(
-                        asset =>
-                            !eqAddresses(KNOWN_TON_ASSETS.USDe, asset.address) &&
-                            !eqAddresses(KNOWN_TON_ASSETS.tsUSDe, asset.address)
-                    );
-                }
-                return result;
+                return filterDisabledAssets(
+                    fetchedAssets.concat(matchingCustomAssets),
+                    enabledUSDe
+                );
             } catch (e) {
                 console.error(e);
                 return [];
             }
         },
-        enabled: !!customAssets
+        enabled: !!baseUrl && !!customAssets && (options.enabled ?? true),
+        keepPreviousData: options.keepPreviousData
     });
 }
 
@@ -98,89 +138,122 @@ export type WalletSwapAsset = {
     fiatAmount: BigNumber;
 };
 
-export function useWalletSwapAssets() {
+const toWalletSwapAsset = (
+    asset: TonAsset,
+    walletAssetsData: NonNullable<ReturnType<typeof useAssets>[0]>,
+    tonRate: TokenRate,
+    fiat: FiatCurrencies
+): WalletSwapAsset => {
+    if (isTon(asset.address)) {
+        return {
+            assetAmount: new AssetAmount({
+                asset,
+                weiAmount: walletAssetsData.ton.info.balance
+            }),
+            fiatAmount: shiftedDecimals(
+                new BigNumber(walletAssetsData.ton.info.balance)
+            ).multipliedBy(tonRate.prices)
+        };
+    }
+
+    const balance = walletAssetsData.ton.jettons.balances.find(j =>
+        Address.parse(j.jetton.address).equals(asset.address as Address)
+    );
+
+    return {
+        assetAmount: new AssetAmount({
+            asset,
+            weiAmount: balance?.balance || 0
+        }),
+        fiatAmount: shiftedDecimals(
+            new BigNumber(balance?.balance || 0),
+            asset.decimals
+        ).multipliedBy(new BigNumber(balance?.price?.prices?.[fiat] || 0))
+    };
+};
+
+export function useWalletSwapAssets(query = '', limit = SWAP_ASSETS_SEARCH_LIMIT) {
     const [walletAssetsData] = useAssets();
-    const { data: allAssets } = useAllSwapAssets();
+    const { data: swapAssets } = useSwapAssetsSearch(query, limit, {
+        keepPreviousData: true
+    });
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const { fiat } = useAppContext();
+    const normalizedQuery = query.trim();
 
     return useQuery<WalletSwapAsset[]>({
-        queryKey: [QueryKey.swapWalletAssets, allAssets, walletAssetsData, tonRate, fiat],
+        queryKey: [
+            QueryKey.swapWalletAssets,
+            normalizedQuery,
+            swapAssets,
+            walletAssetsData,
+            tonRate,
+            fiat
+        ],
         queryFn: async () => {
-            if (!walletAssetsData || !allAssets || !tonRate) {
+            if (!walletAssetsData || !swapAssets || !tonRate) {
                 return [];
             }
 
-            const assetsAmounts = allAssets.map(asset => {
-                if (isTon(asset.address)) {
-                    return {
-                        assetAmount: new AssetAmount({
-                            asset,
-                            weiAmount: walletAssetsData.ton.info.balance
-                        }),
-                        fiatAmount: shiftedDecimals(
-                            new BigNumber(walletAssetsData.ton.info.balance)
-                        ).multipliedBy(tonRate.prices)
-                    };
-                }
+            const assetsAmounts = swapAssets.map(asset =>
+                toWalletSwapAsset(asset, walletAssetsData, tonRate, fiat)
+            );
 
-                const balance = walletAssetsData.ton.jettons.balances.find(j =>
-                    Address.parse(j.jetton.address).equals(asset.address as Address)
-                );
-
-                return {
-                    assetAmount: new AssetAmount({
-                        asset,
-                        weiAmount: balance?.balance || 0
-                    }),
-                    fiatAmount: shiftedDecimals(
-                        new BigNumber(balance?.balance || 0),
-                        asset.decimals
-                    ).multipliedBy(new BigNumber(balance?.price?.prices?.[fiat] || 0))
-                };
-            });
-
-            assetsAmounts.sort((a, b) => {
-                if (a.fiatAmount.isZero() && b.fiatAmount.isZero()) {
-                    return b.assetAmount.weiAmount.comparedTo(a.assetAmount.weiAmount);
-                }
-                return b.fiatAmount.comparedTo(a.fiatAmount);
-            });
+            if (!normalizedQuery) {
+                assetsAmounts.sort((a, b) => {
+                    if (a.fiatAmount.isZero() && b.fiatAmount.isZero()) {
+                        return b.assetAmount.weiAmount.comparedTo(a.assetAmount.weiAmount);
+                    }
+                    return b.fiatAmount.comparedTo(a.fiatAmount);
+                });
+            }
 
             return assetsAmounts;
         },
-        enabled: !!walletAssetsData && !!allAssets && !!tonRate
+        enabled: !!walletAssetsData && !!swapAssets && !!tonRate,
+        keepPreviousData: true
     });
 }
 
-export const useWalletFilteredSwapAssets = () => {
+export const useWalletFilteredSwapAssets = (limit = SWAP_ASSETS_SEARCH_LIMIT) => {
     const [filter] = useSwapTokensFilter();
-    const { data: walletSwapAssets } = useWalletSwapAssets();
+
+    return useWalletSwapAssets(filter, limit);
+};
+
+export const useSwapAssetSearch = (query: string | undefined) => {
+    const normalizedQuery = query?.trim() ?? '';
+    const { data: swapAssets } = useSwapAssetsSearch(normalizedQuery, 10, {
+        enabled: !!normalizedQuery
+    });
 
     return useMemo(() => {
-        if (!walletSwapAssets) {
+        if (!normalizedQuery) {
+            return null;
+        }
+
+        if (!swapAssets) {
             return undefined;
         }
 
-        return walletSwapAssets.filter(swapAsset => {
-            if (!filter) {
-                return true;
-            }
+        if (seeIfValidTonAddress(normalizedQuery)) {
+            const address = Address.parse(normalizedQuery);
+            return (
+                swapAssets.find(
+                    asset => Address.isAddress(asset.address) && address.equals(asset.address)
+                ) || null
+            );
+        }
 
-            if (seeIfValidTonAddress(filter)) {
-                return Address.parse(filter).equals(swapAsset.assetAmount.asset.address as Address);
-            }
-
-            const upperCaseFilter = filter.toUpperCase();
-
-            if (
-                swapAsset.assetAmount.asset.symbol.toUpperCase().includes(upperCaseFilter) ||
-                swapAsset.assetAmount.asset.name?.toUpperCase().includes(upperCaseFilter)
-            ) {
-                return true;
-            }
-        });
-    }, [filter, walletSwapAssets]);
+        const normalizedToken = normalizeSwapDeeplinkToken(normalizedQuery);
+        return (
+            swapAssets.find(
+                asset =>
+                    normalizeSwapDeeplinkToken(asset.symbol) === normalizedToken ||
+                    normalizeSwapDeeplinkToken(asset.name ?? '') === normalizedToken
+            ) || null
+        );
+    }, [normalizedQuery, swapAssets]);
 };
 
 export const useSwapCustomTokenSearch = () => {

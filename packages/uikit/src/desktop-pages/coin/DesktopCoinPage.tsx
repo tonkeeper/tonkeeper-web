@@ -24,7 +24,7 @@ import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { toTokenRate, useFormatFiat, useRate, useUSDTRate } from '../../state/rates';
-import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
+import { useSwapAssetSearch } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
@@ -37,7 +37,8 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
     jettonToTonAssetAmount,
-    tonAssetAddressFromString
+    tonAssetAddressFromString,
+    tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useCanReceiveTron, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -166,13 +167,12 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const isReadOnly = useIsActiveWalletWatchOnly();
     const { data: buy } = useTonendpointBuyMethods();
     const canBuy = token === CryptoCurrency.TON && network !== Network.TESTNET;
-    const { data: swapAssets } = useAllSwapAssets();
-
     const currentAssetAddress = tonAssetAddressFromString(token);
-    const swapAsset =
+    const swapAsset = useSwapAssetSearch(
         isReadOnly || network === Network.TESTNET
             ? undefined
-            : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
+            : tonAssetAddressToString(currentAssetAddress)
+    );
 
     const [_, setSwapFromAsset] = useSwapFromAsset();
     const navigate = useNavigate();
