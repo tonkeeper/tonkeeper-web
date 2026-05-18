@@ -1,0 +1,184 @@
+name: Release
+
+on:
+    # Fires when a GitHub Release is published as stable (prerelease unchecked).
+    # This is the primary trigger: create tag → pre-release → verify → promote to release.
+    release:
+        types: [released]
+    # Manual fallback: provide an existing stable tag to re-run or recover a release.
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Tag to release (must already exist, e.g. v4.5.0)'
+                required: true
+                type: string
+
+# Prevent concurrent release runs; never cancel in-progress to avoid partial releases
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: false
+
+permissions:
+    contents: write
+
+env:
+    node-version: 20.11.1
+    RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+
+jobs:
+    desktop-build:
+        name: desktop-build
+        strategy:
+            matrix:
+                include:
+                    - os: ubuntu-latest
+                      command: publish:intel
+                    - os: ubuntu-latest
+                      command: publish:arm
+                    - os: windows-latest
+                      command: publish:intel
+                    - os: macos-15-intel
+                      command: publish:intel
+                    - os: macos-latest
+                      command: publish:arm
+                    - os: macos-latest
+                      command: publish:universal
+
+        runs-on: ${{ matrix.os }}
+        timeout-minutes: 30
+        env:
+            APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
+            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+            APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            DEBUG: electron*
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ env.RELEASE_TAG }}
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: corepack enable
+
+            - name: Set version from tag
+              run: node scripts/set-version.js
+              env:
+                  RELEASE_TAG: ${{ env.RELEASE_TAG }}
+
+            - name: Decode Apple API key
+              if: runner.os == 'macOS'
+              env:
+                  CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
+              run: echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
+
+            - name: Configure keychain
+              if: runner.os == 'macOS'
+              uses: apple-actions/import-codesign-certs@v2
+              with:
+                  p12-file-base64: ${{ secrets.IDENTITY_P12_B64 }}
+                  p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
+
+            - name: Install dependencies
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Build packages
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: build:pkg
+
+            - name: Publish desktop
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: ${{ matrix.command }}
+                  dir: 'apps/desktop'
+
+            - name: Clean up credentials
+              if: always() && runner.os == 'macOS'
+              run: rm ${{ github.workspace }}/AuthKey.p8
+
+    ipad-build:
+        uses: ./.github/workflows/ipad-build.yaml
+        with:
+            release_tag: ${{ inputs.tag || github.event.release.tag_name }}
+        secrets: inherit
+
+    web-build:
+        uses: ./.github/workflows/web-build.yaml
+        with:
+            environment: 'main'
+            release_tag: ${{ inputs.tag || github.event.release.tag_name }}
+        secrets: inherit
+
+    extension-build:
+        name: extension-build
+        runs-on: macos-14
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ env.RELEASE_TAG }}
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: corepack enable
+
+            - name: Set version from tag
+              run: node scripts/set-version.js
+              env:
+                  RELEASE_TAG: ${{ env.RELEASE_TAG }}
+
+            - name: Install dependencies
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Build extension
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: build:extension
+
+            - name: Upload extension to release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ env.RELEASE_TAG }}
+                  name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
+                  draft: false
+                  prerelease: false
+                  files: |
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{ env.RELEASE_TAG }}.zip
+                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{ env.RELEASE_TAG }}.zip
+
+    # Runs after all builds succeed — marks the release as latest
+    publish-release:
+        name: publish-release
+        needs: [desktop-build, ipad-build, web-build, extension-build]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Mark release as latest
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ env.RELEASE_TAG }}
+                  name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
+                  draft: false
+                  prerelease: false
+                  make_latest: true
+
+            - name: Summary
+              run: |
+                  echo "### Release ${{ env.RELEASE_TAG }} published 🚀" >> $GITHUB_STEP_SUMMARY
+                  echo "https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}" >> $GITHUB_STEP_SUMMARY

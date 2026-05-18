@@ -1,0 +1,36 @@
+name: Cleanup Web Preview
+
+on:
+    pull_request:
+        types: [closed]
+
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Delete Cloudflare Pages preview deployments for this branch
+              env:
+                  CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  BRANCH: ${{ github.event.pull_request.head.ref }}
+              run: |
+                  set -euo pipefail
+                  api="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/pages/projects/tonkeeper-web/deployments"
+                  page=1
+                  deleted=0
+                  while :; do
+                      resp=$(curl -fsS -H "Authorization: Bearer $CF_API_TOKEN" "$api?env=preview&page=$page&per_page=100")
+                      count=$(echo "$resp" | jq -r '.result | length')
+                      [ "$count" -eq 0 ] && break
+                      ids=$(echo "$resp" | jq -r --arg b "$BRANCH" '.result[] | select(.deployment_trigger.metadata.branch == $b) | .id')
+                      for id in $ids; do
+                          echo "Deleting deployment $id (branch=$BRANCH)"
+                          # force=true is required to delete the alias deployment (latest for the branch).
+                          curl -fsS -X DELETE -H "Authorization: Bearer $CF_API_TOKEN" "$api/$id?force=true" > /dev/null
+                          deleted=$((deleted+1))
+                      done
+                      [ "$count" -lt 100 ] && break
+                      page=$((page+1))
+                  done
+                  echo "Deleted $deleted preview deployment(s) for branch=$BRANCH"

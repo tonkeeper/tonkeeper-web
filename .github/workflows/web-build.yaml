@@ -5,6 +5,11 @@ on:
             environment:
                 required: true
                 type: string
+            release_tag:
+                description: 'Release tag to stamp into package.json (e.g. v1.2.3). Omit on PR/manual deploys.'
+                required: false
+                type: string
+                default: ''
         secrets:
             CLOUDFLARE_API_TOKEN:
                 required: true
@@ -37,6 +42,12 @@ jobs:
             - name: Enable Corepack
               run: |
                   corepack enable
+
+            - name: Set version from tag
+              if: inputs.release_tag != ''
+              run: node scripts/set-version.js
+              env:
+                  RELEASE_TAG: ${{ inputs.release_tag }}
 
             - name: Yarn cache
               uses: actions/cache@v4

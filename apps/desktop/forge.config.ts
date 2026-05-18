@@ -18,8 +18,16 @@ import { mainWindowName } from './src/constants';
 
 const isDev = process.env.NODE_ENV === 'development';
 const isPrerelease = process.env.GITHUB_REF_NAME?.includes('-') ?? false;
+const githubToken = process.env.GITHUB_TOKEN;
 
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
+const squirrelRemoteReleases = githubToken
+    ? {
+          // SyncReleases uses the GitHub API for repo URLs, so keep PR/local builds offline.
+          remoteReleases: 'https://github.com/tonkeeper/tonkeeper-web',
+          remoteToken: githubToken
+      }
+    : {};
 
 const devAndRpmOptions = {
     name: 'Tonkeeper',
@@ -71,7 +79,7 @@ const config: ForgeConfig = {
                 iconUrl: 'https://tonkeeper.com/assets/icon.ico',
                 setupIcon: path.join(process.cwd(), 'public', 'icon.ico'),
                 loadingGif: path.join(process.cwd(), 'public', 'install.gif'),
-                remoteReleases: 'https://github.com/tonkeeper/tonkeeper-web'
+                ...squirrelRemoteReleases
             },
             ['win32']
         ),

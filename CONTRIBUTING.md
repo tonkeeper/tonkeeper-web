@@ -83,36 +83,55 @@ After approval, the PR is merged into `main` using merge commit.
 
 ## Release Process
 
-### 1. Update versions
+The git tag is the single source of truth for versioning — no manual `package.json` bumps needed.
 
-Update version in the following files:
-- `package.json` (root)
-- `apps/web/package.json`
-- `apps/desktop/package.json`
-- `apps/extension/package.json`
+| Workflow | Trigger | What it does |
+|---|---|---|
+| **Pre-release** | `v*-*` tag (e.g. `v4.6.0-rc.1`) | Builds all packages, deploys demo to `rc`, publishes GitHub pre-release |
+| **Release** | `v*` tag (e.g. `v4.6.0`) | Builds all packages, deploys to production, publishes GitHub release as latest |
 
-### 2. Create release commit
+### Tag convention
 
-```bash
-git add .
-git commit -m "chore: release X.Y.Z"
+```
+vMAJOR.MINOR.PATCH          # stable release
+vMAJOR.MINOR.PATCH-rc.N     # release candidate
 ```
 
-### 3. Create and push tag
+### Step-by-step
+
+**1. Pre-release**
 
 ```bash
-git tag vX.Y.Z
-git push origin main
-git push origin vX.Y.Z
+git tag v4.6.0-rc.1
+git push origin v4.6.0-rc.1
 ```
 
-### 4. Automated deployment
+**2. Release**
 
-Pushing a tag triggers the CD workflow which:
-- Builds and publishes Desktop apps to GitHub Release
-- Deploys Web app to production
-- Builds and uploads browser extensions
-- Uploads iPad build to TestFlight
+```bash
+git tag v4.6.0
+git push origin v4.6.0
+```
+
+Deploys web to production and publishes the GitHub release as latest. Desktop auto-update is available immediately.
+
+**3. Manual store submissions**
+
+| Package | Channel |
+|---|---|
+| Extension | Upload zip from GitHub release to Chrome Web Store and Firefox Add-ons |
+| iPad | Submit TestFlight build to App Store via App Store Connect |
+
+Both extension stores and the App Store require review (1–7 days for extensions, 1–3 days for App Store).
+
+### Manual trigger
+
+Both workflows support `workflow_dispatch` — useful for testing or re-running a failed build.
+
+```bash
+gh workflow run pre-release.yaml --ref main --field tag=v4.6.0-rc.1
+gh workflow run release.yaml --ref main --field tag=v4.6.0
+```
 
 ## Versioning
 
