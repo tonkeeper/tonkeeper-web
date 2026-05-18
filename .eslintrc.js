@@ -67,7 +67,6 @@ module.exports = {
                 '@typescript-eslint',
                 'import',
                 'unused-imports',
-                'chakra-ui',
                 'i18next'
             ],
             extends: [

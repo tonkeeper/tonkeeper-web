@@ -5803,7 +5803,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/utils@npm:5.62.0, @typescript-eslint/utils@npm:^5.44.0":
+"@typescript-eslint/utils@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/utils@npm:5.62.0"
   dependencies:
@@ -10812,17 +10812,6 @@ __metadata:
     eslint:
       optional: true
   checksum: 10/a9a7ed93eb858092e3cdc797357d4ead2b3ea06959b0eada31ab13862d46a59eb064b9cb82302214232e547980ce33618c2992f6821138a4934e65710ed9cc29
-  languageName: node
-  linkType: hard
-
-"eslint-plugin-chakra-ui@npm:^0.7.6":
-  version: 0.7.6
-  resolution: "eslint-plugin-chakra-ui@npm:0.7.6"
-  dependencies:
-    "@typescript-eslint/utils": "npm:^5.44.0"
-  peerDependencies:
-    eslint: ">=6"
-  checksum: 10/7b4392c32046d7b5bab38d45aecaf20a0a65445f4a0095323ef8b9c1c32ae47c65321f8183ba91053d7ad967eff4021bc8a91b01199de83644be3e21e541be89
   languageName: node
   linkType: hard
 
@@ -18455,7 +18444,6 @@ __metadata:
     eslint: "npm:^8.33.0"
     eslint-config-airbnb-typescript: "npm:^17.0.0"
     eslint-config-prettier: "npm:^8.6.0"
-    eslint-plugin-chakra-ui: "npm:^0.7.6"
     eslint-plugin-i18next: "npm:^6.0.0-2"
     eslint-plugin-import: "npm:^2.27.5"
     eslint-plugin-mobx: "npm:^0.0.9"

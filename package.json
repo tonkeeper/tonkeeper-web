@@ -24,7 +24,6 @@
         "eslint": "^8.33.0",
         "eslint-config-airbnb-typescript": "^17.0.0",
         "eslint-config-prettier": "^8.6.0",
-        "eslint-plugin-chakra-ui": "^0.7.6",
         "eslint-plugin-i18next": "^6.0.0-2",
         "eslint-plugin-import": "^2.27.5",
         "eslint-plugin-mobx": "^0.0.9",
