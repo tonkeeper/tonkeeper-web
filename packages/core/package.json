@@ -4,6 +4,7 @@
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Core features and state for tonkeeper web wallet",
     "main": "index.js",
+    "sideEffects": false,
     "scripts": {
         "build": "rm -fr dist && tsc",
         "start": "tsc -w",
@@ -13,6 +14,7 @@
         "generate:batteryApi": "./resource/check_github_token.sh && rm -fr ./src/batteryApi && docker build --no-cache --build-arg GITHUB_TOKEN=\"$GITHUB_TOKEN\" -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
         "generate:2faApi": "./resource/check_github_token.sh && rm -fr src/2faApi && docker build -f resource/Dockerfile.2faApi . -t 2faapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local -e GITHUB_TOKEN 2faapi",
         "generate:tonkeeperApi": "./resource/check_github_token.sh && rm -fr src/tonkeeperApiGenerated && docker build -f resource/Dockerfile.tonkeeperApi . -t tonkeeperapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local -e GITHUB_TOKEN tonkeeperapi",
+        "generate:swapsApi": "./resource/check_github_token.sh && rm -fr src/swapsApiGenerated && docker build -f resource/Dockerfile.swapsApi . -t swapsapi && docker run --rm --user=$(id -u):$(id -g) -v \"$(pwd)\":/local -e GITHUB_TOKEN swapsapi",
         "generate:analytics": "./resource/generate_analytics_client.sh",
         "build:pkg": "yarn build",
         "test": "vitest run"

@@ -1,14 +1,12 @@
-import {
-    findSwapAssetByDeeplinkToken,
-    SwapDeeplinkParams
-} from '@tonkeeper/core/dist/service/deeplinkingService';
+import { SwapDeeplinkParams } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useCallback, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { useNavigate } from '../router/useNavigate';
-import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
+import { useSwapAssetSearch } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset, useSwapToAsset } from '../../state/swap/useSwapForm';
+import { useAtom } from '../../libs/useAtom';
 
 const pendingSwapDeeplinkParams$ = atom<SwapDeeplinkParams | undefined>(undefined);
 
@@ -52,30 +50,30 @@ export const useOpenSwapDeeplink = () => {
 export const useApplySwapDeeplinkParams = () => {
     const location = useLocation();
     const history = useHistory();
-    const { data: allAssets } = useAllSwapAssets();
+    const [pendingParams, setPendingParams] = useAtom(pendingSwapDeeplinkParams$);
+    const fromAsset = useSwapAssetSearch(pendingParams?.fromToken);
+    const toAsset = useSwapAssetSearch(pendingParams?.toToken);
     const [, setFromAsset] = useSwapFromAsset();
     const [, setToAsset] = useSwapToAsset();
 
     useEffect(() => {
         const params = getSwapDeeplinkParamsFromSearch(location.search);
         if (params) {
-            pendingSwapDeeplinkParams$.next(params);
+            setPendingParams(params);
         }
-    }, [location.search]);
+    }, [location.search, setPendingParams]);
 
     useEffect(() => {
-        const params = pendingSwapDeeplinkParams$.value;
-
-        if (!params || !allAssets?.length) {
+        if (!pendingParams) {
             return;
         }
 
-        const fromAsset = params.fromToken
-            ? findSwapAssetByDeeplinkToken(allAssets, params.fromToken)
-            : undefined;
-        const toAsset = params.toToken
-            ? findSwapAssetByDeeplinkToken(allAssets, params.toToken)
-            : undefined;
+        if (
+            (pendingParams.fromToken && fromAsset === undefined) ||
+            (pendingParams.toToken && toAsset === undefined)
+        ) {
+            return;
+        }
 
         if (fromAsset) {
             setFromAsset(fromAsset);
@@ -85,7 +83,7 @@ export const useApplySwapDeeplinkParams = () => {
             setToAsset(toAsset);
         }
 
-        pendingSwapDeeplinkParams$.next(undefined);
+        setPendingParams(undefined);
 
         const searchParams = new URLSearchParams(location.search);
         if (searchParams.has('ft') || searchParams.has('tt')) {
@@ -96,5 +94,14 @@ export const useApplySwapDeeplinkParams = () => {
                 search: searchParams.toString()
             });
         }
-    }, [allAssets, history, location, setFromAsset, setToAsset]);
+    }, [
+        fromAsset,
+        history,
+        location,
+        pendingParams,
+        setFromAsset,
+        setPendingParams,
+        setToAsset,
+        toAsset
+    ]);
 };
