@@ -13,7 +13,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig, useActiveWallet } from '../../state/wallet';
 import { Body2, Label2 } from '../../components/Text';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
 import {
     defaultHistoryFilters,

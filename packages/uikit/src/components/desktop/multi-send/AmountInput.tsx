@@ -6,7 +6,7 @@ import {
     replaceTypedDecimalSeparator,
     seeIfValueValid
 } from '../../transfer/amountView/AmountViewUI';
-import { formatSendValue, isNumeric, removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
+import { formatSendValue, inputToBigNumber, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import BigNumber from 'bignumber.js';
 import { formatter } from '../../../hooks/balance';
@@ -111,9 +111,7 @@ export const AmountInput: FC<{
 
             if (isNumeric(inputValue) && !inputValue.endsWith(getDecimalSeparator())) {
                 const formattedInput = formatSendValue(inputValue);
-                const bnInput = new BigNumber(
-                    removeGroupSeparator(inputValue).replace(getDecimalSeparator(), '.')
-                );
+                const bnInput = inputToBigNumber(inputValue);
                 if (inFiat) {
                     tokenValue = formatter.format(!price ? new BigNumber(0) : bnInput.div(price), {
                         decimals: asset.decimals

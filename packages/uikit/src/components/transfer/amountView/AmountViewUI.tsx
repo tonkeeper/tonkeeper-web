@@ -1,6 +1,7 @@
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
@@ -204,10 +205,6 @@ export const seeIfValueValid = (value: string, decimals: number) => {
     }
 
     return true;
-};
-
-export const inputToBigNumber = (value: string): BigNumber => {
-    return new BigNumber(removeGroupSeparator(value).replace(',', '.') || '0');
 };
 
 export const SecondaryAmount: FC<{ amountState: AmountState; toggleFiat: () => void }> = ({

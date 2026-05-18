@@ -1,9 +1,6 @@
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
-import {
-    formatAddress,
-    seeIfValidTonAddress,
-    toShortValue
-} from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import React, { ForwardedRef, forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { ErrorOption, UseFormSetError } from 'react-hook-form';
 import styled from 'styled-components';
@@ -210,7 +207,7 @@ export const useTonRecipientValidator = () => {
                 };
             }
 
-            if (seeIfValidTonAddress(value)) {
+            if (isTonAddress(value)) {
                 return {
                     success: true,
                     result: {

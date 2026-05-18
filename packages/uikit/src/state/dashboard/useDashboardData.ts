@@ -9,7 +9,7 @@ import { IAppContext, useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { ClientColumns, useDashboardColumnsAsForm } from './useDashboardColumns';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { useAccountsOrdered } from '../folders';
 import { seeIfMainnnetAccount, Account } from '@tonkeeper/core/dist/entries/account';
 import { useAppSdk } from '../../hooks/appSdk';

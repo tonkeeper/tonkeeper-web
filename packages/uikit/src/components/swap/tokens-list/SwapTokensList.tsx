@@ -11,7 +11,7 @@ import { useAppContext } from '../../../hooks/appContext';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { LinkOutIcon, SpinnerIcon } from '../../Icon';
 import { ConfirmImportNotification } from './ConfirmImportNotification';
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { throttle } from 'es-toolkit';
 import { useTranslation } from '../../../hooks/translation';
 import { ExternalLink } from '../../shared/ExternalLink';
 import { Image } from '../../shared/Image';
@@ -57,7 +57,7 @@ export const SwapTokensList: FC<{
     };
 
     return (
-        <SwapTokensListWrapper ref={ref} onScroll={throttle(onScroll, 100)}>
+        <SwapTokensListWrapper ref={ref} onScroll={throttle(onScroll, 100, { edges: ['trailing'] })}>
             {walletSwapAssets.length ? (
                 <>
                     {walletSwapAssets.map((swapAsset, index) => (

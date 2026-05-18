@@ -64,7 +64,7 @@ import {
     tronWalletByTonMnemonic
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
@@ -418,7 +418,7 @@ export const useCreateAccountTonMultisig = () => {
             pinToWallet?: string;
         }
     >(async ({ address, name, emoji, selectedHostWalletId, pinToWallet, hostWallets }) => {
-        const valid = await seeIfValidTonAddress(address);
+        const valid = await isTonAddress(address);
         if (!valid) {
             throw new Error('Address is not valid.');
         }
@@ -452,7 +452,7 @@ export const useCreateAccountReadOnly = () => {
             name?: string;
         }
     >(async ({ address, name }) => {
-        const valid = await seeIfValidTonAddress(address);
+        const valid = await isTonAddress(address);
         if (!valid) {
             throw new Error('Address is not valid.');
         }

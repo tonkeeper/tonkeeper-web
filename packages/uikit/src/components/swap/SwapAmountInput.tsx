@@ -7,8 +7,8 @@ import { replaceTypedDecimalSeparator, seeIfValueValid } from '../transfer/amoun
 import {
     formatNumberValue,
     formatSendValue,
-    isNumeric,
-    removeGroupSeparator
+    inputToBigNumber,
+    isNumeric
 } from '@tonkeeper/core/dist/utils/send';
 
 const AmountInputWrapper = styled.input<{ isErrored: boolean }>`
@@ -51,12 +51,8 @@ export const SwapAmountInput: FC<{
 
         if (isNumeric(inputValue)) {
             if (!inputValue.endsWith(getDecimalSeparator())) {
-                const bnInput = new BigNumber(
-                    removeGroupSeparator(inputValue).replace(getDecimalSeparator(), '.')
-                );
-                const prevBnInput = new BigNumber(
-                    removeGroupSeparator(input).replace(getDecimalSeparator(), '.')
-                );
+                const bnInput = inputToBigNumber(inputValue);
+                const prevBnInput = inputToBigNumber(input);
                 if (!bnInput.eq(prevBnInput)) {
                     onChange(bnInput);
                     inputValue = formatSendValue(inputValue);
@@ -73,9 +69,7 @@ export const SwapAmountInput: FC<{
         } else {
             if (!input.endsWith(getDecimalSeparator())) {
                 try {
-                    const bnInput = new BigNumber(
-                        removeGroupSeparator(input).replace(getDecimalSeparator(), '.')
-                    );
+                    const bnInput = inputToBigNumber(input);
 
                     if (!bnInput.eq(value)) {
                         setInput(formatNumberValue(value));

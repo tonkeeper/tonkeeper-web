@@ -1,8 +1,7 @@
 import { MultiSendForm } from '../../../state/multiSend';
 import BigNumber from 'bignumber.js';
 import { formatter } from '../../../hooks/balance';
-import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
-import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { inputToBigNumber } from '@tonkeeper/core/dist/utils/send';
 
 export function getWillBeMultiSendValue(
     rowsValue: MultiSendForm['rows'],
@@ -14,9 +13,7 @@ export function getWillBeMultiSendValue(
             return BigNumber(0);
         }
 
-        const bnInput = new BigNumber(
-            removeGroupSeparator(item.amount.value).replace(getDecimalSeparator(), '.')
-        );
+        const bnInput = inputToBigNumber(item.amount.value);
         let inToken = bnInput;
         if (item.amount.inFiat) {
             inToken = rate?.prices ? new BigNumber(bnInput).div(rate.prices) : new BigNumber(0);

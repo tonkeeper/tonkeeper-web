@@ -75,6 +75,7 @@
         "electron-log": "^5.0.1",
         "electron-squirrel-startup": "^1.0.0",
         "electron-store": "^8.1.0",
+        "es-toolkit": "^1.46.1",
         "eventsource": "^4.0.0",
         "i18next": "^23.7.7",
         "keytar": "^7.9.0",

@@ -3,10 +3,10 @@ import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import { formatSendValue, isNumeric } from '@tonkeeper/core/dist/utils/send';
+import { formatSendValue, inputToBigNumber, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import { Reducer } from 'react';
-import { inputToBigNumber, replaceTypedDecimalSeparator, seeIfValueValid } from './AmountViewUI';
+import { replaceTypedDecimalSeparator, seeIfValueValid } from './AmountViewUI';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 
 function formatStringToInput(value: BigNumber): string {

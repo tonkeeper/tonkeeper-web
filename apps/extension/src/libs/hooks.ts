@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { throttle } from 'es-toolkit';
 import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
@@ -18,7 +18,7 @@ export const useAppWidth = () => {
             ) as HTMLDivElement;
 
             doc.style.setProperty('--app-width', `${app.clientWidth}px`);
-        }, 50);
+        }, 50, { edges: ['trailing'] });
         window.addEventListener('resize', appWidth);
 
         appWidth();

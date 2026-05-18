@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import React, { FC, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';

@@ -2,11 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import {
-    formatAddress,
-    seeIfValidTonAddress,
-    seeIfValidTronAddress
-} from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, isTonAddress, isTronAddress } from '@tonkeeper/core/dist/utils/address';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -65,8 +61,8 @@ export const seeIfInvalidDns = (value: string) => {
         value.length < 8 ||
         value.length === 48 ||
         value.length === 52 ||
-        seeIfValidTonAddress(value) ||
-        seeIfValidTronAddress(value)
+        isTonAddress(value) ||
+        isTronAddress(value)
     );
 };
 
@@ -86,7 +82,7 @@ const seeIfValidTonRecipient = (recipient: BaseRecipient | DnsRecipient, tonNetw
         //
     }
 
-    return seeIfValidTonAddress(recipient.address);
+    return isTonAddress(recipient.address);
 };
 
 const defaultRecipient = { address: '' };
@@ -170,7 +166,7 @@ export const RecipientView: FC<{
         let validForBlockchain;
         if (seeIfValidTonRecipient(recipient, network)) {
             validForBlockchain = BLOCKCHAIN_NAME.TON;
-        } else if (seeIfValidTronAddress(recipient.address)) {
+        } else if (isTronAddress(recipient.address)) {
             validForBlockchain = BLOCKCHAIN_NAME.TRON;
         }
 
@@ -188,7 +184,7 @@ export const RecipientView: FC<{
         if (acceptBlockchains && acceptBlockchains.length === 1) {
             return acceptBlockchains[0] === BLOCKCHAIN_NAME.TON
                 ? seeIfValidTonRecipient(recipient, network)
-                : seeIfValidTronAddress(recipient.address);
+                : isTronAddress(recipient.address);
         } else {
             return true;
         }
@@ -246,7 +242,7 @@ export const RecipientView: FC<{
                 break;
             case BLOCKCHAIN_NAME.TRON:
                 isValid =
-                    seeIfValidTronAddress(recipient.address) &&
+                    isTronAddress(recipient.address) &&
                     acceptBlockchains?.includes(BLOCKCHAIN_NAME.TRON);
         }
         if (isValid) {

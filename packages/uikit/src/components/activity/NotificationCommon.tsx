@@ -1,6 +1,7 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountAddress, AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';

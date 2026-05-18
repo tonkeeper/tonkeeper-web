@@ -1,6 +1,7 @@
 import { Address } from '@ton/core';
 import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';

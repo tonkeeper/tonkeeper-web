@@ -8,6 +8,10 @@ export function removeGroupSeparator(str: string): string {
     return str.replaceAll(getGroupSeparator(), '');
 }
 
+export function inputToBigNumber(value: string): BigNumber {
+    return new BigNumber(removeGroupSeparator(value).replace(getDecimalSeparator(), '.') || '0');
+}
+
 export function toNumberAmount(str: string): number {
     return parseFloat(str.replace(',', '.'));
 }

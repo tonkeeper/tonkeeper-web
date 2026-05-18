@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { passwordStorage, validatePassword } from '@tonkeeper/core/dist/service/passwordService';
-import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { debounce } from 'es-toolkit';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -149,7 +149,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
     const [requestId, setId] = useState<number | undefined>(undefined);
 
     const setRequest = useMemo(() => {
-        return debounce<[number | undefined]>(v => setId(v), 200);
+        return debounce((v: number | undefined) => setId(v), 200);
     }, [setId]);
 
     const { mutateAsync, isLoading, isError, reset } = useMutateUnlock(sdk, requestId);

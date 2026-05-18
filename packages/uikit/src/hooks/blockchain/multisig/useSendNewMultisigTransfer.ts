@@ -7,7 +7,7 @@ import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useTrackTransactionSent } from '../../analytics/events-hooks';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { useTonAssetTransferService } from '../useBlockchainService';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { useNotifyErrorHandle } from '../../useNotification';
 import { useGetSender } from '../useSender';
 
@@ -32,7 +32,7 @@ export function useSendNewMultisigTransfer(
 
             const comment = (recipient as TonRecipientData).comment;
             await transferService.send(sender, estimation, {
-                to: seeIfValidTonAddress(recipient.address.address)
+                to: isTonAddress(recipient.address.address)
                     ? recipient.address.address
                     : recipient.toAccount.address,
                 amount: amount as AssetAmount<TonAsset>,

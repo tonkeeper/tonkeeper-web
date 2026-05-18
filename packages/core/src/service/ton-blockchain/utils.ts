@@ -17,7 +17,7 @@ import {
     jettonToTonAssetAmount,
     tonAssetAddressToString
 } from '../../entries/crypto/asset/ton-asset';
-import { formatAddress } from '../../utils/common';
+import { formatAddress } from '../../utils/address';
 import { TonEstimation } from '../../entries/send';
 import { fetchAccountBatched } from './api-utils';
 

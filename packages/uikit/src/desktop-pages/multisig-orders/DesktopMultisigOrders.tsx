@@ -27,7 +27,7 @@ import { toNano } from '@ton/core';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useMultisigOrderNotification } from '../../components/modals/MultisigOrderNotificationControlled';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
 import { orderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 import { useActiveConfig } from '../../state/wallet';

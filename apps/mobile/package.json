@@ -47,6 +47,7 @@
         "@tonkeeper/uikit": "0.1.0",
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",
+        "es-toolkit": "^1.46.1",
         "eventsource": "^2.0.2",
         "framer-motion": "^11.3.28",
         "i18next": "^23.7.7",

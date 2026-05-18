@@ -59,7 +59,7 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { QueryKey } from '../../libs/queryKey';
 import { useJettonList } from '../../state/jetton';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 export type SenderChoice =
@@ -271,7 +271,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 payload.messagesVariants?.gasless &&
                 isStandardTonWallet(account.activeTonWallet) &&
                 payload.messagesVariants.gasless.options?.asset &&
-                seeIfValidTonAddress(payload.messagesVariants.gasless.options?.asset)
+                isTonAddress(payload.messagesVariants.gasless.options?.asset)
             ) {
                 const assetAddress = Address.parse(
                     payload.messagesVariants.gasless.options?.asset

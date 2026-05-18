@@ -1,9 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import {
-    formatAddress,
-    formatTransferUrl,
-    seeIfValidTonAddress
-} from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, isTonAddress } from '@tonkeeper/core/dist/utils/address';
+import { formatTransferUrl } from '@tonkeeper/core/dist/utils/url';
 import { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -318,7 +315,7 @@ export const ReceiveContent: FC<{
                             {isTon ? (
                                 <ReceiveTon
                                     jetton={
-                                        jetton && seeIfValidTonAddress(jetton) ? jetton : undefined
+                                        jetton && isTonAddress(jetton) ? jetton : undefined
                                     }
                                 />
                             ) : (

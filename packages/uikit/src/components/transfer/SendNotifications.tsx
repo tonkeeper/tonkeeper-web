@@ -53,7 +53,7 @@ import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
 import { useAnalyticsTrack } from '../../hooks/analytics';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress, isTronAddress } from '@tonkeeper/core/dist/utils/address';
 import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
@@ -261,7 +261,7 @@ const SendContent: FC<{
             return;
         }
 
-        if (seeIfValidTronAddress(signature)) {
+        if (isTronAddress(signature)) {
             return processTron(signature);
         }
 
@@ -478,7 +478,7 @@ const SendActionNotification = () => {
             const fromAccount = await getAccountAsync({ address: wallet.rawAddress });
             const jettons: JettonsBalances | undefined = await client.fetchQuery(jettonsQueryKey);
 
-            if (transfer.address && seeIfValidTonAddress(transfer.address)) {
+            if (transfer.address && isTonAddress(transfer.address)) {
                 const toAccount = await getAccountAsync({ address: transfer.address });
                 setTransferParams(
                     makeTonTransferInitData(transfer, fromAccount, toAccount, jettons)

@@ -12,7 +12,7 @@ import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { isStandardTonWallet, TonContract } from '../../entries/wallet';
 import { MessagePayloadParam } from './encoder/types';
 import { assertMessagesNumberSupported } from './utils';
-import { seeIfValidTonAddress } from '../../utils/common';
+import { isTonAddress } from '../../utils/address';
 import { ExtraCurrencyEncoder } from './encoder/extra-currency-encoder';
 
 export type TransferParams =
@@ -268,7 +268,7 @@ export class TonAssetTransactionService {
             ? params[0].amount.asset.address
             : params.amount.asset.address;
 
-        return token !== TON_ASSET.address && !seeIfValidTonAddress(token.toString());
+        return token !== TON_ASSET.address && !isTonAddress(token.toString());
     }
 
     private isJettonTransfer(params: TransferParams) {

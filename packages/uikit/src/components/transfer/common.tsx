@@ -27,7 +27,7 @@ import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { formatAddress, seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ResponseError } from '@tonkeeper/core/dist/2faApi';
 
@@ -402,7 +402,7 @@ export const makeTonTransferInitData = (
     jettons: JettonsBalances | undefined
 ): InitTransferData => {
     const address =
-        tonTransfer.address && seeIfValidTonAddress(tonTransfer.address)
+        tonTransfer.address && isTonAddress(tonTransfer.address)
             ? tonTransfer.address
             : formatAddress(toAccount.address);
     const initRecipient: TonRecipientData = {

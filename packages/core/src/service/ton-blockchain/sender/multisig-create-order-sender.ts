@@ -12,7 +12,7 @@ import { estimateOrderByOutgoingMessage } from '../encoder/multisig-encoder/mult
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { NotEnoughHostWalletBalanceError } from '../../../errors/NotEnoughHostWalletBalanceError';
 import { errorMessage } from '../../../utils/types';
-import { formatAddress } from '../../../utils/common';
+import { formatAddress } from '../../../utils/address';
 
 export class MultisigCreateOrderSender implements ISender {
     constructor(

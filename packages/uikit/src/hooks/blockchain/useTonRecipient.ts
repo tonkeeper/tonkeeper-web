@@ -1,6 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { useEffect, useMemo, useRef } from 'react';
 import { useGetToAccount } from '../../components/transfer/RecipientView';
 import { useActiveTonNetwork } from '../../state/wallet';

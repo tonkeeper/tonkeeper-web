@@ -1,5 +1,5 @@
 import { RefCallback, useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { throttle } from 'es-toolkit';
 
 export function useIsScrolled<T extends HTMLElement = HTMLDivElement>(options?: {
     gapTop?: number;
@@ -44,7 +44,7 @@ export function useIsScrolled<T extends HTMLElement = HTMLDivElement>(options?: 
             timer = setTimeout(function () {
                 document.body.classList.remove('scroll');
             }, 300);
-        }, 50);
+        }, 50, { edges: ['trailing'] });
 
         element.addEventListener('scroll', handlerScroll);
         handlerScroll();

@@ -14,7 +14,7 @@ import { Button } from './fields/Button';
 import { Background, HeaderBlock } from './home/AccountView';
 import { KeystoneAnimatedQRCode } from './home/qrCodeView';
 import { useActiveWallet } from '../state/wallet';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 
 export const SignerContent: FC<{
     sdk: IAppSdk;

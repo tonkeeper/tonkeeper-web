@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { useTonAssetTransferService } from '../useBlockchainService';
 import { useGetEstimationSender } from '../useSender';
 import { useToQueryKeyPart } from '../../useToQueryKeyPart';
@@ -28,7 +28,7 @@ export function useEstimateNewMultisigTransfer(
 
             const comment = (recipient as TonRecipientData).comment;
             return transferService.estimate(sender, {
-                to: seeIfValidTonAddress(recipient.address.address)
+                to: isTonAddress(recipient.address.address)
                     ? recipient.address.address
                     : recipient.toAccount.address,
                 amount: amount as AssetAmount<TonAsset>,

@@ -1,6 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
+import { eqAddresses, formatAddress } from '@tonkeeper/core/dist/utils/address';
 import React, { FC, useMemo } from 'react';
 import {
     ActivityIcon,
@@ -154,7 +154,7 @@ export const SmartContractExecAction: FC<{
         return <ErrorAction />;
     }
 
-    if (seeIfAddressEqual(smartContractExec.contract.address, wallet.rawAddress)) {
+    if (eqAddresses(smartContractExec.contract.address, wallet.rawAddress)) {
         return (
             <ListItemGrid>
                 <ActivityIcon status={action.status}>

@@ -3,8 +3,7 @@ import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AccountStakingInfo } from '@tonkeeper/core/dist/tonApiV2';
-import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
-import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { eqAddresses, isTonCoinAddress } from '@tonkeeper/core/dist/utils/address';
 import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { fallbackRenderOver } from '../../components/Error';
@@ -240,7 +239,7 @@ const DesktopTokensPayload = () => {
             if (env === 'mobile') {
                 return;
             }
-            if (isTonAddress(address) && tonRef.current) {
+            if (isTonCoinAddress(address) && tonRef.current) {
                 return rowVirtualizer.scrollToOffset(tonRef.current.offsetTop);
             }
 

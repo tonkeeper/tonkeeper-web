@@ -5,7 +5,7 @@ import { SwapAmountInput } from './SwapAmountInput';
 import { useMaxSwapValue, useSwapFromAmount, useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { SwapAmountFiat } from './SwapAmountFiat';
 import { SwapFromAmountBalance } from './SwapAmountBalance';
-import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { debounce } from 'es-toolkit';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, PropsWithChildren } from 'react';
 import { useTranslation } from '../../hooks/translation';
@@ -75,7 +75,7 @@ export const SwapFromField: FC<PropsWithChildren> = ({ children }) => {
                 <SwapTokenSelectStyled token={fromAsset} onTokenChange={setFromAsset} />
                 <SwapAmountInputStyled
                     value={swapAmount}
-                    onChange={debounce(setSwapAmount)}
+                    onChange={debounce(setSwapAmount, 300)}
                     decimals={fromAsset.decimals}
                     isErrored={
                         !!max &&

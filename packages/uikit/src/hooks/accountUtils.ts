@@ -1,5 +1,6 @@
 import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { useActiveAccountQuery, useActiveApi } from '../state/wallet';
 import { useTranslation } from './translation';
 import { useAppSdk } from './appSdk';
