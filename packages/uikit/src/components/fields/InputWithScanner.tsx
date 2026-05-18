@@ -44,7 +44,10 @@ const ScanBlock = styled.div`
 `;
 
 export const InputWithScanner = React.forwardRef<HTMLTextAreaElement, IInputWithScanner>(
-    ({ value, onChange, isValid = true, label, disabled, onScan, onSubmit, autoFocusTimeout }, ref) => {
+    (
+        { value, onChange, isValid = true, label, disabled, onScan, onSubmit, autoFocusTimeout },
+        ref
+    ) => {
         const [focus, setFocus] = useState(false);
         const [scanId, setScanId] = useState<number | undefined>(undefined);
         const sdk = useAppSdk();

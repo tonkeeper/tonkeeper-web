@@ -24,19 +24,10 @@ describe('getOsName', () => {
     });
 
     it.each([
-        [
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-            'macOS'
-        ],
-        [
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Windows'
-        ],
+        ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'macOS'],
+        ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Windows'],
         ['Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36', 'Linux'],
-        [
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',
-            'iOS'
-        ],
+        ['Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15', 'iOS'],
         ['Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36', 'Android']
     ])('parses %s as %s', (ua, expected) => {
         setNavigator({ userAgent: ua });

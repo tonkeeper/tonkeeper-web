@@ -47,4 +47,3 @@ export const useTrackLocation = () => {
         track({ eventName: 'page_view', location: location.pathname });
     }, [track, location.pathname]);
 };
-

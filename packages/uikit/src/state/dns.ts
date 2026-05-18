@@ -1,4 +1,3 @@
-import { useAppContext } from '../hooks/appContext';
 import { useMemo, useState } from 'react';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import { useQuery } from '@tanstack/react-query';

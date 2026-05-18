@@ -3,6 +3,5 @@ node_modules
 .vscode
 .idea
 
-apps/web
-apps/desktop
 apps/twa
+tests

@@ -30,7 +30,6 @@ describe('Atom', () => {
     });
 });
 
-
 describe('Subject', () => {
     it('delivers values to current subscribers', () => {
         const s = subject<number>();

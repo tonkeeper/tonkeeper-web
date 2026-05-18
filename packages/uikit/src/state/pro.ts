@@ -60,7 +60,12 @@ export const useTrialAvailability = () => {
     const hasCompatibleWallets = compatibleWallets.length > 0;
 
     return useQuery<boolean, Error>(
-        [QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id, hasCompatibleWallets],
+        [
+            QueryKey.pro,
+            QueryKey.trialAvailability,
+            config.pro_trial_tg_bot_id,
+            hasCompatibleWallets
+        ],
         async () => {
             const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
             const botIdIsSet = !!config.pro_trial_tg_bot_id;

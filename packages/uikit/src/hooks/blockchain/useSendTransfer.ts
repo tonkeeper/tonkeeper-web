@@ -86,7 +86,9 @@ export function useSendTransfer<T extends Asset>({
                     from: 'send_confirm',
                     token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
                 });
-                trackTransactionSent(isTon(amount.asset.address) ? 'TonTransfer' : 'JettonTransfer');
+                trackTransactionSent(
+                    isTon(amount.asset.address) ? 'TonTransfer' : 'JettonTransfer'
+                );
             } else if (amount.asset.id === TRON_USDT_ASSET.id) {
                 const tronSender = await getTronSender(senderType as TronSenderType);
                 await tronSender.send(

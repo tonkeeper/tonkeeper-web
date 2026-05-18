@@ -10,7 +10,7 @@ import { Configuration, DefaultApi, EmulationApi } from '../../../batteryApi';
 import BigNumber from 'bignumber.js';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
-import { TonEstimation } from "../../../entries/send";
+import { TonEstimation } from '../../../entries/send';
 
 export class BatteryMessageSender implements ISender {
     constructor(

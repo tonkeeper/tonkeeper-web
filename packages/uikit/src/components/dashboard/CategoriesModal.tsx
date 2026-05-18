@@ -233,9 +233,7 @@ const CategoriesModalContent: FC<{
                                 <CategoryItemContent
                                     category={activeCategory}
                                     isEnabled={activeEntry.isEnabled}
-                                    isDisabled={
-                                        !!(activeCategory?.onlyPro && !isProEnabled)
-                                    }
+                                    isDisabled={!!(activeCategory?.onlyPro && !isProEnabled)}
                                     onOpen={onOpen}
                                     onCheckboxChange={() => undefined}
                                 />

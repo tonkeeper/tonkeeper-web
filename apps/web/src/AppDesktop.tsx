@@ -31,21 +31,17 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import Initialize from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useLayoutEffect, useMemo } from 'react';
-import { Route, Switch, useLocation } from "react-router-dom";
+import { Route, Switch, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
-import {
-  DesktopManageMultisigsPage
-} from "@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs";
-import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
-import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
+import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
+import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
+import { UrlTonConnectSubscription } from './components/UrlTonConnectSubscription';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
-import {
-  DesktopCancelLegacySubscriptionBanner
-} from "@tonkeeper/uikit/dist/components/legacy-plugins/DesktopCancelLegacySubscriptionBanner";
+import { DesktopCancelLegacySubscriptionBanner } from '@tonkeeper/uikit/dist/components/legacy-plugins/DesktopCancelLegacySubscriptionBanner';
 
 const DesktopAccountSettingsPage = React.lazy(
-  () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
+    () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
 );
 
 const WebTonConnectSubscription = React.lazy(
@@ -223,7 +219,7 @@ export const DesktopContent: FC<{
         return (
             <FullScreen>
                 <InitializeContainer>
-                   <Initialize />
+                    <Initialize />
                 </InitializeContainer>
             </FullScreen>
         );
@@ -238,10 +234,7 @@ export const DesktopContent: FC<{
                     <Route path={AppRoute.browser} component={DesktopBrowser} />
                     <Route path={AppRoute.settings} component={PreferencesContent} />
                     <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
-                    <Route
-                      path={AppRoute.accountSettings}
-                      component={DesktopAccountSettingsPage}
-                    />
+                    <Route path={AppRoute.accountSettings} component={DesktopAccountSettingsPage} />
                     <Route path="*" component={WalletContent} />
                 </Switch>
             </WideContent>
@@ -261,19 +254,16 @@ const WalletContent = () => {
                     <Wrapper>
                         <Switch>
                             <Route path={AppRoute.activity} component={DesktopHistoryPage} />
-                            <Route
-                                path={AppRoute.purchases}
-                                component={DesktopCollectables}
-                            />
+                            <Route path={AppRoute.purchases} component={DesktopCollectables} />
                             <Route path={AppRoute.dns} component={DesktopDns} />
                             <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
                             <Route
-                              path={AppRoute.multisigWallets}
-                              component={DesktopManageMultisigsPage}
+                                path={AppRoute.multisigWallets}
+                                component={DesktopManageMultisigsPage}
                             />
                             <Route
-                              path={AppRoute.multisigOrders}
-                              component={DesktopMultisigOrdersPage}
+                                path={AppRoute.multisigOrders}
+                                component={DesktopMultisigOrdersPage}
                             />
                             <Route
                                 path={AppRoute.walletSettings}
@@ -283,7 +273,7 @@ const WalletContent = () => {
                             <Route path={AppRoute.staking} component={DesktopStakingPage} />
                             <Route path="*" component={DesktopTokens} />
                         </Switch>
-                      <MemoryScroll />
+                        <MemoryScroll />
                     </Wrapper>
                 </WalletRoutingWrapper>
                 <DesktopCancelLegacySubscriptionBanner />

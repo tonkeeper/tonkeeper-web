@@ -107,9 +107,9 @@ describe('findSwapAssetByDeeplinkToken', () => {
 
         // normalizeSwapDeeplinkToken on raw vs friendly gives different uppercase strings —
         // the removed string-comparison branch would have silently missed this case
-        expect(normalizeSwapDeeplinkToken(tonAssetAddressToString(TON_USDT_ASSET.address))).not.toBe(
-            normalizeSwapDeeplinkToken(bounceableAddress)
-        );
+        expect(
+            normalizeSwapDeeplinkToken(tonAssetAddressToString(TON_USDT_ASSET.address))
+        ).not.toBe(normalizeSwapDeeplinkToken(bounceableAddress));
 
         // Address.equals handles both representations correctly
         expect(findSwapAssetByDeeplinkToken([TON_USDT_ASSET], bounceableAddress)).toBe(
@@ -133,20 +133,32 @@ describe('findSwapAssetByDeeplinkToken', () => {
 describe('parsePoolDeeplink', () => {
     it('parses web pool deeplink', () => {
         expect(
-            parsePoolDeeplink('https://app.tonkeeper.com/pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa')
-        ).toEqual({ poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa' });
+            parsePoolDeeplink(
+                'https://app.tonkeeper.com/pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa'
+            )
+        ).toEqual({
+            poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa'
+        });
     });
 
     it('parses app scheme pool deeplink', () => {
         expect(
-            parsePoolDeeplink('tonkeeper://pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa')
-        ).toEqual({ poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa' });
+            parsePoolDeeplink(
+                'tonkeeper://pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa'
+            )
+        ).toEqual({
+            poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa'
+        });
     });
 
     it('ignores a trailing slash added by custom protocol handlers', () => {
         expect(
-            parsePoolDeeplink('tonkeeper://pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa/')
-        ).toEqual({ poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa' });
+            parsePoolDeeplink(
+                'tonkeeper://pool/0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa/'
+            )
+        ).toEqual({
+            poolAddress: '0:a45b17f28409229b78360e3290420f13e4fe20f90d7e2bf8c4ac6703259e22fa'
+        });
     });
 
     it('returns null without pool address', () => {
@@ -206,7 +218,9 @@ describe('parseBrowserDeeplink', () => {
     // items in browser are external links, we can't open them in the app
     it('matches regardless of extra path segments or query params', () => {
         expect(parseBrowserDeeplink('https://app.tonkeeper.com/browser/anything')).toEqual({});
-        expect(parseBrowserDeeplink('tonkeeper://browser?url=https%3A%2F%2Fgetgems.io')).toEqual({});
+        expect(parseBrowserDeeplink('tonkeeper://browser?url=https%3A%2F%2Fgetgems.io')).toEqual(
+            {}
+        );
     });
 
     it('returns null for non-browser links', () => {

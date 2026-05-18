@@ -42,7 +42,7 @@ export default class AppUpdate {
 }
 
 function notify(title: string, message: string) {
-    let windows = BrowserWindow.getAllWindows();
+    const windows = BrowserWindow.getAllWindows();
     if (windows.length == 0) {
         return;
     }

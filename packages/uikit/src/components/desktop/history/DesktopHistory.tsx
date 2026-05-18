@@ -15,7 +15,6 @@ import { ForTargetEnv } from '../../shared/TargetEnv';
 import { Body2Class } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 
-
 const ContainerQuery = styled.div`
     container-type: inline-size;
 `;

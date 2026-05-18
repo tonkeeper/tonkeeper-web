@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query';
-import { useAppContext } from '../../../hooks/appContext';
 import { useActiveApi, useActiveWallet } from '../../../state/wallet';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { toNano } from '@ton/core';

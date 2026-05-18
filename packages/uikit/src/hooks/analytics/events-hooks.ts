@@ -86,9 +86,7 @@ export const useTrackTransactionSent = () => {
                 event_type,
                 wallet_chain: toWalletChain(signingAccount),
                 wallet_network:
-                    getNetworkByAccount(signingAccount) === Network.TESTNET
-                        ? 'testnet'
-                        : 'mainnet',
+                    getNetworkByAccount(signingAccount) === Network.TESTNET ? 'testnet' : 'mainnet',
                 wallet_source: toWalletSource(signingAccount),
                 wallet_interface: isStandardTonWallet(signingWallet)
                     ? toWalletInterface(signingWallet.version)

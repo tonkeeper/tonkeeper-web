@@ -36,10 +36,7 @@ export const useStakedPoolsWithInfo = () => {
     const { data: positions } = useStakingPositions();
     const { data: pools } = useStakingPools();
 
-    const positionsKey = useMemo(
-        () => positions?.map(p => p.pool).join(','),
-        [positions]
-    );
+    const positionsKey = useMemo(() => positions?.map(p => p.pool).join(','), [positions]);
 
     return useQuery<Array<{ position: AccountStakingInfo; pool: PoolInfo }>, Error>(
         [wallet.rawAddress, QueryKey.staking, 'staked-pools-with-info', network, positionsKey],

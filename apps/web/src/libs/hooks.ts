@@ -4,11 +4,11 @@ import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, toWalletType, Aptabase } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
-import { useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
+import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { useEffect, useState } from 'react';
-import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
+import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { TonendpointConfig } from "@tonkeeper/core/dist/tonkeeperApi/tonendpoint";
+import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -50,7 +50,12 @@ export const useAppWidth = (standalone: boolean) => {
     }, [standalone]);
 };
 
-export const useAnalytics = (activeAccount: Account | undefined, accounts: Account[] | undefined, version: string, config: TonendpointConfig | undefined) => {
+export const useAnalytics = (
+    activeAccount: Account | undefined,
+    accounts: Account[] | undefined,
+    version: string,
+    config: TonendpointConfig | undefined
+) => {
     const network = useActiveTonNetwork();
     const sdk = useAppSdk();
 
@@ -58,14 +63,14 @@ export const useAnalytics = (activeAccount: Account | undefined, accounts: Accou
         [QueryKey.analytics, network, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
             if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
-              return;
+                return;
             }
 
             const tracker = new Aptabase({
-                  host: config.aptabaseEndpoint,
-                  key: config.aptabaseKey,
-                  appVersion: version,
-                  userIdentity: sdk.userIdentity
+                host: config.aptabaseEndpoint,
+                key: config.aptabaseKey,
+                appVersion: version,
+                userIdentity: sdk.userIdentity
             });
 
             tracker.init({
@@ -78,7 +83,7 @@ export const useAnalytics = (activeAccount: Account | undefined, accounts: Accou
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount != null  }
+        { enabled: accounts != null && activeAccount != null }
     );
 };
 

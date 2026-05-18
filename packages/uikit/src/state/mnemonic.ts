@@ -9,7 +9,7 @@ import {
     Account,
     AccountSecret
 } from '@tonkeeper/core/dist/entries/account';
-import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import {
     CellSigner,
     MultiTransactionsSigner,
