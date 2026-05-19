@@ -63,8 +63,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
 }) => {
     const { t } = useTranslation();
     const { browserLength } = useAppContext();
-    const [containerRef, { width: w }] = useElementSize();
-    const width = w - 36;
+    const [containerRef] = useElementSize();
     const groups = useMemo(
         () =>
             category.apps.reduce((acc, app, index) => {

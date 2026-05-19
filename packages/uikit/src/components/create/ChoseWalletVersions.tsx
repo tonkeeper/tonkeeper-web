@@ -60,14 +60,6 @@ const Body2Secondary = styled(Body2)`
     color: ${props => props.theme.textSecondary};
 `;
 
-const SubmitBlock = styled.div`
-    padding-top: 16px;
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-    width: 100%;
-`;
-
 export const ChoseWalletVersionsByMnemonic: FC<{
     mnemonic: string[];
     mnemonicType: MnemonicType;

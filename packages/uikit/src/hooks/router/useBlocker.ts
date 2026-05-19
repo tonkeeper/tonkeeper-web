@@ -23,13 +23,7 @@ export type Blocker = BlockerUnblocked | BlockerBlocked | BlockerProceeding;
 
 type BlockerFunction = (location: Location) => boolean;
 
-interface UseBlockerResult {
-    blocker: Blocker;
-    block: (shouldBlock: boolean | BlockerFunction) => void;
-    unblock: () => void;
-}
-
-export const useBlocker = (shouldBlock: boolean | BlockerFunction) => {
+export const useBlocker = (_shouldBlock: boolean | BlockerFunction) => {
     // TODO implement
     return {
         state: 'unblocked' as 'blocked' | 'unblocked' | 'proceeding',

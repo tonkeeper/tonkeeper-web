@@ -102,7 +102,7 @@ module.exports = {
                 'import/no-unresolved': 'off',
                 'unused-imports/no-unused-imports': 'error',
                 'unused-imports/no-unused-vars': [
-                    'warn', // baseline: ~7 violations
+                    'error',
                     {
                         vars: 'all',
                         args: 'all',
