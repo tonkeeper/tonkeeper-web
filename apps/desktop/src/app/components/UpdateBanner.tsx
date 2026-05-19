@@ -43,7 +43,7 @@ export const UpdateBanner: FC = () => {
     const [info, setInfo] = useState<{ version: string; url: string } | undefined>();
 
     useEffect(() => {
-        window.backgroundApi.onUpdateAvailable(value => setInfo(value));
+        return window.backgroundApi.onUpdateAvailable(value => setInfo(value));
     }, []);
 
     if (!info) return null;

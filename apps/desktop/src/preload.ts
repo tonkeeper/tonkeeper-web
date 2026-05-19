@@ -48,10 +48,11 @@ contextBridge.exposeInMainWorld('backgroundApi', {
     onRefresh: (callback: () => void) => {
         refreshes$.subscribe(callback);
     },
-    onUpdateAvailable: (callback: (value: UpdateInfo) => void) => {
-        updateAvailable$.subscribe(callback);
+    onUpdateAvailable: (callback: (value: UpdateInfo) => void): (() => void) => {
+        const unsubscribe = updateAvailable$.subscribe(callback);
         if (updateAvailable$.value !== undefined) {
             callback(updateAvailable$.value);
         }
+        return unsubscribe;
     }
 });

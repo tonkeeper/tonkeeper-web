@@ -14,7 +14,7 @@ interface BackgroundApi {
     onTonConnectRequest: (callback: (value: TonConnectAppRequestPayload) => void) => void;
     onTonConnectDisconnect: (callback: (value: AccountConnection) => void) => void;
     onRefresh: (callback: () => void) => void;
-    onUpdateAvailable: (callback: (value: UpdateInfo) => void) => void;
+    onUpdateAvailable: (callback: (value: UpdateInfo) => void) => () => void;
 }
 
 declare global {
