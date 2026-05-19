@@ -19,7 +19,9 @@ module.exports = {
         'array-bracket-spacing': ['error', 'never'],
         'object-curly-spacing': ['error', 'always'],
         indent: 'off',
-        'max-classes-per-file': 'warn', // baseline: ~7 violations; either split files or add inline disable
+        // codebase deliberately groups tightly-coupled classes in single files
+        // (Atom/Subject/ReplaySubject, polyfill class sets, SDK + helpers)
+        'max-classes-per-file': 'off',
         radix: ['error', 'as-needed'],
         'no-return-assign': 'off',
         'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],

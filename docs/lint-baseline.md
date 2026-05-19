@@ -1,13 +1,13 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=458`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=451`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 
 The goal is to drive each demoted rule to zero violations, then promote it back to `'error'` (and
 lower `--max-warnings` accordingly).
 
-## Demoted rules (severity baseline: 458 warnings, 0 errors)
+## Demoted rules (severity baseline: 451 warnings, 0 errors)
 
 The following rules were demoted from `error` (or `off`) to `warn`:
 
@@ -20,7 +20,6 @@ The following rules were demoted from `error` (or `off`) to `warn`:
 | `complexity`                               |         25 | Threshold `max: 15` (was default 20). Refactor long functions or `// eslint-disable`                    |
 | `@typescript-eslint/no-explicit-any`       |         18 | Highest-priority TS fix — re-tighten first                                                              |
 | `@typescript-eslint/no-shadow`             |          8 | Variable shadowing                                                                                      |
-| `max-classes-per-file`                     |          7 | Split files or `// eslint-disable-next-line`                                                            |
 | `@typescript-eslint/no-non-null-assertion` |          1 |                                                                                                         |
 
 ## How to promote a rule back to `error`
@@ -39,3 +38,7 @@ The following rules were demoted from `error` (or `off`) to `warn`:
     Without it, workspace subpath imports like `@tonkeeper/core/dist/...` and
     `styled-components/dist/types` produce thousands of false positives. To re-enable: install the
     resolver, configure it in `.eslintrc.js`, then flip the rule back on.
+-   `max-classes-per-file` — disabled because the codebase intentionally groups tightly-coupled
+    classes in single files (e.g. `Atom`/`Subject`/`ReplaySubject` in `atom.ts`, polyfill class sets
+    in `bluetooth-plugin.ts`, `BaseApp` + helpers in `AppSdk.ts`). The "one class per file" rule is
+    a stylistic preference that conflicts with this design choice.
