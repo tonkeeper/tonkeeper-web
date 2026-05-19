@@ -67,7 +67,6 @@ const ImageRow = styled.div`
 const Image = styled.img`
     width: 72px;
     height: 72px;
-
     border-radius: ${props => props.theme.cornerMedium};
 `;
 

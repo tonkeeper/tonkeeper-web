@@ -27,7 +27,6 @@ export const TokenLogo = styled(Image)`
     width: 44px;
     height: 44px;
     border-radius: ${props => props.theme.cornerFull};
-
     pointer-events: none;
 
     ${p =>
@@ -40,10 +39,8 @@ export const TokenLogo = styled(Image)`
 
 const Description = styled.div`
     flex-grow: 1;
-
     display: flex;
     flex-direction: column;
-
     white-space: nowrap;
 `;
 
@@ -57,7 +54,6 @@ const FirstLine = styled.div`
 const CoinName = styled(Label1)`
     text-overflow: ellipsis;
     overflow: hidden;
-
     display: flex;
     align-items: center;
 `;
@@ -163,17 +159,17 @@ export const TokenLayout: FC<{
 };
 
 const DeltaColor = styled.span<{ positive: boolean }>`
-  margin-left: 0.5rem;
-  opacity: 0.64;
+    margin-left: 0.5rem;
+    opacity: 0.64;
 
-  ${props =>
-      props.positive
-          ? css`
-                color: ${props.theme.accentGreen};
-            `
-          : css`
-                color: ${props.theme.accentRed};
-            `}}
+    ${props =>
+        props.positive
+            ? css`
+                  color: ${props.theme.accentGreen};
+              `
+            : css`
+                  color: ${props.theme.accentRed};
+              `}
 `;
 
 const Delta: FC<{ data: TokenRate | undefined }> = ({ data }) => {

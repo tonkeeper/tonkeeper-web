@@ -388,10 +388,4 @@ export class MockAppSdk extends BaseApp {
     }
 }
 
-export type TargetEnv =
-    | 'web'
-    | 'extension'
-    | 'desktop'
-    | 'twa'
-    | 'tablet'
-    | 'mobile';
+export type TargetEnv = 'web' | 'extension' | 'desktop' | 'twa' | 'tablet' | 'mobile';

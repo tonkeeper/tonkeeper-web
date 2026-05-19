@@ -14,7 +14,6 @@ const Block = styled.form`
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-
     justify-content: center;
     gap: 1rem;
     width: 100%;

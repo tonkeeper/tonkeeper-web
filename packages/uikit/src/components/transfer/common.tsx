@@ -43,7 +43,7 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
     box-sizing: border-box;
     width: var(--app-width);
 
-    &:after {
+    &::after {
         content: '';
         position: absolute;
         width: 100%;
@@ -141,7 +141,6 @@ export const Wrapper = styled.div<{ standalone: boolean; extension: boolean; ful
         .${rightToLeft}-enter-active
         ${ButtonBlockElement} {
         display: none;
-
         position: absolute !important;
 
         ${props =>
@@ -266,6 +265,7 @@ const ConfirmViewButtonsContainerStyled = styled.div`
     width: 100%;
     display: flex;
     gap: 1rem;
+
     & > * {
         flex: 1;
     }

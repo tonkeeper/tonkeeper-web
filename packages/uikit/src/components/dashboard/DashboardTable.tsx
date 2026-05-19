@@ -66,7 +66,6 @@ const ResizeHandleWrapper = styled.button<{ hidden?: boolean }>`
     display: flex;
     align-items: center;
     justify-content: center;
-
     transition: opacity 0.15s ease-in-out;
 
     ${p =>

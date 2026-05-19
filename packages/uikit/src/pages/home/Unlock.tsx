@@ -24,10 +24,8 @@ const Block = styled.form<{ minHeight?: string }>`
     display: flex;
     flex-direction: column;
     min-height: var(--app-height);
-
     padding: 2rem 1rem;
     box-sizing: border-box;
-
     justify-content: center;
     gap: 12px;
 `;

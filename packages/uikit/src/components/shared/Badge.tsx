@@ -13,7 +13,6 @@ const BadgeStyled = styled.div<{
     display: ${p => p.display};
     flex-shrink: 0;
     height: fit-content;
-
     ${p =>
         p.size === 'm'
             ? css`
@@ -31,12 +30,10 @@ const BadgeStyled = styled.div<{
                   font-weight: 510;
                   line-height: 12px;
               `}
-
     color: ${p => p.theme[p.color]};
     background-color: ${p =>
         p.background ? p.theme[p.background] : hexToRGBA(p.theme[p.color], 0.16)};
     text-transform: uppercase;
-
     font-style: normal;
 
     ${p =>

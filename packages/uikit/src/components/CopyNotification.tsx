@@ -12,7 +12,6 @@ const Message = styled.div`
     top: env(safe-area-inset-top);
     left: 50%;
     transform: translateY(${p => (p.theme.proDisplayType === 'mobile' ? '0' : '-30px')}) scale(0.8);
-
     transition: all 0.1s ease-in-out;
 
     &.enter-done {
@@ -35,15 +34,13 @@ const Content = styled.div`
     overflow-wrap: break-word;
     text-align: center;
     white-space: normal;
-    padding: 14px 24px 14px;
+    padding: 14px 24px;
     box-sizing: border-box;
     background: ${props => props.theme.backgroundContentTint};
     border-radius: ${props => props.theme.cornerLarge};
-
     margin-left: -50%;
     margin-right: 50%;
-
-    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
 `;
 
 export const CopyNotification: FC<{ hideSimpleCopyNotifications?: boolean }> = React.memo(

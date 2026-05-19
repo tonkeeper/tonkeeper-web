@@ -14,11 +14,9 @@ import { useActiveConfig } from '../../state/wallet';
 const CarouselCard = styled.div<{ img: string }>`
     width: 100%;
     aspect-ratio: 2 / 1;
-
     background-image: ${props => `url(${props.img})`};
     background-size: cover;
     border-radius: ${props => props.theme.cornerSmall};
-
     display: inline-flex !important;
     align-items: flex-end;
     justify-content: flex-start;

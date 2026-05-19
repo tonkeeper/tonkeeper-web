@@ -206,7 +206,6 @@ const DisclaimerBlock = styled.div`
     width: 100%;
     padding: 8px 16px 8px 12px;
     box-sizing: border-box;
-
     ${BorderSmallResponsive};
     background: ${props => props.theme.backgroundContent};
 `;
@@ -214,7 +213,6 @@ const DisclaimerBlock = styled.div`
 const DisclaimerText = styled(Label2)`
     display: flex;
     flex-direction: column;
-
     ${Body3Class};
     color: ${({ theme }) => theme.textPrimary};
 `;
@@ -231,7 +229,6 @@ const WarningBlock = styled.div`
     margin-bottom: 8px;
     padding: 8px 16px 8px 12px;
     justify-content: space-between;
-
     ${Body3Class};
     background: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
     color: ${p => p.theme.accentOrange};

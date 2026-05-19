@@ -18,7 +18,6 @@ const Button = styled.div<{ active: boolean }>`
     cursor: pointer;
     gap: 0.25rem;
     width: 20%;
-
     color: ${props => props.theme.tabBarInactiveIcon};
 
     ${props =>
@@ -39,7 +38,6 @@ const Block = styled.div<{ standalone?: boolean; sticky?: boolean }>`
     box-sizing: border-box;
     overflow: visible !important;
     z-index: 3;
-
     background-color: ${props => props.theme.backgroundPage};
 
     ${props =>
@@ -60,7 +58,7 @@ const Block = styled.div<{ standalone?: boolean; sticky?: boolean }>`
 
 export const FooterGlobalStyle = createGlobalStyle`
   body:not(.bottom) ${Block} {
-    &:after {
+    &::after {
       content: '';
       display: block;
       width: 100%;

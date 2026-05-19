@@ -99,7 +99,6 @@ const WalletLayout = styled.div<{ $gradient: boolean }>`
     display: flex;
     flex-direction: column;
     height: 100%;
-
     position: relative;
 `;
 

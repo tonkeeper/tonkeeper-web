@@ -101,6 +101,7 @@ const Cell = styled.div`
     min-width: 0;
     justify-content: space-between;
     position: relative;
+
     &::after {
         content: '';
         position: absolute;

@@ -85,7 +85,6 @@ const Wrapper = styled.div`
     flex-grow: 1;
     display: flex;
     justify-content: center;
-
     flex-direction: column;
     padding: 0 1rem;
     position: relative;
@@ -106,7 +105,6 @@ const TronButton = styled.button`
     background-color: transparent;
     border: none;
     outline: none;
-
     ${Body2Class};
     color: ${p => p.theme.textSecondary};
 `;

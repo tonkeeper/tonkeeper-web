@@ -37,7 +37,6 @@ const Wrapper = styled.form`
 const AssetImage = styled(Image)`
     width: 40px;
     height: 40px;
-
     border-radius: ${p => p.theme.cornerFull};
 `;
 

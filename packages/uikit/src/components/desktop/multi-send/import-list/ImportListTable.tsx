@@ -12,6 +12,7 @@ const TDBasic = styled.div<{ borderBottom?: boolean }>`
     padding: 8px 12px;
     box-sizing: border-box;
     background: ${p => p.theme.backgroundContent};
+
     &:nth-child(4n + 1) {
         border-left: 1px solid ${p => p.theme.separatorCommon};
     }
@@ -36,6 +37,7 @@ const TD = styled(TDBasic)<{
 
 const TH = styled(TDBasic)`
     color: ${p => p.theme.textTertiary};
+
     &:first-child {
         border-top-left-radius: ${p => p.theme.corner2xSmall};
         border-bottom-left-radius: ${p => p.theme.corner2xSmall};

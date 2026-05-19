@@ -47,8 +47,7 @@ const HistoryContainer = styled.div`
     ${p =>
         p.theme.proDisplayType === 'desktop' &&
         css`
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow: auto hidden;
         `}
 `;
 
@@ -60,9 +59,9 @@ const ExplorerButton = styled.button`
     align-items: center;
     justify-content: center;
     cursor: pointer;
-
     color: ${p => p.theme.iconTertiary};
     transition: color 0.15s ease-in-out;
+
     &:hover {
         color: ${p => p.theme.textAccent};
     }

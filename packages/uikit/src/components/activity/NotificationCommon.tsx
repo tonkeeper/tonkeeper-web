@@ -83,7 +83,6 @@ export const SpamBadge = styled.div`
     border-radius: ${p => p.theme.corner3xSmall};
     background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
     text-transform: uppercase;
-
     font-style: normal;
     font-size: 8.5px;
     font-weight: 510;

@@ -25,7 +25,6 @@ export const InputBlock = styled.div<{
                   min-height: 64px;
                   padding: 0 1rem;
               `}
-
     ${BorderSmallResponsive};
     display: flex;
     gap: 0.5rem;
@@ -103,7 +102,6 @@ export const InputField = styled.input<{ marginRight?: string; size?: 'small' | 
     font-size: 16px;
     padding: 30px 0 10px;
     box-sizing: border-box;
-
     ${p =>
         p.size === 'small'
             ? css`
@@ -112,7 +110,6 @@ export const InputField = styled.input<{ marginRight?: string; size?: 'small' | 
             : css`
                   padding: 30px 0 10px;
               `}
-
     color: ${props => props.theme.textPrimary};
     ${props =>
         props.marginRight &&
@@ -123,7 +120,6 @@ export const InputField = styled.input<{ marginRight?: string; size?: 'small' | 
 
 export const Label = styled.label<{ active?: boolean }>`
     user-select: none;
-
     position: absolute;
     pointer-events: none;
     transform: translate(0, 23px) scale(1);
@@ -182,7 +178,6 @@ const RightBlock = styled.div`
 const ClearBlock = styled(RightBlock)`
     cursor: pointer;
     color: ${props => props.theme.textSecondary};
-
     transition: color 0.15s ease-in-out;
 
     &:hover {

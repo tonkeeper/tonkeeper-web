@@ -35,19 +35,20 @@ export const DesktopPromotedItemText = styled.div<{ color?: string }>`
     box-sizing: border-box;
     color: ${props => props.color || props.theme.textPrimary};
 
-  
     & > span:nth-child(1) {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-height: 20px;
-      white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 20px;
+        white-space: nowrap;
     }
+
     & > span:nth-child(2) {
         color: ${props => props.color || props.theme.textSecondary};
         overflow: hidden;
         text-overflow: ellipsis;
         max-height: 16px;
-      white-space: nowrap;
+        white-space: nowrap;
+    }
 `;
 
 export const DesktopCategoryGroupItem: FC<{

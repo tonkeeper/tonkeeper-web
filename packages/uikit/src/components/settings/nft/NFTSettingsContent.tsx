@@ -41,8 +41,8 @@ const NftImageStyled = styled(Image)`
 
 const NftButton = styled(IconButton)`
     padding: 8px;
-
     background-color: ${props => props.theme.backgroundContentTint};
+
     &:hover {
         background-color: ${props => props.theme.backgroundContentAttention};
     }

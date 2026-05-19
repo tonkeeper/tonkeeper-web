@@ -9,6 +9,7 @@ const Container = styled.div<{ activeAddress: string | undefined }>`
     padding: 1rem 0;
     display: flex;
     gap: 1rem;
+
     path {
         stroke: transparent !important;
         transition: opacity 0.15s ease-in-out;
@@ -45,9 +46,7 @@ const LegendContainer = styled.div`
     grid-template-rows: repeat(auto-fit, minmax(28px, 1fr));
     grid-auto-flow: column;
     grid-auto-columns: minmax(auto, 400px);
-
     padding: 10px 0;
-
     cursor: default;
 
     ${p =>
@@ -78,7 +77,6 @@ const TokenRow = styled.div<{ opacity?: number }>`
     padding: 6px 16px;
     height: fit-content;
     cursor: pointer;
-
     transition: opacity 0.15s ease-in-out;
     overflow: hidden;
 `;

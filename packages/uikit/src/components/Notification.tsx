@@ -199,10 +199,8 @@ const Content = styled.div<{ standalone: boolean }>`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            border-top-right-radius: ${props => props.theme.cornerSmall};
-            border-top-left-radius: ${props => props.theme.cornerSmall};
-            border-bottom-right-radius: ${p.theme.cornerSmall};
-            border-bottom-left-radius: ${p.theme.cornerSmall};
+            border-radius: ${props => props.theme.cornerSmall} ${props => props.theme.cornerSmall}
+                ${p.theme.cornerSmall} ${p.theme.cornerSmall};
             max-height: calc(100% - 32px);
             overflow: auto;
             padding-top: 0;
@@ -244,7 +242,6 @@ const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
                 : css`
                       transform: translateY(0);
                   `}
-
             transition: transform ${iosKeyboardTransition};
 
             &:empty {
@@ -349,7 +346,6 @@ export const FullHeightBlock = styled(NotificationBlock)<{
         props.fitContent ? 'unset' : `calc(var(--app-height) - ${props.standalone ? 3 : 2}rem)`};
     padding-bottom: ${props => (props.noPadding ? 0 : 'calc(56px + 1rem)')};
     box-sizing: border-box;
-
     background-color: ${props => props.theme.backgroundPage};
 
     ${props =>
@@ -700,12 +696,11 @@ const IonicModalContentStyled = styled(IonContent)`
     &::part(scroll) {
         border-top-right-radius: ${props => props.theme.cornerMedium};
         border-top-left-radius: ${props => props.theme.cornerMedium};
-        padding: 0 1rem 0;
+        padding: 0 1rem;
         position: relative;
         display: flex;
         flex-direction: column;
         min-height: 100%;
-
         overscroll-behavior-y: none;
     }
 

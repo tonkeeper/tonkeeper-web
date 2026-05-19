@@ -18,7 +18,6 @@ const AssetIcon = styled(Image)`
     height: 24px;
     border-radius: ${props => props.theme.cornerFull};
     margin-right: 12px;
-
     pointer-events: none;
 `;
 
@@ -88,7 +87,6 @@ const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
         width: 6px;
         background-color: ${p => p.theme.accentBlue};
         border-radius: ${p => p.theme.cornerFull};
-
         display: ${p => (p.$badge ? 'block' : 'none')};
     }
 `;

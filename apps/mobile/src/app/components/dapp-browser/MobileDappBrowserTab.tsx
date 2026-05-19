@@ -81,14 +81,12 @@ const BackgroundStyled = styled.div<{ $isTransparent: boolean }>`
     justify-content: center;
     gap: 8px;
     height: 100%;
-
     ${p =>
         p.$isTransparent &&
         css`
             background-color: transparent;
             opacity: 0;
         `};
-
     transition: opacity 0.1s ease-in-out, background-color 0.1s ease-in-out;
 
     img {
@@ -159,9 +157,8 @@ export const MobileDappBrowserTab: FC<{
 const TabHeaderWrapper = styled.div`
     box-sizing: content-box;
     height: 32px;
-    padding: env(safe-area-inset-top) 0 4px 0;
+    padding: env(safe-area-inset-top) 0 4px;
     background-color: ${p => p.theme.backgroundPage};
-
     display: flex;
     align-items: center;
     justify-content: space-between;

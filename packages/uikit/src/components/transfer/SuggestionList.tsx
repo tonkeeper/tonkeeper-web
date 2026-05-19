@@ -52,7 +52,6 @@ const useLatestSuggestion = (acceptBlockchains?: BLOCKCHAIN_NAME[]) => {
 const Icon = styled.span`
     display: flex;
     color: ${props => props.theme.iconSecondary};
-
     padding: 8px;
     margin: -8px;
 `;

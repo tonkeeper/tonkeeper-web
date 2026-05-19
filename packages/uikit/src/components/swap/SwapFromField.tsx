@@ -22,7 +22,6 @@ const FiledHeader = styled.div`
     color: ${p => p.theme.textSecondary};
     gap: 8px;
     display: flex;
-
     padding: 4px 0;
 
     > *:first-child {

@@ -20,7 +20,6 @@ const Block = styled.form`
 const Body = styled(Body1)`
     user-select: none;
     margin-bottom: 1rem;
-
     text-align: center;
     color: ${props => props.theme.textSecondary};
 

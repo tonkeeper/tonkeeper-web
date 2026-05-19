@@ -31,7 +31,6 @@ const NftsListStyled = styled(NftsList)`
         minmax(max(${minColumnWidth}, var(--grid-item--max-width)), 1fr)
     );
     grid-gap: ${gap};
-
     margin-bottom: 0;
 `;
 
@@ -55,7 +54,6 @@ const NFTPageBody = styled.div`
 
 const NFTEmptyContainer = styled.div`
     padding: 2rem;
-
     text-align: center;
 
     & > * {
@@ -80,14 +78,12 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)<{ emptyList$: 
         p.emptyList$ &&
         css`
             height: 100%;
-            
-            ${
-                p.theme.proDisplayType === 'mobile' &&
-                css`
-                    display: flex;
-                    flex-direction: column;
-                `
-            }}
+
+            ${p.theme.proDisplayType === 'mobile' &&
+            css`
+                display: flex;
+                flex-direction: column;
+            `}
         `}
 `;
 

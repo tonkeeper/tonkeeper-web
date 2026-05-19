@@ -91,7 +91,6 @@ const Row = styled.div<{ $tabLevel?: number }>`
     padding-right: 1rem;
     ${p => `padding-left: ${16 + (p.$tabLevel ?? 0) * 24}px !important;`}
     border-bottom: none !important;
-
     width: 100%;
 `;
 
@@ -115,6 +114,7 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
         p.$isDragging &&
         css`
             background-color: ${p.theme.backgroundContent};
+
             > div {
                 border: none !important;
             }
@@ -128,6 +128,7 @@ const ListItemStyled = styled(ListItem)<{ $isDragging: boolean }>`
         css`
             border-radius: unset !important;
             background-color: ${p.theme.backgroundContent};
+
             div {
                 border: none !important;
             }

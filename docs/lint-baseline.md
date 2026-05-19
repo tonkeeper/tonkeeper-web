@@ -1,6 +1,6 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=494`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=493`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 

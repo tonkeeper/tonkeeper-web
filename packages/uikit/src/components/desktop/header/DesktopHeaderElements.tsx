@@ -42,7 +42,6 @@ const TestnetBadge = styled(Link)`
     margin-left: 10px;
     margin-right: auto;
     text-decoration: none;
-
     transition: background 0.15s ease-in-out;
 
     &:hover {

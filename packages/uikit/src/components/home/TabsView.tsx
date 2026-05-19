@@ -16,13 +16,11 @@ const TabsBlock = styled.div`
     position: relative;
     justify-content: center;
     gap: 2.25rem;
-
     user-select: none;
 `;
 
 const TabsButton = styled.div<{ active?: boolean }>`
     cursor: pointer;
-
     padding: 0.5rem;
     margin: -0.5rem;
     box-sizing: border-box;
@@ -40,7 +38,7 @@ const TabsButton = styled.div<{ active?: boolean }>`
 const Line = styled.div`
     position: absolute;
     height: 3px;
-    width: 0px;
+    width: 0;
     bottom: -0.5rem;
     border-radius: ${props => props.theme.corner3xSmall};
     background: ${props => props.theme.accentBlue};

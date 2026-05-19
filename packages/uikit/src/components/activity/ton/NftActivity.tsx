@@ -248,7 +248,6 @@ const Image = styled.img<{ isSpam: boolean; isUnverified: boolean }>`
     margin-bottom: 15px;
     border-radius: ${props => props.theme.cornerMedium};
     user-select: none;
-
     ${p =>
         p.isSpam
             ? css`
@@ -259,7 +258,6 @@ const Image = styled.img<{ isSpam: boolean; isUnverified: boolean }>`
                   opacity: 0.5;
               `
             : undefined}
-
     transition: filter 0.15s ease-in-out, opacity 0.15s ease-in-out;
 `;
 

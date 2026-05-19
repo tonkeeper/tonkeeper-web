@@ -19,7 +19,6 @@ const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
     text-align: right;
     min-width: 1px;
     flex: 1;
-
     transition: color 0.1s ease-in-out;
 
     &:disabled {
@@ -36,7 +35,6 @@ const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
 const AmountInputFieldRight = styled(Body2)<{ color?: string; isDisabled?: boolean }>`
     height: fit-content;
     align-self: center;
-
     transition: color 0.1s ease-in-out;
 
     ${p =>

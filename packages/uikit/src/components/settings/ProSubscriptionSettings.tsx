@@ -45,6 +45,7 @@ export const ProSettingsContent: FC = () => {
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     padding: 1rem 1rem 0;
     box-sizing: border-box;
+
     * {
         box-sizing: border-box;
     }

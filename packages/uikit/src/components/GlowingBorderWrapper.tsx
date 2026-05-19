@@ -13,15 +13,19 @@ export const GlowingBorderWrapper = styled.div(
         1% {
             background-position: 0 0;
         }
+
         33% {
             background-position: 50% 100%;
         }
+
         50% {
             background-position: 100% 50%;
         }
+
         75% {
             background-position: 50% 0%;
         }
+
         100% {
             background-position: 0 0;
         }

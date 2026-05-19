@@ -10,14 +10,12 @@ const Banner = styled.div`
     width: 100%;
     box-sizing: border-box;
     margin: 8px 0;
-
     background: ${p => p.theme.accentOrange};
     border-radius: ${p => p.theme.cornerSmall};
     padding: 12px 16px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-
     color: ${p => p.theme.constantBlack};
 `;
 

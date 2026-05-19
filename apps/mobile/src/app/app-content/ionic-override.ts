@@ -37,6 +37,7 @@ export const IonicOverride = css`
 
     ion-menu {
         --width: 256px;
+
         outline: none;
         height: calc(100% - var(--footer-full-height) + 1px);
 
@@ -71,17 +72,7 @@ export const IonicOverride = css`
 
     ion-back-button {
         color: ${p => p.theme.accentBlue};
-    }
 
-    ion-button {
-        --color: ${p => p.theme.accentBlue};
-    }
-
-    ion-title {
-        ${Label1Class};
-    }
-
-    ion-back-button {
         &::part(text) {
             ${Label2Class}
         }
@@ -92,6 +83,14 @@ export const IonicOverride = css`
         }
     }
 
+    ion-button {
+        --color: ${p => p.theme.accentBlue};
+    }
+
+    ion-title {
+        ${Label1Class};
+    }
+
     .header-translucent-ios ion-toolbar,
     .footer-translucent-ios ion-toolbar {
         --opacity: 0.64;
@@ -99,6 +98,7 @@ export const IonicOverride = css`
 
     .locked-transform {
         --fixed-transform: none;
+
         transform: var(--fixed-transform) !important;
     }
 `;

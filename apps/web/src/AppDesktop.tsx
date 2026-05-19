@@ -75,7 +75,7 @@ const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
     
     body {
-        font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
+        font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, sans-serif;
     }
     
     html, body, #root {
@@ -110,7 +110,6 @@ const FullSizeWrapper = styled(Container)`
 
 const Wrapper = styled.div`
     box-sizing: border-box;
-
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -190,7 +189,7 @@ const InitializeContainer = styled.div`
     display: flex;
     flex-direction: column;
     min-height: var(--app-height);
-    padding: 1rem 1rem;
+    padding: 1rem;
     box-sizing: border-box;
     position: relative;
     justify-content: center;

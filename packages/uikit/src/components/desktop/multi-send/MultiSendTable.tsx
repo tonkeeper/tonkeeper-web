@@ -300,7 +300,6 @@ const MaximumReachedContainer = styled.div`
 
 const LinkStyled = styled(Link)`
     color: ${p => p.theme.textAccent};
-
     text-decoration: unset;
 
     &:hover {

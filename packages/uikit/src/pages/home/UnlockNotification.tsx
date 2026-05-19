@@ -18,18 +18,17 @@ const Block = styled.form<{ padding: number }>`
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-
     justify-content: center;
     gap: 2rem;
     width: 100%;
 
-    @media (max-width: 440px) {
+    @media (width <= 440px) {
         padding-bottom: ${props => props.padding}px;
     }
 `;
 
 const CreatePasswordStyled = styled(CreatePassword)<{ padding: number }>`
-    @media (max-width: 440px) {
+    @media (width <= 440px) {
         padding-bottom: ${props => props.padding}px;
     }
 `;

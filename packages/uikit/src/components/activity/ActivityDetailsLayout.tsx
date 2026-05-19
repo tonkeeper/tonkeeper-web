@@ -56,9 +56,7 @@ const LabelRight = styled(Label1)`
     padding-left: 1rem;
     box-sizing: border-box;
     text-align: right;
-
     word-break: break-word;
-
     white-space: break-spaces;
     overflow: hidden;
 `;

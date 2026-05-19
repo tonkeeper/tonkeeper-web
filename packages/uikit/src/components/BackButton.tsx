@@ -51,7 +51,6 @@ export const BackButtonBlock: FC<{ onClick: () => void; className?: string }> = 
 
 const LogoutButtonBlock = styled.div`
     flex-shrink: 0;
-
     cursor: pointer;
     padding: 6px 12px;
     border-radius: ${props => props.theme.cornerMedium};

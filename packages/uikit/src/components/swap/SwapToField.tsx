@@ -28,7 +28,6 @@ const FiledHeader = styled.div`
     color: ${p => p.theme.textSecondary};
     gap: 8px;
     display: flex;
-
     padding: 4px 0;
 
     > *:first-child {
@@ -49,7 +48,6 @@ const FieldBody = styled.div`
 const ToAmountField = styled.div`
     margin-left: auto;
     overflow: auto;
-
     cursor: default;
 
     &::-webkit-scrollbar {

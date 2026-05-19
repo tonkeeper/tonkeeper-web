@@ -66,9 +66,11 @@ const Dot = styled.div<{ $type: 'success' | 'error' | 'active' | undefined }>`
         0% {
             transform: scale(1);
         }
+
         50% {
             transform: scale(1.3);
         }
+
         100% {
             transform: scale(1);
         }
@@ -78,9 +80,11 @@ const Dot = styled.div<{ $type: 'success' | 'error' | 'active' | undefined }>`
         0% {
             transform: scale(1);
         }
+
         50% {
             transform: scale(1.3);
         }
+
         100% {
             transform: scale(1);
         }
@@ -90,12 +94,15 @@ const Dot = styled.div<{ $type: 'success' | 'error' | 'active' | undefined }>`
         0% {
             transform: translateX(0);
         }
+
         25% {
             transform: translateX(4px);
         }
+
         75% {
             transform: translateX(-4px);
         }
+
         100% {
             transform: translateX(0);
         }
@@ -253,6 +260,7 @@ const DeleteIcon = () => {
 
 const TouchAnimationWrapper = styled.div<{ $isTouching: boolean }>`
     position: relative;
+
     &::after {
         content: '';
         position: absolute;
@@ -264,7 +272,6 @@ const TouchAnimationWrapper = styled.div<{ $isTouching: boolean }>`
         height: 60px;
         opacity: 0;
         transform: translate(-50%, -50%) scale(0);
-
         transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
 
         ${p =>

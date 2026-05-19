@@ -13,7 +13,7 @@ export const ScrollContainer = styled.div<{ thumbColor?: string }>`
             }
 
             &::-webkit-scrollbar {
-                -webkit-appearance: none;
+                appearance: none;
                 width: 5px;
                 background-color: transparent;
             }

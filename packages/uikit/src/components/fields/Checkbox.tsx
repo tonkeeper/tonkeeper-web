@@ -18,7 +18,6 @@ const Wrapper = styled.div`
     display: inline-flex;
     gap: 8px;
     align-items: center;
-
     cursor: pointer;
 `;
 
@@ -26,7 +25,6 @@ const IconBase = styled.div<{ checked: boolean; disabled?: boolean; $borderColor
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-width: 2px;
     border-style: solid;
     box-sizing: border-box;

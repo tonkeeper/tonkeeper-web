@@ -12,7 +12,7 @@ import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 const Grid = styled.div`
     display: grid;
-    margin: 0 0 2rem 0;
+    margin: 0 0 2rem;
     gap: 0.5rem;
     grid-template-columns: repeat(3, minmax(0, 1fr));
 `;
@@ -27,12 +27,9 @@ export const NftBlock = styled.div<{
     width: 100%;
     display: flex;
     flex-direction: column;
-
     background-color: ${props => props.theme.backgroundContent};
     transition: background-color 0.1s ease;
-
     border-radius: ${props => props.theme.cornerSmall};
-
     overflow: hidden;
 
     ${props => {
@@ -66,7 +63,6 @@ const ImageContainer = styled.div`
 export const Image = styled.div<{ url?: string }>`
     width: 100%;
     padding-bottom: 100%;
-
     ${props =>
         props.url &&
         css`
@@ -78,7 +74,7 @@ export const Image = styled.div<{ url?: string }>`
 const Text = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 0.5rem 0.75rem 0.5rem;
+    padding: 0.5rem 0.75rem;
     white-space: nowrap;
 `;
 

@@ -47,13 +47,10 @@ const Block = styled.div<{
     second?: boolean;
 }>`
     flex-shrink: 0;
-
     user-select: none;
-
     overflow: visible !important;
     top: 0;
     z-index: 4;
-
     ${p =>
         p.theme.displayType === 'full-width'
             ? css`
@@ -65,27 +62,23 @@ const Block = styled.div<{
                   width: var(--app-width);
                   max-width: 548px;
               `}
-
     ${props =>
         css`
             padding: ${props.second ? '12px 1rem 0.75rem' : '16px 1rem 1rem'};
         `}
-
     display: flex;
     box-sizing: border-box;
-
     ${props =>
         props.center &&
         css`
             justify-content: center;
         `}
-
     background-color: ${props => props.theme.backgroundPage};
 `;
 
 export const HeaderGlobalStyle = createGlobalStyle`
   body:not(.top) ${Block} {
-    &:after {
+    &::after {
       content: '';
       display: block;
       width: 100%;
@@ -131,7 +124,6 @@ const Row = styled.div`
     box-sizing: border-box;
     align-items: center;
     justify-content: space-between;
-
     background: ${props => props.theme.backgroundContentTint};
 
     &:hover {

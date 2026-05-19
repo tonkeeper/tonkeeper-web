@@ -64,11 +64,11 @@ const ContentWrapper = styled.div``;
 
 const AssetSelectStyled = styled(AssetSelect)`
     margin-bottom: 1rem;
-
     min-height: 52px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
+
     > * {
         flex: 1;
     }

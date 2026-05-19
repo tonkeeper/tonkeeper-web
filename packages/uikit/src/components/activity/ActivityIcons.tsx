@@ -3,14 +3,11 @@ import React, { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
 const ActivityIconWrapper = styled.span`
-    display: flex;
     width: 44px;
     height: 44px;
-
     border-radius: ${props => props.theme.cornerFull};
     color: ${props => props.theme.iconSecondary};
     background: ${props => props.theme.backgroundContentTint};
-
     display: flex;
     justify-content: center;
     align-items: center;

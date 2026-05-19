@@ -63,7 +63,7 @@ const GlobalStyle = createGlobalStyle`
 
     body {
         background: ${p => p.theme.backgroundPage};
-        font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
+        font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, sans-serif;
     }
     
     html, body, #root {
@@ -87,7 +87,6 @@ const GlobalStyle = createGlobalStyle`
     
     * {
       -webkit-touch-callout: none !important;
-      -webkit-user-select: none;
       user-select: none;
 
         ${() =>

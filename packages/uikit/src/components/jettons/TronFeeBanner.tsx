@@ -51,7 +51,6 @@ const TransfersNumberStatusWrapper = styled.div`
     grid-template-columns: auto auto 1fr;
     align-items: center;
     gap: 6px;
-
     ${Body3Class};
     grid-template-areas: 'a b c';
 
@@ -79,9 +78,11 @@ const TransfersNumberStatusWrapper = styled.div`
     > *:first-child {
         grid-area: a;
     }
+
     > *:nth-child(2) {
         grid-area: b;
     }
+
     > *:nth-child(3) {
         grid-area: c;
     }
@@ -232,7 +233,6 @@ const TableFirsLineText = styled.span`
         css`
             ${Body1Class};
         `}
-}
 `;
 
 const TableSecondLineText = styled(Body3)`

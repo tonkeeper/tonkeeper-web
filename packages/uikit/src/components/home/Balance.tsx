@@ -40,8 +40,8 @@ const Body = styled(Label2)`
     user-select: none;
     display: flex;
     cursor: pointer;
-
     transition: transform 0.2s ease;
+
     &:active {
         transform: scale(0.97);
     }
@@ -167,7 +167,6 @@ const BlockchainImage = styled.img`
 const DropDownItemStyled = styled(DropDownItem)`
     padding: 8px 12px;
     gap: 12px;
-
     font-family: ${p => p.theme.fontMono};
 
     > *:last-child {

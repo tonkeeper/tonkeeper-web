@@ -12,7 +12,6 @@ const Banner = styled.div`
     bottom: 16px;
     left: 16px;
     right: 16px;
-
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p => p.theme.cornerSmall};
     padding: 0 16px;

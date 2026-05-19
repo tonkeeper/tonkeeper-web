@@ -39,7 +39,6 @@ const ScanBlock = styled.div`
     display: flex;
     align-items: center;
     cursor: pointer;
-
     color: ${props => props.theme.accentBlue};
 `;
 

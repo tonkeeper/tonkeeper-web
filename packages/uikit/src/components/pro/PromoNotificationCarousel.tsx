@@ -250,8 +250,7 @@ const CarouselWrapper = styled(CarouselRootProvider)`
     align-items: center;
     width: 100%;
     overflow: hidden;
-
-    -webkit-user-select: none;
+    user-select: none;
 `;
 
 const ItemGroupStyled = styled(CarouselItemGroup)`
@@ -278,7 +277,7 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
     z-index: 0;
     border-radius: ${props => props.theme.corner2xSmall};
 
-    @media (min-width: 550px) {
+    @media (width >= 550px) {
         max-height: 40dvh;
         aspect-ratio: unset;
     }
@@ -354,7 +353,7 @@ const ImageWrapper = styled.div<{ isActive: boolean }>`
     transform: scale(${({ isActive }) => (isActive ? 1 : 0.7)});
     opacity: ${({ isActive }) => (isActive ? 1 : 0.2)};
 
-    @media (min-width: 550px) {
+    @media (width >= 550px) {
         max-height: 40dvh;
     }
 `;

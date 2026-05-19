@@ -71,7 +71,6 @@ const SettingsListItem = styled.div`
     display: flex;
     gap: 12px;
     align-items: center;
-
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
     ${hover`

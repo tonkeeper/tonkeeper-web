@@ -71,7 +71,6 @@ export const KnownNFTDnsCollections = [
 
 const Title = styled(H2)`
     word-break: break-word;
-
     user-select: none;
 `;
 
@@ -81,10 +80,8 @@ const SaleBlock = styled(Label4)`
     border-radius: 6px;
     padding: 3.5px 6px 4.5px;
     text-transform: uppercase;
-
     position: relative;
     top: -3px;
-
     white-space: nowrap;
 `;
 
