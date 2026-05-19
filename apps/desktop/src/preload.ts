@@ -22,9 +22,7 @@ ipcRenderer.on('disconnect', (_event, value: AccountConnection) =>
     tonConnectDisconnects$.next(value)
 );
 ipcRenderer.on('refresh', () => refreshes$.next());
-ipcRenderer.on('update-available', (_event, value: UpdateInfo) =>
-    updateAvailable$.next(value)
-);
+ipcRenderer.on('update-available', (_event, value: UpdateInfo) => updateAvailable$.next(value));
 
 contextBridge.exposeInMainWorld('backgroundApi', {
     platform: () => process.platform,

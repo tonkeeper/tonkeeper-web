@@ -74,25 +74,19 @@ describe('evaluateRelease', () => {
     });
 
     it('strips the leading v from the tag', () => {
-        const result = evaluateRelease(
-            { ...baseRelease, tag_name: 'v10.0.0' },
-            '9.0.0',
-            undefined
-        );
+        const result = evaluateRelease({ ...baseRelease, tag_name: 'v10.0.0' }, '9.0.0', undefined);
         expect(result?.version).toBe('10.0.0');
     });
 
     it('accepts tag names without a v prefix', () => {
-        const result = evaluateRelease(
-            { ...baseRelease, tag_name: '4.7.0' },
-            '4.6.1',
-            undefined
-        );
+        const result = evaluateRelease({ ...baseRelease, tag_name: '4.7.0' }, '4.6.1', undefined);
         expect(result?.version).toBe('4.7.0');
     });
 
     it('returns undefined for draft releases', () => {
-        expect(evaluateRelease({ ...baseRelease, draft: true }, '4.6.1', undefined)).toBeUndefined();
+        expect(
+            evaluateRelease({ ...baseRelease, draft: true }, '4.6.1', undefined)
+        ).toBeUndefined();
     });
 
     it('returns undefined for pre-releases', () => {
@@ -129,11 +123,7 @@ describe('evaluateRelease', () => {
     });
 
     it('falls back to the releases-latest URL when html_url is missing', () => {
-        const result = evaluateRelease(
-            { ...baseRelease, html_url: undefined },
-            '4.6.1',
-            undefined
-        );
+        const result = evaluateRelease({ ...baseRelease, html_url: undefined }, '4.6.1', undefined);
         expect(result?.url).toBe('https://github.com/tonkeeper/tonkeeper-web/releases/latest');
     });
 });
