@@ -1,11 +1,14 @@
-import { SwapAsset, SwapConfirmation } from './models';
+import { Configuration, SwapApi } from '../swapsApiGenerated';
+import type { OmnistonSwapMessages, SwapAsset } from '../swapsApiGenerated';
+import { removeLastSlash } from '../utils/url';
 
-export async function fetchSwapAssets(baseUrl: string): Promise<SwapAsset[]> {
-    const response = await fetch(`${baseUrl}/v2/swap/assets`);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch swap assets: ${response.status}`);
-    }
-    return response.json();
+export async function fetchSwapAssets(
+    baseUrl: string,
+    params: { q?: string; limit?: number } = {}
+): Promise<SwapAsset[]> {
+    return new SwapApi(new Configuration({ basePath: removeLastSlash(baseUrl) })).swapAssets(
+        params
+    );
 }
 
 const QUOTE_TIMEOUT_MS = 10_000;
@@ -17,7 +20,7 @@ export function subscribeToOmnistonStream(params: {
     fromAmount: string;
     userAddress: string;
     slippageBps?: number;
-    onQuote: (confirmation: SwapConfirmation) => void;
+    onQuote: (confirmation: OmnistonSwapMessages) => void;
     onError: (error: Error) => void;
     signal?: AbortSignal;
 }): { close: () => void } {
@@ -53,7 +56,7 @@ export function subscribeToOmnistonStream(params: {
                 return;
             }
 
-            params.onQuote(data as SwapConfirmation);
+            params.onQuote(data as OmnistonSwapMessages);
         } catch (e) {
             clearTimeout(quoteTimeoutId);
             close();

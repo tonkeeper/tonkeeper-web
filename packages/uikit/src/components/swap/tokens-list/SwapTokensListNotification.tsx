@@ -1,11 +1,15 @@
 import { Notification } from '../../Notification';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useAtom } from '../../../libs/useAtom';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { css, styled } from 'styled-components';
 import { SwapSearchInput } from './SwapSearchInput';
 import { SwapTokensList } from './SwapTokensList';
-import { useWalletFilteredSwapAssets } from '../../../state/swap/useSwapAssets';
+import {
+    SWAP_ASSETS_SEARCH_LIMIT,
+    useSwapTokensFilter,
+    useWalletFilteredSwapAssets
+} from '../../../state/swap/useSwapAssets';
 import { SpinnerIcon } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
@@ -89,14 +93,34 @@ const SpinnerContainer = styled.div`
 const SwapTokensListContent: FC<{ onSelect: (token: TonAsset | undefined) => void }> = ({
     onSelect
 }) => {
-    const walletSwapAssets = useWalletFilteredSwapAssets();
+    const [filter] = useSwapTokensFilter();
+    const [limit, setLimit] = useState(SWAP_ASSETS_SEARCH_LIMIT);
+    const { data: walletSwapAssets, isFetching } = useWalletFilteredSwapAssets(limit);
+
+    useEffect(() => {
+        setLimit(SWAP_ASSETS_SEARCH_LIMIT);
+    }, [filter]);
+
+    const canLoadMore = !!walletSwapAssets && walletSwapAssets.length >= limit;
+    const onLoadMore = useCallback(() => {
+        if (!canLoadMore || isFetching) {
+            return;
+        }
+
+        setLimit(currentLimit => currentLimit + SWAP_ASSETS_SEARCH_LIMIT);
+    }, [canLoadMore, isFetching]);
 
     return (
         <SwapTokensListContentWrapper>
             <SwapSearchInputStyled isDisabled={!walletSwapAssets} />
             <Divider />
             {walletSwapAssets ? (
-                <SwapTokensList onSelect={onSelect} walletSwapAssets={walletSwapAssets} />
+                <SwapTokensList
+                    onSelect={onSelect}
+                    walletSwapAssets={walletSwapAssets}
+                    onLoadMore={onLoadMore}
+                    isLoadingMore={isFetching && walletSwapAssets.length > 0}
+                />
             ) : (
                 <SpinnerContainer>
                     <SpinnerIcon />

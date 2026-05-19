@@ -1,2 +1,6 @@
 export { fetchSwapAssets, subscribeToOmnistonStream } from './SwapService';
-export type { SwapAsset, SwapConfirmation, SwapConfirmationMessage } from './models';
+export type {
+    SwapAsset,
+    OmnistonSwapMessages as SwapConfirmation,
+    TonMessage as SwapConfirmationMessage
+} from '../swapsApiGenerated';

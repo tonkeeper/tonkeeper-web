@@ -1,8 +1,5 @@
 import { Address } from '@ton/core';
-import {
-    jettonToTonAssetAmount,
-    tonAssetAddressToString
-} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { jettonToTonAssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
@@ -22,7 +19,7 @@ import { useFormatBalance } from '../../hooks/balance';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { useFormatFiat, useRate } from '../../state/rates';
-import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
+import { useSwapAssetSearch } from '../../state/swap/useSwapAssets';
 import { useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
@@ -107,15 +104,12 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
     const { data: info } = useJettonInfo(jettonAddress);
     const { data: balance } = useJettonBalance(jettonAddress);
     const isReadOnly = useIsActiveWalletWatchOnly();
-    const { data: swapAssets } = useAllSwapAssets();
 
     const address = Address.parse(jettonAddress);
     const jettonAddressRaw = address.toRawString();
-    const swapAsset = isReadOnly
-        ? undefined
-        : swapAssets?.find(a => tonAssetAddressToString(a.address) === jettonAddressRaw);
+    const swapAsset = useSwapAssetSearch(isReadOnly ? undefined : jettonAddressRaw);
     const ref = useRef<HTMLDivElement>(null);
-    if (!info || !balance || !swapAssets) {
+    if (!info || !balance || swapAsset === undefined) {
         return <CoinSkeletonPage />;
     }
 
