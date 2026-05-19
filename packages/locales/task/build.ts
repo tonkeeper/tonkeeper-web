@@ -73,7 +73,7 @@ const fillMissingLocales = (
 ) => {
     Object.entries(resources).forEach(([locale, { translation }]) => {
         Object.entries(defaultResource).forEach(([key, value]) => {
-            if (translation[key] == undefined) {
+            if (translation[key] === undefined) {
                 translation[key] = value;
             }
         });

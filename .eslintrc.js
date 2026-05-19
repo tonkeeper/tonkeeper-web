@@ -8,7 +8,7 @@ module.exports = {
         'no-underscore-dangle': 'off',
         'no-plusplus': 'off',
         'class-method-use-this': 'off',
-        eqeqeq: ['warn', 'smart'], // baseline: ~10 violations; promote to 'error' once cleaned up
+        eqeqeq: ['error', 'smart'],
         complexity: ['warn', { max: 15 }], // baseline: 25 violations at max 15
         'no-empty': ['error'],
         'no-restricted-globals': 'error',

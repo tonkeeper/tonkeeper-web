@@ -1,13 +1,13 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=479`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=470`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 
 The goal is to drive each demoted rule to zero violations, then promote it back to `'error'` (and
 lower `--max-warnings` accordingly).
 
-## Demoted rules (severity baseline: 479 warnings, 0 errors)
+## Demoted rules (severity baseline: 470 warnings, 0 errors)
 
 The following rules were demoted from `error` (or `off`) to `warn`:
 
@@ -19,7 +19,6 @@ The following rules were demoted from `error` (or `off`) to `warn`:
 | `@typescript-eslint/no-unused-vars`        |         28 | TypeScript-aware; complements `unused-imports/no-unused-vars`                                           |
 | `complexity`                               |         25 | Threshold `max: 15` (was default 20). Refactor long functions or `// eslint-disable`                    |
 | `@typescript-eslint/no-explicit-any`       |         18 | Highest-priority TS fix — re-tighten first                                                              |
-| `eqeqeq`                                   |          9 | Loose equality; mostly `== null` checks                                                                 |
 | `@typescript-eslint/no-shadow`             |          8 | Variable shadowing                                                                                      |
 | `max-classes-per-file`                     |          7 | Split files or `// eslint-disable-next-line`                                                            |
 | `unused-imports/no-unused-vars`            |          7 | Args-too; uses `^_` ignore pattern                                                                      |
