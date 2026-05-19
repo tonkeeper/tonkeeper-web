@@ -24,8 +24,48 @@ env:
     RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
+    # Strip assets from every existing pre-release/draft before the build jobs
+    # run, so retagging an existing pre-release (e.g. rc.1 → rc.2) doesn't leave
+    # the previous version's binaries attached alongside the new ones.
+    cleanup-old-assets:
+        name: cleanup-old-assets
+        runs-on: ubuntu-latest
+        steps:
+            - name: Delete assets from existing pre-releases
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  set -euo pipefail
+
+                  tags=$(gh release list --repo "$REPO" --limit 100 \
+                      --json tagName,isPrerelease,isDraft \
+                      --jq '.[] | select(.isPrerelease or .isDraft) | .tagName')
+
+                  if [ -z "$tags" ]; then
+                      echo "No pre-releases or drafts found — nothing to clean."
+                      exit 0
+                  fi
+
+                  while IFS= read -r tag; do
+                      [ -z "$tag" ] && continue
+                      echo "Cleaning assets on $tag"
+                      assets=$(gh release view "$tag" --repo "$REPO" \
+                          --json assets --jq '.assets[].name' || true)
+                      if [ -z "$assets" ]; then
+                          echo "  (no assets)"
+                          continue
+                      fi
+                      while IFS= read -r asset; do
+                          [ -z "$asset" ] && continue
+                          echo "  deleting $asset"
+                          gh release delete-asset "$tag" "$asset" --repo "$REPO" --yes
+                      done <<< "$assets"
+                  done <<< "$tags"
+
     desktop-build:
         name: desktop-build
+        needs: cleanup-old-assets
         strategy:
             matrix:
                 include:
@@ -104,6 +144,7 @@ jobs:
               run: rm ${{ github.workspace }}/AuthKey.p8
 
     ipad-build:
+        needs: cleanup-old-assets
         uses: ./.github/workflows/ipad-build.yaml
         with:
             release_tag: ${{ inputs.tag || github.ref_name }}
@@ -111,6 +152,7 @@ jobs:
 
     # Deploys to 'rc' Cloudflare preview — never touches prod
     web-build:
+        needs: cleanup-old-assets
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: 'rc'
@@ -119,6 +161,7 @@ jobs:
 
     extension-build:
         name: extension-build
+        needs: cleanup-old-assets
         runs-on: macos-14
         timeout-minutes: 10
 
