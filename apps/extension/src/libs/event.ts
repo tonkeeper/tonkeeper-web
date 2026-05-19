@@ -25,7 +25,7 @@ export type NotificationFields<Kind extends string, Value> = {
     logo?: string;
     origin: string;
     data: Value;
-} & (Kind extends 'tonConnectRequest' | 'tonLinkIntercept' ? {} : { manifest: DAppManifest });
+} & (Kind extends 'tonConnectRequest' | 'tonLinkIntercept' ? unknown : { manifest: DAppManifest });
 
 export type NotificationData =
     | NotificationFields<'tonConnectRequest', ConnectRequest>

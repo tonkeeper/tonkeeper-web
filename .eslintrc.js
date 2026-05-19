@@ -134,7 +134,7 @@ module.exports = {
                 '@typescript-eslint/indent': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off',
                 '@typescript-eslint/no-redeclare': ['error', { ignoreDeclarationMerge: true }],
-                '@typescript-eslint/ban-types': 'warn', // baseline: ~2 violations (recommended ruleset)
+                '@typescript-eslint/ban-types': 'error',
                 '@typescript-eslint/no-unused-expressions': 'warn', // baseline: ~2 violations (recommended ruleset)
 
                 /* react */
