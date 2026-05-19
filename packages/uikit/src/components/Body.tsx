@@ -179,7 +179,7 @@ export const InnerBody = React.forwardRef<
                 document.body.classList.remove('scroll');
             }, 300);
 
-            sdk.twaExpand && sdk.twaExpand();
+            sdk.twaExpand?.();
         }, 50);
 
         element.addEventListener('scroll', handlerScroll);

@@ -135,7 +135,7 @@ module.exports = {
                 '@typescript-eslint/no-non-null-assertion': 'off',
                 '@typescript-eslint/no-redeclare': ['error', { ignoreDeclarationMerge: true }],
                 '@typescript-eslint/ban-types': 'error',
-                '@typescript-eslint/no-unused-expressions': 'warn', // baseline: ~2 violations (recommended ruleset)
+                '@typescript-eslint/no-unused-expressions': 'error',
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',
