@@ -11,10 +11,17 @@ export interface UpdateInfo {
     url: string;
 }
 
+export interface ReleaseResponse {
+    tag_name?: string;
+    html_url?: string;
+    prerelease?: boolean;
+    draft?: boolean;
+}
+
 let lastNotified: string | undefined;
 let timer: NodeJS.Timeout | undefined;
 
-function isNewer(latest: string, current: string): boolean {
+export function isNewer(latest: string, current: string): boolean {
     const parse = (v: string) =>
         v.split('-')[0]
             .split('.')
@@ -29,7 +36,22 @@ function isNewer(latest: string, current: string): boolean {
     return false;
 }
 
-async function checkOnce() {
+export function evaluateRelease(
+    release: ReleaseResponse | null | undefined,
+    currentVersion: string,
+    previouslyNotified: string | undefined
+): UpdateInfo | undefined {
+    if (!release || !release.tag_name || release.draft || release.prerelease) return undefined;
+    const latest = release.tag_name.replace(/^v/, '');
+    if (!isNewer(latest, currentVersion)) return undefined;
+    if (previouslyNotified === latest) return undefined;
+    return {
+        version: latest,
+        url: release.html_url ?? 'https://github.com/tonkeeper/tonkeeper-web/releases/latest'
+    };
+}
+
+export async function checkOnce() {
     try {
         const res = await fetch(RELEASES_URL, {
             headers: {
@@ -41,27 +63,15 @@ async function checkOnce() {
             log.warn(`update check: HTTP ${res.status}`);
             return;
         }
-        const release = (await res.json()) as {
-            tag_name?: string;
-            html_url?: string;
-            prerelease?: boolean;
-            draft?: boolean;
-        };
-        if (!release.tag_name || release.draft || release.prerelease) return;
+        const release = (await res.json()) as ReleaseResponse;
+        const update = evaluateRelease(release, app.getVersion(), lastNotified);
+        if (!update) return;
 
-        const latest = release.tag_name.replace(/^v/, '');
-        if (!isNewer(latest, app.getVersion())) return;
-        if (lastNotified === latest) return;
-
-        lastNotified = latest;
-        const payload: UpdateInfo = {
-            version: latest,
-            url: release.html_url ?? 'https://github.com/tonkeeper/tonkeeper-web/releases/latest'
-        };
+        lastNotified = update.version;
         for (const win of BrowserWindow.getAllWindows()) {
-            win.webContents.send('update-available', payload);
+            win.webContents.send('update-available', update);
         }
-        log.info(`update available: ${latest}`);
+        log.info(`update available: ${update.version}`);
     } catch (e) {
         log.warn('update check failed', e);
     }
@@ -69,8 +79,18 @@ async function checkOnce() {
 
 export function startUpdateCheck() {
     if (timer) return;
-    // macOS has working Squirrel.Mac auto-updates via update-electron-app.
-    if (process.platform === 'darwin') return;
+    // Auto-update notifications elsewhere: macOS via Squirrel.Mac (update-electron-app),
+    // Windows via Squirrel.Windows. Linux has no built-in updater, so the banner is its
+    // only update signal.
+    if (process.platform !== 'linux') return;
     setTimeout(checkOnce, INITIAL_DELAY_MS);
     timer = setInterval(checkOnce, CHECK_INTERVAL_MS);
+}
+
+export function _resetForTesting() {
+    lastNotified = undefined;
+    if (timer) {
+        clearInterval(timer);
+        timer = undefined;
+    }
 }
