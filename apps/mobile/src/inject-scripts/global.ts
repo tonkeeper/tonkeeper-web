@@ -1,4 +1,4 @@
-export declare global {
+declare global {
     interface Window {
         webkit?: {
             messageHandlers?: {
@@ -19,3 +19,5 @@ export declare global {
         };
     }
 }
+
+export {};

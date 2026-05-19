@@ -82,7 +82,7 @@ module.exports = {
             rules: {
                 /* imports */
                 'import/extensions': [
-                    'warn', // baseline: ~4 violations
+                    'error',
                     'never',
                     {
                         scss: 'always',
