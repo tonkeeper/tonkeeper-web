@@ -133,7 +133,7 @@ module.exports = {
                 '@typescript-eslint/return-await': 'error',
                 '@typescript-eslint/indent': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off',
-                '@typescript-eslint/no-redeclare': ['warn', { ignoreDeclarationMerge: true }], // baseline: 1 violation
+                '@typescript-eslint/no-redeclare': ['error', { ignoreDeclarationMerge: true }],
                 '@typescript-eslint/ban-types': 'warn', // baseline: ~2 violations (recommended ruleset)
                 '@typescript-eslint/no-unused-expressions': 'warn', // baseline: ~2 violations (recommended ruleset)
 
