@@ -15,7 +15,7 @@
         "build:desktop": "npx turbo build:desktop",
         "build:ipad": "npx turbo build:ipad",
         "build:pkg": "npx turbo build:pkg",
-        "lint": "eslint --ext .ts,.tsx . --max-warnings=451",
+        "lint": "eslint --ext .ts,.tsx . --max-warnings=443",
         "lint:fix": "eslint --ext .ts,.tsx . --fix",
         "lint:css": "stylelint \"{apps,packages}/**/src/**/*.{ts,tsx,css}\"",
         "lint:css:fix": "stylelint \"{apps,packages}/**/src/**/*.{ts,tsx,css}\" --fix",

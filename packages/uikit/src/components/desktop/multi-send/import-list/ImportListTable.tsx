@@ -21,7 +21,7 @@ const TDBasic = styled.div<{ borderBottom?: boolean }>`
     ${p =>
         p.borderBottom &&
         css`
-            border-bottom: 1px solid ${p => p.theme.separatorCommon};
+            border-bottom: 1px solid ${p.theme.separatorCommon};
         `};
     border-right: 1px solid ${p => p.theme.separatorCommon};
 `;

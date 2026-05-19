@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 export const useLock = (sdk: IAppSdk) => {
     const [lock, setLock] = useState<boolean | undefined>(undefined);
     useEffect(() => {
-        sdk.storage.get<boolean>(AppKey.LOCK).then(useLock => setLock(useLock === true));
+        sdk.storage.get<boolean>(AppKey.LOCK).then(value => setLock(value === true));
 
         const unlock = () => {
             setLock(false);

@@ -263,8 +263,8 @@ const BrowserTabsPinned: FC<{
         setActiveId(null);
         const { active, over } = event;
         if (!over || !tabs || active.id === over.id) return;
-        const oldIndex = tabs.findIndex(t => t.id === active.id);
-        const newIndex = tabs.findIndex(t => t.id === over.id);
+        const oldIndex = tabs.findIndex(tab => tab.id === active.id);
+        const newIndex = tabs.findIndex(tab => tab.id === over.id);
         if (oldIndex === -1 || newIndex === -1) return;
         onUpdateOrder(arrayMove([...tabs], oldIndex, newIndex));
     };
@@ -278,7 +278,7 @@ const BrowserTabsPinned: FC<{
         return null;
     }
 
-    const activeTab = activeId ? tabs.find(t => t.id === activeId) : null;
+    const activeTab = activeId ? tabs.find(tab => tab.id === activeId) : null;
 
     return (
         <GroupWrapper>
@@ -300,7 +300,10 @@ const BrowserTabsPinned: FC<{
                 onDragCancel={() => setActiveId(null)}
                 modifiers={[restrictToVerticalAxis]}
             >
-                <SortableContext items={tabs.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                <SortableContext
+                    items={tabs.map(tab => tab.id)}
+                    strategy={verticalListSortingStrategy}
+                >
                     {tabs.map(tab => (
                         <SortableBrowserTab
                             key={tab.id}

@@ -130,7 +130,7 @@ module.exports = {
                 '@typescript-eslint/dot-notation': 'error',
                 '@typescript-eslint/comma-dangle': ['error', 'never'],
                 '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
-                '@typescript-eslint/no-shadow': 'warn', // baseline: ~8 violations
+                '@typescript-eslint/no-shadow': 'error',
                 '@typescript-eslint/return-await': 'error',
                 '@typescript-eslint/indent': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off',
