@@ -162,7 +162,8 @@ jobs:
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{ env.RELEASE_TAG }}.zip
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{ env.RELEASE_TAG }}.zip
 
-    # Runs after all builds succeed — publishes the draft with demo link and package list
+    # Runs after all builds succeed — flips the draft to published.
+    # Body and title are left untouched so manually authored release notes survive.
     publish-pre-release:
         name: publish-pre-release
         needs: [desktop-build, ipad-build, web-build, extension-build]
@@ -172,17 +173,8 @@ jobs:
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ env.RELEASE_TAG }}
-                  name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
                   draft: false
                   prerelease: true
-                  body: |
-                      ## ${{ env.RELEASE_TAG }} pre-release
-
-                      ### Demo
-                      ${{ needs.web-build.outputs.deployment-url }}
-
-                      ### Packages
-                      Desktop installers, browser extensions, and iPad build are attached below.
 
             - name: Summary
               run: |
