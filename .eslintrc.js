@@ -120,7 +120,7 @@ module.exports = {
                 '@typescript-eslint/no-explicit-any': 'warn', // baseline: ~13 violations
                 '@typescript-eslint/no-inferrable-types': 'error',
                 '@typescript-eslint/naming-convention': [
-                    'warn', // baseline: ~2 violations
+                    'error',
                     {
                         selector: 'enumMember',
                         format: ['UPPER_CASE']
