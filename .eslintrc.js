@@ -29,9 +29,7 @@ module.exports = {
                 allow: ['debug', 'error', 'info']
             }
         ],
-        // baseline: prettier/prettier set to 'error' by plugin:prettier/recommended; demoted while
-        // existing formatting drift is cleaned up
-        'prettier/prettier': 'warn'
+        'prettier/prettier': 'error'
     },
     overrides: [
         {
@@ -77,7 +75,8 @@ module.exports = {
                 'plugin:react/recommended',
                 'plugin:react-hooks/recommended',
                 'plugin:@typescript-eslint/recommended',
-                'plugin:i18next/recommended'
+                'plugin:i18next/recommended',
+                'prettier'
             ],
             rules: {
                 /* imports */
