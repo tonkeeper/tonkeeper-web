@@ -39,6 +39,11 @@ jobs:
               with:
                   cmd: install
 
+            - name: Build shared packages
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: build:pkg
+
             - name: Run lint
               uses: borales/actions-yarn@v5
               with:
