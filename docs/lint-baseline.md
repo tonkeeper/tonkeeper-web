@@ -1,13 +1,13 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=495`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=493`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 
 The goal is to drive each demoted rule to zero violations, then promote it back to `'error'` (and
 lower `--max-warnings` accordingly).
 
-## Demoted rules (severity baseline: 495 warnings, 0 errors)
+## Demoted rules (severity baseline: 493 warnings, 0 errors)
 
 The following rules were demoted from `error` (or `off`) to `warn`:
 
@@ -27,7 +27,6 @@ The following rules were demoted from `error` (or `off`) to `warn`:
 | `prettier/prettier`                        |          3 | Format drift the autofix couldn't reconcile                                                             |
 | `@typescript-eslint/naming-convention`     |          2 | Enum members must be `UPPER_CASE`                                                                       |
 | `@typescript-eslint/no-unused-expressions` |          2 | Statements with no side effect                                                                          |
-| `prefer-const`                             |          2 | `let` that's never reassigned (autofix didn't catch)                                                    |
 | `@typescript-eslint/no-non-null-assertion` |          1 |                                                                                                         |
 | `import/no-named-as-default` / `-member`   |          2 |                                                                                                         |
 

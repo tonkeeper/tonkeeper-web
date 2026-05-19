@@ -11,9 +11,9 @@ export const QrWrapper = styled.div`
 `;
 
 function chunks<T>(arr: T[], len: number): T[][] {
-    let chunks: T[][] = [],
-        i = 0,
-        n = arr.length;
+    const chunks: T[][] = [];
+    const n = arr.length;
+    let i = 0;
 
     while (i < n) {
         chunks.push(arr.slice(i, (i += len)));

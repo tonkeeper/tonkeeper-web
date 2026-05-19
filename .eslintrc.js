@@ -112,7 +112,7 @@ module.exports = {
                         varsIgnorePattern: '^_'
                     }
                 ],
-                'prefer-const': 'warn', // baseline: ~2 violations (autofix didn't catch them)
+                'prefer-const': 'error',
 
                 /* typescript */
                 '@typescript-eslint/no-use-before-define': 'off',
