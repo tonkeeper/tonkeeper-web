@@ -113,6 +113,8 @@ module.exports = {
                         varsIgnorePattern: '^_'
                     }
                 ],
+                // disabled in favor of unused-imports/no-unused-vars (above), which honors the ^_ ignore pattern
+                '@typescript-eslint/no-unused-vars': 'off',
                 'prefer-const': 'error',
 
                 /* typescript */

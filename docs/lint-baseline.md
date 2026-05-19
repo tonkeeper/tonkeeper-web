@@ -1,13 +1,13 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=443`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=420`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 
 The goal is to drive each demoted rule to zero violations, then promote it back to `'error'` (and
 lower `--max-warnings` accordingly).
 
-## Demoted rules (severity baseline: 443 warnings, 0 errors)
+## Demoted rules (severity baseline: 420 warnings, 0 errors)
 
 The following rules were demoted from `error` (or `off`) to `warn`:
 
@@ -16,7 +16,6 @@ The following rules were demoted from `error` (or `off`) to `warn`:
 | `react-hooks/exhaustive-deps`              |        269 | **Was off** — re-enabled to catch stale closures. High count is expected; treat as a backlog, not noise |
 | `no-console`                               |         70 | Already `warn` with `allow: ['debug', 'error', 'info']`                                                 |
 | `i18next/no-literal-string`                |         43 | User-facing string literals; cleanup needs translation keys                                             |
-| `@typescript-eslint/no-unused-vars`        |         28 | TypeScript-aware; complements `unused-imports/no-unused-vars`                                           |
 | `complexity`                               |         25 | Threshold `max: 15` (was default 20). Refactor long functions or `// eslint-disable`                    |
 | `@typescript-eslint/no-explicit-any`       |         18 | Highest-priority TS fix — re-tighten first                                                              |
 | `@typescript-eslint/no-non-null-assertion` |          1 |                                                                                                         |
@@ -41,3 +40,6 @@ The following rules were demoted from `error` (or `off`) to `warn`:
     classes in single files (e.g. `Atom`/`Subject`/`ReplaySubject` in `atom.ts`, polyfill class sets
     in `bluetooth-plugin.ts`, `BaseApp` + helpers in `AppSdk.ts`). The "one class per file" rule is
     a stylistic preference that conflicts with this design choice.
+-   `@typescript-eslint/no-unused-vars` — disabled in favor of `unused-imports/no-unused-vars`,
+    which honors the `^_` ignore pattern. Both rules check the same thing; running both produces
+    duplicate violations for any unused variable not prefixed with `_`.
