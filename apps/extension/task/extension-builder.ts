@@ -11,6 +11,10 @@ export const BUILD_BASE_PATH = 'dist';
 export class ExtensionBuilder {
     public readonly version: string;
 
+    public readonly manifestVersion: string;
+
+    public readonly manifestVersionName: string | undefined;
+
     private readonly isDevMode = process.env.NODE_ENV === 'development';
 
     private readonly env: Record<string, string>;
@@ -31,6 +35,9 @@ export class ExtensionBuilder {
             throw new Error('Invalid package.json');
         }
         this.version = packageJson.version;
+        const { manifestVersion, manifestVersionName } = toManifestVersion(this.version);
+        this.manifestVersion = manifestVersion;
+        this.manifestVersionName = manifestVersionName;
 
         const { PATH, ...baseEnv } = process.env;
         this.env = {
@@ -89,8 +96,17 @@ export class ExtensionBuilder {
 
     private updateManifestVersion() {
         const manifestData = this.readManifest();
-        manifestData.version = this.version;
+        this.applyManifestVersion(manifestData);
         this.writeManifest(manifestData);
+    }
+
+    public applyManifestVersion(manifestData: any) {
+        manifestData.version = this.manifestVersion;
+        if (this.manifestVersionName) {
+            manifestData.version_name = this.manifestVersionName;
+        } else {
+            delete manifestData.version_name;
+        }
     }
 
     public archive() {
@@ -109,4 +125,25 @@ export class ExtensionBuilder {
     public writeManifest(data: any) {
         fs.writeFileSync(`${this.buildPath}/manifest.json`, JSON.stringify(data));
     }
+}
+
+// Chrome/Firefox require manifest `version` to be 1-4 dot-separated integers (0-65536).
+// A semver like "4.6.2-pre.3" is rejected, so we map the pre-release counter into a
+// 4th numeric segment ("4.6.2.3") and keep the original semver in `version_name` for
+// display in chrome://extensions. Returns undefined name when no remap was needed.
+export function toManifestVersion(semver: string): {
+    manifestVersion: string;
+    manifestVersionName: string | undefined;
+} {
+    const [core, prerelease] = semver.split('-', 2);
+    if (!prerelease) {
+        return { manifestVersion: core, manifestVersionName: undefined };
+    }
+    const trailingInt = prerelease.match(/(\d+)$/);
+    const coreSegments = core.split('.');
+    const manifestVersion =
+        coreSegments.length < 4 && trailingInt
+            ? `${core}.${trailingInt[1]}`
+            : core;
+    return { manifestVersion, manifestVersionName: semver };
 }
