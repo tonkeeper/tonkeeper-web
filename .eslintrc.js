@@ -9,7 +9,7 @@ module.exports = {
         'no-plusplus': 'off',
         'class-method-use-this': 'off',
         eqeqeq: ['warn', 'smart'], // baseline: ~10 violations; promote to 'error' once cleaned up
-        complexity: 'warn', // baseline: ~5 violations; default threshold is 20, consider tightening
+        complexity: ['warn', { max: 15 }], // baseline: 25 violations at max 15
         'no-empty': ['error'],
         'no-restricted-globals': 'error',
         'no-param-reassign': 'off',
@@ -146,7 +146,7 @@ module.exports = {
                     }
                 ],
                 'react-hooks/rules-of-hooks': 'error',
-                'react-hooks/exhaustive-deps': 'off',
+                'react-hooks/exhaustive-deps': 'warn', // baseline: 269 violations; stale-closure detection re-enabled (was off)
                 'react/display-name': 'off',
                 'react/prop-types': 'off'
             },

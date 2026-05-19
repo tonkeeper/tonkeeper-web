@@ -15,7 +15,7 @@
         "build:desktop": "npx turbo build:desktop",
         "build:ipad": "npx turbo build:ipad",
         "build:pkg": "npx turbo build:pkg",
-        "lint": "eslint --ext .ts,.tsx . --max-warnings=205",
+        "lint": "eslint --ext .ts,.tsx . --max-warnings=494",
         "lint:fix": "eslint --ext .ts,.tsx . --fix",
         "typecheck": "npx turbo typecheck",
         "prepare": "husky",
