@@ -1,10 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TonConnectError } from '../../../entries/exception';
-import {
-    SEND_TRANSACTION_ERROR_CODES,
-    TonConnectAppRequest
-} from '../../../entries/tonConnect';
+import { SEND_TRANSACTION_ERROR_CODES, TonConnectAppRequest } from '../../../entries/tonConnect';
 import type { IStorage } from '../../../Storage';
 import type { AccountConnectionHttp } from '../connectionService';
 
@@ -282,7 +279,6 @@ describe('TonConnectSSE.handleMessage', () => {
                 expect.objectContaining({ message: 'Account not found' })
             );
         });
-
     });
 
     describe('signData', () => {

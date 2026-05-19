@@ -89,8 +89,8 @@ const Icon = styled.div`
         background: ${p => p.theme.backgroundPage};
         mask: radial-gradient(
             ellipse 60% 40% at 50% 90%,
-            rgba(0, 0, 0, 0) 30%,
-            rgba(0, 0, 0, 1) 215%
+            rgb(0 0 0 / 0%) 30%,
+            rgb(0 0 0 / 100%) 215%
         );
     }
 

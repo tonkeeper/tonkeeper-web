@@ -56,11 +56,7 @@ export const ConfirmOperationHeading: FC<{
                     i === 0 ? (
                         <TokenIcon key={i} src={icon.src} noRadius={icon.noRadius} />
                     ) : (
-                        <OverlappingTokenIcon
-                            key={i}
-                            src={icon.src}
-                            noRadius={icon.noRadius}
-                        />
+                        <OverlappingTokenIcon key={i} src={icon.src} noRadius={icon.noRadius} />
                     )
                 )}
             </IconsRow>

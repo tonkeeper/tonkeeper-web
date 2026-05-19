@@ -13,7 +13,6 @@ const TokenSymbol = styled(Label2)`
     text-overflow: ellipsis;
     flex-shrink: 0;
     color: ${p => p.theme.textPrimary};
-
     transition: color 0.15s ease-in-out;
 `;
 

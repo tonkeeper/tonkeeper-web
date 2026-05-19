@@ -80,7 +80,7 @@ const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
                   -webkit-overflow-scrolling: touch;
               `
             : css`
-                  @media (min-width: 600px) {
+                  @media (width >= 600px) {
                       border-left: 1px solid ${props.theme.separatorCommon};
                       border-right: 1px solid ${props.theme.separatorCommon};
                   }

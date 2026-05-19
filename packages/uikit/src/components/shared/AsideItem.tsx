@@ -14,7 +14,6 @@ export const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     border-radius: ${p => p.theme.corner2xSmall};
     box-sizing: border-box;
     cursor: pointer;
-
     padding: 6px 10px;
     width: 100%;
     height: 36px;

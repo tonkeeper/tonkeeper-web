@@ -81,7 +81,6 @@ const BlockchainImage = styled.img`
 const DropDownItemStyled = styled(DropDownItem)`
     padding: 8px 12px;
     gap: 12px;
-
     font-family: ${p => p.theme.fontMono};
 
     > *:last-child {

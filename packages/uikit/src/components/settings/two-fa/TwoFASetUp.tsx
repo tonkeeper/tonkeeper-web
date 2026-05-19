@@ -221,7 +221,6 @@ const StepContainer = styled.div<{ $active?: boolean }>`
 
     > *:first-child {
         margin-bottom: 8px;
-
         color: ${p => (p.$active ? p.theme.iconPrimary : p.theme.iconTertiary)};
     }
 
@@ -229,7 +228,6 @@ const StepContainer = styled.div<{ $active?: boolean }>`
         margin-bottom: 16px;
         flex: 1;
         max-width: 196px;
-
         color: ${p => (p.$active ? p.theme.textPrimary : p.theme.textSecondary)};
         text-wrap: balance;
         text-align: center;

@@ -18,6 +18,7 @@ export const IconButton = styled.button<{ transparent?: boolean }>`
         background-color: ${props =>
             props.transparent ? 'transparent' : props.theme.backgroundContentTint};
     }
+
     border: none;
 `;
 
@@ -30,7 +31,6 @@ export const IconButtonTransparentBackground = styled(IconButton)`
     }
 
     background-color: transparent;
-
     transition: opacity 0.15s ease-in-out;
 
     &:hover {

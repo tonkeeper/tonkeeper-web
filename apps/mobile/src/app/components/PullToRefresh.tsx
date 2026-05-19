@@ -92,7 +92,7 @@ export const RefreshContainer = styled.div<{ $pullProgress: number }>`
     z-index: 50;
     background: ${p => p.theme.buttonTertiaryBackground};
     border-radius: 50%;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 4%);
 `;
 
 export const IconWrapper = styled.div<{ $rotation: number; $isRefreshing: boolean }>`
@@ -109,6 +109,7 @@ export const IconWrapper = styled.div<{ $rotation: number; $isRefreshing: boolea
         from {
             transform: rotate(0deg);
         }
+
         to {
             transform: rotate(360deg);
         }

@@ -6,7 +6,6 @@ import { Body2 } from '../Text';
 export const Body = styled(Body2)<{ open: boolean; margin?: 'small' | 'last' }>`
     color: ${props => props.theme.textSecondary};
     margin-bottom: 0.75rem;
-
     word-break: break-word;
 
     ${props => {
@@ -45,10 +44,9 @@ const More = styled.span<{ contentColor?: boolean }>`
     bottom: 0;
     right: 0;
     padding-left: 2rem;
-
     background: linear-gradient(
         90deg,
-        rgba(16, 22, 31, 0) 0%,
+        rgb(16 22 31 / 0%) 0%,
         ${props =>
                 props.contentColor ? props.theme.backgroundContent : props.theme.backgroundPage}
             20%

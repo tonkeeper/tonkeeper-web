@@ -6,24 +6,21 @@ const SentenceInput = styled.input`
     margin: 0;
     border: none;
     outline: none;
+
     /* added styles */
-    font-family: inherit;
     font-size: inherit;
     background: transparent;
     color: ${props => props.theme.textPrimary};
-
-    font-family: 'Montserrat', sans-serif;
+    font-family: Montserrat, sans-serif;
     font-style: normal;
     font-weight: 600;
-
     line-height: 49px;
     text-align: right;
-
-    -moz-appearance: textfield;
+    appearance: textfield;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
+        appearance: none;
     }
 `;
 

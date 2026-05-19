@@ -12,13 +12,13 @@ export interface SwitchProps {
 const Wrapper = styled.div<{ disabled?: boolean }>`
     flex-shrink: 0;
     position: relative;
-    margin: -5px 0 -5px 0;
+    margin: -5px 0;
     width: 51px;
     display: inline-block;
     vertical-align: middle;
     text-align: left;
     cursor: pointer;
-    -webkit-user-select: none;
+    user-select: none;
     -webkit-tap-highlight-color: transparent;
     ${props =>
         props.disabled &&
@@ -54,8 +54,8 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
             transition: margin 0.2s ease-in-out;
         `}
 
-    &:before,
-    &:after {
+    &::before,
+    &::after {
         display: block;
         float: left;
         width: 50%;
@@ -67,7 +67,7 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
         box-sizing: border-box;
     }
 
-    &:before {
+    &::before {
         content: '';
         text-transform: uppercase;
         padding-left: 10px;
@@ -75,7 +75,7 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
         color: ${props => props.theme.textPrimary};
     }
 
-    &:after {
+    &::after {
         content: '';
         text-transform: uppercase;
         padding-right: 10px;

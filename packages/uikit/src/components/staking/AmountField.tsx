@@ -72,11 +72,11 @@ const AmountInputStyled = styled.input<{ $widthPx: number }>`
 
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
+        appearance: none;
         margin: 0;
     }
 
-    -moz-appearance: textfield;
+    appearance: textfield;
 `;
 
 const TokenLabel = styled.span`

@@ -18,7 +18,6 @@ const AssetIcon = styled(Image)`
     width: 24px;
     height: 24px;
     border-radius: ${props => props.theme.cornerFull};
-
     pointer-events: none;
 `;
 

@@ -54,7 +54,6 @@ const Description = styled.div`
 const Text = styled.div`
     display: flex;
     flex-direction: column;
-
     user-select: none;
 `;
 
@@ -92,13 +91,12 @@ const CheckboxBlock = styled.span`
 
 export const DisclaimerBlock = styled.div`
     margin: 2rem 0;
-    padding: 18px 18px;
+    padding: 18px;
     box-sizing: border-box;
     display: flex;
     gap: 0.5rem;
     flex-direction: column;
     width: 100%;
-
     background: ${props => props.theme.backgroundContent};
     border-radius: ${props => props.theme.cornerSmall};
 `;

@@ -16,19 +16,16 @@ const SentenceInput = styled.input`
     font-size: inherit;
     background: transparent;
     color: ${props => props.theme.textPrimary};
-
-    font-family: 'Montserrat', sans-serif;
+    font-family: Montserrat, sans-serif;
     font-style: normal;
     font-weight: 600;
-
     line-height: 49px;
     text-align: right;
-
-    -moz-appearance: textfield;
+    appearance: textfield;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
+        appearance: none;
     }
 `;
 
@@ -119,10 +116,9 @@ const Symbol = styled.span<{ $fontSize: number }>`
     padding-left: 12px;
     white-space: pre;
     font-weight: 600;
-
     font-size: ${p => p.$fontSize}px;
 
-    @media (max-width: 600px) {
+    @media (width <= 600px) {
         padding-left: 8px;
     }
 `;
@@ -132,18 +128,14 @@ const SecondCurrencyBlock = styled(Body1)`
     align-items: center;
     cursor: pointer;
     z-index: 2;
-
     padding: 8px 16px;
-
     color: ${props => props.theme.textSecondary};
     border: 1px solid ${props => props.theme.buttonTertiaryBackground};
     border-radius: ${props => props.theme.cornerLarge};
-
     max-width: 80%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: pre;
-
     user-select: none;
 `;
 

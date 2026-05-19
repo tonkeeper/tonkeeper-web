@@ -44,8 +44,7 @@ describe('cryptoService', () => {
         const blob = await encrypt(plaintext, password);
         const parts = blob.split(':');
         const ct = parts[4];
-        const flipped =
-            ct.slice(0, ct.length - 4) + (ct.endsWith('A') ? 'B===' : 'A===');
+        const flipped = ct.slice(0, ct.length - 4) + (ct.endsWith('A') ? 'B===' : 'A===');
         parts[4] = flipped;
         await expect(decrypt(parts.join(':'), password)).rejects.toBeDefined();
     });

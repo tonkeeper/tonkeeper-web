@@ -10,11 +10,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useActivateTrialMutation, useSelectWalletForProMutation } from '../../state/pro';
 import { useProCompatibleAccountsWallets, useActiveWallet } from '../../state/wallet';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
-import {
-    Notification,
-    NotificationFooterPortal,
-    useSetNotificationOnBack
-} from '../Notification';
+import { Notification, NotificationFooterPortal, useSetNotificationOnBack } from '../Notification';
 import { ProSubscriptionLightHeader } from './ProSubscriptionLightHeader';
 import { ProWalletListItem } from './ProWalletListItem';
 import { ErrorBoundary } from '../shared/ErrorBoundary';
@@ -27,9 +23,7 @@ export const ProTrialStartNotification: FC<{
     return (
         <Notification isOpen={isOpen} handleClose={() => onClose()}>
             {() => (
-                <ErrorBoundary
-                    fallbackRender={fallbackRenderOver('Failed to display Trial modal')}
-                >
+                <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Trial modal')}>
                     <ProTrialStartContent key={isOpen ? 'open' : 'closed'} onClose={onClose} />
                 </ErrorBoundary>
             )}

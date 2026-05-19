@@ -53,7 +53,6 @@ export const MaxRow = styled.div`
     align-items: center;
     justify-content: space-between;
     width: 100%;
-
     user-select: none;
 `;
 
@@ -92,7 +91,7 @@ export const Symbol = styled(Num2)`
     white-space: pre;
     padding-bottom: 3px;
 
-    @media (max-width: 600px) {
+    @media (width <= 600px) {
         padding-left: 8px;
     }
 `;
@@ -112,18 +111,14 @@ export const FiatBlock = styled(Body1)`
     left: 50%;
     transform: translate(-50%, 50px);
     z-index: 2;
-
     padding: 8px 16px;
-
     color: ${props => props.theme.textSecondary};
     border: 1px solid ${props => props.theme.buttonTertiaryBackground};
     border-radius: ${props => props.theme.cornerLarge};
-
     max-width: 80%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: pre;
-
     user-select: none;
 `;
 

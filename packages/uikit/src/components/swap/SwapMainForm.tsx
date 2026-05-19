@@ -29,7 +29,6 @@ const ChangeIconStyled = styled(IconButton)`
     right: calc(50% - 16px);
     bottom: -20px;
     border: none;
-
     background-color: ${props => props.theme.buttonTertiaryBackground};
 
     > svg {
@@ -38,6 +37,7 @@ const ChangeIconStyled = styled(IconButton)`
 
     &:hover {
         background-color: ${props => props.theme.buttonTertiaryBackgroundHighlighted};
+
         > svg {
             color: ${props => props.theme.iconPrimary};
         }

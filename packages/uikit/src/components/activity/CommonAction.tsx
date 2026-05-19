@@ -10,18 +10,14 @@ import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 export const ListItemGrid = styled(ListItemPayload)`
     display: grid;
     grid-template-columns: min-content 1fr;
-    column-gap: 1rem;
-    row-gap: 0.5rem;
-
+    gap: 0.5rem 1rem;
     align-items: flex-start;
 `;
 
 export const Description = styled.div`
     flex-grow: 1;
-
     display: flex;
     flex-direction: column;
-
     white-space: nowrap;
 `;
 

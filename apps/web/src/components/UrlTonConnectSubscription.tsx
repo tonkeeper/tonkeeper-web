@@ -21,12 +21,15 @@ export const UrlTonConnectSubscription = () => {
         useCompleteHttpConnection();
 
     const handlerClose = async (
-        result: {
-            replyItems: TonConnectEventPayload;
-            manifest: DAppManifest;
-            account: Account;
-            walletId: WalletId;
-        } | null | TonConnectError
+        result:
+            | {
+                  replyItems: TonConnectEventPayload;
+                  manifest: DAppManifest;
+                  account: Account;
+                  walletId: WalletId;
+              }
+            | null
+            | TonConnectError
     ) => {
         if (!params) return;
         responseReset();

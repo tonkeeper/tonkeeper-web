@@ -6,11 +6,9 @@ import { IconButtonTransparentBackground } from './IconButton';
 
 export const ButtonMock = styled.div`
     flex-shrink: 0;
-
     cursor: pointer;
     width: 2rem;
     height: 2rem;
-
     border-radius: ${props => props.theme.cornerFull};
 `;
 

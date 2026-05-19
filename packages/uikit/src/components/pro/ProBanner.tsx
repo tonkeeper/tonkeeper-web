@@ -27,8 +27,7 @@ const ProBannerStyled = styled.div`
     ${p =>
         p.theme.proDisplayType === 'mobile' &&
         css`
-            flex-direction: row;
-            flex-wrap: nowrap;
+            flex-flow: row nowrap;
 
             > *:last-child {
                 color: ${p.theme.iconSecondary};

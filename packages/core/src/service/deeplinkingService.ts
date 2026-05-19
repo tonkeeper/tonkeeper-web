@@ -12,7 +12,7 @@ import {
 import { DNSApi } from '../tonApiV2';
 import { APIConfig } from '../entries/apis';
 import { JettonEncoder, JettonWalletNotFound } from './ton-blockchain/encoder/jetton-encoder';
-import { TonAsset, tonAssetAddressToString } from '../entries/crypto/asset/ton-asset';
+import { TonAsset } from '../entries/crypto/asset/ton-asset';
 
 export function seeIfBringToFrontLink(options: { url: string }) {
     const { query } = queryString.parseUrl(options.url);

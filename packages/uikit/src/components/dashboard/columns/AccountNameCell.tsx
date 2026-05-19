@@ -5,7 +5,7 @@ import { AccountAndWalletInfo } from '../../account/AccountAndWalletInfo';
 import styled from 'styled-components';
 import { useMutateActiveTonWallet } from '../../../state/wallet';
 import { AppRoute } from '../../../libs/routes';
-import { useNavigate } from "../../../hooks/router/useNavigate";
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const AccountAndWalletInfoStyled = styled(AccountAndWalletInfo)`
     cursor: pointer;

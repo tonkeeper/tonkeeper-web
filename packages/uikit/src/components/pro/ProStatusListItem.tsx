@@ -109,7 +109,6 @@ const ListItemStyled = styled(ListItem)`
 const ListItemPayloadStyled = styled(ListItemPayload)`
     flex-direction: column;
     gap: 0;
-
     padding-top: 10px;
     padding-bottom: 10px;
 `;

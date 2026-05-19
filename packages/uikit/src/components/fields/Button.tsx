@@ -24,25 +24,20 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
     position: relative;
     border: 0;
     outline: 0;
-
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 8px;
-
     font-style: normal;
-
     transition: background-color 0.1s ease, color 0.1s ease;
-
     ${p =>
         p.theme.displayType === 'full-width'
             ? Body2Class
             : css`
-                  font-family: 'Montserrat', sans-serif;
+                  font-family: Montserrat, sans-serif;
                   font-weight: 600;
               `}
-
     ${props =>
         !props.disabled
             ? css`
@@ -51,7 +46,6 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
             : css`
                   cursor: not-allowed;
               `}
-
     flex-shrink: 0;
 
     ${props =>
@@ -280,7 +274,6 @@ export const ButtonFlat = styled.button`
     background: transparent;
     border: none;
     padding: 0;
-
     color: ${p => p.theme.accentBlue};
     opacity: 1;
     transition: opacity 0.15s ease-in-out;

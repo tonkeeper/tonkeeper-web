@@ -17,7 +17,6 @@ export const MethodImageRounded = styled(Image)`
     width: 40px;
     height: 40px;
     border-radius: ${props => props.theme.cornerFull};
-
     margin-right: 12px;
     pointer-events: none;
     flex-shrink: 0;

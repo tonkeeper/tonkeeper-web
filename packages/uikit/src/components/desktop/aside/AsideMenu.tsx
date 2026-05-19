@@ -80,12 +80,11 @@ const AsideContentContainer = styled.div`
     width: 100%;
     box-sizing: border-box;
     height: calc(100% - 69px);
-
     background: ${p =>
         p.theme.proDisplayType === 'desktop' ? p.theme.backgroundContent : p.theme.backgroundPage};
     display: flex;
     flex-direction: column;
-    padding: 0 0.5rem 0;
+    padding: 0 0.5rem;
 
     > *:first-child {
         padding-top: 0.5rem;
@@ -98,7 +97,6 @@ const DividerStyled = styled.div<{ isHidden?: boolean }>`
     background-color: ${p => p.theme.separatorCommon};
     margin: 0 -0.5rem;
     width: calc(100% + 1rem);
-
     transition: opacity 0.15s ease-in-out;
 `;
 
@@ -116,7 +114,6 @@ const AsideMenuBottom = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-
     background: ${p =>
         p.theme.proDisplayType === 'desktop' ? p.theme.backgroundContent : p.theme.backgroundPage};
     padding-bottom: 0.5rem;

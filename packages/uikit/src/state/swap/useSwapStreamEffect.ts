@@ -59,7 +59,9 @@ export function useSwapStreamEffect() {
 
         const fromAmountWei = unShiftedDecimals(fromAmountRelative, fromAsset.decimals);
 
-        const paramsKey = `${toTradeAssetId(fromAsset.address)}:${toTradeAssetId(toAsset.address)}:${fromAmountWei.toFixed(0)}:${slippageBps}:${wallet.rawAddress}`;
+        const paramsKey = `${toTradeAssetId(fromAsset.address)}:${toTradeAssetId(
+            toAsset.address
+        )}:${fromAmountWei.toFixed(0)}:${slippageBps}:${wallet.rawAddress}`;
         const isParamsChanged = lastParamsRef.current !== paramsKey;
         lastParamsRef.current = paramsKey;
 

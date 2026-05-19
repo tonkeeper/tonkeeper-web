@@ -194,7 +194,9 @@ const NameInput: FC<{
                 placeholder="List name"
             />
             <InputRight>
-                <Body2>{rowsNumber}&nbsp;{t('multi_send_wallets')}</Body2>
+                <Body2>
+                    {rowsNumber}&nbsp;{t('multi_send_wallets')}
+                </Body2>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;

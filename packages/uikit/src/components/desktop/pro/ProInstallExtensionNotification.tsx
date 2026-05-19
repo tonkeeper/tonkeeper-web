@@ -247,7 +247,6 @@ const ListItemStyled = styled(ListItem)`
 const ListItemPayloadStyled = styled(ListItemPayload)<{ alignItems?: string }>`
     padding-top: 10px;
     padding-bottom: 10px;
-
     align-items: ${({ alignItems }) => alignItems ?? 'center'};
 `;
 

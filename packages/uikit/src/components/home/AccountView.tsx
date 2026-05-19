@@ -61,7 +61,7 @@ export const Background = styled.div<{ extension?: boolean; margin?: boolean }>`
     ${props =>
         props.extension &&
         css`
-            @media (max-width: 768px) {
+            @media (width <= 768px) {
                 max-width: 217px;
                 padding: 16px;
             }
@@ -85,7 +85,7 @@ export const AddressText = styled(Body1)<{ extension?: boolean }>`
     ${props =>
         props.extension &&
         css`
-            @media (max-width: 768px) {
+            @media (width <= 768px) {
                 margin-top: 8px;
             }
         `}
@@ -101,7 +101,7 @@ const TextBlock = styled.div<{ extension?: boolean }>`
     ${props =>
         props.extension &&
         css`
-            @media (max-width: 768px) {
+            @media (width <= 768px) {
                 padding-bottom: 0;
             }
         `}

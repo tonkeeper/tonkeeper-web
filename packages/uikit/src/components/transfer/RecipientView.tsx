@@ -195,8 +195,7 @@ export const RecipientView: FC<{
     }, [acceptBlockchains, recipient, network]);
 
     const { data: toAccount, isFetching: isAccountFetching } = useToAccount(
-        isValidForBlockchain === BLOCKCHAIN_NAME.TON &&
-            seeIfValidTonRecipient(recipient, network),
+        isValidForBlockchain === BLOCKCHAIN_NAME.TON && seeIfValidTonRecipient(recipient, network),
         recipient
     );
 

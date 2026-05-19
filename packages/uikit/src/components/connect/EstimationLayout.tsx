@@ -48,11 +48,9 @@ const Block = styled.div`
     width: 100%;
     box-sizing: border-box;
     padding: 12px 16px;
-
     background-color: ${props => props.theme.accentOrange};
     position: relative;
     border-radius: ${props => props.theme.cornerSmall};
-
     user-select: none;
 `;
 

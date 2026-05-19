@@ -8,7 +8,13 @@ import { useTranslation } from '../../../hooks/translation';
 import { useActiveTonWalletConfig } from '../../../state/wallet';
 import { IconButton } from '../../../components/fields/IconButton';
 import { BorderSmallResponsive } from '../../../components/shared/Styles';
-import { isSpamNft, useHideNft, useMakeNftVisible, useMarkNftAsTrusted, useWalletNftList } from "../../../state/nft";
+import {
+    isSpamNft,
+    useHideNft,
+    useMakeNftVisible,
+    useMarkNftAsTrusted,
+    useWalletNftList
+} from '../../../state/nft';
 import { SettingsNFTCollection, SettingsSingleNFT } from './models';
 import { SpamNftInfoNotification } from './SpamNftInfoNotification';
 import { Image } from '../../../components/shared/Image';
@@ -35,8 +41,8 @@ const NftImageStyled = styled(Image)`
 
 const NftButton = styled(IconButton)`
     padding: 8px;
-
     background-color: ${props => props.theme.backgroundContentTint};
+
     &:hover {
         background-color: ${props => props.theme.backgroundContentAttention};
     }

@@ -253,7 +253,6 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
 const CoinInfoWrapper = styled.div`
     padding: 1rem 0;
     display: flex;
-
     gap: 1rem;
 
     > img {
@@ -266,7 +265,6 @@ const CoinInfoWrapper = styled.div`
 const TronCoinInfoWrapper = styled.div`
     padding: 1rem 0;
     display: flex;
-
     gap: 1rem;
 
     > img {
@@ -382,8 +380,7 @@ const HistoryContainer = styled.div`
     ${p =>
         p.theme.proDisplayType === 'desktop' &&
         css`
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow: auto hidden;
         `}
 `;
 

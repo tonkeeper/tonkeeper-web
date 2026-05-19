@@ -45,7 +45,6 @@ const FullSizeWrapper = styled(Container)`
 
 const Wrapper = styled.div`
     box-sizing: border-box;
-
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -98,7 +97,6 @@ const PreferencesRoutingWrapper = styled.div`
 const FullSizeWrapperBounded = styled(FullSizeWrapper)`
     max-height: 100%;
     overflow: auto;
-
     justify-content: center;
 `;
 

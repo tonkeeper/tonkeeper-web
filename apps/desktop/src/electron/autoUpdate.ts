@@ -2,7 +2,7 @@ import { app, autoUpdater, BrowserWindow, webContents } from 'electron';
 
 export default class AppUpdate {
     constructor() {
-        autoUpdater.addListener('update-available', function (event: any) {
+        autoUpdater.addListener('update-available', function () {
             console.log('update available');
         });
         autoUpdater.addListener(
@@ -22,7 +22,7 @@ export default class AppUpdate {
         autoUpdater.addListener('error', function (error) {
             console.log(error);
         });
-        autoUpdater.addListener('checking-for-update', function (event: any) {
+        autoUpdater.addListener('checking-for-update', function () {
             console.log('checking-for-update');
         });
 
@@ -42,7 +42,7 @@ export default class AppUpdate {
 }
 
 function notify(title: string, message: string) {
-    let windows = BrowserWindow.getAllWindows();
+    const windows = BrowserWindow.getAllWindows();
     if (windows.length == 0) {
         return;
     }

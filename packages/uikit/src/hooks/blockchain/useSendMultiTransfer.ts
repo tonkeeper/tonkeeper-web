@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TonEstimation, TonRecipient } from "@tonkeeper/core/dist/entries/send";
+import { TonEstimation, TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 import BigNumber from 'bignumber.js';
 import { useTrackTransactionSent } from '../analytics/events-hooks';

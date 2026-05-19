@@ -147,7 +147,6 @@ const TokenListItemWrapper = styled.button`
     display: flex;
     gap: 12px;
     background-color: transparent;
-
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
 

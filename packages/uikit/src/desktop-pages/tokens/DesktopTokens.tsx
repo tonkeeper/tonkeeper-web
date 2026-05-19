@@ -101,6 +101,7 @@ const HideButton = styled.button`
         css`
             justify-content: flex-start;
             width: 100%;
+
             > svg {
                 width: 16px;
                 height: 16px;

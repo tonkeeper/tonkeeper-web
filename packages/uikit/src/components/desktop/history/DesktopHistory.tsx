@@ -15,7 +15,6 @@ import { ForTargetEnv } from '../../shared/TargetEnv';
 import { Body2Class } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 
-
 const ContainerQuery = styled.div`
     container-type: inline-size;
 `;
@@ -46,6 +45,7 @@ const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
             grid-template-columns: 152px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
             column-gap: 8px;
             padding: 0 1rem;
+
             * {
                 box-sizing: content-box;
             }

@@ -22,10 +22,7 @@ const HeaderButtons = styled.div`
 
 const HeaderLabel = styled(Label2)`
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 3rem;
-    right: 2rem;
+    inset: 0 2rem 0 3rem;
     display: flex;
     align-items: center;
     justify-content: center;

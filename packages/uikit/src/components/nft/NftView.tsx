@@ -2,7 +2,6 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { TrustType } from '@tonkeeper/core/dist/tonApiV2';
 import { FC, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -72,7 +71,6 @@ export const KnownNFTDnsCollections = [
 
 const Title = styled(H2)`
     word-break: break-word;
-
     user-select: none;
 `;
 
@@ -82,10 +80,8 @@ const SaleBlock = styled(Label4)`
     border-radius: 6px;
     padding: 3.5px 6px 4.5px;
     text-transform: uppercase;
-
     position: relative;
     top: -3px;
-
     white-space: nowrap;
 `;
 

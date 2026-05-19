@@ -36,4 +36,5 @@ export const PromotedItemText = styled.div<{ color?: string }>`
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         max-height: 32px;
+    }
 `;

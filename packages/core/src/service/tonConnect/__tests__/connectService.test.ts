@@ -1,10 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TonConnectError } from '../../../entries/exception';
-import {
-    SEND_TRANSACTION_ERROR_CODES,
-    TonConnectNetwork
-} from '../../../entries/tonConnect';
+import { SEND_TRANSACTION_ERROR_CODES, TonConnectNetwork } from '../../../entries/tonConnect';
 import { Network } from '../../../entries/network';
 import type { TonContract } from '../../../entries/wallet';
 import type { IStorage } from '../../../Storage';
@@ -183,7 +180,6 @@ describe('checkTonConnectFromAndNetwork', () => {
             })
         ).rejects.toThrow('Unknown account provided');
     });
-
 });
 
 describe('checkDappOriginMatchesManifest', () => {

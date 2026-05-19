@@ -40,7 +40,6 @@ const Block = styled.div<{
     gap: 0.5rem;
     width: 65px;
     text-align: center;
-
     user-select: none;
 
     ${props => {

@@ -1,0 +1,29 @@
+{
+    "extends": ["stylelint-config-standard"],
+    "rules": {
+        "custom-property-pattern": null,
+        "declaration-block-no-redundant-longhand-properties": [
+            true,
+            {
+                "ignoreShorthands": ["grid-template"]
+            }
+        ]
+    },
+    "overrides": [
+        {
+            "files": ["**/*.{ts,tsx}"],
+            "customSyntax": "postcss-styled-syntax",
+            "rules": {
+                "no-empty-source": null,
+                "value-keyword-case": null,
+                "function-no-unknown": null,
+                "function-name-case": null,
+                "declaration-property-value-no-unknown": null,
+                "no-descending-specificity": null,
+                "selector-type-no-unknown": null,
+                "selector-class-pattern": null,
+                "keyframes-name-pattern": null
+            }
+        }
+    ]
+}

@@ -19,9 +19,9 @@
         "publish:arm": "electron-forge publish --arch=arm64",
         "publish:intel": "electron-forge publish --arch=x64",
         "publish:universal": "electron-forge publish --arch=universal",
-        "lint": "eslint --ext .ts,.tsx .",
         "build": "yarn make",
         "build:desktop": "yarn make",
+        "typecheck": "tsc --noEmit",
         "proxyTonConsole": "lcp --proxyUrl https://dev.tonconsole.com"
     },
     "keywords": [],

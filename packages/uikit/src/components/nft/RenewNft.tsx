@@ -19,9 +19,10 @@ import { Button } from '../fields/Button';
 import {
     ConfirmView,
     ConfirmViewButtons,
-    ConfirmViewButtonsSlot, ConfirmViewHeading,
+    ConfirmViewButtonsSlot,
+    ConfirmViewHeading,
     ConfirmViewHeadingSlot
-} from "../transfer/ConfirmView";
+} from '../transfer/ConfirmView';
 import { ConfirmAndCancelMainButton } from '../transfer/common';
 import { useNotifyErrorHandle, useToast } from '../../hooks/useNotification';
 

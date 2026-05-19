@@ -80,9 +80,7 @@ async function deriveAesKey(
     usages: KeyUsage[]
 ): Promise<CryptoKey> {
     const pwBytes = new TextEncoder().encode(password);
-    const baseKey = await crypto.subtle.importKey('raw', pwBytes, 'PBKDF2', false, [
-        'deriveKey'
-    ]);
+    const baseKey = await crypto.subtle.importKey('raw', pwBytes, 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey(
         { name: 'PBKDF2', salt, iterations, hash: PBKDF2_HASH },
         baseKey,

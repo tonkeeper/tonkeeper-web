@@ -28,7 +28,6 @@ const DropDownHeader = styled.div`
 const DropDownListContainer = styled.div<{ center?: boolean }>`
     position: absolute;
     width: 240px;
-
     ${props =>
         props.center
             ? css`
@@ -40,11 +39,9 @@ const DropDownListContainer = styled.div<{ center?: boolean }>`
                   top: -1.25rem;
                   right: -1rem;
               `}
-
     z-index: 1;
     background-color: ${props => props.theme.backgroundContentTint};
     border-radius: ${props => props.theme.cornerSmall};
-
     ${p =>
         p.theme.displayType === 'full-width'
             ? css`
@@ -54,11 +51,9 @@ const DropDownListContainer = styled.div<{ center?: boolean }>`
             : css`
                   max-height: 368px;
               `}
-
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-
-    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
 `;
 
 export const DropDownListPayload = styled.div`
@@ -276,15 +271,15 @@ const DropDownListItemStyled = styled.div`
     cursor: pointer;
     display: flex;
     align-items: center;
-
     transition: background 0.1s ease-in-out;
 
     ${p =>
         p.theme.proDisplayType !== 'mobile' &&
         css`
-    &:hover {
-        background: ${props => props.theme.backgroundHighlighted};
-    `}
+            &:hover {
+                background: ${props => props.theme.backgroundHighlighted};
+            }
+        `}
 `;
 
 const DoneIconStyled = styled(DoneIcon)`
@@ -295,6 +290,7 @@ const DoneIconStyled = styled(DoneIcon)`
 
 export const DropDownRightIcon = styled.div`
     display: contents;
+
     & > * {
         flex-shrink: 0;
         margin-left: auto;

@@ -5,9 +5,7 @@ export interface DAppMessage {
     origin: string;
 }
 
-export type TonkeeperApiMessage =
-    | TonkeeperApiResponse
-    | TonkeeperApiTonConnectEvent;
+export type TonkeeperApiMessage = TonkeeperApiResponse | TonkeeperApiTonConnectEvent;
 
 export interface TonkeeperError {
     message: string;

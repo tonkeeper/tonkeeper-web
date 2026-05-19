@@ -144,7 +144,7 @@ const ErrorStyled = styled.div`
     align-items: center;
     gap: 0.5rem;
     width: 100%;
-    margin: 1rem 0px 2rem;
+    margin: 1rem 0 2rem;
 `;
 
 const Header = styled(H2)`

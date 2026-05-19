@@ -17,7 +17,8 @@
         "generate:swapsApi": "./resource/check_github_token.sh && rm -fr src/swapsApiGenerated && docker build -f resource/Dockerfile.swapsApi . -t swapsapi && docker run --rm --user=$(id -u):$(id -g) -v \"$(pwd)\":/local -e GITHUB_TOKEN swapsapi",
         "generate:analytics": "./resource/generate_analytics_client.sh",
         "build:pkg": "yarn build",
-        "test": "vitest run"
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
         "@types/aes-js": "^3.1.4",

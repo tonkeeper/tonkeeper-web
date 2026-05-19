@@ -31,7 +31,6 @@ export const NftHeaderLabel2: FC<{ nft: NftItem }> = React.memo(({ nft }) => {
 
 const HeaderBody3Secondary = styled(Body3)<{ verified?: boolean }>`
     color: ${props => props.theme.textSecondary};
-
     display: inline-flex;
     width: fit-content;
     max-width: 100%;
@@ -129,7 +128,6 @@ export const NftHeaderBody2: FC<{ nft: NftItem; isSpam?: boolean; isUnverified?:
 
 const HeaderBody2Secondary = styled(Body2)<{ verified?: boolean }>`
     color: ${props => props.theme.textSecondary};
-
     display: inline-flex;
     width: fit-content;
     max-width: 100%;

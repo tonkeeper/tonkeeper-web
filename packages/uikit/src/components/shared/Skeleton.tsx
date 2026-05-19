@@ -13,6 +13,7 @@ const Base = styled.div`
         0% {
             background-position: -800px 0;
         }
+
         100% {
             background-position: 800px 0;
         }
@@ -23,12 +24,9 @@ const Base = styled.div`
     animation-iteration-count: infinite;
     animation-name: placeHolderShimmer;
     animation-timing-function: linear;
-    background-color: #f6f7f8;
-    background: linear-gradient(to right, #4f5a70 8%, #bbbbbb 18%, #4f5a70 33%);
+    background: linear-gradient(to right, #4f5a70 8%, #bbb 18%, #4f5a70 33%), #f6f7f8;
     background-size: 800px 104px;
-
     opacity: 0.1;
-
     position: relative;
 `;
 const Block = styled(Base)<{ size?: string; width?: string }>`

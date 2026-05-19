@@ -11,7 +11,7 @@ export const QrWrapper = styled.div`
 `;
 
 function chunks<T>(arr: T[], len: number): T[][] {
-    var chunks: T[][] = [],
+    let chunks: T[][] = [],
         i = 0,
         n = arr.length;
 
@@ -26,7 +26,7 @@ export const AnimatedQrCode: FC<{ message: string }> = React.memo(({ message }) 
     const [value, setValue] = useState('');
 
     useEffect(() => {
-        let arr = [...message];
+        const arr = [...message];
 
         const items = chunks(arr, 256);
 
@@ -35,7 +35,7 @@ export const AnimatedQrCode: FC<{ message: string }> = React.memo(({ message }) 
         } else {
             let count = 0;
             const timer = setInterval(() => {
-                let current = items[count];
+                const current = items[count];
                 setValue(current.join(''));
 
                 // increment our counter

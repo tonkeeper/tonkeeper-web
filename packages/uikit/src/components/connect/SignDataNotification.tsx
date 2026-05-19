@@ -69,8 +69,7 @@ const Payload = styled.div`
         props.theme.displayType === 'full-width'
             ? props.theme.corner2xSmall
             : props.theme.cornerMedium};
-
-    padding: 16px 16px;
+    padding: 16px;
     width: 100%;
     box-sizing: border-box;
 `;
@@ -95,14 +94,12 @@ const WarningBlock = styled.div`
     width: 100%;
     box-sizing: border-box;
     padding: 12px 16px;
-
     background-color: ${props => props.theme.accentOrange};
     position: relative;
     border-radius: ${props =>
         props.theme.displayType === 'full-width'
             ? props.theme.corner2xSmall
             : props.theme.cornerMedium};
-
     user-select: none;
 `;
 
@@ -191,7 +188,7 @@ const ErrorStyled = styled.div`
     align-items: center;
     gap: 0.5rem;
     width: 100%;
-    margin: 1rem 0px 2rem;
+    margin: 1rem 0 2rem;
 `;
 
 const Header = styled(H2)`

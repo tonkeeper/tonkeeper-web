@@ -39,7 +39,6 @@ export const H3 = styled.h3`
     font-size: 20px;
     line-height: 28px;
     margin: 0 0 0.25rem;
-
     user-select: none;
 `;
 
@@ -96,19 +95,16 @@ export const Body1 = styled.span`
 
 export const Body1Body2Responsive = styled(Body1)<{ secondary?: boolean }>`
     user-select: none;
-
     ${p =>
         p.secondary &&
         css`
             color: ${p => p.theme.textSecondary};
         `}
-
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
             ${Body2Class};
         `}
-
     text-wrap: balance;
 `;
 
@@ -164,9 +160,6 @@ export const TextEllipsis = css`
 
 export const NoSelectText = css`
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 `;
 

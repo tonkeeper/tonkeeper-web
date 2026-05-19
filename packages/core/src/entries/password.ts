@@ -1,5 +1,4 @@
 import { KeystonePathInfo } from '../service/keystone/types';
-import { TonWalletStandard } from './wallet';
 
 export type AuthState =
     | AuthPassword

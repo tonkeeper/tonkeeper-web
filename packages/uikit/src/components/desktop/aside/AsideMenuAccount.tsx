@@ -51,7 +51,6 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
     margin-right: -10px;
     flex-shrink: 0;
     padding-left: 0;
-
     opacity: ${p => (p.isShown ? 1 : 0)};
     transition: opacity 0.15s ease-in-out;
 `;

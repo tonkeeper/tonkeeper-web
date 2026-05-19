@@ -27,7 +27,6 @@ const Version = styled(Body3)`
 
 const Icon = styled.span`
     margin-bottom: 0.25rem;
-
     color: ${props => props.theme.accentBlue};
 `;
 

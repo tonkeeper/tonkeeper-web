@@ -201,11 +201,9 @@ const QrContent = styled.div`
     display: flex;
     align-items: center;
     flex-direction: column;
-
     width: 100%;
     margin-top: 8px;
     padding: 32px;
-
     box-sizing: border-box;
     background-color: ${props => props.theme.backgroundContent};
     border-radius: ${p => p.theme.corner2xSmall};
@@ -215,11 +213,9 @@ const QrWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-
     width: fit-content;
     padding: 12px;
     margin-bottom: 16px;
-
     border-radius: ${p => p.theme.corner2xSmall};
     background-color: ${props => props.theme.constantWhite};
 `;
@@ -238,7 +234,6 @@ const PurchaseButtonWrapper = styled.div`
 
 const Body2Styled = styled(Body2)`
     margin-top: 4px;
-
     text-align: center;
     color: ${props => props.theme.textSecondary};
 `;

@@ -43,7 +43,8 @@
     "scripts": {
         "build": "tsc --noEmit && NODE_ENV=production ts-node ./task/build",
         "build:dev": "tsc --noEmit && NODE_ENV=development ts-node ./task/build",
-        "build:extension": "yarn build"
+        "build:extension": "yarn build",
+        "typecheck": "tsc --noEmit"
     },
     "browserslist": {
         "production": [

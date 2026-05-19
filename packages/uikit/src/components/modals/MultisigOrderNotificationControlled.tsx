@@ -67,7 +67,6 @@ const AlreadySignedButton = styled(ResultButton)`
     justify-content: center;
     margin-bottom: 16px;
     height: fit-content;
-
     color: ${props => props.theme.textPrimary};
 
     svg {

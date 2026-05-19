@@ -1,7 +1,11 @@
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { isStandardTonWallet, TonContract, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    isStandardTonWallet,
+    TonContract,
+    walletVersionText
+} from '@tonkeeper/core/dist/entries/wallet';
 import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
 
 /**

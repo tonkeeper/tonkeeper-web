@@ -8,11 +8,8 @@ const LabelStyled = styled.label`
     ${BorderSmallResponsive};
     ${Body2Class};
     box-sizing: border-box;
-
     text-align: center;
-
     padding: 8px 12px;
-
     background: ${p => p.theme.fieldBackground};
     border: 1px solid transparent;
     transition: border-color 0.15s ease-in-out;

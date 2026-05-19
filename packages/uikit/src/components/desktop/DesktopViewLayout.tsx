@@ -132,7 +132,6 @@ export const DesktopViewHeaderStyled = styled.div<{
     left: 0;
     z-index: 10;
     background-color: ${p => p.theme.backgroundPage};
-
     border-bottom: 1px solid transparent;
     transition: border-bottom-color 0.15s ease-in-out;
 

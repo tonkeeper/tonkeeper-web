@@ -16,7 +16,7 @@ export const switchNetwork = (current: Network): Network => {
 export const getTonClientV2 = (config: TonendpointConfig) => {
     const headers: Record<string, string> = {};
     if (config.tonApiV2Key) {
-        headers['Authorization'] = `Bearer ${config.tonApiV2Key}`;
+        headers.Authorization = `Bearer ${config.tonApiV2Key}`;
     }
     return new ConfigurationV2({
         basePath: config.tonapiV2Endpoint,

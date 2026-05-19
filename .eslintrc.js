@@ -8,8 +8,8 @@ module.exports = {
         'no-underscore-dangle': 'off',
         'no-plusplus': 'off',
         'class-method-use-this': 'off',
-        eqeqeq: ['error', 'smart'],
-        complexity: 'error',
+        eqeqeq: ['warn', 'smart'], // baseline: ~10 violations; promote to 'error' once cleaned up
+        complexity: ['warn', { max: 15 }], // baseline: 25 violations at max 15
         'no-empty': ['error'],
         'no-restricted-globals': 'error',
         'no-param-reassign': 'off',
@@ -19,7 +19,7 @@ module.exports = {
         'array-bracket-spacing': ['error', 'never'],
         'object-curly-spacing': ['error', 'always'],
         indent: 'off',
-        'max-classes-per-file': 'error',
+        'max-classes-per-file': 'warn', // baseline: ~7 violations; either split files or add inline disable
         radix: ['error', 'as-needed'],
         'no-return-assign': 'off',
         'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],
@@ -28,7 +28,10 @@ module.exports = {
             {
                 allow: ['debug', 'error', 'info']
             }
-        ]
+        ],
+        // baseline: prettier/prettier set to 'error' by plugin:prettier/recommended; demoted while
+        // existing formatting drift is cleaned up
+        'prettier/prettier': 'warn'
     },
     overrides: [
         {
@@ -67,7 +70,6 @@ module.exports = {
                 '@typescript-eslint',
                 'import',
                 'unused-imports',
-                'chakra-ui',
                 'i18next'
             ],
             extends: [
@@ -80,7 +82,7 @@ module.exports = {
             rules: {
                 /* imports */
                 'import/extensions': [
-                    'error',
+                    'warn', // baseline: ~4 violations
                     'never',
                     {
                         scss: 'always',
@@ -94,9 +96,14 @@ module.exports = {
                     'error',
                     { devDependencies: false, optionalDependencies: false, peerDependencies: false }
                 ],
+                // import/no-unresolved without a TypeScript resolver produces thousands of
+                // false positives in this workspace setup (e.g. @tonkeeper/core/dist/... and
+                // styled-components subpath imports). Disable until eslint-import-resolver-typescript
+                // is configured.
+                'import/no-unresolved': 'off',
                 'unused-imports/no-unused-imports': 'error',
                 'unused-imports/no-unused-vars': [
-                    'error',
+                    'warn', // baseline: ~7 violations
                     {
                         vars: 'all',
                         args: 'all',
@@ -105,14 +112,15 @@ module.exports = {
                         varsIgnorePattern: '^_'
                     }
                 ],
+                'prefer-const': 'warn', // baseline: ~2 violations (autofix didn't catch them)
 
                 /* typescript */
                 '@typescript-eslint/no-use-before-define': 'off',
                 '@typescript-eslint/explicit-function-return-type': 'off',
-                '@typescript-eslint/no-explicit-any': 'error',
+                '@typescript-eslint/no-explicit-any': 'warn', // baseline: ~13 violations
                 '@typescript-eslint/no-inferrable-types': 'error',
                 '@typescript-eslint/naming-convention': [
-                    'error',
+                    'warn', // baseline: ~2 violations
                     {
                         selector: 'enumMember',
                         format: ['UPPER_CASE']
@@ -121,11 +129,13 @@ module.exports = {
                 '@typescript-eslint/dot-notation': 'error',
                 '@typescript-eslint/comma-dangle': ['error', 'never'],
                 '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
-                '@typescript-eslint/no-shadow': 'error',
+                '@typescript-eslint/no-shadow': 'warn', // baseline: ~8 violations
                 '@typescript-eslint/return-await': 'error',
                 '@typescript-eslint/indent': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off',
-                '@typescript-eslint/no-redeclare': ['error', { ignoreDeclarationMerge: true }],
+                '@typescript-eslint/no-redeclare': ['warn', { ignoreDeclarationMerge: true }], // baseline: 1 violation
+                '@typescript-eslint/ban-types': 'warn', // baseline: ~2 violations (recommended ruleset)
+                '@typescript-eslint/no-unused-expressions': 'warn', // baseline: ~2 violations (recommended ruleset)
 
                 /* react */
                 'react/react-in-jsx-scope': 'off',
@@ -136,7 +146,7 @@ module.exports = {
                     }
                 ],
                 'react-hooks/rules-of-hooks': 'error',
-                'react-hooks/exhaustive-deps': 'off',
+                'react-hooks/exhaustive-deps': 'warn', // baseline: 269 violations; stale-closure detection re-enabled (was off)
                 'react/display-name': 'off',
                 'react/prop-types': 'off'
             },

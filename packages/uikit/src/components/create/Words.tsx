@@ -52,10 +52,8 @@ const HeadingBlock = styled(Block)`
 
 const Body = styled(Body1)`
     user-select: none;
-
     text-align: center;
     color: ${props => props.theme.textSecondary};
-
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
@@ -64,7 +62,6 @@ const Body = styled(Body1)`
             display: block;
             margin: 0 auto;
         `}
-
     text-wrap: balance;
 `;
 
@@ -75,7 +72,6 @@ export const WorldsGrid = styled.div<{ wordsNumber: 12 | 24 }>`
     gap: 0.5rem;
     place-content: space-evenly;
     margin: 1rem 0;
-
     white-space: normal;
 `;
 
@@ -84,7 +80,6 @@ export const WorldNumber = styled(Body2)`
     width: 24px;
     line-height: 24px;
     color: ${props => props.theme.textSecondary};
-
     user-select: none;
 `;
 
@@ -92,9 +87,7 @@ const Number1 = styled(Body1)`
     display: inline-block;
     width: 26px;
     text-align: right;
-
     font-size: 15px;
-
     color: ${props => props.theme.textSecondary};
 `;
 
@@ -277,7 +270,6 @@ const Input = styled.input`
     flex-grow: 1;
     font-weight: 500;
     font-size: 16px;
-
     color: ${props => props.theme.textPrimary};
 `;
 
@@ -533,7 +525,7 @@ const Inputs = styled.div<{ wordsNumber: 12 | 24 }>`
     grid-auto-flow: column;
     gap: 0.5rem;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         grid-template-rows: repeat(${p => p.wordsNumber}, minmax(0, 1fr));
     }
 

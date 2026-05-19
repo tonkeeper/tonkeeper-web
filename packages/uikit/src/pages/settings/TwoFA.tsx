@@ -147,7 +147,7 @@ const WarningBlockText = styled.ul`
 const TwoFASetUpStyled = styled(TwoFASetUp)`
     margin: 16px auto 84px;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         flex-direction: column;
         gap: 16px;
     }
@@ -219,7 +219,7 @@ const ActionButtonsContainer = styled.div`
     margin: 0 auto 84px;
     gap: 8px;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         flex-direction: column;
     }
 `;

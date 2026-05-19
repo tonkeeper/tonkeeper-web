@@ -3,12 +3,11 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 export const GlobalStyleCss = css`
     body {
         margin: 0;
-        font-family: 'Montserrat', sans-serif;
+        font-family: Montserrat, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         background-color: ${props => props.theme.backgroundContent};
         color: ${props => props.theme.textPrimary};
-
         overflow-y: scroll;
     }
 
@@ -41,9 +40,6 @@ export const GlobalStyleCss = css`
     html.no-user-select {
         * {
             user-select: none;
-            -moz-user-select: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
         }
     }
 
@@ -92,7 +88,6 @@ export const Container = styled.div`
     flex-direction: column;
     min-height: var(--app-height);
     background-color: ${props => props.theme.backgroundPage};
-
     white-space: pre-wrap;
 `;
 

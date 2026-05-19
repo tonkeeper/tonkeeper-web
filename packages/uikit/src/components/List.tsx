@@ -42,7 +42,6 @@ export const ListBlock = styled.div<{
 }>`
     display: flex;
     flex-direction: column;
-
     ${props =>
         props.dropDown
             ? css`
@@ -51,30 +50,25 @@ export const ListBlock = styled.div<{
             : css`
                   background: ${p => p.theme.backgroundContent};
               `}
-
     padding: 0;
-
     ${props =>
         props.margin !== false
             ? css`
                   margin: 0 0 2rem;
               `
             : undefined}
-
     ${props =>
         props.fullWidth
             ? css`
                   width: 100%;
               `
             : undefined}
-
       ${props =>
         props.noUserSelect
             ? css`
                   user-select: none;
               `
             : undefined}
-
   border-radius: ${props =>
         props.theme.displayType === 'full-width'
             ? props.theme.corner2xSmall
@@ -90,6 +84,7 @@ export const ListBlock = styled.div<{
                 ? props.theme.corner2xSmall
                 : props.theme.cornerSmall};
     }
+
     > div:last-child {
         border-bottom-right-radius: ${props =>
             props.theme.displayType === 'full-width'
@@ -107,6 +102,7 @@ const ListBlockDesktop = styled(ListBlock)`
         p.theme.displayType === 'full-width' &&
         css`
             background: transparent;
+
             & > div {
                 border-radius: 0 !important;
             }
@@ -172,6 +168,7 @@ export const ListItemElement = styled.div<{
             return props.hover !== false
                 ? css`
                       cursor: pointer;
+
                       &:hover {
                           background-color: ${background};
 
@@ -212,12 +209,7 @@ export const ListItemElement = styled.div<{
         `}
 `;
 
-export const GlobalListStyle = createGlobalStyle`
-  body:not(.disable-hover) ${ListItemElement}:hover,
-  body:not(.disable-hover) ${ListItemElement}:active {
-    
-  }
-`;
+export const GlobalListStyle = createGlobalStyle``;
 export const ListItem = forwardRef<
     HTMLDivElement,
     PropsWithChildren<

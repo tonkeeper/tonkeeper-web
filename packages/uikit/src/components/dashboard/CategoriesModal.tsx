@@ -233,9 +233,7 @@ const CategoriesModalContent: FC<{
                                 <CategoryItemContent
                                     category={activeCategory}
                                     isEnabled={activeEntry.isEnabled}
-                                    isDisabled={
-                                        !!(activeCategory?.onlyPro && !isProEnabled)
-                                    }
+                                    isDisabled={!!(activeCategory?.onlyPro && !isProEnabled)}
                                     onOpen={onOpen}
                                     onCheckboxChange={() => undefined}
                                 />
@@ -257,7 +255,6 @@ const Row = styled.div`
     display: flex;
     gap: 0.5rem;
     align-items: center;
-
     width: 100%;
 `;
 
