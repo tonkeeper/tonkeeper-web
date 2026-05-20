@@ -1,6 +1,6 @@
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
 import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
-import { PushNotifications, Token } from '@capacitor/push-notifications';
+import { PushNotifications, RegistrationError, Token } from '@capacitor/push-notifications';
 import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { Device } from '@capacitor/device';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
@@ -24,7 +24,7 @@ const requestPushPermission = async () => {
             PushNotifications.removeAllListeners();
         });
 
-        PushNotifications.addListener('registrationError', (error: any) => {
+        PushNotifications.addListener('registrationError', (error: RegistrationError) => {
             rej(error);
             PushNotifications.removeAllListeners();
         });

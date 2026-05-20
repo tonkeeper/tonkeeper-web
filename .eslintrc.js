@@ -120,7 +120,7 @@ module.exports = {
                 /* typescript */
                 '@typescript-eslint/no-use-before-define': 'off',
                 '@typescript-eslint/explicit-function-return-type': 'off',
-                '@typescript-eslint/no-explicit-any': 'warn', // baseline: ~13 violations
+                '@typescript-eslint/no-explicit-any': 'error',
                 '@typescript-eslint/no-inferrable-types': 'error',
                 '@typescript-eslint/naming-convention': [
                     'error',

@@ -12,7 +12,7 @@ export class TonProvider extends EventEmitter {
         string,
         {
             resolve: (value: unknown) => void;
-            reject: (reason?: any) => void;
+            reject: (reason?: unknown) => void;
         }
     > = {};
 
@@ -29,7 +29,7 @@ export class TonProvider extends EventEmitter {
         window.addEventListener('message', this.onMessage);
     }
 
-    send<Result>(method: string, ...params: any[]) {
+    send<Result>(method: string, ...params: unknown[]) {
         if (!method || typeof method !== 'string') {
             return Promise.reject('Method is not a valid string.');
         }
@@ -66,7 +66,7 @@ export class TonProvider extends EventEmitter {
         return promise as Promise<Result>;
     }
 
-    onMessage = async (event: any) => {
+    onMessage = async (event: MessageEvent) => {
         // Return if no data to parse
         if (!event || !event.data) {
             return;

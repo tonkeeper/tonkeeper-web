@@ -59,6 +59,8 @@ export interface UIEvents {
     keyboard: KeyboardParams;
     addSuggestion: LatestSuggestion;
     editSuggestion: FavoriteSuggestion;
+    // generic response channel: each emitter/listener pair owns its own params shape
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     response: any;
     toast: string;
     signerTxResponse: {
