@@ -49,7 +49,8 @@ export const MultisigConfigDiff: FC<{
                 <DiffRow>
                     <Body2>{t('multisig_config_diff_quorum_updates')}</Body2>
                     <Body2>
-                        {prevConfig.threshold} → {newConfig.threshold} participants
+                        {prevConfig.threshold} → {newConfig.threshold}{' '}
+                        {t('create_multisig_quorum_participants')}
                     </Body2>
                 </DiffRow>
             )}

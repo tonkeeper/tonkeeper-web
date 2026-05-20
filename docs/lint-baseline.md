@@ -1,13 +1,13 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=384`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=341`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 
 The goal is to drive each demoted rule to zero violations, then promote it back to `'error'` (and
 lower `--max-warnings` accordingly).
 
-## Demoted rules (severity baseline: 384 warnings, 0 errors)
+## Demoted rules (severity baseline: 341 warnings, 0 errors)
 
 The following rules were demoted from `error` (or `off`) to `warn`:
 
@@ -15,14 +15,8 @@ The following rules were demoted from `error` (or `off`) to `warn`:
 | ------------------------------------------ | ---------: | ------------------------------------------------------------------------------------------------------- |
 | `react-hooks/exhaustive-deps`              |        269 | **Was off** — re-enabled to catch stale closures. High count is expected; treat as a backlog, not noise |
 | `no-console`                               |         70 | Already `warn` with `allow: ['debug', 'error', 'info']`                                                 |
-| `i18next/no-literal-string`                |         43 | User-facing string literals; cleanup needs translation keys                                             |
 | `@typescript-eslint/no-non-null-assertion` |          1 |                                                                                                         |
 
-## Promoted rules
-
-| Rule                                 | Promoted on | Notes                                                                                       |
-| ------------------------------------ | ----------- | ------------------------------------------------------------------------------------------- |
-| `@typescript-eslint/no-explicit-any` | 2026-05-20  | Two `eslint-disable` lines remain on intentionally generic message-passing channels: `UIEvents.response` in `packages/core/AppSdk.ts` and `PayloadRequest<P = any>` in `apps/extension/src/libs/event.ts` |
 
 ## How to promote a rule back to `error`
 

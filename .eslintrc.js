@@ -146,9 +146,31 @@ module.exports = {
                 /* react */
                 'react/react-in-jsx-scope': 'off',
                 'i18next/no-literal-string': [
-                    'warn',
+                    'error',
                     {
-                        exclude: ['Ton Console']
+                        words: {
+                            // user options replace defaults entirely, so we re-list the
+                            // plugin defaults (numbers/symbols, uppercase tokens, html
+                            // entities, emoji) alongside our brand/protocol exemptions
+                            exclude: [
+                                '[0-9!-/:-@[-`{-~]+',
+                                '[A-Z_-]+',
+                                require('eslint-plugin-i18next/lib/options/htmlEntities'),
+                                /^\p{Emoji}+$/u,
+                                'Tonkeeper',
+                                'Tonkeeper Pro',
+                                'Tonkeeper Web',
+                                'Ton Console',
+                                'Tonviewer',
+                                'TRC20',
+                                'Beta',
+                                'Testnet',
+                                'Ledger',
+                                'Signer',
+                                'USD₮',
+                                '≈'
+                            ]
+                        }
                     }
                 ],
                 'react-hooks/rules-of-hooks': 'error',

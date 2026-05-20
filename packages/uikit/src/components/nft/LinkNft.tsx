@@ -278,7 +278,7 @@ const LinkNFTWalletView: FC<{
             />
             <Gap />
             <Button fullWidth size="large" primary disabled={!inputValue} loading={isLoading}>
-                Save
+                {t('save')}
             </Button>
         </ChangeWalletContainerStyled>
     );

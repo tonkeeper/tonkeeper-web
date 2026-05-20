@@ -792,7 +792,7 @@ const SenderDropdownItemTronTrxOrTonAsset: FC<{
                 <Label2>{fee.extra.asset.symbol}</Label2>
                 {fiatAmount ? (
                     <Body3Secondary>
-                        {fee.extra.stringAssetRelativeAmount} (≈ {fiatAmount})
+                        {`${fee.extra.stringAssetRelativeAmount} (≈ ${fiatAmount})`}
                     </Body3Secondary>
                 ) : (
                     <Skeleton height="14px" marginTop="2px" width="100px" />
