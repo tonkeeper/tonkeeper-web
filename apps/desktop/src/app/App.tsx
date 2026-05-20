@@ -77,6 +77,7 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { UpdateBanner } from './components/UpdateBanner';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
@@ -341,6 +342,7 @@ export const Loader: FC = () => {
                 <CopyNotification hideSimpleCopyNotifications />
                 <QrScanner />
                 <ModalsRoot />
+                <UpdateBanner />
             </CryptoStrategyInstaller>
         </AppContext.Provider>
     );

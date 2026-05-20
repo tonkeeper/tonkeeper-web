@@ -1,3 +1,8 @@
+interface UpdateInfo {
+    version: string;
+    url: string;
+}
+
 interface BackgroundApi {
     platform: () => string;
     arch: () => string;
@@ -9,6 +14,7 @@ interface BackgroundApi {
     onTonConnectRequest: (callback: (value: TonConnectAppRequestPayload) => void) => void;
     onTonConnectDisconnect: (callback: (value: AccountConnection) => void) => void;
     onRefresh: (callback: () => void) => void;
+    onUpdateAvailable: (callback: (value: UpdateInfo) => void) => () => void;
 }
 
 declare global {

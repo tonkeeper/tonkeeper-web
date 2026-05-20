@@ -6,11 +6,13 @@ import { Message } from './libs/message';
 import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { atom, replaySubject } from '@tonkeeper/core/dist/entries/atom';
+import type { UpdateInfo } from './electron/updateCheck';
 
 const tcRequests$ = atom<string>(undefined);
 const tonConnectRequests$ = replaySubject<TonConnectAppRequestPayload>('all');
 const tonConnectDisconnects$ = replaySubject<AccountConnection>('all');
 const refreshes$ = replaySubject<void>('all');
+const updateAvailable$ = atom<UpdateInfo>(undefined);
 
 ipcRenderer.on('tc', (_event, value) => tcRequests$.next(value));
 ipcRenderer.on('tonConnectRequest', (_event, value: TonConnectAppRequestPayload) =>
@@ -20,6 +22,7 @@ ipcRenderer.on('disconnect', (_event, value: AccountConnection) =>
     tonConnectDisconnects$.next(value)
 );
 ipcRenderer.on('refresh', () => refreshes$.next());
+ipcRenderer.on('update-available', (_event, value: UpdateInfo) => updateAvailable$.next(value));
 
 contextBridge.exposeInMainWorld('backgroundApi', {
     platform: () => process.platform,
@@ -42,5 +45,12 @@ contextBridge.exposeInMainWorld('backgroundApi', {
     },
     onRefresh: (callback: () => void) => {
         refreshes$.subscribe(callback);
+    },
+    onUpdateAvailable: (callback: (value: UpdateInfo) => void): (() => void) => {
+        const unsubscribe = updateAvailable$.subscribe(callback);
+        if (updateAvailable$.value !== undefined) {
+            callback(updateAvailable$.value);
+        }
+        return unsubscribe;
     }
 });

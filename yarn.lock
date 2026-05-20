@@ -4731,6 +4731,7 @@ __metadata:
     ts-node: "npm:^10.0.0"
     typescript: "npm:^4.9.4"
     update-electron-app: "npm:^3.0.0"
+    vitest: "npm:^3.2.4"
     webpack: "npm:^5.104.0"
   languageName: unknown
   linkType: soft
