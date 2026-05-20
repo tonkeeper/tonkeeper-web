@@ -133,7 +133,8 @@ class EventEmitter<T extends string, V extends Event = Event> {
 }
 class PolyfillCharacteristic
     extends EventEmitter<'characteristicvaluechanged', Event & { value: ArrayBuffer }>
-    implements ExtendedBluetoothRemoteGATTCharacteristic {
+    implements ExtendedBluetoothRemoteGATTCharacteristic
+{
     private _value: DataView | null = null;
 
     private pluginListenerHandle: PluginListenerHandle | null = null;
@@ -288,7 +289,8 @@ class PolyfillGATTServer implements BluetoothRemoteGATTServer {
 
 class PolyfillDevice
     extends EventEmitter<'gattserverdisconnected'>
-    implements ExtendedBluetoothDevice {
+    implements ExtendedBluetoothDevice
+{
     private pluginListenerHandle: PluginListenerHandle | null = null;
 
     gatt?: BluetoothRemoteGATTServer;

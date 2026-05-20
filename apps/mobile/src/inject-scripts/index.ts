@@ -1,4 +1,4 @@
-import './global.d.ts';
+import './global';
 import type { ITonConnectInjectedBridge } from '@tonkeeper/core/dist/entries/tonConnect';
 import { MobileInjectedBridge } from './ton-connect';
 import { setupHistoryNotifier } from './history-notifier';

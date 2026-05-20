@@ -98,7 +98,7 @@ export const Body1Body2Responsive = styled(Body1)<{ secondary?: boolean }>`
     ${p =>
         p.secondary &&
         css`
-            color: ${p => p.theme.textSecondary};
+            color: ${p.theme.textSecondary};
         `}
     ${p =>
         p.theme.displayType === 'full-width' &&

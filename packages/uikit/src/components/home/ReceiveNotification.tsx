@@ -35,7 +35,7 @@ const ReceiveNotification = () => {
     }, [params, handleClose]);
 
     return (
-        <Notification isOpen={params != undefined} handleClose={handleClose} backShadow hideButton>
+        <Notification isOpen={params !== undefined} handleClose={handleClose} backShadow hideButton>
             {Content}
         </Notification>
     );

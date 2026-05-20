@@ -61,6 +61,6 @@ export const useAnalytics = (
 
             return tracker;
         },
-        { enabled: accounts != undefined && activeAccount != undefined && config != undefined }
+        { enabled: accounts !== undefined && activeAccount !== undefined && config !== undefined }
     );
 };
