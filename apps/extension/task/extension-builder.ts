@@ -102,7 +102,8 @@ export class ExtensionBuilder {
 
     public applyManifestVersion(manifestData: any) {
         manifestData.version = this.manifestVersion;
-        if (this.manifestVersionName) {
+        // `version_name` is Chrome-only; Firefox warns on unknown manifest keys.
+        if (this.directory === 'chrome' && this.manifestVersionName) {
             manifestData.version_name = this.manifestVersionName;
         } else {
             delete manifestData.version_name;
