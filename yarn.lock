@@ -3420,6 +3420,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@js-joda/core@npm:3.2.0":
+  version: 3.2.0
+  resolution: "@js-joda/core@npm:3.2.0"
+  checksum: 10/af7d3717eacbee33c7b7af68d17ea99765218e3d1fff7c7ea555986181a8ee6459b8c7289f346f9e67e7dfbb97f16c356e98efd9d0cb0ae2137608f38e837ee9
+  languageName: node
+  linkType: hard
+
 "@keystonehq/alias-sampling@npm:^0.1.1":
   version: 0.1.2
   resolution: "@keystonehq/alias-sampling@npm:0.1.2"
@@ -4961,6 +4968,7 @@ __metadata:
     "@types/styled-components": "npm:^5.1.26"
     "@vitejs/plugin-react": "npm:^4.2.1"
     buffer: "npm:^6.0.3"
+    chainkit: "file:/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz"
     copy-to-clipboard: "npm:^3.3.3"
     fs-extra: "npm:^11.2.0"
     i18next: "npm:^22.1.4"
@@ -4991,6 +4999,15 @@ __metadata:
   version: 3.21.2
   resolution: "@tronweb3/google-protobuf@npm:3.21.2"
   checksum: 10/00d9344e0d32af7af3e55087ffb60b8663ce2c180e8450e5e76b72e5d7309dc2b6ce9999dece7aa48050b626e6f50622dc2614d80e5bb4bcd259512363aaa048
+  languageName: node
+  linkType: hard
+
+"@trustwallet/wallet-core@npm:4.6.0":
+  version: 4.6.0
+  resolution: "@trustwallet/wallet-core@npm:4.6.0"
+  dependencies:
+    protobufjs: "npm:>=6.11.3"
+  checksum: 10/87d2042dd4050134a1139f2c20ecc97cf05ac96f70d98a2c1595f844d7ce2f6ccc9ff41c01d6b4c6a5d55de690aeaa3e9ba4529320df661b42e65c676017d179
   languageName: node
   linkType: hard
 
@@ -8638,6 +8655,28 @@ __metadata:
     loupe: "npm:^3.1.0"
     pathval: "npm:^2.0.0"
   checksum: 10/0d0ef63106083b05c7ba510697cd9991a02b8df5984a7d010ab4af10205c7a1f27d1c06bfa4679540894295ac4dcc22aa2a281e2e4cfe5133c1db379626689a2
+  languageName: node
+  linkType: hard
+
+"chainkit@file:/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz::locator=%40tonkeeper%2Fweb%40workspace%3Aapps%2Fweb":
+  version: 0.0.1-alpha1
+  resolution: "chainkit@file:/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz#/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz::hash=d73e3b&locator=%40tonkeeper%2Fweb%40workspace%3Aapps%2Fweb"
+  dependencies:
+    "@js-joda/core": "npm:3.2.0"
+    "@trustwallet/wallet-core": "npm:4.6.0"
+    ws: "npm:8.18.3"
+  checksum: 10/fc798d591d3330cffc0062be8b67587aad935892c0566a2b38ea9d6595d924ab50970b4530d21bc41a32937ae116c0e4fe7c36b465b024e1c1b6c136f72c955e
+  languageName: node
+  linkType: hard
+
+"chainkit@file:/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz::locator=tonkeeper-web%40workspace%3A.":
+  version: 0.0.1-alpha1
+  resolution: "chainkit@file:/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz#/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz::hash=d73e3b&locator=tonkeeper-web%40workspace%3A."
+  dependencies:
+    "@js-joda/core": "npm:3.2.0"
+    "@trustwallet/wallet-core": "npm:4.6.0"
+    ws: "npm:8.18.3"
+  checksum: 10/fc798d591d3330cffc0062be8b67587aad935892c0566a2b38ea9d6595d924ab50970b4530d21bc41a32937ae116c0e4fe7c36b465b024e1c1b6c136f72c955e
   languageName: node
   linkType: hard
 
@@ -14460,6 +14499,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"long@npm:^5.3.2":
+  version: 5.3.2
+  resolution: "long@npm:5.3.2"
+  checksum: 10/b6b55ddae56fcce2864d37119d6b02fe28f6dd6d9e44fd22705f86a9254b9321bd69e9ffe35263b4846d54aba197c64882adcb8c543f2383c1e41284b321ea64
+  languageName: node
+  linkType: hard
+
 "loose-envify@npm:^1.1.0, loose-envify@npm:^1.2.0, loose-envify@npm:^1.3.1, loose-envify@npm:^1.4.0":
   version: 1.4.0
   resolution: "loose-envify@npm:1.4.0"
@@ -16653,6 +16699,15 @@ __metadata:
     object-assign: "npm:^4.1.1"
     react-is: "npm:^16.13.1"
   checksum: 10/7d959caec002bc964c86cdc461ec93108b27337dabe6192fb97d69e16a0c799a03462713868b40749bfc1caf5f57ef80ac3e4ffad3effa636ee667582a75e2c0
+  languageName: node
+  linkType: hard
+
+"protobufjs@npm:>=6.11.3":
+  version: 8.4.0
+  resolution: "protobufjs@npm:8.4.0"
+  dependencies:
+    long: "npm:^5.3.2"
+  checksum: 10/eeaeee9a7ab97105cb2dc74033cddbf52059745e630a556d39c0812f87f87c2cbdb6f5c7f5bea4e28cbad6bfb33464322998836344e6ca20de63a51eaf0f45ea
   languageName: node
   linkType: hard
 
@@ -19271,6 +19326,7 @@ __metadata:
     "@tonkeeper/uikit": "workspace:^"
     "@typescript-eslint/eslint-plugin": "npm:^5.50.0"
     "@typescript-eslint/parser": "npm:^5.50.0"
+    chainkit: "file:/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz"
     eslint: "npm:^8.33.0"
     eslint-config-airbnb-typescript: "npm:^17.0.0"
     eslint-config-prettier: "npm:^8.6.0"
@@ -20990,6 +21046,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10/70dfe53f23ff4368d46e4c0b1d4ca734db2c4149c6f68bc62cb16fc21f753c47b35fcc6e582f3bdfba0eaeb1c488cddab3c2255755a5c3eecb251431e42b3ff6
+  languageName: node
+  linkType: hard
+
+"ws@npm:8.18.3":
+  version: 8.18.3
+  resolution: "ws@npm:8.18.3"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10/725964438d752f0ab0de582cd48d6eeada58d1511c3f613485b5598a83680bedac6187c765b0fe082e2d8cc4341fc57707c813ae780feee82d0c5efe6a4c61b6
   languageName: node
   linkType: hard
 

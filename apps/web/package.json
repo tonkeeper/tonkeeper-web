@@ -9,6 +9,7 @@
         "@tonkeeper/locales": "0.1.0",
         "@tonkeeper/uikit": "0.1.0",
         "buffer": "^6.0.3",
+        "chainkit": "file:/Users/nataliastus/.npm_local/chainkit/chainkit-0.0.1-alpha1.tgz",
         "copy-to-clipboard": "^3.3.3",
         "i18next": "^22.1.4",
         "i18next-browser-languagedetector": "^7.0.2",

@@ -9,8 +9,9 @@ export const baseCspConfig = {
     'worker-src': ["'none'"],
     'media-src': ["'none'"],
 
-    /* Allow loading self scripts */
-    'script-src': ["'self'"],
+    /* Allow loading self scripts; 'wasm-unsafe-eval' is required by chainkit / Trust Wallet Core
+     * to compile its WebAssembly module. Does NOT enable eval()/Function(). */
+    'script-src': ["'self'", "'wasm-unsafe-eval'"],
 
     /* Allow using inline styles for Styled Components; allow loading Montserrat font from Google Fonts */
     'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com/'],
