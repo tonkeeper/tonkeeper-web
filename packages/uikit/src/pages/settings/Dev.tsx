@@ -1,4 +1,4 @@
-/* eslint-disable i18next/no-literal-string -- dev-only settings page, not user-facing */
+/* eslint-disable i18next/no-literal-string, no-console -- dev-only settings page, not user-facing */
 import React, { useEffect, useMemo, useState } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';

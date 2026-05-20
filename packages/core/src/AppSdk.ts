@@ -290,13 +290,13 @@ export abstract class BaseApp implements IAppSdk {
     pasteFromClipboard = async () => navigator.clipboard.readText();
 
     copyToClipboard = (value: string, notification?: string) => {
-        console.log(value, notification);
+        console.debug(value, notification);
 
         this.topMessage(notification);
     };
 
     openPage = async (url: string): Promise<void> => {
-        console.log(url);
+        console.debug(url);
     };
 
     openNft = (nft: NFT) => {

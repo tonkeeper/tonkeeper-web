@@ -3,7 +3,7 @@ import { app, autoUpdater, BrowserWindow, webContents } from 'electron';
 export default class AppUpdate {
     constructor() {
         autoUpdater.addListener('update-available', function () {
-            console.log('update available');
+            console.info('update available');
         });
         autoUpdater.addListener(
             'update-downloaded',
@@ -20,10 +20,10 @@ export default class AppUpdate {
         const arch = process.arch; // Get the architecture dynamically (e.g., 'arm64', 'x64')
 
         autoUpdater.addListener('error', function (error) {
-            console.log(error);
+            console.error(error);
         });
         autoUpdater.addListener('checking-for-update', function () {
-            console.log('checking-for-update');
+            console.info('checking-for-update');
         });
 
         // autoUpdater.addListener('update-not-available', function (event: any) {

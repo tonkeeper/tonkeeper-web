@@ -48,7 +48,6 @@ export class SessionCrypto {
     public decrypt(message: Buffer, senderPublicKey: Buffer): string {
         const nonce = message.subarray(0, this.nonceLength);
         const internalMessage = message.subarray(this.nonceLength);
-        console.log('senderPublicKey', senderPublicKey.length);
 
         const decrypted = nacl.box.open(
             internalMessage,

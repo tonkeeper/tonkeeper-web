@@ -29,9 +29,9 @@ module.exports = {
         'no-return-assign': 'off',
         'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],
         'no-console': [
-            'warn',
+            'error',
             {
-                allow: ['debug', 'error', 'info']
+                allow: ['debug', 'error', 'info', 'warn']
             }
         ],
         'prettier/prettier': 'error'
@@ -189,6 +189,13 @@ module.exports = {
             rules: {
                 '@typescript-eslint/explicit-function-return-type': 'off',
                 'import/no-extraneous-dependencies': ['error', { devDependencies: true }]
+            }
+        },
+        {
+            // build/task scripts run in Node; console is their primary output
+            files: ['**/task/**/*.ts', '**/*.config.ts', '**/forge.config.ts'],
+            rules: {
+                'no-console': 'off'
             }
         }
     ]
