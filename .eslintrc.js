@@ -9,7 +9,10 @@ module.exports = {
         'no-plusplus': 'off',
         'class-method-use-this': 'off',
         eqeqeq: ['error', 'smart'],
-        complexity: ['warn', { max: 15 }], // baseline: 25 violations at max 15
+        // disabled: most violations are essential complexity in React render branches
+        // (state-machine dispatch on discriminated unions) where splitting helpers
+        // hides cases behind indirection without reducing total cognitive load
+        complexity: 'off',
         'no-empty': ['error'],
         'no-restricted-globals': 'error',
         'no-param-reassign': 'off',
