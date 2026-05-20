@@ -357,19 +357,32 @@ on any byte difference.
 
 ### Tasks
 
--   [ ] **G1.** Create `packages/core/src/__tests__/snapshots/sign/` directory.
--   [ ] **G2.** Fixtures: 5 BIP39 mnemonics (one per account type that supports mnemonic input —
+-   [x] **G1.** Create `packages/core/src/__tests__/snapshots/sign/` directory.
+-   [x] **G2.** Fixtures: 5 BIP39 mnemonics (one per account type that supports mnemonic input —
         `mnemonic`, `mam`, `sk`, `testnet`, and a synthetic `ton-only` case using a recorded signer
-        response). Stored as hardcoded constants — never use real funds.
--   [ ] **G3.** For each fixture × `WalletVersion` (V3R1, V3R2, V4R2, V5_BETA, V5R1) × Network
+        response). Stored as hardcoded constants — never use real funds. _Landed as 6 fixture kinds:
+        `mnemonic-ton`, `mnemonic-bip39`, `testnet`, `mam`, `sk`, `ton-only` — the two mnemonic
+        types are split because `account.mnemonicType` is a separate dispatch axis._
+-   [x] **G3.** For each fixture × `WalletVersion` (V3R1, V3R2, V4R2, V5*BETA, V5R1) × Network
         (MAINNET, TESTNET), pre-compute a signed transfer of a fixed canonical message. Store BOCs
-        as base64 in `snapshots/sign/<combo>.json`.
--   [ ] **G4.** Test runner: load fixture, call `getSigner()` (and after refactor, the new factory),
-        assert output equals snapshot.
--   [ ] **G5.** Ledger and Keystone are skipped (require hardware) — mock the pairing calls and
+        as base64 in `snapshots/sign/<combo>.json`. \_60 BOC snapshots committed; re-running the
+        harness twice produces byte-identical output.*
+-   [x] **G4.** Test runner: load fixture, call `getSigner()` (and after refactor, the new factory),
+        assert output equals snapshot. _Runner lives in
+        `packages/core/src/__tests__/snapshots/sign/sign.test.ts`. Uses core-only primitives
+        (`mnemonicToKeypair`, `walletContract`, `signWithSecret`) so it can run without a uikit SDK;
+        the Track B factory will plug in here. `UPDATE_SNAPSHOTS=1` regenerates. Verified the runner
+        detects intentional drift._
+-   [x] **G5.** Ledger and Keystone are skipped (require hardware) — mock the pairing calls and
         snapshot the _call shape_ (`path`, `transactions[]` payload) instead of the signature.
--   [ ] **G6.** Wire into CI (yarn workspace `@tonkeeper/core test`); make Phase 1 PRs auto-fail if
-        snapshots diverge.
+        _Ledger derivation-path mapping snapshotted in `ledger-call-shapes.json` for indices
+        0/1/5/42. Keystone's input is exactly the canonical transfer BOC, which is already pinned by
+        the per-combo snapshots — no additional file needed._
+-   [x] **G6.** Wire into CI (yarn workspace `@tonkeeper/core test`); make Phase 1 PRs auto-fail if
+        snapshots diverge. _Added `test` task to `turbo.json`, root `test` script (filters out
+        playwright), and new `test` job in `.github/workflows/quality.yaml`. Also needed
+        `packages/core/vitest.config.mts` to alias `@ton/crypto/dist/mnemonic/mnemonic`
+        (extension-less import inside `@ton-keychain/core`) so vitest can resolve it._
 
 ### Risk callouts
 
@@ -391,7 +404,7 @@ on any byte difference.
 
 Track progress by milestone, not week. Each milestone gates the next; don't skip.
 
-1. **M1 — Harness in place.** Track G complete: snapshot harness running green on main against
+1. **M1 — Harness in place.** ✅ Track G complete: snapshot harness running green on main against
    current code. Pinned baseline.
 2. **M2 — Facade ready.** Track A complete: chain-kit `.tgz` resolves; `getAdapter('ton')` returns a
    working adapter; other chains stub clearly.

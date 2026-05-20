@@ -88,6 +88,45 @@ jobs:
               with:
                   cmd: typecheck
 
+    test:
+        name: test
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Build shared packages
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: build:pkg
+
+            - name: Run unit tests
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: test
+
     stylelint:
         name: stylelint
         runs-on: ubuntu-latest

@@ -1,5 +1,5 @@
 {
-    "*.{ts,tsx}": ["eslint --fix", "stylelint --fix"],
+    "*.{ts,tsx}": ["eslint --fix", "stylelint --fix --allow-empty-input"],
     "*.css": ["stylelint --fix", "prettier --write"],
     "*.{js,jsx,json,md,yml,yaml,scss,html}": ["prettier --write"]
 }

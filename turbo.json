@@ -41,6 +41,9 @@
         },
         "lint": {
             "outputs": []
+        },
+        "test": {
+            "outputs": []
         }
     }
 }

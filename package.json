@@ -20,6 +20,7 @@
         "lint:css": "stylelint \"{apps,packages}/**/src/**/*.{ts,tsx,css}\"",
         "lint:css:fix": "stylelint \"{apps,packages}/**/src/**/*.{ts,tsx,css}\" --fix",
         "typecheck": "npx turbo typecheck",
+        "test": "npx turbo test --filter='!@tonkeeper/playwrite'",
         "prepare": "husky",
         "prepare-release": "node scripts/prepare-release.js"
     },
