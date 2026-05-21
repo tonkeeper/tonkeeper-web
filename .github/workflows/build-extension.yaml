@@ -1,5 +1,6 @@
 name: Tonkeeper Build Extension
 on:
+    workflow_call:
     workflow_dispatch:
 jobs:
     extension-build:

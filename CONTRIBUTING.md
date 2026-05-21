@@ -71,11 +71,17 @@ Or create PR via GitHub UI.
 
 ### 4. CI Checks
 
-When you open a PR, the following builds run automatically:
-- Desktop (Linux, Windows, macOS)
-- Web (preview deployment)
-- Extension (Chrome, Firefox)
-- iPad
+When you open a PR, the **web preview deployment** runs automatically — every PR gets a Cloudflare Pages link in a comment.
+
+The heavier builds are **opt-in via PR labels** to save CI compute. Add a label on the PR and that build will run; remove and re-add it to re-trigger.
+
+| Label | Build |
+|---|---|
+| `build:desktop` | Desktop matrix (Linux, Windows, macOS x64/arm/universal) |
+| `build:extension` | Extension (Chrome, Firefox) |
+| `build:ipad` | iPad (uploads to TestFlight) |
+
+You can also run any build off-PR from the **Actions** tab → pick the workflow → *Run workflow* (uses `workflow_dispatch`). Useful for branch builds, re-runs, or builds without an open PR.
 
 ### 5. Code Review and Merge
 

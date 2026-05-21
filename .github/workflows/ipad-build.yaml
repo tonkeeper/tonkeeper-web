@@ -27,6 +27,18 @@ on:
                 required: true
             BUILD_PROVISION_PROFILE_BASE64:
                 required: true
+    workflow_dispatch:
+        inputs:
+            version-mode:
+                description: 'How to derive the iPad marketing version'
+                required: false
+                type: string
+                default: next-patch
+            release_tag:
+                description: 'Release tag to checkout and stamp into package.json (e.g. v1.2.3-beta.1). Omit for branch builds.'
+                required: false
+                type: string
+                default: ''
 env:
     node-version: 20.18.1
     ruby-version: 3.3.6
