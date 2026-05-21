@@ -19,6 +19,17 @@ on:
             deployment-url:
                 description: 'The app deployment url'
                 value: ${{ jobs.web-build.outputs.deployment-url }}
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: 'Cloudflare Pages branch name to deploy to'
+                required: true
+                type: string
+            release_tag:
+                description: 'Release tag to stamp into package.json (e.g. v1.2.3). Leave empty for branch builds.'
+                required: false
+                type: string
+                default: ''
 env:
     node-version: 20.11.1
 
