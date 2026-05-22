@@ -1,5 +1,5 @@
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import {
     closestCenter,
     DndContext,
@@ -194,22 +194,29 @@ export const PinnedJettonList: FC<{
         [jettons, config]
     );
 
+    const [optimisticList, setOptimisticList] = useState(list);
+
+    useLayoutEffect(() => {
+        setOptimisticList(list);
+    }, [list]);
+
     const handleDragEnd = useCallback(
         (event: DragEndEvent) => {
             setActiveId(null);
             const { active, over } = event;
             if (!over || active.id === over.id) return;
-            const oldIndex = list.findIndex(j => j.asset.id === String(active.id));
-            const newIndex = list.findIndex(j => j.asset.id === String(over.id));
+            const oldIndex = optimisticList.findIndex(j => j.asset.id === String(active.id));
+            const newIndex = optimisticList.findIndex(j => j.asset.id === String(over.id));
             if (oldIndex === -1 || newIndex === -1) return;
-            const updatedList = arrayMove([...list], oldIndex, newIndex);
+            const updatedList = arrayMove([...optimisticList], oldIndex, newIndex);
+            setOptimisticList(updatedList);
             const pinnedTokens = updatedList.map(item => assetAddressToString(item.asset.address));
             mutate({ config, pinnedTokens });
         },
-        [config, list, mutate]
+        [config, optimisticList, mutate]
     );
 
-    const activeJetton = activeId ? list.find(j => j.asset.id === activeId) : null;
+    const activeJetton = activeId ? optimisticList.find(j => j.asset.id === activeId) : null;
 
     return (
         <DndContext
@@ -221,11 +228,11 @@ export const PinnedJettonList: FC<{
             modifiers={[restrictToVerticalAxis]}
         >
             <SortableContext
-                items={list.map(j => j.asset.id)}
+                items={optimisticList.map(j => j.asset.id)}
                 strategy={verticalListSortingStrategy}
             >
                 <ListBlock noUserSelect>
-                    {list.map(jetton => (
+                    {optimisticList.map(jetton => (
                         <SortablePinnedJettonItem
                             key={jetton.asset.id}
                             jetton={jetton}
