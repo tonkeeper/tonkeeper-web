@@ -1,184 +1,51 @@
 name: PR
+run-name: "PR #${{ github.event.pull_request.number }} — ${{ github.event.action == 'labeled' && format('label: {0}', github.event.label.name) || github.event.action }}"
 on:
     pull_request:
-
-env:
-    node-version: 20.11.1
+        types: [opened, synchronize, reopened, labeled]
 
 permissions:
     pull-requests: write
 
+# Opt-in builds gated by PR labels (save CI compute on routine PRs):
+#   build:desktop    → run the desktop matrix (6 jobs)
+#   build:extension  → run the Chrome/Firefox extension build
+#   build:ipad       → run the iPad TestFlight build
+# Web build runs on every PR so reviewers always get a Cloudflare preview.
+# All three gated builds also expose workflow_dispatch for off-PR manual runs.
+#
+# The `if:` on each gated job runs the build when:
+#   - the build's label was just added (labeled event with matching name), OR
+#   - any non-label event fires and the label is already on the PR
+# This prevents unrelated label changes from re-running builds.
+
 jobs:
-    desktop-build:
-        name: desktop-build
-        strategy:
-            matrix:
-                include:
-                    - os: ubuntu-latest
-                      command: make:intel
-                      tag: x64
-                      dist: /apps/desktop/out/make
-                    - os: ubuntu-latest
-                      command: make:arm
-                      tag: arm64
-                      dist: /apps/desktop/out/make
-                    - os: windows-latest
-                      command: make:intel
-                      tag: x64
-                      dist: /apps/desktop/out/make/squirrel.windows/x64/*Setup.exe
-                    - os: macos-15-intel
-                      command: make:intel
-                      tag: x64
-                      dist: /apps/desktop/out/make
-                    - os: macos-latest
-                      command: make:arm
-                      tag: arm
-                      dist: /apps/desktop/out/make
-                    - os: macos-latest
-                      command: make:universal
-                      tag: universal
-                      dist: /apps/desktop/out/make
-
-        runs-on: ${{ matrix.os }}
-        timeout-minutes: 30
-        env:
-            APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
-            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-            APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
-            DEBUG: electron*
-
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Decode service account into a file
-              if: runner.os == 'macOS'
-              env:
-                  CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
-              run: |
-                  echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
-
-            - name: Configure keychain
-              if: runner.os == 'macOS'
-              uses: apple-actions/import-codesign-certs@v3
-              with:
-                  p12-file-base64: ${{ secrets.IDENTITY_P12_B64 }}
-                  p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
-
-            - name: Yarn cache
-              uses: actions/cache@v4
-              with:
-                  path: ./.yarn
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Run build packages
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:pkg
-
-            - name: Run build intel distributive
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: ${{ matrix.command }}
-                  dir: 'apps/desktop'
-
-            - name: Upload zip distributives to artifacts
-              uses: actions/upload-artifact@v4
-              if: runner.os == 'Windows'
-              with:
-                  name: Tonkeeper Desktop ${{ runner.os }} x64 archive
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}/apps/desktop/out/make/zip/**/*.zip
-
-            - name: Upload distributives to artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: Tonkeeper Desktop ${{ runner.os }} ${{ matrix.tag }}
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}${{ matrix.dist }}
-
-            - name: Clean-up credentials
-              if: always() && runner.os == 'macOS'
-              run: |
-                  rm ${{ github.workspace }}/AuthKey.p8
-
     web-build:
+        # Skip on label events so adding labels doesn't redeploy the preview.
+        if: github.event.action != 'labeled'
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: ${{ github.head_ref }}
         secrets: inherit
 
+    desktop-build:
+        if: |
+            (github.event.action == 'labeled' && github.event.label.name == 'build:desktop') ||
+            (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'build:desktop'))
+        uses: ./.github/workflows/desktop-build.yaml
+        secrets: inherit
+
     extension-build:
-        name: extension-build
-        runs-on: macos-14
-        timeout-minutes: 10
-
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Yarn cache
-              uses: actions/cache@v4
-              with:
-                  path: ./.yarn
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Run build
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:extension
-
-            - name: Upload Extension Chrome to artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: Extension Chrome
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}/apps/extension/dist/chrome
-
-            - name: Upload Extension Firefox to artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: Extension Firefox
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}/apps/extension/dist/firefox
+        if: |
+            (github.event.action == 'labeled' && github.event.label.name == 'build:extension') ||
+            (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'build:extension'))
+        uses: ./.github/workflows/build-extension.yaml
+        secrets: inherit
 
     ipad-build:
+        if: |
+            (github.event.action == 'labeled' && github.event.label.name == 'build:ipad') ||
+            (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'build:ipad'))
         uses: ./.github/workflows/ipad-build.yaml
         with:
             version-mode: next-patch
