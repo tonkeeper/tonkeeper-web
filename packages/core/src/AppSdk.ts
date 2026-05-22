@@ -59,6 +59,8 @@ export interface UIEvents {
     keyboard: KeyboardParams;
     addSuggestion: LatestSuggestion;
     editSuggestion: FavoriteSuggestion;
+    // generic response channel: each emitter/listener pair owns its own params shape
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     response: any;
     toast: string;
     signerTxResponse: {
@@ -288,13 +290,13 @@ export abstract class BaseApp implements IAppSdk {
     pasteFromClipboard = async () => navigator.clipboard.readText();
 
     copyToClipboard = (value: string, notification?: string) => {
-        console.log(value, notification);
+        console.debug(value, notification);
 
         this.topMessage(notification);
     };
 
     openPage = async (url: string): Promise<void> => {
-        console.log(url);
+        console.debug(url);
     };
 
     openNft = (nft: NFT) => {

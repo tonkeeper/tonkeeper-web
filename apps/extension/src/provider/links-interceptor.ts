@@ -31,8 +31,9 @@ export class TonLinksInterceptor {
     };
 
     private windowOpenOverride = (
-        url?: string | URL | undefined,
-        ...args: any[]
+        url?: string | URL,
+        target?: string,
+        features?: string
     ): Window | null => {
         const href = typeof url === 'string' ? url : url?.toString();
 
@@ -41,7 +42,6 @@ export class TonLinksInterceptor {
             return null;
         }
 
-        const [target, features] = args;
         return this.originalWindowOpen!.call(window, url, target, features);
     };
 

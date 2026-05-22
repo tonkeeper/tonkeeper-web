@@ -93,6 +93,7 @@ export const ImportListTable = () => {
             <TD corner="top-right">
                 <Body2Secondary>D</Body2Secondary>
             </TD>
+            {/* eslint-disable i18next/no-literal-string -- example row showing what the import format looks like */}
             <TD>
                 <Body2>UQD2NmD_lH5f5u1Kj3KfGyTvhZSX0Eg6qp2a5IQUKXxOGzCi</Body2>
             </TD>
@@ -126,6 +127,7 @@ export const ImportListTable = () => {
             <TD borderBottom>
                 <Body2>UQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_p0p</Body2>
             </TD>
+            {/* eslint-enable i18next/no-literal-string */}
             <TD corner="bottom-right" borderBottom>
                 <Body2Tertiary>{t('import_multisend_table_comment')}</Body2Tertiary>
             </TD>

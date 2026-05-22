@@ -46,6 +46,8 @@ export interface PupUpEvents {
     trackEvent: TrackEvent;
 }
 
+// generic popup-response channel: each emitter/listener pair owns its own payload shape
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface PayloadRequest<P = any> {
     id: number;
     payload: P;
@@ -63,7 +65,7 @@ export interface UserProperties {
 
 export interface TrackEvent {
     name: string;
-    params: Record<string, any>;
+    params: Record<string, string | number | boolean>;
 }
 
 export interface BackgroundEvents {

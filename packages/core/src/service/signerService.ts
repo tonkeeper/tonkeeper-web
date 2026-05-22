@@ -9,8 +9,6 @@ import { externalMessage, getWalletSeqNo } from './ton-blockchain/utils';
 import { walletContractFromState } from './wallet/contractService';
 
 export const parseSignerSignature = (payload: string): Buffer => {
-    console.log('signer', payload);
-
     if (!payload.startsWith('tonkeeper://publish')) {
         throw new Error(`Unexpected Result: ${payload}`);
     }

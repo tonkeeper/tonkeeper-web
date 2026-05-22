@@ -1,24 +1,21 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=420`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=269`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 
 The goal is to drive each demoted rule to zero violations, then promote it back to `'error'` (and
 lower `--max-warnings` accordingly).
 
-## Demoted rules (severity baseline: 420 warnings, 0 errors)
+## Demoted rules (severity baseline: 269 warnings, 0 errors)
 
 The following rules were demoted from `error` (or `off`) to `warn`:
 
 | Rule                                       | Violations | Notes                                                                                                   |
 | ------------------------------------------ | ---------: | ------------------------------------------------------------------------------------------------------- |
 | `react-hooks/exhaustive-deps`              |        269 | **Was off** — re-enabled to catch stale closures. High count is expected; treat as a backlog, not noise |
-| `no-console`                               |         70 | Already `warn` with `allow: ['debug', 'error', 'info']`                                                 |
-| `i18next/no-literal-string`                |         43 | User-facing string literals; cleanup needs translation keys                                             |
-| `complexity`                               |         25 | Threshold `max: 15` (was default 20). Refactor long functions or `// eslint-disable`                    |
-| `@typescript-eslint/no-explicit-any`       |         18 | Highest-priority TS fix — re-tighten first                                                              |
 | `@typescript-eslint/no-non-null-assertion` |          1 |                                                                                                         |
+
 
 ## How to promote a rule back to `error`
 
@@ -32,6 +29,10 @@ The following rules were demoted from `error` (or `off`) to `warn`:
 
 ## Disabled rules
 
+-   `complexity` — disabled. Most violations were essential complexity in React render
+    branches (state-machine dispatch on discriminated unions) where splitting into helpers
+    hides cases behind indirection without reducing cognitive load. Original threshold was
+    `max: 15` with 25 violations.
 -   `import/no-unresolved` — disabled until `eslint-import-resolver-typescript` is configured.
     Without it, workspace subpath imports like `@tonkeeper/core/dist/...` and
     `styled-components/dist/types` produce thousands of false positives. To re-enable: install the

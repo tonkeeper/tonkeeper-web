@@ -20,7 +20,7 @@ class StonfiApi {
 
             return response.result.assets;
         } catch (e) {
-            console.log(e);
+            console.error(e);
             return [];
         }
     }

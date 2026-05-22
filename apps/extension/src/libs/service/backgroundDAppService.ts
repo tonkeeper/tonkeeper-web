@@ -5,7 +5,13 @@
  */
 
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
-import { CONNECT_EVENT_ERROR_CODES } from '@tonkeeper/core/dist/entries/tonConnect';
+import {
+    CONNECT_EVENT_ERROR_CODES,
+    ConnectRequest,
+    SignDataRequestPayload,
+    TonConnectAccount,
+    TonConnectTransactionPayload
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import browser from 'webextension-polyfill';
 import { DAppMessage, TonkeeperApiResponse } from '../../entries/message';
 import { backgroundEventsEmitter } from '../event';
@@ -93,7 +99,7 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
             return 'pong';
         }
         case 'tonConnect_connect': {
-            return tonConnectRequest(message.id, origin, message.params[0]);
+            return tonConnectRequest(message.id, origin, message.params[0] as ConnectRequest);
         }
         case 'tonConnect_reconnect': {
             return tonConnectReConnect(origin);
@@ -102,16 +108,28 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
             return tonConnectDisconnect(message.id, origin);
         }
         case 'tonConnect_sendTransaction': {
-            return tonConnectTransaction(message.id, origin, message.params[0], message.params[1]);
+            return tonConnectTransaction(
+                message.id,
+                origin,
+                message.params[0] as TonConnectTransactionPayload,
+                message.params[1] as TonConnectAccount | undefined
+            );
         }
         case 'tonConnect_signData': {
-            return tonConnectSignData(message.id, origin, message.params[0]);
+            return tonConnectSignData(
+                message.id,
+                origin,
+                message.params[0] as SignDataRequestPayload
+            );
         }
         case 'tonapi_request': {
-            return createTonapiRequest(message.params[0], message.params[1]);
+            return createTonapiRequest(
+                message.params[0] as string,
+                message.params[1] as RequestInit | undefined
+            );
         }
         case 'tonLink_intercept': {
-            return processInterceptTonLink(origin, message.params[0]);
+            return processInterceptTonLink(origin, message.params[0] as string);
         }
         default:
             throw new TonConnectError(

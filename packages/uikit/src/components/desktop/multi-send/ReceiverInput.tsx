@@ -83,8 +83,6 @@ export const ReceiverInput: FC<{
 
     const onPaste = useCallback(
         async (e: React.ClipboardEvent<HTMLInputElement>) => {
-            console.log('paste');
-
             const clipText = e.clipboardData.getData('Text');
 
             const values = await getPastedTable(clipText, validator);
@@ -107,7 +105,6 @@ export const ReceiverInput: FC<{
                 onChange={e => {
                     inputTouched.current = true;
                     setInputValue(e.target.value);
-                    console.log(e.target.value);
                 }}
                 value={inputValue}
                 placeholder={t('transactionDetails_recipient')}
