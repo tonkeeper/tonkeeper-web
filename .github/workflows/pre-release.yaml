@@ -24,9 +24,11 @@ env:
     RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
-    # Strip assets from every existing pre-release/draft before the build jobs
-    # run, so retagging an existing pre-release (e.g. rc.1 → rc.2) doesn't leave
-    # the previous version's binaries attached alongside the new ones.
+    # Strip assets from existing pre-releases/drafts of the SAME base version
+    # before the build jobs run, so retagging within a version (e.g. rc.1 → rc.2)
+    # doesn't leave the previous iteration's binaries attached alongside the new
+    # ones. Scoped by base version so cleaning v4.7.0-rc.3 only touches other
+    # v4.7.0-* pre-releases — never unrelated versions.
     cleanup-old-assets:
         name: cleanup-old-assets
         runs-on: ubuntu-latest
@@ -38,12 +40,18 @@ jobs:
               run: |
                   set -euo pipefail
 
+                  # Base version is everything before the first '-'
+                  # e.g. v4.7.0-rc.3 -> v4.7.0
+                  BASE="${RELEASE_TAG%%-*}"
+                  echo "Cleaning pre-releases/drafts for base version: $BASE"
+
                   tags=$(gh release list --repo "$REPO" --limit 100 \
                       --json tagName,isPrerelease,isDraft \
-                      --jq '.[] | select(.isPrerelease or .isDraft) | .tagName')
+                      | jq -r --arg base "$BASE" \
+                        '.[] | select(.isPrerelease or .isDraft) | select(.tagName | startswith($base + "-")) | .tagName')
 
                   if [ -z "$tags" ]; then
-                      echo "No pre-releases or drafts found — nothing to clean."
+                      echo "No pre-releases or drafts matching $BASE-* — nothing to clean."
                       exit 0
                   fi
 
