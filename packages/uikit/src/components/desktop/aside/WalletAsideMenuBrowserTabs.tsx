@@ -24,13 +24,7 @@ import React, {
     useLayoutEffect,
     useState
 } from 'react';
-import {
-    closestCenter,
-    DndContext,
-    DragEndEvent,
-    DragOverlay,
-    DragStartEvent
-} from '@dnd-kit/core';
+import { closestCenter, DndContext, DragEndEvent } from '@dnd-kit/core';
 import {
     SortableContext,
     useSortable,
@@ -227,8 +221,8 @@ const SortableBrowserTab: FC<BrowserTabRowProps> = props => {
     const style: React.CSSProperties = {
         transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
         transition,
-        left: '8px',
-        opacity: isDragging ? 0 : undefined
+        zIndex: isDragging ? 1 : undefined,
+        position: isDragging ? 'relative' : undefined
     };
 
     return (
@@ -253,7 +247,6 @@ const BrowserTabsPinned: FC<{
     const sdk = useAppSdk();
     const track = useCountryContextTracker();
     const sensors = useSortableDndSensors();
-    const [activeId, setActiveId] = useState<string | null>(null);
 
     const [optimisticTabs, setOptimisticTabs] = useState(tabs);
 
@@ -261,13 +254,11 @@ const BrowserTabsPinned: FC<{
         setOptimisticTabs(tabs);
     }, [tabs]);
 
-    const handleDragStart = (event: DragStartEvent) => {
-        setActiveId(String(event.active.id));
+    const handleDragStart = () => {
         sdk.hapticNotification('impact_medium');
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
-        setActiveId(null);
         const { active, over } = event;
         if (!over || !optimisticTabs || active.id === over.id) return;
         const oldIndex = optimisticTabs.findIndex(t => t.id === active.id);
@@ -287,8 +278,6 @@ const BrowserTabsPinned: FC<{
         return null;
     }
 
-    const activeTab = activeId ? optimisticTabs.find(t => t.id === activeId) : null;
-
     return (
         <GroupWrapper>
             <Divider />
@@ -306,7 +295,6 @@ const BrowserTabsPinned: FC<{
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
                 onDragStart={handleDragStart}
-                onDragCancel={() => setActiveId(null)}
                 modifiers={[restrictToVerticalAxis]}
             >
                 <SortableContext
@@ -324,17 +312,6 @@ const BrowserTabsPinned: FC<{
                         />
                     ))}
                 </SortableContext>
-                <DragOverlay modifiers={[restrictToVerticalAxis]}>
-                    {activeTab ? (
-                        <BrowserTabRow
-                            tab={activeTab}
-                            isEditMode={isEditMode}
-                            openedTabId={openedTabId}
-                            onClickTab={onClickTab}
-                            unpinTab={unpinTab}
-                        />
-                    ) : null}
-                </DragOverlay>
             </DndContext>
         </GroupWrapper>
     );
