@@ -65,6 +65,7 @@ export const ReceiverInput: FC<{
             return;
         }
         field.onChange(validationProduct);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally ignoring `field` identity changes
     }, [field.onChange, validationProduct]);
 
     useEffect(() => {
@@ -77,6 +78,7 @@ export const ReceiverInput: FC<{
                 ? field.value.dns.account.name
                 : field.value.address
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only init
     }, []);
 
     const { onCopy, copied } = useCopyToClipboard(validationProduct?.address ?? '');

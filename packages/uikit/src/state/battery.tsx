@@ -78,7 +78,7 @@ export const useBatteryApi = () => {
         return new Configuration({
             basePath: config.batteryHost
         });
-    }, []);
+    }, [config.batteryHost]);
 };
 
 export const useBatteryServiceConfigQuery = () => {
@@ -328,7 +328,7 @@ export const useBatteryMinBootstrapValue = (asset: TonAsset) => {
             asset,
             weiAmount: min
         });
-    }, [methods, balance, asset, shouldReserve]);
+    }, [methods, balance, asset, shouldReserve, tokenRate]);
 };
 
 export type BatteryBalance = {

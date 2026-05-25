@@ -25,7 +25,7 @@ const QrScanner = () => {
         return () => {
             sdk.uiEvents.off('scan', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const onCancel = () => {
         setScanId(undefined);

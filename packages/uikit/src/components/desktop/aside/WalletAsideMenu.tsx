@@ -112,7 +112,7 @@ export const WalletAsideMenu = () => {
     const menuController = useMenuController('wallet-nav');
     useEffect(() => {
         menuController.close();
-    }, [location]);
+    }, [location, menuController]);
 
     const hideBrowser = useHideBrowserAfterNavigation();
     const isBrowserOpened = useIsBrowserOpened();

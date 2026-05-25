@@ -280,7 +280,7 @@ export const PurchaseAction: FC<{
                 scaledUIMultiplier: scaledUIMultiplierOne
             }
         }).stringAssetRelativeAmount;
-    }, [purchase?.amount]);
+    }, [purchase]);
 
     if (!purchase) {
         return <ErrorAction />;

@@ -181,7 +181,7 @@ const SendNftNotification = () => {
         return () => {
             sdk.uiEvents.off('transferNft', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!nftItem) return undefined;

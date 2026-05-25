@@ -165,7 +165,7 @@ export const NFTSettingsContent = () => {
 
             return acc;
         }, [] as (SettingsNFTCollection | SettingsSingleNFT)[]);
-    }, [nfts, config?.spamNfts, config?.hiddenNfts, config?.trustedNfts]);
+    }, [nfts, config]);
 
     const visibleCollections = useMemo(
         () => collections.filter(collection => !collection.isHidden && !collection.isSpam),

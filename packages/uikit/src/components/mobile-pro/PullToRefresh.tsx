@@ -54,7 +54,7 @@ export const PullToRefresh: FC<
                 resolve();
             }, remainingTime);
         });
-    }, [handleRefresh, invalidate, client, notification]);
+    }, [handleRefresh, invalidate, client, notification, sdk]);
 
     return (
         <ForTargetEnv env="mobile">

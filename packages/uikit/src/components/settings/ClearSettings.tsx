@@ -21,7 +21,7 @@ export const ClearSettings = () => {
                 action: () => setOpen(true)
             }
         ];
-    }, [t, setOpen]);
+    }, [t, setOpen, wallets.length]);
 
     return (
         <>

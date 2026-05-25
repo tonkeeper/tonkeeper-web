@@ -430,7 +430,7 @@ const StakingModalContent: FC<{
             sdk.twaExpand();
             sdk.hapticNotification('success');
         }
-    }, []);
+    }, [sdk]);
 
     const amountBN = useMemo(() => {
         const bn = new BigNumber(amount);

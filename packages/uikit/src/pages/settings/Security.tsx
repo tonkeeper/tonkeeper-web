@@ -129,7 +129,7 @@ const WebPassword = () => {
             }
         ];
         return i;
-    }, []);
+    }, [t]);
 
     return (
         <>

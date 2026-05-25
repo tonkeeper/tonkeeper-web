@@ -141,7 +141,7 @@ export const AddWalletNotificationControlled = () => {
             sdk.addWalletPage?.open(method);
             setSelectedMethod(method);
         };
-    }, [isSubscriptionValid, openBuyPro, setSelectedMethod, sdk]);
+    }, [isSubscriptionValid, openBuyPro, setSelectedMethod, sdk, onClose]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

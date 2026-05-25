@@ -488,7 +488,7 @@ export const useHistoryFilters = () => {
         reset();
         mutate({ historyFilterSpam: !filters.filterSpam });
         setFilters(f => ({ ...f, filterSpam: !f.filterSpam }));
-    }, [setFilters, mutate, filters.filterSpam]);
+    }, [setFilters, mutate, filters.filterSpam, reset]);
 
     const setAsset = useCallback(
         (asset: Asset | undefined) => {
@@ -547,7 +547,7 @@ export const useScrollMonitor = (
         return () => {
             clearInterval(timer);
         };
-    }, [isAtTop, callback]);
+    }, [isAtTop, callback, timeout]);
 
     return setElement as Dispatch<SetStateAction<HTMLDivElement | null>>;
 };

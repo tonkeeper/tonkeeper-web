@@ -59,10 +59,9 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: 
 
     // Re-measure scrollbar width after the transition completes (`entered` flips to true),
     // because the scrollbar may appear/disappear as the modal opens.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const scrollbarWidth = useMemo(() => {
         return window.innerWidth > notificationMaxWidth ? sdk.getScrollbarWidth() : 0;
-    }, [sdk, entered]);
+    }, [sdk, entered]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <NotificationContainer
@@ -132,10 +131,9 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
     ({ entered, children }, ref) => {
         const sdk = useAppSdk();
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         const scrollbarWidth = useMemo(() => {
             return sdk.getScrollbarWidth();
-        }, [sdk, entered]);
+        }, [sdk, entered]); // eslint-disable-line react-hooks/exhaustive-deps
 
         return (
             <Overlay

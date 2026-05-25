@@ -87,7 +87,7 @@ export const AddFavoriteNotification = () => {
         return () => {
             sdk.uiEvents.off('addSuggestion', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!latest) return undefined;
@@ -194,7 +194,7 @@ export const EditFavoriteNotification = () => {
         return () => {
             sdk.uiEvents.off('editSuggestion', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!favorite) return undefined;

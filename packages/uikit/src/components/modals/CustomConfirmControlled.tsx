@@ -41,7 +41,7 @@ export const CustomConfirmNotificationControlled = () => {
                 }}
             />
         );
-    }, [onClose, params?.options, params?.options]);
+    }, [onClose, params]);
 
     return (
         <Notification

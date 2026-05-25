@@ -210,7 +210,7 @@ export const StakingPositionAsset = forwardRef<
             return undefined;
         }
         return getStakingPendingSubtitleLine(t, stakingPosition.position, countdown);
-    }, [isFullWidth, stakingPosition.position, t, countdown]);
+    }, [isFullWidth, stakingPosition, t, countdown]);
 
     return (
         <ListItem

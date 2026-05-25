@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { Notification, NotificationFooter, NotificationFooterPortal } from './Notification';
@@ -117,7 +117,7 @@ export const LedgerContent: FC<{
         return () => {
             sdk.ledgerConnectionPage?.close();
         };
-    }, []);
+    }, [sdk.ledgerConnectionPage]);
 
     const onRetry = () => {
         resetConnection();

@@ -233,7 +233,7 @@ const SendContent: FC<{
 
             return true;
         },
-        [sdk, filter, initAmountState?.assetAmount]
+        [sdk, filter, initAmountState?.assetAmount, t]
     );
 
     const network = useActiveTonNetwork();
@@ -514,7 +514,7 @@ const SendActionNotification = () => {
                 initRecipient={transferParams?.initRecipient}
             />
         );
-    }, [open, transferParams, chain]);
+    }, [open, transferParams, chain, onClose]);
 
     return (
         <NotificationStyled

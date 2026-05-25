@@ -175,7 +175,18 @@ const SingleAccountSettings = () => {
         }
 
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron, isNftEnabled]);
+    }, [
+        t,
+        navigate,
+        account,
+        jettons,
+        nft,
+        twoFAEnabled,
+        canUseBattery,
+        canUseTron,
+        isNftEnabled,
+        rename
+    ]);
 
     return (
         <>
@@ -351,7 +362,8 @@ const MultipleAccountSettings = () => {
         twoFAEnabled,
         canUseBattery,
         canUseTron,
-        isNftEnabled
+        isNftEnabled,
+        rename
     ]);
 
     return (

@@ -84,7 +84,7 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         return () => {
             sdk.ledgerConnectionPage?.close();
         };
-    }, []);
+    }, [sdk.ledgerConnectionPage]);
 
     useEffect(() => {
         onStartConnection();

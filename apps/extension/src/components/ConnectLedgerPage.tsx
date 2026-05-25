@@ -62,7 +62,7 @@ const ConnectLedgerPage = () => {
             console.error(e);
         }
         window.close();
-    }, []);
+    }, [sdk.storage]);
 
     const location = useLocation();
     useEffect(() => {

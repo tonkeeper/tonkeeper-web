@@ -46,7 +46,7 @@ export const SignerContent: FC<{
             formatAddress(wallet.rawAddress),
             transactionParams.pathInfo
         );
-    }, [transactionParams]);
+    }, [transactionParams, wallet.rawAddress]);
 
     return (
         <NotificationBlock

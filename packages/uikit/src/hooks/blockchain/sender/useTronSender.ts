@@ -234,7 +234,8 @@ const useGetTronTonSender = () => {
         tronApi,
         batteryApi,
         authToken,
-        requestToken
+        requestToken,
+        sdk
     ]);
 };
 
@@ -274,7 +275,8 @@ const useGetBatteryTronSender = () => {
         activeTronWallet,
         tronApi,
         batteryApi,
-        batteryUnitTonRate
+        batteryUnitTonRate,
+        sdk
     ]);
 };
 
@@ -294,7 +296,7 @@ const useGetTronTrxSender = () => {
 
         const signer = getTronSigner(sdk, tronApi, activeAccount);
         return new TronTrxSender(tronApi, activeTronWallet, signer);
-    }, [activeAccount, activeTronWallet, tronApi]);
+    }, [activeAccount, activeTronWallet, tronApi, sdk]);
 };
 
 const useGetTronFreeProSender = () => {
@@ -332,7 +334,7 @@ const useGetTronFreeProSender = () => {
             batteryAuthToken,
             proToken
         );
-    }, [activeAccount, activeTronWallet, tronApi, batteryApi, batteryAuthToken]);
+    }, [activeAccount, activeTronWallet, tronApi, batteryApi, batteryAuthToken, sdk]);
 };
 
 export const useTronEstimationSender = (senderType: TronSenderType | undefined) => {
@@ -466,5 +468,12 @@ const useTronEstimationFreeProSender = () => {
             batteryAuthToken,
             proToken
         );
-    }, [activeTronWallet, activeAccount.activeTonWallet, tronApi, batteryApi, proToken, batteryAuthToken]);
+    }, [
+        activeTronWallet,
+        activeAccount.activeTonWallet,
+        tronApi,
+        batteryApi,
+        proToken,
+        batteryAuthToken
+    ]);
 };

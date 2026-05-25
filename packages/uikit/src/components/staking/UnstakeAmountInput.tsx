@@ -64,7 +64,7 @@ export const UnstakeAmountInput: FC<UnstakeAmountInputProps> = ({
     const isInsufficientRecommendedFeeReserve = useMemo(() => {
         if (!amountBN) return false;
         return balanceTON.lte(GAS_RESERVE_TON) && !amountBN?.isZero();
-    }, [amountBN, tonAmount]);
+    }, [amountBN, tonAmount, balanceTON]);
 
     return (
         <AmountField

@@ -351,7 +351,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             amount: format(extra.amount, extra.preview.decimals),
             fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
         };
-    }, [assets, format, rate, fiat]);
+    }, [assets, format, rate, fiat, token]);
 
     if (!asset) {
         return <></>;

@@ -320,7 +320,7 @@ const SwapConfirmContent: FC<{
         if (sdk.twaExpand) {
             sdk.twaExpand();
         }
-    }, []);
+    }, [sdk]);
 
     const done = sendResult !== undefined;
 

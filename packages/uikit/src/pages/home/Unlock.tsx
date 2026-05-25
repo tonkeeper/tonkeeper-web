@@ -195,7 +195,7 @@ export const Unlock = () => {
             mutate(false);
             sdk.uiEvents.emit('unlock');
         }
-    }, [isPasswordSet, keychainPassword, mutate]);
+    }, [isPasswordSet, keychainPassword, mutate, sdk.uiEvents]);
 
     if (isPasswordSet || keychainPassword) {
         return <PasswordUnlock logOutConfirmed={() => (canUnlock.current = false)} />;

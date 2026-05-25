@@ -19,7 +19,7 @@ export function useNotifyError(error: unknown) {
         if (error instanceof Error) {
             sdk.topMessage(error.message);
         }
-    }, [error]);
+    }, [error, sdk]);
 }
 
 export const useNotifyErrorHandle = () => {

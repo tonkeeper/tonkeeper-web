@@ -246,7 +246,7 @@ export const Words: FC<{
         if (sdk.twaExpand) {
             sdk.twaExpand();
         }
-    }, []);
+    }, [sdk]);
 
     return (
         <CenterContainer>

@@ -241,7 +241,7 @@ const TonTransactionContent: FC<{
             sdk.twaExpand();
             sdk.hapticNotification('success');
         }
-    }, []);
+    }, [sdk]);
 
     const onSubmit = async () => {
         try {

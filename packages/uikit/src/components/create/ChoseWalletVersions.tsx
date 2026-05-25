@@ -118,7 +118,7 @@ export const ChoseWalletVersions: FC<{
         if (sdk.isIOs()) {
             hideIosKeyboard();
         }
-    }, []);
+    }, [sdk]);
 
     useLayoutEffect(() => {
         if (filteredWallets) {

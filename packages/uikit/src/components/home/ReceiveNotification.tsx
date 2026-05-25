@@ -25,7 +25,7 @@ const ReceiveNotification = () => {
         return () => {
             sdk.uiEvents.off('receive', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!params) return undefined;

@@ -91,7 +91,7 @@ export const DeepLinkSubscription = () => {
         return subscribeToSignerResponse(val => {
             sdk.uiEvents.emit('signerTxResponse', { method: 'signerTxResponse', params: val });
         });
-    }, []);
+    }, [sdk.uiEvents]);
 
     const [params, setParams] = useState<TonConnectConnectionParams | null>(null);
     const paramsRef = useValueRef(params);

@@ -201,7 +201,7 @@ const WebTonConnectSubscription = () => {
                 JSON.stringify({ event: 'close-tx-confirmation', id: request.id })
             );
         },
-        [request, setRequest]
+        [request, setRequest, sendResponse]
     );
 
     useEffect(() => {
