@@ -21,15 +21,10 @@ import React, {
     SetStateAction,
     useContext,
     useEffect,
+    useLayoutEffect,
     useState
 } from 'react';
-import {
-    closestCenter,
-    DndContext,
-    DragEndEvent,
-    DragOverlay,
-    DragStartEvent
-} from '@dnd-kit/core';
+import { closestCenter, DndContext, DragEndEvent } from '@dnd-kit/core';
 import {
     SortableContext,
     useSortable,
@@ -226,8 +221,8 @@ const SortableBrowserTab: FC<BrowserTabRowProps> = props => {
     const style: React.CSSProperties = {
         transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
         transition,
-        left: '8px',
-        opacity: isDragging ? 0 : undefined
+        zIndex: isDragging ? 1 : undefined,
+        position: isDragging ? 'relative' : undefined
     };
 
     return (
@@ -252,21 +247,26 @@ const BrowserTabsPinned: FC<{
     const sdk = useAppSdk();
     const track = useCountryContextTracker();
     const sensors = useSortableDndSensors();
-    const [activeId, setActiveId] = useState<string | null>(null);
 
-    const handleDragStart = (event: DragStartEvent) => {
-        setActiveId(String(event.active.id));
+    const [optimisticTabs, setOptimisticTabs] = useState(tabs);
+
+    useLayoutEffect(() => {
+        setOptimisticTabs(tabs);
+    }, [tabs]);
+
+    const handleDragStart = () => {
         sdk.hapticNotification('impact_medium');
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
-        setActiveId(null);
         const { active, over } = event;
-        if (!over || !tabs || active.id === over.id) return;
-        const oldIndex = tabs.findIndex(tab => tab.id === active.id);
-        const newIndex = tabs.findIndex(tab => tab.id === over.id);
+        if (!over || !optimisticTabs || active.id === over.id) return;
+        const oldIndex = optimisticTabs.findIndex(tab => tab.id === active.id);
+        const newIndex = optimisticTabs.findIndex(tab => tab.id === over.id);
         if (oldIndex === -1 || newIndex === -1) return;
-        onUpdateOrder(arrayMove([...tabs], oldIndex, newIndex));
+        const reordered = arrayMove([...optimisticTabs], oldIndex, newIndex);
+        setOptimisticTabs(reordered);
+        onUpdateOrder(reordered);
     };
 
     const unpinTab = (tab: BrowserTab) => {
@@ -277,8 +277,6 @@ const BrowserTabsPinned: FC<{
     if (!tabs) {
         return null;
     }
-
-    const activeTab = activeId ? tabs.find(tab => tab.id === activeId) : null;
 
     return (
         <GroupWrapper>
@@ -297,14 +295,13 @@ const BrowserTabsPinned: FC<{
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
                 onDragStart={handleDragStart}
-                onDragCancel={() => setActiveId(null)}
                 modifiers={[restrictToVerticalAxis]}
             >
                 <SortableContext
-                    items={tabs.map(tab => tab.id)}
+                    items={optimisticTabs.map(tab => tab.id)}
                     strategy={verticalListSortingStrategy}
                 >
-                    {tabs.map(tab => (
+                    {optimisticTabs.map(tab => (
                         <SortableBrowserTab
                             key={tab.id}
                             tab={tab}
@@ -315,17 +312,6 @@ const BrowserTabsPinned: FC<{
                         />
                     ))}
                 </SortableContext>
-                <DragOverlay modifiers={[restrictToVerticalAxis]}>
-                    {activeTab ? (
-                        <BrowserTabRow
-                            tab={activeTab}
-                            isEditMode={isEditMode}
-                            openedTabId={openedTabId}
-                            onClickTab={onClickTab}
-                            unpinTab={unpinTab}
-                        />
-                    ) : null}
-                </DragOverlay>
             </DndContext>
         </GroupWrapper>
     );
