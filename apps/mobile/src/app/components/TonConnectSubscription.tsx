@@ -49,7 +49,7 @@ const useInjectedBridgeRequestsSubscription = (
                 });
             }
         );
-    }, []);
+    }, [setRequest]);
 
     return ref;
 };

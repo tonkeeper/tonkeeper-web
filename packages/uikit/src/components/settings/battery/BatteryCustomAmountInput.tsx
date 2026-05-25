@@ -90,7 +90,7 @@ export const BatteryCustomAmountInput: FC<{
                 amount: minValue.stringAssetRelativeAmount
             });
         }
-    }, [t, remainingAssetAmount, asset, minValue, selectedAssetAmount]);
+    }, [t, remainingAssetAmount, minValue, selectedAssetAmount]);
 
     useEffect(() => {
         if (selectedAssetAmount.lte(0)) {

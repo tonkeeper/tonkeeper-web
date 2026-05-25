@@ -436,7 +436,7 @@ const QuorumInput = () => {
         if (selectedSignersNumber > totalSignersNumber) {
             setValue('quorum', totalSignersNumber);
         }
-    }, [totalSignersNumber, selectedSignersNumber]);
+    }, [totalSignersNumber, selectedSignersNumber, setValue]);
 
     return (
         <QuorumAndDeadlineInputsContainer>

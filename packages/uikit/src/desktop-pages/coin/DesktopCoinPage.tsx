@@ -434,7 +434,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         } else {
             return undefined;
         }
-    }, [assets, t, token]);
+    }, [assets, token]);
 
     const { mainnetConfig } = useAppContext();
     const tonviewer = new URL(mainnetConfig.accountExplorer).origin;

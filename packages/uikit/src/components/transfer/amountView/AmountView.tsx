@@ -112,7 +112,7 @@ export const AmountView: FC<{
         if (refBlock.current) {
             setFontSize(getInputSize(amountState.inputValue, refBlock.current));
         }
-    }, [refBlock.current, amountState.inputValue]);
+    }, [amountState.inputValue]);
 
     useEffect(() => {
         dispatch({ kind: 'price', payload: { prices: tokenRate?.prices } });

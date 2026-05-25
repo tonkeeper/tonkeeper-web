@@ -78,7 +78,7 @@ const useInjectedBridgeConnectionSubscription = (
                 });
             }
         );
-    }, []);
+    }, [setParams]);
 
     return ref;
 };

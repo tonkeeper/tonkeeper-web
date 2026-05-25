@@ -31,7 +31,6 @@ import styled from 'styled-components';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
-import { useNavigate } from '../../hooks/router/useNavigate';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
@@ -102,7 +101,6 @@ export const ConfirmTransferView: FC<
         : availableTronSendersChoices;
 
     const [selectedSenderType, setSelectedSenderType] = useState<AllChainsSenderType>();
-    const navigate = useNavigate();
 
     const onSenderTypeChange = useCallback(
         (type: AllChainsSenderType) => {
@@ -120,7 +118,7 @@ export const ConfirmTransferView: FC<
                 return setSelectedSenderType(type);
             }
         },
-        [availableSenderChoices, navigate, rest.onClose]
+        [availableSenderChoices]
     );
 
     const estimation = useEstimateTransfer({

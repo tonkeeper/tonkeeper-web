@@ -128,7 +128,7 @@ export const AddWalletNotificationControlled = () => {
     const onCloseCallback = useCallback(() => {
         sdk.addWalletPage?.close();
         onClose();
-    }, [onClose, setSelectedMethod, sdk]);
+    }, [onClose, sdk]);
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {

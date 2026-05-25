@@ -478,7 +478,7 @@ export const useHistoryFilters = () => {
             isInited = true;
             setFilters(f => ({ ...f, filterSpam: historyFilterSpam }));
         }
-    }, [historyFilterSpam]);
+    }, [historyFilterSpam, setFilters]);
 
     const toggleOnlyInitiator = useCallback(() => {
         setFilters(f => ({ ...f, onlyInitiator: !f.onlyInitiator }));

@@ -112,7 +112,7 @@ export const NftItemView: FC<{
         } else {
             setHover(false);
         }
-    }, [ref.current, selection, setHover]);
+    }, [selection, setHover]);
 
     const isExpiring = expirationDate && Number(toDaysLeft(expirationDate)) <= 30;
 

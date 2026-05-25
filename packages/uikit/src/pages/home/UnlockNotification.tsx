@@ -82,7 +82,7 @@ export const PasswordUnlock: FC<{
         return () => {
             clearTimeout(timeout);
         };
-    }, [ref.current]);
+    }, []);
 
     useEffect(() => {
         if (!active) {
@@ -195,7 +195,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
         return () => {
             sdk.uiEvents.off('getPassword', handler);
         };
-    }, [sdk]);
+    }, [sdk, setRequest]);
 
     const Content = useCallback(() => {
         if (!requestId) return undefined;

@@ -44,7 +44,7 @@ const useRegisterTabChangeListener = () => {
 
     useEffect(() => {
         return sdk.dappBrowser?.tabChange.subscribe(mutate);
-    }, [sdk.dappBrowser]);
+    }, [sdk.dappBrowser, mutate]);
 };
 
 /**

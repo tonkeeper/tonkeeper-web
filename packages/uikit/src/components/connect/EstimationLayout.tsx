@@ -64,7 +64,7 @@ export const EmulationList: FC<{
     const [date, timestamp] = useMemo(() => {
         const _timestamp = event?.timestamp ? event?.timestamp * 1000 : Date.now();
         return [formatActivityDate(i18n.language, 'now', _timestamp), _timestamp] as const;
-    }, [event]);
+    }, [event, i18n.language]);
 
     if (isError) {
         return (

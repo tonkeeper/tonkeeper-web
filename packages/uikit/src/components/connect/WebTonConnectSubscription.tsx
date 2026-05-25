@@ -179,8 +179,10 @@ const WebTonConnectSubscription = () => {
         lastEventId,
         disconnect,
         setRequest,
+        setActiveWallet,
         badRequestResponse,
-        mainnetConfig.ton_connect_bridge
+        mainnetConfig.ton_connect_bridge,
+        wallet.rawAddress
     ]);
 
     const handleClose = useCallback(

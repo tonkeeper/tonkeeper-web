@@ -101,7 +101,7 @@ export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
         } else {
             setHover(false);
         }
-    }, [ref.current, selection, setHover]);
+    }, [selection, setHover]);
 
     const onClick = () => {
         if (disabled) return;

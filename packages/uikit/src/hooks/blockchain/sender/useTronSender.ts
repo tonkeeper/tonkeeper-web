@@ -384,14 +384,13 @@ const useTronEstimationBatterySender = () => {
                       authToken
                   )
                 : undefined,
-        [activeAccount, activeTronWallet, tronApi, batteryApi, authToken, batteryUnitTonRate]
+        [activeTronWallet, tronApi, batteryApi, authToken, batteryUnitTonRate]
     );
 };
 
 const useTronEstimationTrxSender = () => {
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
-    const batteryApi = useBatteryApi();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
@@ -402,7 +401,7 @@ const useTronEstimationTrxSender = () => {
             activeTronWallet
                 ? new TronTrxSender(tronApi, activeTronWallet, emptySigner)
                 : undefined,
-        [activeAccount, activeTronWallet, tronApi, batteryApi]
+        [activeTronWallet, tronApi]
     );
 };
 
@@ -435,14 +434,7 @@ const useTronEstimationTonSender = () => {
             emptySigner,
             authToken
         );
-    }, [
-        activeAccount,
-        activeTronWallet,
-        activeAccount.activeTonWallet,
-        tronApi,
-        batteryApi,
-        authToken
-    ]);
+    }, [activeTronWallet, activeAccount.activeTonWallet, tronApi, tonApi, batteryApi, authToken]);
 };
 
 const useTronEstimationFreeProSender = () => {
@@ -474,13 +466,5 @@ const useTronEstimationFreeProSender = () => {
             batteryAuthToken,
             proToken
         );
-    }, [
-        activeAccount,
-        activeTronWallet,
-        activeAccount.activeTonWallet,
-        tronApi,
-        batteryApi,
-        proToken,
-        batteryAuthToken
-    ]);
+    }, [activeTronWallet, activeAccount.activeTonWallet, tronApi, batteryApi, proToken, batteryAuthToken]);
 };

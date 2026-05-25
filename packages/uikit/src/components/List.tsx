@@ -230,7 +230,7 @@ export const ListItem = forwardRef<
         } else {
             setHover(false);
         }
-    }, [ref.current, selection, setHover]);
+    }, [selection, setHover]);
     const { isDesktopAdaptive } = useContext(ListBlockContext);
 
     const isCapacitorApp = useIsCapacitorApp();

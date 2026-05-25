@@ -103,7 +103,7 @@ const PasswordUnlock: FC<{ logOutConfirmed?: () => void }> = ({ logOutConfirmed 
         if (ref.current) {
             ref.current.focus();
         }
-    }, [ref.current]);
+    }, []);
 
     const onChange = (value: string) => {
         reset();

@@ -42,7 +42,7 @@ export const UpdateWalletName: FC<{
         if (ref.current) {
             ref.current.focus();
         }
-    }, [ref.current]);
+    }, []);
 
     const [name, setName] = useState(nameProp || '');
     const [emoji, setEmoji] = useState(walletEmoji);

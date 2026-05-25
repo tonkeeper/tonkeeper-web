@@ -125,7 +125,7 @@ const LinkNftUnlinked: FC<{
             await refetchEstimateFee();
             setOpenedView('confirm');
         },
-        [refetchEstimateFee, nft.address]
+        [refetchEstimateFee]
     );
 
     const mutation = useLinkNft({
