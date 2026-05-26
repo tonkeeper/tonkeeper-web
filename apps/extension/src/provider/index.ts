@@ -6,7 +6,9 @@ export class TonProvider extends EventEmitter {
 
     targetOrigin = '*';
 
-    nextJsonRpcId = 0;
+    // Random starting offset so an attacker cannot predict outstanding request
+    // ids. Defense-in-depth on top of the source/origin checks in onMessage.
+    nextJsonRpcId = Math.floor(Math.random() * 0x7fffffff);
 
     promises: Record<
         string,
@@ -66,8 +68,13 @@ export class TonProvider extends EventEmitter {
         return promise as Promise<Result>;
     }
 
-    onMessage = async (event: any) => {
-        // Return if no data to parse
+    onMessage = async (event: MessageEvent) => {
+        // Without these two checks, an iframe could postMessage a forged
+        // response and resolve a pending request with attacker data. Mirrors
+        // the symmetric checks in content.ts onPageMessage.
+        if (event.source !== window) return;
+        if (event.origin !== window.location.origin) return;
+
         if (!event || !event.data) {
             return;
         }

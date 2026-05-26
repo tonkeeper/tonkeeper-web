@@ -4658,6 +4658,7 @@ __metadata:
     uuid: "npm:^9.0.1"
     vite: "npm:^6.4.2"
     vite-plugin-node-polyfills: "npm:0.17.0"
+    vitest: "npm:^3.2.4"
     webextension-polyfill: "npm:^0.10.0"
   languageName: unknown
   linkType: soft
