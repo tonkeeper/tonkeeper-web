@@ -5,7 +5,7 @@ import { formatFiatCurrency } from '../../../hooks/balance';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { useUserFiat } from '../../../state/fiat';
 import React, { FC } from 'react';
-import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
+import { AccountAndWalletBadgesGroup, NetworkBadge } from '../../account/AccountBadge';
 import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useCanReceiveTron } from '../../../state/tron/tron';
@@ -109,6 +109,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
                         walletId={activeAccount.activeTonWallet.id}
                         size="s"
                     />
+                    <NetworkBadge network={network} size="s" />
                     <ChevronDownIconSecondary />
                 </AddressAndBadgesWrapper>
             </AddressMultiChain>
@@ -140,6 +141,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
                             walletId={activeAccount.activeTonWallet.id}
                             size="s"
                         />
+                        <NetworkBadge network={network} size="s" />
                     </AddressAndBadgesWrapper>
                 ) : (
                     <Label2Orange>{t('web_no_connection')}</Label2Orange>
