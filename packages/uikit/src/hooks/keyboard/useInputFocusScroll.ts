@@ -38,19 +38,22 @@ export const useInputFocusScroll = (
     scrollContainerRef: RefObject<HTMLElement>,
     { scrollOnFocus = true, useScrollableParent = true } = {}
 ) => {
-    const getScrollProps = (ref: HTMLElement) => {
-        let scrollElement: HTMLElement;
-        let scrollTo: (pos: number) => void;
-        if (useScrollableParent && ref) {
-            const scl = findClosestScrollableElement(ref);
-            scrollElement = scl.scrollElement;
-            scrollTo = scl.scrollTo;
-        } else {
-            scrollElement = ref;
-            scrollTo = (pos: number) => ref.scrollTo({ top: pos, behavior: 'smooth' });
-        }
-        return { scrollElement, scrollTo };
-    };
+    const getScrollProps = useCallback(
+        (ref: HTMLElement) => {
+            let scrollElement: HTMLElement;
+            let scrollTo: (pos: number) => void;
+            if (useScrollableParent && ref) {
+                const scl = findClosestScrollableElement(ref);
+                scrollElement = scl.scrollElement;
+                scrollTo = scl.scrollTo;
+            } else {
+                scrollElement = ref;
+                scrollTo = (pos: number) => ref.scrollTo({ top: pos, behavior: 'smooth' });
+            }
+            return { scrollElement, scrollTo };
+        },
+        [useScrollableParent]
+    );
 
     const handleFocus = useCallback(
         (event: FocusEvent) => {
@@ -79,7 +82,7 @@ export const useInputFocusScroll = (
 
             scrollTo(newScrollTop);
         },
-        [scrollOnFocus, useScrollableParent]
+        [scrollOnFocus, scrollContainerRef, getScrollProps]
     );
 
     const handleKeyboardShow = useCallback(
@@ -111,13 +114,13 @@ export const useInputFocusScroll = (
                 scrollTo(newScrollTop);
             }
         },
-        [scrollOnFocus, useScrollableParent]
+        [scrollOnFocus, scrollContainerRef, getScrollProps]
     );
 
     const handleKeyboardHide = useCallback(() => {
         if (!scrollContainerRef.current) return;
         scrollContainerRef.current.style.paddingBottom = '0px';
-    }, [useScrollableParent]);
+    }, [scrollContainerRef]);
 
     const sdk = useAppSdk();
 
@@ -139,5 +142,5 @@ export const useInputFocusScroll = (
             unsubscribeWillShow();
             unsubscribeWillHide();
         };
-    }, [handleFocus, handleKeyboardShow, handleKeyboardHide, sdk]);
+    }, [handleFocus, handleKeyboardShow, handleKeyboardHide, sdk, scrollContainerRef]);
 };

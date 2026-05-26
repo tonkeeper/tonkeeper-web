@@ -135,7 +135,7 @@ const useEditMode = () => {
         if (!isOpen) {
             setIsEditMode(false);
         }
-    }, [isOpen]);
+    }, [isOpen, setIsEditMode]);
 
     return {
         isEditMode,

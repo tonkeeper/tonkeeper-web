@@ -41,7 +41,7 @@ export const Recovery = () => {
     const [searchParams] = useSearchParams();
     const walletId = useMemo(() => {
         return new URLSearchParams(searchParams).get('wallet') ?? undefined;
-    }, [searchParams, location]);
+    }, [searchParams]);
 
     if (accountId) {
         return <RecoveryPageContent accountId={accountId} walletId={walletId} />;
@@ -76,7 +76,7 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 onBack();
             }
         })();
-    }, [onBack, accountId, walletId]);
+    }, [onBack, accountId, walletId, sdk, t]);
 
     return secret;
 };

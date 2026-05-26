@@ -63,7 +63,7 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
                 setCategoriesForm={setCategoriesForm}
             />
         ),
-        [categoriesForm, setCategoriesForm]
+        [categoriesForm, setCategoriesForm, data]
     );
 
     const onSave = () => {

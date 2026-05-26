@@ -75,9 +75,9 @@ export const AddFavoriteNotification = () => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
 
-    const onClose = () => {
+    const onClose = useCallback(() => {
         setLatest(undefined);
-    };
+    }, []);
 
     useEffect(() => {
         const handler = (options: { method: 'addSuggestion'; params: LatestSuggestion }) => {
@@ -87,7 +87,7 @@ export const AddFavoriteNotification = () => {
         return () => {
             sdk.uiEvents.off('addSuggestion', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!latest) return undefined;
@@ -182,9 +182,9 @@ export const EditFavoriteNotification = () => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
 
-    const onClose = () => {
+    const onClose = useCallback(() => {
         setFavorite(undefined);
-    };
+    }, []);
 
     useEffect(() => {
         const handler = (options: { method: 'editSuggestion'; params: FavoriteSuggestion }) => {
@@ -194,7 +194,7 @@ export const EditFavoriteNotification = () => {
         return () => {
             sdk.uiEvents.off('editSuggestion', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!favorite) return undefined;

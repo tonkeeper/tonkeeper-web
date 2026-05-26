@@ -37,5 +37,5 @@ export const useIosSubscriptionPolling = (intervalMs = 10000) => {
             isMounted = false;
             clearInterval(interval);
         };
-    }, [originalTxInfo, subscription, refetch]);
+    }, [originalTxInfo, subscription, refetch, sdk.subscriptionService, intervalMs]);
 };

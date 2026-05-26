@@ -71,12 +71,12 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     const onStartConnection = useCallback(() => {
         resetConnection();
         connectLedger();
-    }, []);
+    }, [resetConnection, connectLedger]);
 
     const onConnectionPageClosed = useCallback(() => {
         resetConnection();
         connectLedger({ skipOpenConnectionPage: true });
-    }, []);
+    }, [resetConnection, connectLedger]);
 
     useEffectOnLedgerConnectionPageClosed(onConnectionPageClosed);
 
@@ -84,13 +84,13 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         return () => {
             sdk.ledgerConnectionPage?.close();
         };
-    }, []);
+    }, [sdk.ledgerConnectionPage]);
 
     useEffect(() => {
         onStartConnection();
 
         return resetConnection;
-    }, []);
+    }, [onStartConnection, resetConnection]);
 
     useEffect(() => {
         if (tonTransport) {
@@ -190,7 +190,7 @@ const ChooseLedgerAccounts: FC<{
 
     useEffect(() => {
         getLedgerWallets(tonTransport).then(data => setSelectedIndexes(data.preselectedIndexes));
-    }, [tonTransport]);
+    }, [tonTransport, getLedgerWallets]);
 
     const chosenSomeAccounts = !!Object.values(selectedIndexes).filter(Boolean).length;
 

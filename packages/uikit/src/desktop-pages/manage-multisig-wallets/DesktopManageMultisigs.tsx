@@ -175,13 +175,7 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                 hostWallets: m.signers.filter(s => allWallets.includes(s))
             };
         });
-    }, [
-        accounts,
-        multisigs,
-        selectedHostWalletId,
-        currentActiveAccount.name,
-        currentActiveAccount.emoji
-    ]);
+    }, [accounts, multisigs, selectedHostWalletId]);
 
     const onRename = async (item: {
         address: string;

@@ -134,7 +134,7 @@ export const Balance: FC<{
         return () => {
             clearTimeout(timer);
         };
-    }, [total]);
+    }, [total, client]);
 
     if (total === undefined) {
         return <BalanceSkeleton />;

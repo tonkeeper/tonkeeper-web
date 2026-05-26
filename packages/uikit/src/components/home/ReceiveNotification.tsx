@@ -8,9 +8,9 @@ const ReceiveNotification = () => {
     const sdk = useAppSdk();
     const [params, setParams] = useState<ReceiveInitParams | undefined>(undefined);
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setParams(undefined);
-    };
+    }, []);
 
     useEffect(() => {
         const handler = (options: {
@@ -25,7 +25,7 @@ const ReceiveNotification = () => {
         return () => {
             sdk.uiEvents.off('receive', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!params) return undefined;

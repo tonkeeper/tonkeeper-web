@@ -74,7 +74,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
                 }
                 return acc;
             }, [] as PromotedApp[][]),
-        [category.apps]
+        [category.apps, browserLength]
     );
 
     const groupsKeys = useMemo(() => groups.map(group => group.map(i => i.url).join('')), [groups]);

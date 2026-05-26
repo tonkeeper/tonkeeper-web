@@ -58,7 +58,7 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
                 }
                 return succeed;
             });
-    }, [wallet, pluginAddress, t]);
+    }, [wallet, pluginAddress, t, sdk, unsubscribeMutation]);
 
     useEffect(() => {
         if (!isStandardTonWallet(wallet) || wallet.version !== WalletVersion.V4R2) {
@@ -70,7 +70,7 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
             extensionContract: pluginAddress,
             destroyValue
         });
-    }, []);
+    }, [wallet, pluginAddress, estimation, onClose]);
 
     return (
         <ConfirmView

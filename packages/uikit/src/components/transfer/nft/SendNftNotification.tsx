@@ -40,11 +40,11 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
 
     const { mutateAsync: getAccountAsync } = useGetToAccount();
 
-    const onRecipient = async (data: RecipientData) => {
+    const onRecipient = useCallback(async (data: RecipientData) => {
         setRight(true);
         setRecipient(data as TonRecipientData);
         setView('confirm');
-    };
+    }, []);
 
     const backToRecipient = useCallback(() => {
         setRight(false);
@@ -181,7 +181,7 @@ const SendNftNotification = () => {
         return () => {
             sdk.uiEvents.off('transferNft', handler);
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     const Content = useCallback(() => {
         if (!nftItem) return undefined;

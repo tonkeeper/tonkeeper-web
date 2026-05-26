@@ -362,7 +362,7 @@ export const useIsTwoFARemovingProcess = () => {
         ) {
             queryClient.setQueryData([QueryKey.twoFARemovingProcess, wallet.id], false);
         }
-    }, [config, wallet.id]);
+    }, [config, wallet.id, queryClient]);
 
     return useQuery(
         [QueryKey.twoFARemovingProcess, wallet.id],

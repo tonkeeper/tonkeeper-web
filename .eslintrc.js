@@ -174,7 +174,7 @@ module.exports = {
                     }
                 ],
                 'react-hooks/rules-of-hooks': 'error',
-                'react-hooks/exhaustive-deps': 'warn', // baseline: 269 violations; stale-closure detection re-enabled (was off)
+                'react-hooks/exhaustive-deps': 'error',
                 'react/display-name': 'off',
                 'react/prop-types': 'off'
             },

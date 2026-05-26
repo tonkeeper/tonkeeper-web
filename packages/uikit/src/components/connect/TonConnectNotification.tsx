@@ -115,7 +115,7 @@ const ConnectContent: FC<{
         if (sdk.twaExpand) {
             sdk.twaExpand();
         }
-    }, []);
+    }, [sdk]);
 
     const [error, setError] = useState<Error | null>(null);
     const { mutateAsync, isLoading } = useGetTonConnectConnectResponse();

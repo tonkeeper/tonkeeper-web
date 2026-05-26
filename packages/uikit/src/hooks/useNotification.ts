@@ -19,11 +19,11 @@ export function useNotifyError(error: unknown) {
         if (error instanceof Error) {
             sdk.topMessage(error.message);
         }
-    }, [error]);
+    }, [error, sdk]);
 }
 
 export const useNotifyErrorHandle = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    return useCallback((e: unknown) => notifyError(sdk, t, e), []);
+    return useCallback((e: unknown) => notifyError(sdk, t, e), [sdk, t]);
 };

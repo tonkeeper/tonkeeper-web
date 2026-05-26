@@ -73,7 +73,7 @@ export const ChoseWalletVersionsByMnemonic: FC<{
         mnemonicToKeypair(mnemonic, mnemonicType).then(keypair =>
             setPublicKey(keypair.publicKey.toString('hex'))
         );
-    }, [mnemonic]);
+    }, [mnemonic, mnemonicType]);
 
     return (
         <ChoseWalletVersions
@@ -118,7 +118,7 @@ export const ChoseWalletVersions: FC<{
         if (sdk.isIOs()) {
             hideIosKeyboard();
         }
-    }, []);
+    }, [sdk]);
 
     useLayoutEffect(() => {
         if (filteredWallets) {
@@ -134,7 +134,7 @@ export const ChoseWalletVersions: FC<{
             }
             setCheckedVersions(versionsToCheck);
         }
-    }, [filteredWallets, accountState]);
+    }, [filteredWallets, accountState, defaultWalletVersion]);
 
     const toggleVersion = (version: WalletVersion, isChecked: boolean) => {
         setCheckedVersions(state =>

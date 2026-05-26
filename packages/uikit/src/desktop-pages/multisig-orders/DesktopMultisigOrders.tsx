@@ -165,7 +165,7 @@ const useOpenTonviewer = (address: string) => {
         const explorerUrl = config.accountExplorer;
 
         sdk.openPage(explorerUrl.replace('%s', formatAddress(address)));
-    }, []);
+    }, [sdk, config.accountExplorer, address]);
 };
 
 const MobileOrderCard: FC<{ order: MultisigOrder }> = ({ order }) => {

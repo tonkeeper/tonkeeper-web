@@ -241,7 +241,7 @@ const TonTransactionContent: FC<{
             sdk.twaExpand();
             sdk.hapticNotification('success');
         }
-    }, []);
+    }, [sdk]);
 
     const onSubmit = async () => {
         try {
@@ -445,7 +445,16 @@ export const TonTransactionNotification: FC<{
                 />
             </>
         );
-    }, [params, onClose, wallets.length, isActiveAccountMultisig, multisigTTL, setMultisigTTL]);
+    }, [
+        params,
+        onClose,
+        wallets.length,
+        isActiveAccountMultisig,
+        multisigTTL,
+        setMultisigTTL,
+        t,
+        waitInvalidation
+    ]);
 
     return (
         <>

@@ -24,7 +24,7 @@ export const useSendTransferNotification = () => {
                 } as TransferInitParams
             });
         },
-        [sdk]
+        [sdk, availableTrc20Transfers.total, openTopUpNotification]
     );
 
     return { onOpen };

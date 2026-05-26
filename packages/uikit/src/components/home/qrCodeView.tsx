@@ -69,7 +69,7 @@ export const AnimatedQrCode: FC<{ message: string }> = React.memo(({ message }) 
 export const KeystoneAnimatedQRCode: FC<{ data: UR }> = ({ data }) => {
     const urEncoder = useMemo(() => {
         return new UREncoder(data);
-    }, []);
+    }, [data]);
 
     const [value, setValue] = useState(urEncoder.nextPart());
 
@@ -80,7 +80,7 @@ export const KeystoneAnimatedQRCode: FC<{ data: UR }> = ({ data }) => {
         return () => {
             clearInterval(interval);
         };
-    }, []);
+    }, [urEncoder]);
 
     return (
         <QrWrapper>

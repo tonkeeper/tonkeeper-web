@@ -152,5 +152,5 @@ export const useDebuggingTools = () => {
                 }
             };
         }
-    }, [api, activeAccount, getSigner, metaEncryptionMap]);
+    }, [api, activeAccount, getSigner, metaEncryptionMap, sdk.storage]);
 };

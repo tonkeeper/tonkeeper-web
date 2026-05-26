@@ -58,7 +58,7 @@ export const useTrackDappBrowserOpened = () => {
             type: 'explore',
             location
         }));
-    }, []);
+    }, [track]);
 };
 
 export const useTrackTransactionSent = () => {
@@ -100,17 +100,20 @@ export const useTrackTransactionSent = () => {
 
 export const useTrackerTonConnectSendSuccess = () => {
     const track = useAnalyticsTrack();
-    return useCallback((params: { dappUrl: string; sender: SenderChoice }) => {
-        track({
-            eventName: 'tc_send_success',
-            dapp_url: params.dappUrl,
-            address_type: 'raw',
-            network_fee_paid:
-                params.sender.type === 'battery'
-                    ? 'battery'
-                    : params.sender.type === 'gasless'
-                    ? 'gasless'
-                    : 'ton'
-        });
-    }, []);
+    return useCallback(
+        (params: { dappUrl: string; sender: SenderChoice }) => {
+            track({
+                eventName: 'tc_send_success',
+                dapp_url: params.dappUrl,
+                address_type: 'raw',
+                network_fee_paid:
+                    params.sender.type === 'battery'
+                        ? 'battery'
+                        : params.sender.type === 'gasless'
+                        ? 'gasless'
+                        : 'ton'
+            });
+        },
+        [track]
+    );
 };

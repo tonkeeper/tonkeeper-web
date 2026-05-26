@@ -172,7 +172,7 @@ export const MobileDappBrowserNewTab = () => {
                 iconUrl: app.icon
             });
         },
-        [openTab]
+        [openTab, trackDappOpened]
     );
 
     const onSubmit = () => {

@@ -121,7 +121,7 @@ export const DesktopMultiSendPage: FC = () => {
         if (lists && !lists.length && !isStandardWallet) {
             navigate('./list/' + 1);
         }
-    }, [lists, isStandardWallet]);
+    }, [lists, isStandardWallet, navigate]);
 
     if (!isStandardWallet) {
         return <Navigate to={AppRoute.home} />;

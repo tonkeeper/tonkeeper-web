@@ -65,7 +65,7 @@ export const DesktopCoinPage = () => {
         if (!name) {
             navigate(AppRoute.home);
         }
-    }, [name]);
+    }, [name, navigate]);
 
     const canUseTron = useCanReceiveTron();
 
@@ -351,7 +351,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             amount: format(extra.amount, extra.preview.decimals),
             fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
         };
-    }, [assets, format, rate, fiat]);
+    }, [assets, format, rate, fiat, token]);
 
     if (!asset) {
         return <></>;
@@ -434,7 +434,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         } else {
             return undefined;
         }
-    }, [assets, t, token]);
+    }, [assets, token]);
 
     const { mainnetConfig } = useAppContext();
     const tonviewer = new URL(mainnetConfig.accountExplorer).origin;

@@ -114,7 +114,7 @@ export const MobileDappBrowserTab: FC<{
         if (activeWallet.id === asideLastSelectedWalletId) {
             capacitorTonConnectInjectedConnector.changeConnectedWalletToActive(tab);
         }
-    }, [activeWallet.id]);
+    }, [activeWallet.id, asideLastSelectedWalletId, tab]);
 
     const { data: activeConnection } = useInjectedDappConnectionByOrigin(originFromUrl(tab.url));
     const [bannerData, setBannerData] = useState<WalletId | undefined>(undefined);

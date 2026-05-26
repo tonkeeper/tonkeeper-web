@@ -57,7 +57,7 @@ export const RedirectToTonkeeperMobile: FC<{
         if (isOpen && !isTonkeeperMobileInstalled && unsupportedLinkError) {
             notifyError(unsupportedLinkError);
         }
-    }, [isOpen, isTonkeeperMobileInstalled, unsupportedLinkError]);
+    }, [isOpen, isTonkeeperMobileInstalled, unsupportedLinkError, notifyError]);
 
     return (
         <HideOnReview>

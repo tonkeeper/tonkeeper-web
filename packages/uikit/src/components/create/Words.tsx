@@ -246,7 +246,7 @@ export const Words: FC<{
         if (sdk.twaExpand) {
             sdk.twaExpand();
         }
-    }, []);
+    }, [sdk]);
 
     return (
         <CenterContainer>
@@ -442,7 +442,7 @@ export const Check: FC<{
             .replace('%1%', formatOrdinals(i18n.language, test1))
             .replace('%2%', formatOrdinals(i18n.language, test2))
             .replace('%3%', formatOrdinals(i18n.language, test3));
-    }, [t, test1, test2, test3]);
+    }, [t, test1, test2, test3, i18n.language]);
 
     const isValid = useMemo(
         () => words.every((val, i) => val.toLowerCase().trim() === mnemonic[positions[i] - 1]),
@@ -470,7 +470,7 @@ export const Check: FC<{
         window.addEventListener('keydown', handler);
 
         return () => window.removeEventListener('keydown', handler);
-    }, [words]);
+    }, [words, isValid]);
 
     const handleChange = (changeValue: string, wordIndex: number) =>
         setWords(prevWordsState =>
@@ -574,42 +574,39 @@ export const ImportWords: FC<{
 
     useEffect(() => {
         onIsDirtyChange?.(isDirty);
-    }, [isDirty]);
+    }, [isDirty, onIsDirtyChange]);
 
-    const onChange = useCallback(
-        (newValue: string, index: number) => {
-            if (newValue.includes(' ') || newValue.includes(String.fromCharCode(160))) {
-                let values = newValue
-                    .trim()
-                    .replace(/\xA0/g, ' ') // replace char 160
-                    .replace(/[0-9]/g, '') // remove numbers
-                    .replace(/\./g, '') // remove dots
-                    .replace(/\s+/g, ' ') // remove double spaces
-                    .split(' ');
+    const onChange = useCallback((newValue: string, index: number) => {
+        if (newValue.includes(' ') || newValue.includes(String.fromCharCode(160))) {
+            let values = newValue
+                .trim()
+                .replace(/\xA0/g, ' ') // replace char 160
+                .replace(/[0-9]/g, '') // remove numbers
+                .replace(/\./g, '') // remove dots
+                .replace(/\s+/g, ' ') // remove double spaces
+                .split(' ');
 
-                if (!values[0]) return;
+            if (!values[0]) return;
 
-                if (values.length === 1) {
-                    setMnemonic(items => items.map((v, i) => (i === index ? values[0] : v)));
-                    focusInput(ref.current, index + 1);
-                } else {
-                    const max = Math.min(24 - index, values.length);
-                    values = values.slice(0, max);
-                    setMnemonic(items => {
-                        items = [...items];
-                        items.splice(index, max, ...values);
-                        return items;
-                    });
-                    focusInput(ref.current, max - 1);
-                }
-
-                return;
+            if (values.length === 1) {
+                setMnemonic(items => items.map((v, i) => (i === index ? values[0] : v)));
+                focusInput(ref.current, index + 1);
             } else {
-                return setMnemonic(items => items.map((v, i) => (i === index ? newValue : v)));
+                const max = Math.min(24 - index, values.length);
+                values = values.slice(0, max);
+                setMnemonic(items => {
+                    items = [...items];
+                    items.splice(index, max, ...values);
+                    return items;
+                });
+                focusInput(ref.current, max - 1);
             }
-        },
-        [ref.current]
-    );
+
+            return;
+        } else {
+            return setMnemonic(items => items.map((v, i) => (i === index ? newValue : v)));
+        }
+    }, []);
 
     const validations = useMemo(() => {
         return mnemonic.map(item => item === '' || wordlist.includes(item));

@@ -47,7 +47,7 @@ export const ThemeSettings = () => {
             });
         }
         return items;
-    }, [t, i18n.enable, navigate, fiat]);
+    }, [t, i18n.enable, navigate, fiat, sdk.linksInterceptorAvailable, sdk.notifications]);
 
     return <SettingsList items={secondaryItems} />;
 };

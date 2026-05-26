@@ -209,7 +209,7 @@ export const useWalletFilteredNftList = () => {
 
             return !walletConfig?.hiddenNfts.includes(address);
         });
-    }, [nfts, walletConfig?.trustedNfts, walletConfig?.spamNfts, walletConfig?.hiddenNfts]);
+    }, [nfts, walletConfig]);
 
     return {
         data: filtered,

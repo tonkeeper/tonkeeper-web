@@ -113,7 +113,7 @@ export const useOpenSupport = () => {
     const { data: support } = useSupport();
     return useCallback(
         () => sdk.openPage(support.url, { forceExternalBrowser: true }),
-        [support.url]
+        [support.url, sdk]
     );
 };
 

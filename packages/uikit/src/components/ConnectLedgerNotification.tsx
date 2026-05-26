@@ -103,11 +103,13 @@ export const LedgerContent: FC<{
 
     useEffect(() => {
         connect();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onConnectionPageClosed = useCallback(() => {
         resetConnection();
         connect({ skipOpenConnectionPage: true });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffectOnLedgerConnectionPageClosed(onConnectionPageClosed);
@@ -117,7 +119,7 @@ export const LedgerContent: FC<{
         return () => {
             sdk.ledgerConnectionPage?.close();
         };
-    }, []);
+    }, [sdk.ledgerConnectionPage]);
 
     const onRetry = () => {
         resetConnection();
@@ -243,7 +245,7 @@ const ConnectLedgerNotification = () => {
                 onClose={onCancel}
             />
         );
-    }, [sdk, ledgerParams, requestId, onCancel, onSubmit]);
+    }, [ledgerParams, requestId, onCancel, onSubmit]);
 
     return (
         <Notification

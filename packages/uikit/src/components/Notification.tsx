@@ -52,14 +52,16 @@ const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
 
 const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: string }>> = ({
     children,
-    entered,
-    className
+    className,
+    entered
 }) => {
     const sdk = useAppSdk();
 
+    // Re-measure scrollbar width after the transition completes (`entered` flips to true),
+    // because the scrollbar may appear/disappear as the modal opens.
     const scrollbarWidth = useMemo(() => {
         return window.innerWidth > notificationMaxWidth ? sdk.getScrollbarWidth() : 0;
-    }, [sdk, entered]);
+    }, [sdk, entered]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <NotificationContainer
@@ -131,7 +133,7 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
 
         const scrollbarWidth = useMemo(() => {
             return sdk.getScrollbarWidth();
-        }, [sdk, entered]);
+        }, [sdk, entered]); // eslint-disable-line react-hooks/exhaustive-deps
 
         return (
             <Overlay
@@ -600,7 +602,7 @@ export const NotificationIonic: FC<{
                 );
             };
         }
-    }, [handleClose, onCloseInterceptor, isOpen]);
+    }, [onCloseInterceptor, isOpen]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -616,7 +618,7 @@ export const NotificationIonic: FC<{
             setTimeout(() => _afterClose && _afterClose(), 100);
             onClose();
         });
-    }, [isOpen, children, onClose]);
+    }, [children, onClose]);
 
     const HeightAnimation = useMemo(() => {
         if (disableHeightAnimation || mobileFullScreen) {
@@ -780,7 +782,7 @@ export const NotificationDesktopAndWeb: FC<{
             setTimeout(() => _afterClose && _afterClose(), animationTime);
             onClose();
         });
-    }, [open, children, onClose]);
+    }, [children, onClose]);
 
     useEffect(() => {
         const handler = () => {
@@ -1046,7 +1048,7 @@ export const useSetNotificationOnBack = (onBack: undefined | (() => void)) => {
 
     useEffect(() => {
         return () => setOnBack(undefined);
-    }, []);
+    }, [setOnBack]);
 };
 
 export const useSetNotificationOnCloseInterceptor = (interceptor: OnCloseInterceptor) => {
@@ -1058,5 +1060,5 @@ export const useSetNotificationOnCloseInterceptor = (interceptor: OnCloseInterce
 
     useEffect(() => {
         return () => setOnCloseInterceptor(undefined);
-    }, []);
+    }, [setOnCloseInterceptor]);
 };

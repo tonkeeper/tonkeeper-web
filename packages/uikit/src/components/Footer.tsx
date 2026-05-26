@@ -97,7 +97,7 @@ export const Footer: FC<{ standalone?: boolean; sticky?: boolean }> = ({ standal
                 scrollToTop();
             }
         },
-        [location.pathname]
+        [location.pathname, navigate]
     );
 
     return (

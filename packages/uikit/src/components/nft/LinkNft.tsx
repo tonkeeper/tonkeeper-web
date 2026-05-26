@@ -55,7 +55,7 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
         if (isCompleted) {
             toast(linkedAddress ? t('dns_address_linked') : t('dns_address_unlinked'));
         }
-    }, [isCompleted, linkedAddress]);
+    }, [isCompleted, linkedAddress, toast, t]);
 
     if (!linkedAddress) {
         return (
@@ -125,7 +125,7 @@ const LinkNftUnlinked: FC<{
             await refetchEstimateFee();
             setOpenedView('confirm');
         },
-        [refetchEstimateFee, nft.address]
+        [refetchEstimateFee]
     );
 
     const mutation = useLinkNft({
@@ -183,7 +183,7 @@ const LinkNftUnlinked: FC<{
                 domain={nft.dns}
             />
         ),
-        [onSaveLinkToAddress, estimation.isFetching]
+        [onSaveLinkToAddress, estimation.isFetching, nft.dns]
     );
 
     const isDisabled = useAreNftActionsDisabled(nft);

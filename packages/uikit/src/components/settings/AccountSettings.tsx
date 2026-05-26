@@ -55,7 +55,7 @@ const SingleAccountSettings = () => {
         ];
 
         return items;
-    }, [t]);
+    }, [t, navigate]);
 
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
@@ -175,7 +175,18 @@ const SingleAccountSettings = () => {
         }
 
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron, isNftEnabled]);
+    }, [
+        t,
+        navigate,
+        account,
+        jettons,
+        nft,
+        twoFAEnabled,
+        canUseBattery,
+        canUseTron,
+        isNftEnabled,
+        rename
+    ]);
 
     return (
         <>
@@ -198,8 +209,6 @@ const MultipleAccountSettings = () => {
 
     const [deleteAccount, setDeleteAccount] = useState(false);
 
-    const wallet = account.activeTonWallet;
-
     const canUseTron = useCanUseTronForActiveWallet();
 
     const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
@@ -214,7 +223,7 @@ const MultipleAccountSettings = () => {
         ];
 
         return items;
-    }, [wallet, t]);
+    }, [t, navigate]);
 
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
@@ -344,14 +353,14 @@ const MultipleAccountSettings = () => {
     }, [
         t,
         navigate,
-        wallet,
         account,
         jettons,
         nft,
         twoFAEnabled,
         canUseBattery,
         canUseTron,
-        isNftEnabled
+        isNftEnabled,
+        rename
     ]);
 
     return (

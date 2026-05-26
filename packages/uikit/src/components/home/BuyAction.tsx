@@ -3,7 +3,6 @@ import {
     TonendpoinFiatItem
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -115,7 +114,7 @@ export const BuyNotification: FC<{
     const Content = useCallback(() => {
         if (!open || !buy) return undefined;
         return <ActionNotification item={buy} kind="buy" handleClose={handleClose} />;
-    }, [open, buy]);
+    }, [open, buy, handleClose]);
 
     return (
         <HideOnReview>
@@ -129,12 +128,11 @@ export const BuyNotification: FC<{
 export const BuyAction: FC = () => {
     const { data: buy } = useTonendpointBuyMethods();
 
-    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
     const open = useMemo(() => {
         return new URLSearchParams(searchParams).get('buy') === 'open';
-    }, [searchParams, location]);
+    }, [searchParams]);
 
     const toggle = useCallback(() => {
         if (!searchParams.has('buy')) {

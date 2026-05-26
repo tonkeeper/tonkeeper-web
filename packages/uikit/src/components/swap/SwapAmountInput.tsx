@@ -85,7 +85,7 @@ export const SwapAmountInput: FC<{
                 }
             }
         }
-    }, [value]);
+    }, [value, input]);
 
     const decimalSeparator = getDecimalSeparator();
     return (

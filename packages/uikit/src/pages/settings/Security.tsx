@@ -129,7 +129,7 @@ const WebPassword = () => {
             }
         ];
         return i;
-    }, []);
+    }, [t]);
 
     return (
         <>
@@ -201,7 +201,7 @@ const DesktopAndTabletProPassword = () => {
         if (autoOpenSetPassword) {
             onOpen();
         }
-    }, [autoOpenSetPassword]);
+    }, [autoOpenSetPassword, onOpen]);
 
     const onResetPassword = async () => {
         await sdk.keychain?.securityCheck();
@@ -263,7 +263,7 @@ const ShowPhrases = () => {
             }
         ];
         return i;
-    }, []);
+    }, [navigate, t]);
 
     if (isLedger || isKeystone || isReadOnly) {
         return <></>;

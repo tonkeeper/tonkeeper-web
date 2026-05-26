@@ -112,7 +112,7 @@ export const AmountView: FC<{
         if (refBlock.current) {
             setFontSize(getInputSize(amountState.inputValue, refBlock.current));
         }
-    }, [refBlock.current, amountState.inputValue]);
+    }, [amountState.inputValue]);
 
     useEffect(() => {
         dispatch({ kind: 'price', payload: { prices: tokenRate?.prices } });
@@ -144,7 +144,7 @@ export const AmountView: FC<{
                 payload: { token: tokenToTonAsset(address, info, jettons) }
             });
         },
-        [dispatch, jettons]
+        [dispatch, jettons, info]
     );
 
     const remaining = balance.relativeAmount.minus(amountState.assetAmount.relativeAmount);

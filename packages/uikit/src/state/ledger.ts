@@ -102,7 +102,7 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
     const reset = useCallback(() => {
         setIsDeviceConnected(false);
         mutation.reset();
-    }, [mutation.reset]);
+    }, [mutation]);
 
     return {
         ...mutation,

@@ -107,7 +107,7 @@ export const CreatePasswordNotification: FC<{
 
     const Content = useCallback(() => {
         return <CreatePassword afterCreate={handleClose} noTitle />;
-    }, []);
+    }, [handleClose]);
 
     return (
         <Notification title={t('set_up_password')} isOpen={isOpen} handleClose={handleClose}>

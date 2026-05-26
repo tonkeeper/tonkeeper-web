@@ -6,7 +6,6 @@ import {
     Sender,
     WalletMessageSender
 } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { useAppContext } from '../appContext';
 import {
     useAccountsState,
     useActiveAccount,
@@ -320,7 +319,6 @@ export const EXTERNAL_SENDER_CHOICE = { type: 'external' } as const satisfies Se
 export const BATTERY_SENDER_CHOICE = { type: 'battery' } as const satisfies SenderChoice;
 
 export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SENDER_CHOICE) => {
-    const appContext = useAppContext();
     const api = useActiveApi();
     const batteryApi = useBatteryApi();
     const batteryConfig = useBatteryServiceConfig();
@@ -374,7 +372,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
             signerWallet,
             hostWalletSender
         );
-    }, [senderChoice.type, accounts, activeAccount, client, twoFAConfig, api]);
+    }, [senderChoice, accounts, activeAccount, client, twoFAConfig, api, twoFaApi]);
 
     const otherChoicesCallback = useMemo(() => {
         if (!senderChoice) {
@@ -470,8 +468,6 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         senderChoice,
         authToken,
         activeAccount,
-        accounts,
-        appContext,
         wallet,
         batteryApi,
         batteryConfig,
@@ -480,14 +476,14 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         twoFaApi,
         twoFAConfig,
         batteryUnitTonRate,
-        isGaslessEnabled
+        isGaslessEnabled,
+        api
     ]);
 
     return senderChoice.type === 'multisig' ? multisigChoiceCallback : otherChoicesCallback;
 };
 
 export const useGetSender = () => {
-    const appContext = useAppContext();
     const api = useActiveApi();
     const batteryApi = useBatteryApi();
     const batteryConfig = useBatteryServiceConfig();
@@ -703,7 +699,6 @@ export const useGetSender = () => {
         },
         [
             accounts,
-            appContext,
             batteryApi,
             batteryConfig,
             wallet,
@@ -719,7 +714,9 @@ export const useGetSender = () => {
             twoFAServiceConfig.confirmMessageTGTtlSeconds,
             batteryUnitTonRate,
             client,
-            isGaslessEnabled
+            isGaslessEnabled,
+            api,
+            controllerTwoFa
         ]
     );
 };

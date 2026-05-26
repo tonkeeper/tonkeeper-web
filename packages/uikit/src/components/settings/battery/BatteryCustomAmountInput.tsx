@@ -90,7 +90,7 @@ export const BatteryCustomAmountInput: FC<{
                 amount: minValue.stringAssetRelativeAmount
             });
         }
-    }, [t, remainingAssetAmount, asset, minValue, selectedAssetAmount]);
+    }, [t, remainingAssetAmount, minValue, selectedAssetAmount]);
 
     useEffect(() => {
         if (selectedAssetAmount.lte(0)) {
@@ -98,7 +98,7 @@ export const BatteryCustomAmountInput: FC<{
         }
 
         onChange({ tokenValue: selectedAssetAmount, error: !!error });
-    }, [selectedAssetAmount, error]);
+    }, [selectedAssetAmount, error, onChange]);
 
     const ref = useRef<HTMLInputElement>(null);
     const env = useAppTargetEnv();
@@ -107,7 +107,7 @@ export const BatteryCustomAmountInput: FC<{
         if (!hidden) {
             setTimeout(() => ref.current?.focus(), env === 'mobile' || env === 'tablet' ? 400 : 30);
         }
-    }, [hidden]);
+    }, [hidden, env]);
 
     if (!unitToTokenRate || !shouldReserveAmount || !remainingAssetAmount) {
         return null;
@@ -175,7 +175,7 @@ const FlashIconAdaptive = () => {
         if (ref.current) {
             setSize(getComputedStyle(ref.current).fontSize);
         }
-    });
+    }, []);
 
     return (
         <svg

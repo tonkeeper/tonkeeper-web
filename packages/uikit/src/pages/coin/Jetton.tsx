@@ -79,7 +79,7 @@ const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, 
             jettonToTonAssetAmount(balance).relativeAmount.toNumber(),
             Address.parse(balance.jetton.address).toString()
         ],
-        [info, balance]
+        [balance]
     );
 
     const { data } = useRate(address);

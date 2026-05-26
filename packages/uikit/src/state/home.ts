@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
 import { useJettonList } from './jetton';
-import { useActiveTonWalletConfig, useActiveWallet, useWalletAccountInfo } from './wallet';
+import { useActiveTonWalletConfig, useWalletAccountInfo } from './wallet';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     TON_ASSET,
@@ -25,8 +25,6 @@ import { useUserFiat } from './fiat';
 import { useUSDTRate } from './rates';
 
 export const useAssets = () => {
-    const wallet = useActiveWallet();
-
     const { data: info, error, isFetching: isAccountLoading } = useWalletAccountInfo();
     const { data: jettons, error: jettonError, isFetching: isJettonLoading } = useJettonList();
     const { data: tronBalances } = useTronBalances();
@@ -38,7 +36,7 @@ export const useAssets = () => {
             ton: { info, jettons: jettons ?? { balances: [] } },
             tron: tronBalances
         };
-    }, [info, jettons, wallet, tronBalances]);
+    }, [info, jettons, tronBalances]);
 
     return [assets, error, isJettonLoading || isAccountLoading, jettonError] as const;
 };
@@ -133,7 +131,7 @@ export const useAllChainsAssetsWithPrice = () => {
         }
 
         return { assets: result, error: error ?? jettonError ?? undefined };
-    }, [assets, error, jettonError, config, fiat, isTronEnabled]);
+    }, [assets, error, jettonError, config, fiat, isTronEnabled, usdtRate]);
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

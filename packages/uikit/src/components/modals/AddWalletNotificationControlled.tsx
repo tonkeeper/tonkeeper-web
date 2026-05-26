@@ -99,13 +99,14 @@ export const AddWalletNotificationControlled = () => {
     const [selectedMethod, setSelectedMethod] = useState<AddWalletMethod | undefined>(
         params?.walletType
     );
+    const sdk = useAppSdk();
 
     useEffect(() => {
         const walletType = sdk.addWalletPage?.getAutoMountMethod();
         if (walletType) {
             onOpen({ walletType, skipSecurityCheck: true });
         }
-    }, []);
+    }, [onOpen, sdk.addWalletPage]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -121,14 +122,12 @@ export const AddWalletNotificationControlled = () => {
             sdk.addWalletPage?.open(params.walletType);
         }
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType]);
-
-    const sdk = useAppSdk();
+    }, [isOpen, params?.walletType, isSubscriptionValid, openBuyPro, onClose, sdk.addWalletPage]);
 
     const onCloseCallback = useCallback(() => {
         sdk.addWalletPage?.close();
         onClose();
-    }, [onClose, setSelectedMethod, sdk]);
+    }, [onClose, sdk]);
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
@@ -141,7 +140,7 @@ export const AddWalletNotificationControlled = () => {
             sdk.addWalletPage?.open(method);
             setSelectedMethod(method);
         };
-    }, [isSubscriptionValid, openBuyPro, setSelectedMethod, sdk]);
+    }, [isSubscriptionValid, openBuyPro, setSelectedMethod, sdk, onClose]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

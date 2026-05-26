@@ -79,7 +79,7 @@ export const CopyNotification: FC<{ hideSimpleCopyNotifications?: boolean }> = R
             return () => {
                 sdk.uiEvents.off('copy', handler);
             };
-        }, [hideSimpleCopyNotifications]);
+        }, [hideSimpleCopyNotifications, sdk.uiEvents, t]);
 
         const nodeRef = useRef(null);
 

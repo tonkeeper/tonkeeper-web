@@ -100,11 +100,11 @@ const SampleJettonRow: FC<{ jetton: AssetAmount; config: TonWalletConfig }> = ({
 
     const visible = useMemo(() => {
         return !config.hiddenTokens.includes(jettonAddress);
-    }, [config.hiddenTokens]);
+    }, [config.hiddenTokens, jettonAddress]);
 
     const pinned = useMemo(() => {
         return config.pinnedTokens.includes(jettonAddress);
-    }, [config.pinnedTokens]);
+    }, [config.pinnedTokens, jettonAddress]);
 
     return (
         <ListItemPayload>

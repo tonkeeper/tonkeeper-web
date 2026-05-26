@@ -234,7 +234,8 @@ const useGetTronTonSender = () => {
         tronApi,
         batteryApi,
         authToken,
-        requestToken
+        requestToken,
+        sdk
     ]);
 };
 
@@ -274,7 +275,8 @@ const useGetBatteryTronSender = () => {
         activeTronWallet,
         tronApi,
         batteryApi,
-        batteryUnitTonRate
+        batteryUnitTonRate,
+        sdk
     ]);
 };
 
@@ -294,7 +296,7 @@ const useGetTronTrxSender = () => {
 
         const signer = getTronSigner(sdk, tronApi, activeAccount);
         return new TronTrxSender(tronApi, activeTronWallet, signer);
-    }, [activeAccount, activeTronWallet, tronApi]);
+    }, [activeAccount, activeTronWallet, tronApi, sdk]);
 };
 
 const useGetTronFreeProSender = () => {
@@ -332,7 +334,7 @@ const useGetTronFreeProSender = () => {
             batteryAuthToken,
             proToken
         );
-    }, [activeAccount, activeTronWallet, tronApi, batteryApi, batteryAuthToken]);
+    }, [activeAccount, activeTronWallet, tronApi, batteryApi, batteryAuthToken, sdk]);
 };
 
 export const useTronEstimationSender = (senderType: TronSenderType | undefined) => {
@@ -384,14 +386,13 @@ const useTronEstimationBatterySender = () => {
                       authToken
                   )
                 : undefined,
-        [activeAccount, activeTronWallet, tronApi, batteryApi, authToken, batteryUnitTonRate]
+        [activeTronWallet, tronApi, batteryApi, authToken, batteryUnitTonRate]
     );
 };
 
 const useTronEstimationTrxSender = () => {
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
-    const batteryApi = useBatteryApi();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
@@ -402,7 +403,7 @@ const useTronEstimationTrxSender = () => {
             activeTronWallet
                 ? new TronTrxSender(tronApi, activeTronWallet, emptySigner)
                 : undefined,
-        [activeAccount, activeTronWallet, tronApi, batteryApi]
+        [activeTronWallet, tronApi]
     );
 };
 
@@ -435,14 +436,7 @@ const useTronEstimationTonSender = () => {
             emptySigner,
             authToken
         );
-    }, [
-        activeAccount,
-        activeTronWallet,
-        activeAccount.activeTonWallet,
-        tronApi,
-        batteryApi,
-        authToken
-    ]);
+    }, [activeTronWallet, activeAccount.activeTonWallet, tronApi, tonApi, batteryApi, authToken]);
 };
 
 const useTronEstimationFreeProSender = () => {
@@ -475,7 +469,6 @@ const useTronEstimationFreeProSender = () => {
             proToken
         );
     }, [
-        activeAccount,
         activeTronWallet,
         activeAccount.activeTonWallet,
         tronApi,

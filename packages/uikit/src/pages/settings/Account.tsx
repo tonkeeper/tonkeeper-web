@@ -243,7 +243,7 @@ export const Account = () => {
                 action: () => addWallet()
             }
         ];
-    }, []);
+    }, [addWallet, t]);
 
     const activeItem = activeId ? itemsOptimistic.find(i => i.id === activeId) : null;
 

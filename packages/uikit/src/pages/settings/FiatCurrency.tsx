@@ -42,7 +42,7 @@ export const FiatCurrency = () => {
                 icon: key === fiat ? <CheckIcon /> : undefined,
                 action: () => mutate(key as FiatCurrencies)
             }));
-    }, [mutate, fiat, i18n.language, allowedCurrencies]);
+    }, [mutate, fiat, i18n.language, allowedCurrencies, t]);
 
     if (isProDisplay) {
         return (

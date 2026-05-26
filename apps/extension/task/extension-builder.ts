@@ -143,8 +143,6 @@ export function toManifestVersion(semver: string): {
     const trailingInt = prerelease.match(/(\d+)$/);
     const coreSegments = core.split('.');
     const manifestVersion =
-        coreSegments.length < 4 && trailingInt
-            ? `${core}.${trailingInt[1]}`
-            : core;
+        coreSegments.length < 4 && trailingInt ? `${core}.${trailingInt[1]}` : core;
     return { manifestVersion, manifestVersionName: semver };
 }
