@@ -95,7 +95,7 @@ export const ReceiverInput: FC<{
             form.rows.splice(index, values.length, ...values);
             methods.reset(form);
         },
-        [methods, validator]
+        [methods, validator, index]
     );
 
     return (

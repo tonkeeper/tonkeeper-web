@@ -131,7 +131,7 @@ export const useAllChainsAssetsWithPrice = () => {
         }
 
         return { assets: result, error: error ?? jettonError ?? undefined };
-    }, [assets, error, jettonError, config, fiat, isTronEnabled]);
+    }, [assets, error, jettonError, config, fiat, isTronEnabled, usdtRate]);
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

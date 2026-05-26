@@ -96,13 +96,16 @@ export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectConnectionParams | null>(null);
     const paramsRef = useValueRef(params);
 
-    const onNewParamsReceived = useCallback((p: TonConnectConnectionParams | null) => {
-        if (p && paramsRef.current) {
-            throw new Error('New params received while old params not processed');
-        }
+    const onNewParamsReceived = useCallback(
+        (p: TonConnectConnectionParams | null) => {
+            if (p && paramsRef.current) {
+                throw new Error('New params received while old params not processed');
+            }
 
-        setParams(p);
-    }, []);
+            setParams(p);
+        },
+        []
+    );
 
     const injectedBridgeConnectionRef =
         useInjectedBridgeConnectionSubscription(onNewParamsReceived);

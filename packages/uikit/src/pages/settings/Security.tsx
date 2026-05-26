@@ -201,7 +201,7 @@ const DesktopAndTabletProPassword = () => {
         if (autoOpenSetPassword) {
             onOpen();
         }
-    }, [autoOpenSetPassword]);
+    }, [autoOpenSetPassword, onOpen]);
 
     const onResetPassword = async () => {
         await sdk.keychain?.securityCheck();

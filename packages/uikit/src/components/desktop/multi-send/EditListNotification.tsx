@@ -47,7 +47,7 @@ export const EditListNotification: FC<{
         if (isOpen) {
             setInputValue(listName);
         }
-    }, [isOpen]);
+    }, [isOpen, listName]);
 
     return (
         <Notification isOpen={isOpen} handleClose={onCancel}>

@@ -470,8 +470,6 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         senderChoice,
         authToken,
         activeAccount,
-        accounts,
-        appContext,
         wallet,
         batteryApi,
         batteryConfig,
@@ -480,7 +478,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         twoFaApi,
         twoFAConfig,
         batteryUnitTonRate,
-        isGaslessEnabled
+        isGaslessEnabled,
+        api
     ]);
 
     return senderChoice.type === 'multisig' ? multisigChoiceCallback : otherChoicesCallback;

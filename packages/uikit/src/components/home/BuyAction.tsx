@@ -114,7 +114,7 @@ export const BuyNotification: FC<{
     const Content = useCallback(() => {
         if (!open || !buy) return undefined;
         return <ActionNotification item={buy} kind="buy" handleClose={handleClose} />;
-    }, [open, buy]);
+    }, [open, buy, handleClose]);
 
     return (
         <HideOnReview>

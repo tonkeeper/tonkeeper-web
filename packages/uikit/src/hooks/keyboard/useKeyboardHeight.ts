@@ -15,7 +15,7 @@ export const useKeyboardHeight = () => {
             showUnsubscribe();
             hideUnsubscribe();
         };
-    }, []);
+    }, [sdk.keyboard.willHide, sdk.keyboard.willShow]);
 
     return height;
 };

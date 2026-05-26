@@ -32,7 +32,7 @@ export const SKInput: FC<{
 
     useEffect(() => {
         onIsDirtyChange?.(!!sk);
-    }, [sk]);
+    }, [sk, onIsDirtyChange]);
 
     useEffect(() => {
         if (!touched) {
@@ -46,7 +46,7 @@ export const SKInput: FC<{
         } else {
             setError(false);
         }
-    }, [touched, sk]);
+    }, [touched, sk, signingAlgorithm]);
 
     useEffect(() => {
         if (ref.current) {

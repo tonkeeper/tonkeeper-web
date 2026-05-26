@@ -470,7 +470,7 @@ export const Check: FC<{
         window.addEventListener('keydown', handler);
 
         return () => window.removeEventListener('keydown', handler);
-    }, [words]);
+    }, [words, isValid]);
 
     const handleChange = (changeValue: string, wordIndex: number) =>
         setWords(prevWordsState =>
@@ -574,7 +574,7 @@ export const ImportWords: FC<{
 
     useEffect(() => {
         onIsDirtyChange?.(isDirty);
-    }, [isDirty]);
+    }, [isDirty, onIsDirtyChange]);
 
     const onChange = useCallback((newValue: string, index: number) => {
         if (newValue.includes(' ') || newValue.includes(String.fromCharCode(160))) {

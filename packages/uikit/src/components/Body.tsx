@@ -195,7 +195,7 @@ export const InnerBody = React.forwardRef<
 
             element.removeEventListener('scroll', handlerScroll);
         };
-    }, [elementRef]);
+    }, [elementRef, sdk, standalone]);
 
     const selection = useAppSelection(elementRef);
     const id = standalone ? 'body' : undefined;

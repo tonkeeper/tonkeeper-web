@@ -137,7 +137,7 @@ const PasswordUnlock: FC<{ logOutConfirmed?: () => void }> = ({ logOutConfirmed 
         if (sdk.keychain?.security.value?.biometry) {
             sdk.keychain.securityCheck('biometry').then(() => sdk.uiEvents.emit('unlock'));
         }
-    }, []);
+    }, [sdk.keychain, sdk.uiEvents]);
 
     const contentRef = useRef<HTMLFormElement>(null);
     useInputFocusScroll(contentRef);

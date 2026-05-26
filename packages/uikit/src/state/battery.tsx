@@ -418,7 +418,7 @@ export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
          * api rate is ton / jetton
          */
         return unitTonRate.div(methods.find(m => m.jettonMaster === assetAddress)!.rate);
-    }, [methods, assetAddress]);
+    }, [methods, assetAddress, unitTonRate]);
 };
 
 const imgUrlToName = (url: string) => {

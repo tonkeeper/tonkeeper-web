@@ -15,6 +15,6 @@ export const useLock = (sdk: IAppSdk) => {
         return () => {
             sdk.uiEvents.off('unlock', unlock);
         };
-    }, []);
+    }, [sdk.storage, sdk.uiEvents]);
     return lock;
 };

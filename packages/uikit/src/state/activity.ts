@@ -536,7 +536,7 @@ export const useScrollMonitor = (
         return () => {
             el?.removeEventListener('scroll', handleScroll);
         };
-    }, [element]);
+    }, [element, elementRef]);
 
     useLayoutEffect(() => {
         const timer = setInterval(() => {

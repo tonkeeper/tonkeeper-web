@@ -219,7 +219,17 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
                 padding={usePadding ? padding : 0}
             />
         );
-    }, [sdk, requestId, padding, onCancel, onSubmit, isPasswordSet, isLoading, isError]);
+    }, [
+        sdk,
+        requestId,
+        padding,
+        onCancel,
+        onSubmit,
+        isPasswordSet,
+        isLoading,
+        isError,
+        usePadding
+    ]);
 
     return (
         <Notification

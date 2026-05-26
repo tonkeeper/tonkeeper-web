@@ -13,7 +13,7 @@ export const useInputRefAutoFocus = (delay = 0) => {
         return () => {
             clearTimeout(timer);
         };
-    }, [ref]);
+    }, [ref, delay]);
 
     return ref;
 };

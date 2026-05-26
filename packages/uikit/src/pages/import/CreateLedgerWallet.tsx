@@ -190,7 +190,7 @@ const ChooseLedgerAccounts: FC<{
 
     useEffect(() => {
         getLedgerWallets(tonTransport).then(data => setSelectedIndexes(data.preselectedIndexes));
-    }, [tonTransport]);
+    }, [tonTransport, getLedgerWallets]);
 
     const chosenSomeAccounts = !!Object.values(selectedIndexes).filter(Boolean).length;
 

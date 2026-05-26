@@ -79,7 +79,7 @@ export const useInputFocusScroll = (
 
             scrollTo(newScrollTop);
         },
-        [scrollOnFocus, useScrollableParent]
+        [scrollOnFocus, scrollContainerRef, getScrollProps]
     );
 
     const handleKeyboardShow = useCallback(
@@ -111,13 +111,13 @@ export const useInputFocusScroll = (
                 scrollTo(newScrollTop);
             }
         },
-        [scrollOnFocus, useScrollableParent]
+        [scrollOnFocus, useScrollableParent, scrollContainerRef]
     );
 
     const handleKeyboardHide = useCallback(() => {
         if (!scrollContainerRef.current) return;
         scrollContainerRef.current.style.paddingBottom = '0px';
-    }, []);
+    }, [scrollContainerRef]);
 
     const sdk = useAppSdk();
 

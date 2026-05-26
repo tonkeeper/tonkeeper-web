@@ -76,7 +76,7 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 onBack();
             }
         })();
-    }, [onBack, accountId, walletId]);
+    }, [onBack, accountId, walletId, sdk, t]);
 
     return secret;
 };

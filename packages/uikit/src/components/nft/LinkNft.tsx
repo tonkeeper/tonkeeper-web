@@ -183,7 +183,7 @@ const LinkNftUnlinked: FC<{
                 domain={nft.dns}
             />
         ),
-        [onSaveLinkToAddress, estimation.isFetching]
+        [onSaveLinkToAddress, estimation.isFetching, nft.dns]
     );
 
     const isDisabled = useAreNftActionsDisabled(nft);

@@ -26,7 +26,7 @@ export function useTonRecipient(address: string): {
             done: false,
             toAccount: toAccount!
         }),
-        [toAccount, network]
+        [toAccount, network, address]
     );
 
     return {

@@ -32,10 +32,13 @@ export const SignerContent: FC<{
 
     useNavigate(sdk, onClose);
 
-    const onSubmit = useCallback((ur: UR) => {
-        const signature = new KeystoneTonSDK().parseSignature(ur);
-        handleResult(signature.signature);
-    }, []);
+    const onSubmit = useCallback(
+        (ur: UR) => {
+            const signature = new KeystoneTonSDK().parseSignature(ur);
+            handleResult(signature.signature);
+        },
+        [handleResult]
+    );
 
     const openScanner = useKeystoneScanner(null, onSubmit);
 

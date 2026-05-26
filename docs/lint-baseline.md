@@ -1,19 +1,19 @@
 # Lint baseline
 
-`yarn lint` runs with `--max-warnings=146`. Existing violations are demoted to `'warn'` in
+`yarn lint` runs with `--max-warnings=93`. Existing violations are demoted to `'warn'` in
 `.eslintrc.js` (search for `// baseline:` comments) so CI passes today, and `--max-warnings`
 prevents regressions: each PR can only equal or reduce the count.
 
 The goal is to drive each demoted rule to zero violations, then promote it back to `'error'` (and
 lower `--max-warnings` accordingly).
 
-## Demoted rules (severity baseline: 146 warnings, 0 errors)
+## Demoted rules (severity baseline: 93 warnings, 0 errors)
 
 The following rules were demoted from `error` (or `off`) to `warn`:
 
-| Rule                          | Violations | Notes                                                                                                   |
-| ----------------------------- | ---------: | ------------------------------------------------------------------------------------------------------- |
-| `react-hooks/exhaustive-deps` |        146 | **Was off** — re-enabled to catch stale closures. High count is expected; treat as a backlog, not noise |
+| Rule                          | Violations | Notes                                                                                                  |
+| ----------------------------- | ---------: | ------------------------------------------------------------------------------------------------------ |
+| `react-hooks/exhaustive-deps` |         93 | **Was off** — re-enabled to catch stale closures. High count is expected; treat as a backlog, not noise |
 
 
 ## How to promote a rule back to `error`

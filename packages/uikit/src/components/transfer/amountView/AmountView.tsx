@@ -144,7 +144,7 @@ export const AmountView: FC<{
                 payload: { token: tokenToTonAsset(address, info, jettons) }
             });
         },
-        [dispatch, jettons]
+        [dispatch, jettons, info]
     );
 
     const remaining = balance.relativeAmount.minus(amountState.assetAmount.relativeAmount);

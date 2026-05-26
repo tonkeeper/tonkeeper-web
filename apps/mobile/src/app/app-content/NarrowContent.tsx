@@ -183,7 +183,7 @@ const NarrowContentInitialPagesLock = () => {
                     setTimeout(() => setFaceIdValidation(undefined), 200);
                 });
         }
-    }, [biometry]);
+    }, [biometry, sdk.keychain, sdk.uiEvents]);
 
     const { mutateAsync: mutateLogOut } = useMutateDeleteAll();
     const accounts = useAccountsState();

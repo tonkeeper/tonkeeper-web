@@ -135,6 +135,9 @@ export const ConfirmTransferView: FC<
         senderType: selectedSenderType!
     });
 
+    const availableTonSendersChoicesKey = JSON.stringify(availableTonSendersChoices);
+    const availableTronSendersChoicesKey = JSON.stringify(availableTronSendersChoices);
+
     useEffect(() => {
         if (!mutation.isIdle || !isTonBlockchainAssetTransfer || selectedSenderType) {
             return;
@@ -143,10 +146,11 @@ export const ConfirmTransferView: FC<
         if (availableTonSendersChoices) {
             setSelectedSenderType(availableTonSendersChoices[0].type);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         selectedSenderType,
         isTonBlockchainAssetTransfer,
-        JSON.stringify(availableTonSendersChoices),
+        availableTonSendersChoicesKey,
         mutation.isIdle
     ]);
     useEffect(() => {
@@ -158,10 +162,11 @@ export const ConfirmTransferView: FC<
         if (choice?.isEnoughBalance) {
             return setSelectedSenderType(choice.type);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         selectedSenderType,
         isTonBlockchainAssetTransfer,
-        JSON.stringify(availableTronSendersChoices),
+        availableTronSendersChoicesKey,
         mutation.isIdle
     ]);
 
@@ -193,6 +198,8 @@ export const ConfirmTransferView: FC<
         }
     );
 
+    const assetWeiBalanceKey = assetWeiBalance?.toFixed(0);
+
     useEffect(() => {
         if (!shouldPatchAmount) {
             return setAssetAmountPatched(assetAmount);
@@ -209,7 +216,8 @@ export const ConfirmTransferView: FC<
                 weiAmount: assetWeiBalance.minus(fee.weiAmount)
             })
         );
-    }, [isMax, assetAmount, selectedSenderType, assetWeiBalance?.toFixed(0), tokenToTonRate.data]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isMax, assetAmount, selectedSenderType, assetWeiBalanceKey, tokenToTonRate.data]);
 
     const noAvailableTronSenders = (
         availableSenderChoices as (TonSenderChoiceUserAvailable | TronSenderOption)[]
