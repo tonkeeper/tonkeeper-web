@@ -175,7 +175,7 @@ const FlashIconAdaptive = () => {
         if (ref.current) {
             setSize(getComputedStyle(ref.current).fontSize);
         }
-    });
+    }, []);
 
     return (
         <svg

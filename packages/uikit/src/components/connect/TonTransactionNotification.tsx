@@ -445,7 +445,16 @@ export const TonTransactionNotification: FC<{
                 />
             </>
         );
-    }, [params, onClose, wallets.length, isActiveAccountMultisig, multisigTTL, setMultisigTTL]);
+    }, [
+        params,
+        onClose,
+        wallets.length,
+        isActiveAccountMultisig,
+        multisigTTL,
+        setMultisigTTL,
+        t,
+        waitInvalidation
+    ]);
 
     return (
         <>

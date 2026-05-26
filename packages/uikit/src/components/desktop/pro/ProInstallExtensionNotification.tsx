@@ -98,7 +98,7 @@ const ProInstallExtensionNotificationContent: FC<
             selectedWallet: targetAuth.wallet,
             ...extensionData
         });
-    }, [targetAuth?.wallet]);
+    }, [targetAuth?.wallet, estimateFeeMutation, extensionData]);
 
     const price = useMemo(
         () =>

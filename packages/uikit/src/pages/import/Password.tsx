@@ -11,7 +11,7 @@ export const FinalView: FC<{ afterCompleted: () => void }> = ({ afterCompleted }
     useEffect(() => {
         client.invalidateQueries([]);
         setTimeout(afterCompleted, 3000);
-    }, []);
+    }, [client, afterCompleted]);
 
     return <IconPage icon={<CheckLottieIcon />} title={t('check_words_success')} />;
 };

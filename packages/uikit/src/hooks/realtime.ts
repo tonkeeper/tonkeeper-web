@@ -55,5 +55,5 @@ export const useRealtimeUpdatesInvalidation = () => {
         return () => {
             sse.close();
         };
-    }, [activeTonWallet?.rawAddress, apiPath, apiKey]);
+    }, [activeTonWallet, apiPath, apiKey, client]);
 };

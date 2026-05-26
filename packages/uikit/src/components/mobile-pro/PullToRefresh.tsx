@@ -174,12 +174,13 @@ const RefresherPortal: FC<
     const portalElement = useRef(document.createElement('div'));
 
     useEffect(() => {
+        const el = portalElement.current;
         if (content && content.parentElement) {
-            portalElement.current.style.zIndex = '1';
-            content.parentElement.insertBefore(portalElement.current, content);
+            el.style.zIndex = '1';
+            content.parentElement.insertBefore(el, content);
         }
         return () => {
-            portalElement.current.remove();
+            el.remove();
         };
     }, [content]);
 

@@ -44,7 +44,7 @@ export const useShowAddress = (
         } else {
             setShowAddress(undefined);
         }
-    }, [address, inputTextWidth, addressTextWidth, network]);
+    }, [address, inputTextWidth, addressTextWidth, network, ref]);
 
     return showAddress;
 };

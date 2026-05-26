@@ -209,6 +209,8 @@ const SwapConfirmContent: FC<{
         EXTERNAL_SENDER_CHOICE.type
     );
 
+    const availableSendersChoicesKey = JSON.stringify(availableSendersChoices);
+
     useEffect(() => {
         if (
             availableSendersChoices?.[0] &&
@@ -216,7 +218,8 @@ const SwapConfirmContent: FC<{
         ) {
             setSelectedSenderType(availableSendersChoices[0].type);
         }
-    }, [JSON.stringify(availableSendersChoices)]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [availableSendersChoicesKey, selectedSenderType, setSelectedSenderType]);
 
     const senderChoice: SenderChoice = useMemo(() => {
         if (selectedSenderType === BATTERY_SENDER_CHOICE.type) return BATTERY_SENDER_CHOICE;

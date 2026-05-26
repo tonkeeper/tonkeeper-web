@@ -76,7 +76,7 @@ export const CreateMultisig: FC<{
     const finalClose = useCallback(() => {
         onClose();
         navigate(AppRoute.multisigWallets);
-    }, []);
+    }, [navigate, onClose]);
 
     if (!contractParams) {
         return <CreateMultisigFormPage onSentDeploy={setContractParams} />;
@@ -181,7 +181,7 @@ const CreateMultisigAwaitDeployPage: FC<{
                 })
             )
             .then(onDone);
-    }, []);
+    }, [awaitDeploy, addAccount, deployerWalletId, hostWallets, multisigAddress, onDone]);
 
     const { t } = useTranslation();
     const explorerUrl = config.accountExplorer;
@@ -264,7 +264,7 @@ const CreateMultisigFormPage: FC<{
             });
         }
         return !!address;
-    }, [deployMutation.mutateAsync, onSentDeploy, deployArgs?.fromWallet, accounts]);
+    }, [deployMutation, onSentDeploy, deployArgs, accounts]);
 
     return (
         <ContentWrapper>

@@ -90,7 +90,7 @@ export const PasswordUnlock: FC<{
         } else {
             onClose();
         }
-    }, [location]);
+    }, [location, active, onClose]);
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
@@ -160,16 +160,19 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
 
     const isPasswordSet = useIsPasswordSet();
 
-    const onSubmit = async (password: string) => {
-        reset();
-        try {
-            await mutateAsync(password);
-            close();
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
+    const onSubmit = useCallback(
+        async (password: string) => {
+            reset();
+            try {
+                await mutateAsync(password);
+                close();
+                return true;
+            } catch (e) {
+                return false;
+            }
+        },
+        [reset, mutateAsync, close]
+    );
 
     const onCancel = useCallback(() => {
         reset();

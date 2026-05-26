@@ -263,7 +263,7 @@ const ShowPhrases = () => {
             }
         ];
         return i;
-    }, []);
+    }, [navigate, t]);
 
     if (isLedger || isKeystone || isReadOnly) {
         return <></>;

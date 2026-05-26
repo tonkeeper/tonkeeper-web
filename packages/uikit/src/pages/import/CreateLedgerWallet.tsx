@@ -71,12 +71,12 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     const onStartConnection = useCallback(() => {
         resetConnection();
         connectLedger();
-    }, []);
+    }, [resetConnection, connectLedger]);
 
     const onConnectionPageClosed = useCallback(() => {
         resetConnection();
         connectLedger({ skipOpenConnectionPage: true });
-    }, []);
+    }, [resetConnection, connectLedger]);
 
     useEffectOnLedgerConnectionPageClosed(onConnectionPageClosed);
 
@@ -90,7 +90,7 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         onStartConnection();
 
         return resetConnection;
-    }, []);
+    }, [onStartConnection, resetConnection]);
 
     useEffect(() => {
         if (tonTransport) {

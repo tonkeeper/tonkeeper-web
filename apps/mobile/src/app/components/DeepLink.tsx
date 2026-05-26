@@ -48,7 +48,7 @@ export const useMobileProPairSignerSubscription = () => {
                 onOpen({ accountId: acc.id });
             });
         });
-    }, []);
+    }, [mutateAsync, onOpen]);
 };
 
 const useInjectedBridgeConnectionSubscription = (
@@ -104,7 +104,7 @@ export const DeepLinkSubscription = () => {
 
             setParams(p);
         },
-        []
+        [paramsRef]
     );
 
     const injectedBridgeConnectionRef =
@@ -186,7 +186,7 @@ export const DeepLinkSubscription = () => {
                 notifyError(unsupportedLinkError);
             }
         });
-    }, []);
+    }, [reset, onNewParamsReceived, mutateAsync, notifyError]);
 
     return (
         <>

@@ -105,7 +105,7 @@ const SendContent: FC<{
                 token: amountViewState?.assetAmount?.asset?.symbol ?? 'ton'
             });
         }
-    }, []);
+    }, [initRecipient, amountViewState?.assetAmount?.asset?.symbol, track]);
 
     const availableTrc20Transfers = useTrc20TransfersNumberAvailable();
     const { onOpen: openTopUpNotification } = useTopUpTronFeeBalanceNotification();
@@ -498,7 +498,7 @@ const SendActionNotification = () => {
         return () => {
             sdk.uiEvents.off('transfer', handler);
         };
-    }, [jettonsQueryKey, track]);
+    }, [jettonsQueryKey, track, reset, getAccountAsync, wallet.rawAddress, client, sdk.uiEvents]);
 
     const onClose = useCallback(() => {
         setTransferParams(undefined);
@@ -514,7 +514,7 @@ const SendActionNotification = () => {
                 initRecipient={transferParams?.initRecipient}
             />
         );
-    }, [open, transferParams, chain, onClose]);
+    }, [transferParams, chain, onClose]);
 
     return (
         <NotificationStyled

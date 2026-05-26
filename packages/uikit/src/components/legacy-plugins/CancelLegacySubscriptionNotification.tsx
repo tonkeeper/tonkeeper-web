@@ -70,7 +70,7 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
             extensionContract: pluginAddress,
             destroyValue
         });
-    }, []);
+    }, [wallet, pluginAddress, estimation, onClose]);
 
     return (
         <ConfirmView

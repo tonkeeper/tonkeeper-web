@@ -55,7 +55,7 @@ export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
         if (isCompleted) {
             toast(linkedAddress ? t('dns_address_linked') : t('dns_address_unlinked'));
         }
-    }, [isCompleted, linkedAddress]);
+    }, [isCompleted, linkedAddress, toast, t]);
 
     if (!linkedAddress) {
         return (

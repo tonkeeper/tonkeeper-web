@@ -86,7 +86,15 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
         } else {
             onPurchaseOpen();
         }
-    }, [isSuccess, subscription, selectedAccountId, activeWallet]);
+    }, [
+        isSuccess,
+        subscription,
+        selectedAccountId,
+        activeWallet,
+        navigate,
+        onClose,
+        onPurchaseOpen
+    ]);
 
     const handleNextScreen = async () => {
         if (!selectedAccountId) {

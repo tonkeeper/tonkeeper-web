@@ -65,7 +65,7 @@ export const DesktopCoinPage = () => {
         if (!name) {
             navigate(AppRoute.home);
         }
-    }, [name]);
+    }, [name, navigate]);
 
     const canUseTron = useCanReceiveTron();
 

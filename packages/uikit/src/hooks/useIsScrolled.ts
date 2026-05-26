@@ -54,7 +54,7 @@ export function useIsScrolled<T extends HTMLElement = HTMLDivElement>(options?: 
 
             element.removeEventListener('scroll', handlerScroll);
         };
-    }, [refChanged]);
+    }, [refChanged, gapTop, gapBottom]);
 
     return { ref: refCallback, closeTop, closeBottom };
 }

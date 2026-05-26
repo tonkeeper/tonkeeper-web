@@ -38,19 +38,22 @@ export const useInputFocusScroll = (
     scrollContainerRef: RefObject<HTMLElement>,
     { scrollOnFocus = true, useScrollableParent = true } = {}
 ) => {
-    const getScrollProps = (ref: HTMLElement) => {
-        let scrollElement: HTMLElement;
-        let scrollTo: (pos: number) => void;
-        if (useScrollableParent && ref) {
-            const scl = findClosestScrollableElement(ref);
-            scrollElement = scl.scrollElement;
-            scrollTo = scl.scrollTo;
-        } else {
-            scrollElement = ref;
-            scrollTo = (pos: number) => ref.scrollTo({ top: pos, behavior: 'smooth' });
-        }
-        return { scrollElement, scrollTo };
-    };
+    const getScrollProps = useCallback(
+        (ref: HTMLElement) => {
+            let scrollElement: HTMLElement;
+            let scrollTo: (pos: number) => void;
+            if (useScrollableParent && ref) {
+                const scl = findClosestScrollableElement(ref);
+                scrollElement = scl.scrollElement;
+                scrollTo = scl.scrollTo;
+            } else {
+                scrollElement = ref;
+                scrollTo = (pos: number) => ref.scrollTo({ top: pos, behavior: 'smooth' });
+            }
+            return { scrollElement, scrollTo };
+        },
+        [useScrollableParent]
+    );
 
     const handleFocus = useCallback(
         (event: FocusEvent) => {
@@ -111,7 +114,7 @@ export const useInputFocusScroll = (
                 scrollTo(newScrollTop);
             }
         },
-        [scrollOnFocus, useScrollableParent, scrollContainerRef]
+        [scrollOnFocus, scrollContainerRef, getScrollProps]
     );
 
     const handleKeyboardHide = useCallback(() => {

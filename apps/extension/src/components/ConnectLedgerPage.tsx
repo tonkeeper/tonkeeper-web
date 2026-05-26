@@ -81,7 +81,7 @@ const ConnectLedgerPage = () => {
         resetConnection();
         connectLedger();
         setTried(true);
-    }, []);
+    }, [connectLedger, resetConnection]);
 
     let currentStep: 'connect' | 'open-ton' | 'all-completed' = 'connect';
     if (isDeviceConnected) {

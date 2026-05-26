@@ -68,7 +68,7 @@ export const RenewNft: FC<{
         if (isCompleted) {
             toast(t('renew_nft_renewed'));
         }
-    }, [isCompleted]);
+    }, [isCompleted, toast, t]);
 
     const renewUntilFormatted = useDateFormat(Date.now() + YEAR_MS, intlOptions);
 

@@ -14,7 +14,7 @@ const Block = styled.div`
 const QrScanner = () => {
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const sdk = useAppSdk();
-    const { standalone, ios } = useAppContext();
+    const { standalone } = useAppContext();
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -63,7 +63,7 @@ const QrScanner = () => {
                 </Block>
             </FullHeightBlock>
         );
-    }, [isOpen, onScan, standalone, ios]);
+    }, [isOpen, onScan, standalone, scanId, sdk.uiEvents]);
 
     return (
         <Notification isOpen={isOpen} handleClose={onCancel} title={t('scan_qr_title')}>

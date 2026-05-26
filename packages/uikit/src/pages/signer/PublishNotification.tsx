@@ -33,7 +33,7 @@ const Confirm: FC<{ signatureHex: string; onClose: () => void }> = ({ signatureH
                 navigate(AppRoute.activity);
             }, 2000);
         }
-    }, [isError, isFetched]);
+    }, [isError, isFetched, navigate, onClose]);
 
     return (
         <FullHeightBlockResponsive standalone={false} fitContent={true}>

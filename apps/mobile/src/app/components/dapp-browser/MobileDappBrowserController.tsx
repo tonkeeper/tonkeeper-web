@@ -66,11 +66,12 @@ const useRegisterViewFocusListener = () => {
 const tgResponseSchema = z.object({
     base64Result: z.string()
 });
+const allowedHosts = ['oauth.telegram.org'];
+const allowedResponseOrigins = ['https://wallet.tonkeeper.com'];
+
 const useProvideWindowApi = () => {
     const { mutate: openTab } = useOpenBrowserTab();
     const { mutate: closeTab } = useCloseActiveBrowserTab();
-    const allowedHosts = ['oauth.telegram.org'];
-    const allowedResponseOrigins = ['https://wallet.tonkeeper.com'];
 
     useEffect(() => {
         (window as unknown as { openDappBrowser: (url: string) => void }).openDappBrowser = (
@@ -102,7 +103,7 @@ const useProvideWindowApi = () => {
                 closeTab();
             }
         );
-    }, []);
+    }, [closeTab, openTab]);
 };
 
 export const MobileDappBrowserController = () => {

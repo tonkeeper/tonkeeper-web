@@ -93,7 +93,7 @@ export const useWindowsScroll = (addHidden = true) => {
             window.removeEventListener('scroll', handler);
             sdk.uiEvents.off('loading', handler);
         };
-    }, [standalone]);
+    }, [standalone, addHidden, ios, sdk.uiEvents]);
 };
 
 export const useAppSelection = (elementRef: React.MutableRefObject<HTMLDivElement | null>) => {
