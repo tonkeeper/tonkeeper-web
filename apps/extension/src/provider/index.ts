@@ -8,7 +8,8 @@ export class TonProvider extends EventEmitter {
 
     // Random starting offset so an attacker cannot predict outstanding request
     // ids. Defense-in-depth on top of the source/origin checks in onMessage.
-    nextJsonRpcId = Math.floor(Math.random() * 0x7fffffff);
+    // CSPRNG (not Math.random) so PRNG state can't be recovered from observed ids.
+    nextJsonRpcId = crypto.getRandomValues(new Uint32Array(1))[0];
 
     promises: Record<
         string,

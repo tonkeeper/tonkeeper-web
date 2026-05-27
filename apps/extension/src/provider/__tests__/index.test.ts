@@ -224,10 +224,11 @@ describe('TonProvider.send — id generation', () => {
         const starts = Array.from({ length: 30 }, () => new TonProvider().nextJsonRpcId);
         const allZero = starts.every(v => v === 0);
         expect(allZero).toBe(false);
-        // Sanity: ids are within the documented 31-bit positive range.
+        // Sanity: ids are within Uint32 range (crypto.getRandomValues output).
         for (const v of starts) {
             expect(v).toBeGreaterThanOrEqual(0);
-            expect(v).toBeLessThan(0x7fffffff);
+            expect(v).toBeLessThanOrEqual(0xffffffff);
+            expect(Number.isInteger(v)).toBe(true);
         }
     });
 
