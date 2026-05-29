@@ -19,6 +19,7 @@
         "lint:fix": "eslint --ext .ts,.tsx . --fix",
         "lint:css": "stylelint \"{apps,packages}/**/src/**/*.{ts,tsx,css}\"",
         "lint:css:fix": "stylelint \"{apps,packages}/**/src/**/*.{ts,tsx,css}\" --fix",
+        "lint:i18n": "yarn workspace @tonkeeper/locales lint:i18n",
         "typecheck": "npx turbo typecheck",
         "prepare": "husky",
         "prepare-release": "node scripts/prepare-release.js"

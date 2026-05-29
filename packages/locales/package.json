@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "nodemon --watch src ./task/build.ts",
         "build": "ts-node ./task/build",
-        "build:pkg": "yarn build"
+        "build:pkg": "yarn build",
+        "lint:i18n": "ts-node ./task/check-unused"
     },
     "devDependencies": {
         "@types/node": "^20.6.3",
