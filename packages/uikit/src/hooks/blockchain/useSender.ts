@@ -141,8 +141,8 @@ export const useAvailableTonSendersChoices = (
                 priority: number;
             }[] = [{ choice: EXTERNAL_SENDER_CHOICE, priority: 2 }];
 
-            if (batteryAvailable) {
-                if (!batteryBalance || !batteryReservedAmount) {
+            if (batteryAvailable && batteryBalance && batteryBalance.batteryUnitsBalance.gt(0)) {
+                if (!batteryReservedAmount) {
                     potentialSenders.push({
                         choice: BATTERY_SENDER_CHOICE,
                         priority: 0
@@ -191,6 +191,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const api = useActiveApi();
     const batteryApi = useBatteryApi();
     const { data: batteryAuthToken } = useBatteryAuthToken();
+    const { data: batteryBalance } = useBatteryBalance();
     const account = useActiveAccount();
     const batteryConfig = useBatteryServiceConfig();
     const canUseBattery = useCanSeeBattery();
@@ -199,6 +200,10 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const batteryUnitTonRate = useBatteryUnitTonRate();
     const gaslessConfig = useGaslessConfig();
     const { data: jettons } = useJettonList();
+    const batteryAuthTokenWithBalance =
+        canUseBattery && batteryAuthToken && batteryBalance?.batteryUnitsBalance.gt(0)
+            ? batteryAuthToken
+            : undefined;
 
     return useQuery<TonSenderChoiceUserAvailable[]>(
         [
@@ -206,6 +211,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             payload,
             account,
             batteryAuthToken,
+            batteryBalance?.batteryUnitsBalance.toFixed(0),
             canUseBattery,
             batteryConfig,
             twoFaConfig?.status,
@@ -240,8 +246,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             }
 
             if (
-                canUseBattery &&
-                batteryAuthToken &&
+                batteryAuthTokenWithBalance &&
                 isStandardTonWallet(account.activeTonWallet) &&
                 payload.messagesVariants?.battery
             ) {
@@ -249,7 +254,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                     {
                         messageTtl: batteryConfig.messageTtl,
                         excessAddress: batteryConfig.excessAccount,
-                        authToken: batteryAuthToken,
+                        authToken: batteryAuthTokenWithBalance,
                         batteryUnitTonRate
                     },
                     { batteryApi, tonApi: api },
@@ -310,7 +315,10 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             return choices;
         },
         {
-            enabled: batteryAuthToken !== undefined && jettons !== undefined,
+            enabled:
+                batteryAuthToken !== undefined &&
+                batteryBalance !== undefined &&
+                jettons !== undefined,
             keepPreviousData: true
         }
     );
