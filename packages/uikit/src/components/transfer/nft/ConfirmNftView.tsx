@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { Gap } from '../../Layout';
@@ -42,6 +42,11 @@ import {
     useGetEstimationSender,
     useGetSender
 } from '../../../hooks/blockchain/useSender';
+import {
+    pickPreferredTonSenderType,
+    useMutateTransferFeeMethod,
+    useTransferSettingsQuery
+} from '../../../state/transfer-settings';
 import { useTonRawTransactionService } from '../../../hooks/blockchain/useBlockchainService';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import BigNumber from 'bignumber.js';
@@ -235,9 +240,21 @@ export const ConfirmNftView: FC<{
     const isActiveMultisig = useIsActiveAccountMultisig();
 
     const { data: availableSendersChoices } = useAvailableTonSendersChoices(operationTypeSendNFT);
-    const [selectedSenderType, onSenderTypeChange] = useState<
+    const { data: transferSettings } = useTransferSettingsQuery();
+    const { mutate: persistFeeMethod } = useMutateTransferFeeMethod();
+    const savedFeeMethod = transferSettings?.feeMethod ?? null;
+
+    const [selectedSenderType, setSelectedSenderType] = useState<
         TonSenderTypeUserAvailable | undefined
     >();
+
+    const onSenderTypeChange = useCallback(
+        (type: TonSenderTypeUserAvailable) => {
+            setSelectedSenderType(type);
+            persistFeeMethod(type);
+        },
+        [persistFeeMethod]
+    );
 
     const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
     const { mutateAsync, isLoading, error, reset, isIdle } = useSendNft(
@@ -247,15 +264,28 @@ export const ConfirmNftView: FC<{
         { multisigTTL, selectedSenderType: selectedSenderType! }
     );
 
+    const availableSendersChoicesKey = JSON.stringify(availableSendersChoices);
+
     useEffect(() => {
         if (!isIdle) {
             return;
         }
-
-        if (availableSendersChoices) {
-            onSenderTypeChange(availableSendersChoices[0].type);
+        if (!availableSendersChoices || transferSettings === undefined) {
+            return;
         }
-    }, [JSON.stringify(availableSendersChoices), isIdle]);
+
+        const currentStillAvailable =
+            selectedSenderType !== undefined &&
+            availableSendersChoices.some(c => c.type === selectedSenderType);
+        if (currentStillAvailable) {
+            return;
+        }
+
+        const next = pickPreferredTonSenderType(availableSendersChoices, savedFeeMethod);
+        if (next) {
+            setSelectedSenderType(next);
+        }
+    }, [JSON.stringify(availableSendersChoices), isIdle, savedFeeMethod, transferSettings, selectedSenderType]);
 
     const image = nftItem.previews?.find(item => item.resolution === '100x100');
 

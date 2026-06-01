@@ -6,8 +6,14 @@ import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { ConfirmView, ConfirmViewButtonsSlot } from './ConfirmView';
 import {
     TonSenderChoiceUserAvailable,
+    TonSenderTypeUserAvailable,
     useAvailableTonSendersChoices
 } from '../../hooks/blockchain/useSender';
+import {
+    pickPreferredTonSenderType,
+    useMutateTransferFeeMethod,
+    useTransferSettingsQuery
+} from '../../state/transfer-settings';
 import {
     TonAsset,
     tonAssetAddressToString
@@ -97,8 +103,27 @@ export const ConfirmTransferView: FC<
         rest.recipient.address.address,
         assetAmount
     );
+
+    const { data: transferSettings } = useTransferSettingsQuery();
+    const { mutate: persistFeeMethod } = useMutateTransferFeeMethod();
+    const savedFeeMethod = transferSettings?.feeMethod ?? null;
+
+    const [gaslessUnavailableAssetIds, setGaslessUnavailableAssetIds] = useState<Set<string>>(
+        () => new Set()
+    );
+
+    const tonAssetId = isTonAsset(assetAmount.asset) ? assetAmount.asset.id : undefined;
+
+    const filteredAvailableTonSendersChoices = useMemo(() => {
+        if (!availableTonSendersChoices) return undefined;
+        if (!tonAssetId || !gaslessUnavailableAssetIds.has(tonAssetId)) {
+            return availableTonSendersChoices;
+        }
+        return availableTonSendersChoices.filter(c => c.type !== 'gasless');
+    }, [availableTonSendersChoices, gaslessUnavailableAssetIds, tonAssetId]);
+
     const availableSenderChoices = isTonBlockchainAssetTransfer
-        ? availableTonSendersChoices
+        ? filteredAvailableTonSendersChoices
         : availableTronSendersChoices;
 
     const [selectedSenderType, setSelectedSenderType] = useState<AllChainsSenderType>();
@@ -117,10 +142,13 @@ export const ConfirmTransferView: FC<
             }
 
             if (!isTronSenderOption(choice) || choice.isEnoughBalance) {
-                return setSelectedSenderType(type);
+                setSelectedSenderType(type);
+                if (!isTronSenderOption(choice)) {
+                    persistFeeMethod(type as TonSenderTypeUserAvailable);
+                }
             }
         },
-        [availableSenderChoices, navigate, rest.onClose]
+        [availableSenderChoices, persistFeeMethod]
     );
 
     const estimation = useEstimateTransfer({
@@ -137,19 +165,37 @@ export const ConfirmTransferView: FC<
         senderType: selectedSenderType!
     });
 
+    const filteredAvailableTonSendersChoicesKey = JSON.stringify(
+        filteredAvailableTonSendersChoices
+    );
+    const availableTronSendersChoicesKey = JSON.stringify(availableTronSendersChoices);
+
     useEffect(() => {
-        if (!mutation.isIdle || !isTonBlockchainAssetTransfer || selectedSenderType) {
+        if (!mutation.isIdle || !isTonBlockchainAssetTransfer) {
+            return;
+        }
+        if (!filteredAvailableTonSendersChoices || transferSettings === undefined) {
             return;
         }
 
-        if (availableTonSendersChoices) {
-            setSelectedSenderType(availableTonSendersChoices[0].type);
+        const currentStillAvailable =
+            selectedSenderType !== undefined &&
+            filteredAvailableTonSendersChoices.some(c => c.type === selectedSenderType);
+        if (currentStillAvailable) {
+            return;
+        }
+
+        const next = pickPreferredTonSenderType(filteredAvailableTonSendersChoices, savedFeeMethod);
+        if (next) {
+            setSelectedSenderType(next);
         }
     }, [
         selectedSenderType,
         isTonBlockchainAssetTransfer,
-        JSON.stringify(availableTonSendersChoices),
-        mutation.isIdle
+        mutation.isIdle,
+        savedFeeMethod,
+        transferSettings,
+        filteredAvailableTonSendersChoicesKey
     ]);
     useEffect(() => {
         if (!mutation.isIdle || isTonBlockchainAssetTransfer || selectedSenderType) {
@@ -163,7 +209,7 @@ export const ConfirmTransferView: FC<
     }, [
         selectedSenderType,
         isTonBlockchainAssetTransfer,
-        JSON.stringify(availableTronSendersChoices),
+        availableTronSendersChoicesKey,
         mutation.isIdle
     ]);
 
@@ -212,6 +258,34 @@ export const ConfirmTransferView: FC<
             })
         );
     }, [isMax, assetAmount, selectedSenderType, assetWeiBalance?.toFixed(0), tokenToTonRate.data]);
+
+    // Send-max + gasless edge case: when the emulated gasless fee >= the amount being sent,
+    // gasless can't cover this token — drop it so the priority effect re-selects battery
+    // (if available) or external.
+    useEffect(() => {
+        if (!isMax) return;
+        if (selectedSenderType !== 'gasless') return;
+        if (!tonAssetId) return;
+        if (gaslessUnavailableAssetIds.has(tonAssetId)) return;
+
+        const fee = estimation.data?.fee;
+        if (!fee || fee.type !== 'ton-asset') return;
+        if (fee.extra.asset.id !== tonAssetId) return;
+        if (fee.extra.weiAmount.lt(assetAmountPatched.weiAmount)) return;
+
+        setGaslessUnavailableAssetIds(prev => {
+            const next = new Set(prev);
+            next.add(tonAssetId);
+            return next;
+        });
+    }, [
+        isMax,
+        selectedSenderType,
+        tonAssetId,
+        gaslessUnavailableAssetIds,
+        estimation.data,
+        assetAmountPatched.weiAmount
+    ]);
 
     const noAvailableTronSenders = (
         availableSenderChoices as (TonSenderChoiceUserAvailable | TronSenderOption)[]

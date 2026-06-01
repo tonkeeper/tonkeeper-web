@@ -401,8 +401,23 @@ export interface ResponseTransformer<T> {
 export class JSONApiResponse<T> {
     constructor(public raw: Response, private transformer: ResponseTransformer<T> = (jsonValue: any) => jsonValue) {}
 
+    // NOTE: manual modification — re-apply after regenerating from the OpenAPI spec.
+    // /wallet/emulate returns 200 with an empty body when the wallet has no TON
+    // and no battery; without this guard the user sees "Failed to execute 'json' on 'Response'"
+    // on the confirm screen.
     async value(): Promise<T> {
-        return this.transformer(await this.raw.json());
+        const text = await this.raw.text();
+        if (!text) {
+            throw new EmptyResponseBodyError(this.raw);
+        }
+        return this.transformer(JSON.parse(text));
+    }
+}
+
+export class EmptyResponseBodyError extends Error {
+    constructor(public response: Response) {
+        super(`Empty response body from ${response.url}`);
+        this.name = 'EmptyResponseBodyError';
     }
 }
 

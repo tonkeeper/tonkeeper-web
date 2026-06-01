@@ -88,6 +88,8 @@ export enum QueryKey {
     trc20TrxDefaultFee = 'trc20TrxDefaultFee',
     trc20FreeTransfersConfig = 'trc20FreeTransfersConfig',
 
+    transferSettings = 'transferSettings',
+
     legacyPlugins = 'legacyPlugins',
 
     staking = 'staking'
