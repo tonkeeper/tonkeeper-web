@@ -108,7 +108,18 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
             return tonConnectSignData(message.id, origin, message.params[0]);
         }
         case 'tonapi_request': {
-            return createTonapiRequest(message.params[0], message.params[1]);
+            const isConnected = await isDappConnectedToExtension(origin);
+            if (!isConnected) {
+                throw new TonConnectError(
+                    "dApp don't have an access to tonapi",
+                    CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+                );
+            }
+            return createTonapiRequest(
+                origin,
+                message.params[0] as string,
+                message.params[1] as RequestInit | undefined
+            );
         }
         case 'tonLink_intercept': {
             return processInterceptTonLink(origin, message.params[0]);
