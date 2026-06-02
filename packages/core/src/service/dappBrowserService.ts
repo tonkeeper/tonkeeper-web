@@ -65,8 +65,12 @@ export async function patchBrowserTab(storage: IStorage, tab: BrowserTabStored):
 
 const duckDuckGoSuggestionsSchema = z.array(z.object({ phrase: z.string() }));
 
+const SEARCH_ENGINE_RECOMMENDATIONS_URL = 'https://duckduckgo.com/ac/';
+
 export async function getSearchEngineRecommendations(query: string) {
-    const result = await (await fetch(`https://duckduckgo.com/ac/?q=${query}`)).json();
+    const url = new URL(SEARCH_ENGINE_RECOMMENDATIONS_URL);
+    url.searchParams.set('q', query);
+    const result = await (await fetch(url)).json();
     const parsed = duckDuckGoSuggestionsSchema.parse(result);
 
     return parsed.map(i => i.phrase);
