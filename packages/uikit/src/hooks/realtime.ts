@@ -8,6 +8,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 export const useRealtimeUpdatesInvalidation = () => {
     const { data: activeAccount } = useActiveAccountQuery();
     const activeTonWallet = activeAccount?.activeTonWallet;
+    const activeTonWalletAddress = activeTonWallet?.rawAddress;
 
     const client = useQueryClient();
     const api = useActiveApi();
@@ -21,12 +22,12 @@ export const useRealtimeUpdatesInvalidation = () => {
     const apiPath = `${api.tonApiV2.basePath}/v2/sse/accounts/transactions`;
 
     useEffect(() => {
-        if (!apiKey || !activeTonWallet) {
+        if (!apiKey || !activeTonWalletAddress) {
             return;
         }
 
         const url = new URL(apiPath);
-        url.searchParams.append('accounts', activeTonWallet.rawAddress);
+        url.searchParams.append('accounts', activeTonWalletAddress);
         url.searchParams.append('token', apiKey);
 
         const sse = new EventSource(url.toString());
@@ -37,7 +38,7 @@ export const useRealtimeUpdatesInvalidation = () => {
              */
             setTimeout(() => {
                 client.invalidateQueries(
-                    anyOfKeysParts(QueryKey.wallet, QueryKey.account, activeTonWallet.rawAddress)
+                    anyOfKeysParts(QueryKey.wallet, QueryKey.account, activeTonWalletAddress)
                 );
             }, 500);
         };
@@ -55,5 +56,5 @@ export const useRealtimeUpdatesInvalidation = () => {
         return () => {
             sse.close();
         };
-    }, [activeTonWallet, apiPath, apiKey, client]);
+    }, [activeTonWalletAddress, apiPath, apiKey, client]);
 };
