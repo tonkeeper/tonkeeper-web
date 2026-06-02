@@ -123,7 +123,15 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
             );
         }
         case 'tonapi_request': {
+            const isConnected = await isDappConnectedToExtension(origin);
+            if (!isConnected) {
+                throw new TonConnectError(
+                    "dApp don't have an access to tonapi",
+                    CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+                );
+            }
             return createTonapiRequest(
+                origin,
                 message.params[0] as string,
                 message.params[1] as RequestInit | undefined
             );
