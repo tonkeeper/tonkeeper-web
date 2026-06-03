@@ -51,7 +51,7 @@
         "styled-components": "^6.1.1",
         "tronweb": "^6.0.0",
         "tweetnacl": "^1.0.3",
-        "uuid": "^9.0.0"
+        "uuid": "^14.0.0"
     },
     "devDependencies": {
         "@types/react": "^18.0.26",
