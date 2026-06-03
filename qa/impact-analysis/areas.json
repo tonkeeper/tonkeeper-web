@@ -1,0 +1,828 @@
+{
+  "_comment": "Maps glob-style path patterns to affected test modules. Order matters: more specific patterns first.",
+
+  "_deviceMatrix": {
+    "_comment": "Defines which real devices/OS combos are required per platform token. Used to build the Device Matrix section.",
+    "Web": {
+      "required": ["Chrome/macOS", "Safari/macOS"],
+      "recommended": ["Chrome/Windows", "Firefox/macOS"],
+      "note": "Primary browser is Chrome; Safari matters for crypto APIs and clipboard"
+    },
+    "Desktop": {
+      "required": ["macOS", "Windows"],
+      "recommended": ["Linux (AppImage)"],
+      "note": "Electron IPC, keychain (keytar), and tray behaviour differ between macOS and Windows"
+    },
+    "Extension": {
+      "required": ["Chrome MV3", "Firefox MV2"],
+      "recommended": [],
+      "note": "Chrome ships MV3 (service worker), Firefox ships MV2 (background page) — background lifecycle differs"
+    },
+    "Mobile": {
+      "required": ["iOS (iPhone)"],
+      "recommended": ["Android", "iPad (tablet layout)"],
+      "note": "Capacitor bridge, WKWebView clipboard, and biometry differ on iOS vs Android"
+    },
+    "TWA": {
+      "required": ["Android Telegram"],
+      "recommended": ["iOS Telegram"],
+      "note": "TMA JS SDK behaves differently on Android vs iOS Telegram clients"
+    }
+  },
+
+  "patterns": [
+    {
+      "pattern": ".github/**",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "CI/CD workflows and issue templates — no functional test impact"
+    },
+    {
+      "pattern": "scripts/**",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Build and release scripts — no functional test impact"
+    },
+    {
+      "pattern": "turbo.json",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Turborepo config — no functional test impact"
+    },
+    {
+      "pattern": "yarn.lock",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Dependency lockfile — no functional test impact"
+    },
+    {
+      "pattern": "package.json",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Root package.json — no functional test impact"
+    },
+    {
+      "pattern": "*.md",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Documentation files — no functional test impact"
+    },
+    {
+      "pattern": ".eslintignore",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Linter config — no functional test impact"
+    },
+    {
+      "pattern": "CONTRIBUTING.md",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Contributor guide — no functional test impact"
+    },
+    {
+      "pattern": "CLAUDE.md",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "AI assistant instructions — no functional test impact"
+    },
+    {
+      "pattern": "packages/core/resource/**",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "API client generation scripts and Dockerfiles — no functional test impact"
+    },
+    {
+      "pattern": "packages/core/task/**",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Build task scripts — no functional test impact"
+    },
+    {
+      "pattern": "packages/core/tsconfig.task.json",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "TypeScript config for build tasks — no functional test impact"
+    },
+    {
+      "pattern": "packages/*/package.json",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Shared",
+      "note": "Package manifests — no functional test impact"
+    },
+    {
+      "pattern": "apps/web-swap-widget/src/**",
+      "modules": ["Swap"],
+      "platformScope": "Web-only",
+      "note": "Embeddable swap widget SPA — source code"
+    },
+    {
+      "pattern": "apps/web-swap-widget/**",
+      "modules": ["_IGNORE_"],
+      "platformScope": "Web-only",
+      "note": "Swap widget static assets, configs, and manifests — no functional test impact"
+    },
+    {
+      "pattern": "apps/extension/**",
+      "modules": ["Extension"],
+      "platformScope": "Extension-only",
+      "devices": ["Chrome MV3", "Firefox MV2"],
+      "note": "Extension-specific code (popup, background, content script)"
+    },
+    {
+      "pattern": "apps/extension/src/background/**",
+      "modules": ["Extension"],
+      "platformScope": "Extension-only",
+      "devices": ["Chrome MV3", "Firefox MV2"],
+      "note": "Service worker (Chrome MV3) vs background page (Firefox MV2) — lifecycle differs"
+    },
+    {
+      "pattern": "apps/mobile/**",
+      "modules": ["Mobile Dapp Browser", "Mobile"],
+      "platformScope": "Mobile-only",
+      "devices": ["iOS (iPhone)", "Android", "iPad (tablet layout)"],
+      "note": "Capacitor mobile app"
+    },
+    {
+      "pattern": "apps/twa/**",
+      "modules": ["TWA"],
+      "platformScope": "TWA-limited",
+      "devices": ["Android Telegram", "iOS Telegram"],
+      "note": "Telegram Mini App"
+    },
+    {
+      "pattern": "apps/desktop/**",
+      "modules": ["Desktop"],
+      "platformScope": "Desktop-layout",
+      "devices": ["macOS", "Windows"],
+      "note": "Electron desktop app"
+    },
+    {
+      "pattern": "apps/desktop/src/electron/**",
+      "modules": ["Desktop"],
+      "platformScope": "Desktop-layout",
+      "devices": ["macOS", "Windows", "Linux (AppImage)"],
+      "note": "Electron main process — IPC, keychain (keytar), auto-update, tray differ per OS"
+    },
+    {
+      "pattern": "apps/web/**",
+      "modules": ["Web"],
+      "platformScope": "Web-only",
+      "devices": ["Chrome/macOS", "Safari/macOS", "Chrome/Windows"],
+      "note": "Web SPA"
+    },
+    {
+      "pattern": "packages/locales/**",
+      "modules": ["i18n"],
+      "platformScope": "Shared",
+      "note": "Translation files — check all pluralisation and string rendering"
+    },
+    {
+      "pattern": "packages/core/src/service/sign/**",
+      "modules": ["Send", "Ton Connect"],
+      "platformScope": "Shared",
+      "note": "Signing service — affects all transaction confirmation flows"
+    },
+    {
+      "pattern": "packages/core/src/service/meta/**",
+      "modules": ["Settings", "Home"],
+      "platformScope": "Shared",
+      "note": "Wallet metadata service — names, icons, account config"
+    },
+    {
+      "pattern": "packages/core/src/tonConsoleApi/**",
+      "modules": ["Pro", "Multisig"],
+      "platformScope": "Shared",
+      "note": "TonConsole API — Pro and multisig backend"
+    },
+    {
+      "pattern": "packages/core/src/tonkeeperApiGenerated/**",
+      "modules": ["Home", "Send", "Swap", "Staking"],
+      "platformScope": "Shared",
+      "note": "Auto-generated Tonkeeper backend API client"
+    },
+    {
+      "pattern": "packages/core/src/tronApi/**",
+      "modules": ["Send"],
+      "platformScope": "Shared",
+      "note": "TRON API client — affects USDT TRC20 send flow"
+    },
+    {
+      "pattern": "packages/core/src/utils/**",
+      "modules": ["Home", "Send", "Activity"],
+      "platformScope": "Shared",
+      "note": "Core utilities — formatters, validators; broad but not full regression"
+    },
+    {
+      "pattern": "packages/core/src/service/__tests__/**",
+      "modules": ["Settings", "Send"],
+      "platformScope": "Shared",
+      "note": "Core service unit tests — no runtime impact"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/useDebuggingTools*",
+      "modules": ["Settings"],
+      "platformScope": "Shared",
+      "note": "Debug tools hook — dev menu only"
+    },
+    {
+      "pattern": "packages/core/src/service/cryptoService*",
+      "modules": ["Settings", "Send", "Onboarding"],
+      "platformScope": "Shared",
+      "note": "Crypto / mnemonic service — affects key derivation and password verification"
+    },
+    {
+      "pattern": "packages/core/src/service/passwordService*",
+      "modules": ["Settings", "Onboarding"],
+      "platformScope": "Shared",
+      "note": "Password service — affects PIN / biometry auth"
+    },
+    {
+      "pattern": "packages/core/src/tonkeeperApi/**",
+      "modules": ["Home", "Send", "Swap", "Staking"],
+      "platformScope": "Shared",
+      "note": "Tonkeeper backend API (tonendpoint) — rates, config, features"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/deeplinks/**",
+      "modules": ["Send", "Swap", "Ton Connect"],
+      "platformScope": "Shared",
+      "note": "Deeplink hooks — affects ton:// / tonkeeper:// URL handling"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/translation*",
+      "modules": ["i18n"],
+      "platformScope": "Shared",
+      "note": "Translation hook — affects all UI strings"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/useAreaClick*",
+      "modules": ["Send", "Activity", "Home"],
+      "platformScope": "Shared",
+      "note": "Click propagation hook — affects copy/tap on address rows"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/useSortableDnd*",
+      "modules": ["Settings", "DnD"],
+      "platformScope": "Shared",
+      "note": "DnD sensors — affects wallet/jetton reorder"
+    },
+    {
+      "pattern": "packages/uikit/src/components/Notification*",
+      "modules": ["Send", "Staking", "Activity"],
+      "platformScope": "Shared",
+      "note": "Notification bottom sheet — used by send/stake confirmations"
+    },
+    {
+      "pattern": "packages/uikit/src/components/shared/**",
+      "modules": ["Home", "Send", "Swap", "Activity"],
+      "platformScope": "Shared",
+      "note": "Shared UI components — broad but not full-regression"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/settings/**",
+      "modules": ["Settings"],
+      "platformScope": "Shared",
+      "note": "Settings pages"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/coin/**",
+      "modules": ["Jettons", "Activity"],
+      "platformScope": "Shared",
+      "note": "Jetton/coin page"
+    },
+    {
+      "pattern": "packages/uikit/src/state/swap/**",
+      "modules": ["Swap"],
+      "platformScope": "Shared",
+      "note": "Swap state hooks"
+    },
+    {
+      "pattern": "packages/uikit/src/state/mnemonic*",
+      "modules": ["Settings", "Onboarding"],
+      "platformScope": "Shared",
+      "note": "Mnemonic state — affects backup and import flows"
+    },
+    {
+      "pattern": "packages/uikit/src/state/folders*",
+      "modules": ["Settings", "DnD"],
+      "platformScope": "Shared",
+      "note": "Wallet folders / categories state"
+    },
+    {
+      "pattern": "packages/core/src/analytics/generated/**",
+      "modules": ["Analytics"],
+      "platformScope": "Shared",
+      "note": "Auto-generated analytics API client — schema change only, not a logic change"
+    },
+    {
+      "pattern": "packages/core/src/tonApiV2/**",
+      "modules": ["Activity", "Home", "Send"],
+      "platformScope": "Shared",
+      "note": "Auto-generated TonAPI v2 client"
+    },
+    {
+      "pattern": "packages/core/src/swapsApiGenerated/**",
+      "modules": ["Swap"],
+      "platformScope": "Shared",
+      "note": "Auto-generated swap API client"
+    },
+    {
+      "pattern": "packages/core/src/batteryApi/**",
+      "modules": ["Battery"],
+      "platformScope": "Shared",
+      "note": "Auto-generated Battery API client"
+    },
+    {
+      "pattern": "packages/core/src/2faApi/**",
+      "modules": ["2FA", "Settings"],
+      "platformScope": "Shared",
+      "note": "Auto-generated 2FA API client"
+    },
+    {
+      "pattern": "packages/core/src/service/tonConnect/**",
+      "modules": ["Ton Connect"],
+      "platformScope": "Shared",
+      "note": "TonConnect core service"
+    },
+    {
+      "pattern": "packages/core/src/service/ton-blockchain/**",
+      "modules": ["Send", "Activity"],
+      "platformScope": "Shared",
+      "note": "TON blockchain service — affects send and history"
+    },
+    {
+      "pattern": "packages/core/src/service/tron-blockchain/**",
+      "modules": ["Send", "Activity"],
+      "platformScope": "Shared",
+      "note": "TRON blockchain service"
+    },
+    {
+      "pattern": "packages/core/src/service/ledger/**",
+      "modules": ["Ledger"],
+      "platformScope": "Shared",
+      "devices": ["Chrome/macOS", "Chrome/Windows", "macOS", "Windows"],
+      "note": "Ledger — WebHID/WebUSB available in Chrome only; not in Safari/Firefox"
+    },
+    {
+      "pattern": "packages/core/src/service/keystone/**",
+      "modules": ["Keystone"],
+      "platformScope": "Shared",
+      "devices": ["Chrome/macOS", "Chrome/Windows", "macOS", "Windows"],
+      "note": "Keystone — QR-based, works where camera is available"
+    },
+    {
+      "pattern": "packages/core/src/service/wallet/**",
+      "modules": ["Settings", "Send"],
+      "platformScope": "Shared",
+      "note": "Wallet management service"
+    },
+    {
+      "pattern": "packages/core/src/analytics/**",
+      "modules": ["Analytics"],
+      "platformScope": "Shared",
+      "note": "Analytics events and tracking"
+    },
+    {
+      "pattern": "packages/core/src/swapsApi/**",
+      "modules": ["Swap"],
+      "platformScope": "Shared",
+      "note": "Swap API client"
+    },
+    {
+      "pattern": "packages/core/src/pro/**",
+      "modules": ["Pro"],
+      "platformScope": "Shared",
+      "note": "Pro subscription service"
+    },
+    {
+      "pattern": "packages/core/src/entries/account*",
+      "modules": ["Settings", "Home"],
+      "platformScope": "Shared",
+      "note": "Account model — affects wallet switching and settings"
+    },
+    {
+      "pattern": "packages/core/src/entries/crypto/**",
+      "modules": ["Send", "Settings"],
+      "platformScope": "Shared",
+      "note": "Crypto key entries"
+    },
+    {
+      "pattern": "packages/core/src/entries/**",
+      "modules": ["Home", "Settings"],
+      "platformScope": "Shared",
+      "note": "Core data model entries"
+    },
+    {
+      "pattern": "packages/core/src/Keys.ts",
+      "modules": ["Home", "Settings", "Send", "Swap", "Activity"],
+      "platformScope": "Shared",
+      "note": "Storage keys — broad impact on all persisted state"
+    },
+    {
+      "pattern": "packages/core/src/AppSdk.ts",
+      "modules": ["Home", "Settings", "Send", "Swap", "Activity", "Ton Connect"],
+      "platformScope": "Shared",
+      "note": "AppSdk interface — broad platform impact"
+    },
+    {
+      "pattern": "packages/core/src/**",
+      "modules": ["_FULL_REGRESSION_"],
+      "platformScope": "Shared",
+      "note": "Generic core change — requires full regression assessment"
+    },
+    {
+      "pattern": "packages/uikit/src/components/home/**",
+      "modules": ["Home"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/Balance*",
+      "modules": ["Home"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/swap/**",
+      "modules": ["Swap"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/swap/**",
+      "modules": ["Swap"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/transfer/**",
+      "modules": ["Send"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/multi-send/**",
+      "modules": ["Send"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/connect/**",
+      "modules": ["Ton Connect"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/connected-apps/**",
+      "modules": ["Ton Connect", "Settings"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/analytics/**",
+      "modules": ["Analytics"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/blockchain/**",
+      "modules": ["Send", "Activity"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/browser/**",
+      "modules": ["Ton Connect", "Browser"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/desktop/**",
+      "modules": ["Desktop"],
+      "platformScope": "Desktop-layout",
+      "devices": ["macOS", "Windows"]
+    },
+    {
+      "pattern": "packages/uikit/src/components/activity/**",
+      "modules": ["Activity"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/history/**",
+      "modules": ["Activity"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/staking/**",
+      "modules": ["Staking"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/staking/**",
+      "modules": ["Staking"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/settings/**",
+      "modules": ["Settings"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/settings/**",
+      "modules": ["Settings"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/preferences/**",
+      "modules": ["Settings"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/jettons/**",
+      "modules": ["Jettons", "DnD"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/account/**",
+      "modules": ["Settings", "DnD"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/nft/**",
+      "modules": ["NFT"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/nft/**",
+      "modules": ["NFT"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/multisig/**",
+      "modules": ["Multisig"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/manage-multisig-wallets/**",
+      "modules": ["Multisig"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/multisig-orders/**",
+      "modules": ["Multisig"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/desktop/**",
+      "modules": ["Desktop", "DnD"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/browser/**",
+      "modules": ["Browser", "Ton Connect"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/browser/**",
+      "modules": ["Browser"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/pro/**",
+      "modules": ["Pro"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/ledger/**",
+      "modules": ["Ledger"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/mobile-pro/**",
+      "modules": ["Mobile", "Pro"],
+      "platformScope": "Mobile-only",
+      "devices": ["iOS (iPhone)", "iPad (tablet layout)"]
+    },
+    {
+      "pattern": "packages/uikit/src/components/dashboard/**",
+      "modules": ["Home"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/dashboard/**",
+      "modules": ["Home"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/tokens/**",
+      "modules": ["Jettons", "Home"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/desktop-pages/coin/**",
+      "modules": ["Jettons", "Activity"],
+      "platformScope": "Desktop-layout"
+    },
+    {
+      "pattern": "packages/uikit/src/components/create/**",
+      "modules": ["Onboarding"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/components/skeletons/**",
+      "modules": ["Home"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/libs/queryKey.ts",
+      "modules": ["Home", "Settings", "Send", "Swap", "Activity"],
+      "platformScope": "Shared",
+      "note": "React Query cache keys — stale cache issues possible across all modules"
+    },
+    {
+      "pattern": "packages/uikit/src/libs/**",
+      "modules": ["Home", "Send", "Activity"],
+      "platformScope": "Shared",
+      "note": "uikit lib utilities"
+    },
+    {
+      "pattern": "packages/uikit/src/providers/**",
+      "modules": ["Home", "Settings"],
+      "platformScope": "Shared",
+      "note": "React context providers — app-wide state"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/activity/**",
+      "modules": ["Activity"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/home/**",
+      "modules": ["Home"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/import/**",
+      "modules": ["Onboarding"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/browser/**",
+      "modules": ["Browser", "Ton Connect"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/staking/**",
+      "modules": ["Staking"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/swap/**",
+      "modules": ["Swap"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/pages/signer/**",
+      "modules": ["Keystone"],
+      "platformScope": "Shared",
+      "note": "Signer (Keystone/external signer) pairing pages"
+    },
+    {
+      "pattern": "packages/uikit/src/state/staking/**",
+      "modules": ["Staking"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/state/ton/**",
+      "modules": ["Home", "Send", "Activity"],
+      "platformScope": "Shared",
+      "note": "TON state hooks — balance, rates, account"
+    },
+    {
+      "pattern": "packages/uikit/src/state/tron/**",
+      "modules": ["Send"],
+      "platformScope": "Shared",
+      "note": "TRON state — USDT TRC20 send"
+    },
+    {
+      "pattern": "packages/uikit/src/state/portfolio/**",
+      "modules": ["Home"],
+      "platformScope": "Shared",
+      "note": "Portfolio / total balance state"
+    },
+    {
+      "pattern": "packages/uikit/src/state/dashboard/**",
+      "modules": ["Home", "Desktop"],
+      "platformScope": "Desktop-layout",
+      "note": "Dashboard state — desktop layout"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/pro/**",
+      "modules": ["Pro"],
+      "platformScope": "Shared"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/keyboard/**",
+      "modules": ["Send", "Swap"],
+      "platformScope": "Shared",
+      "note": "Keyboard hooks — affects amount input fields"
+    },
+    {
+      "pattern": "packages/uikit/src/hooks/router/**",
+      "modules": ["Home", "Settings"],
+      "platformScope": "Shared",
+      "note": "Router hooks — navigation state"
+    },
+    {
+      "pattern": "packages/uikit/src/mobile-pro-pages/**",
+      "modules": ["Mobile", "Pro"],
+      "platformScope": "Mobile-only",
+      "devices": ["iOS (iPhone)", "iPad (tablet layout)"]
+    },
+    {
+      "pattern": "packages/uikit/src/components/confirm-modal/**",
+      "modules": ["Send", "Ton Connect"],
+      "platformScope": "Shared",
+      "note": "Transaction confirmation modal"
+    },
+    {
+      "pattern": "packages/uikit/src/components/ios/**",
+      "modules": ["Mobile"],
+      "platformScope": "Mobile-only",
+      "devices": ["iOS (iPhone)"],
+      "note": "iOS-specific UI components"
+    },
+    {
+      "pattern": "packages/uikit/src/components/modals/**",
+      "modules": ["Home", "Send", "Settings"],
+      "platformScope": "Shared",
+      "note": "Generic modal components"
+    },
+    {
+      "pattern": "packages/uikit/src/**",
+      "modules": ["_FULL_REGRESSION_"],
+      "platformScope": "Shared",
+      "note": "Generic uikit change — review affected components manually"
+    }
+  ],
+
+  "moduleAliases": {
+    "Mobile": ["Mobile Dapp Browser"],
+    "Desktop": ["Desktop-layout"],
+    "DnD": ["Settings"]
+  },
+
+  "_testpadSectionModules": {
+    "Onboarding": ["Onboarding"],
+    "Add wallet": ["Onboarding"],
+    "Wallet version management": ["Settings"],
+    "Wallet management": ["Settings", "DnD"],
+    "Main screen": ["Home"],
+    "Buy +": ["Home"],
+    "Receive ↓": ["Home"],
+    "Send TON": ["Send"],
+    "Scaled UI tokens": ["Send", "Jettons"],
+    "Send USDT TRC20": ["Send"],
+    "Swap Omniston": ["Swap"],
+    "Staking Screen": ["Staking"],
+    "Tokens": ["Jettons"],
+    "Collectibles": ["NFT"],
+    "History screen": ["Activity"],
+    "Ton Connect 2.0": ["Ton Connect"],
+    "Preferences": ["Settings"],
+    "Settings": ["Settings"],
+    "Deeplinks / QR code scanner": ["Send"],
+    "PRO Subscription": ["Pro"],
+    "PRO features": ["Pro", "Multisig", "DnD", "Send", "Analytics"],
+    "Hardware wallets": ["Ledger", "Keystone"],
+    "Other options": ["Settings"],
+    "Desktop App": ["Desktop"],
+    "Browser Extension": ["Extension"],
+    "Web Browser specific": ["Web"],
+    "Smoke checks": ["Home", "Send", "Swap", "Ton Connect", "Mobile Dapp Browser"],
+    "Home Screen Specifics": ["Home", "Battery"],
+    "Copy Address specifics": ["Send", "Activity"],
+    "Ton Connect — signData": ["Ton Connect"],
+    "Send — extended": ["Send"],
+    "Swap — extended": ["Swap"],
+    "Staking — stake_meta": ["Staking", "Activity"],
+    "Drag and Drop — extended": ["DnD", "Desktop"],
+    "Analytics verification": ["Analytics"],
+    "Desktop — Pro features": ["Desktop", "Pro"],
+    "Extension — TC notification": ["Extension", "Ton Connect"],
+    "Mobile — extended": ["Mobile", "Mobile Dapp Browser"],
+    "Release checklist": ["Settings"]
+  },
+
+  "_fullRegressionModules": [
+    "Smoke",
+    "Home",
+    "Send",
+    "Swap",
+    "Activity",
+    "Staking",
+    "Settings",
+    "Ton Connect",
+    "Extension",
+    "NFT",
+    "Multisig",
+    "Analytics",
+    "Jettons",
+    "Battery",
+    "Pro",
+    "Ledger",
+    "Keystone",
+    "Browser",
+    "Onboarding",
+    "i18n"
+  ]
+}
