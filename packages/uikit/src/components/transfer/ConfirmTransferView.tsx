@@ -33,6 +33,7 @@ import { Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
+import { NotEnoughBatteryBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBatteryBalanceError';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     const k = asset.id === TON_USDT_ASSET.id ? 0.9 : 0.5;
@@ -97,8 +98,16 @@ export const ConfirmTransferView: FC<
         rest.recipient.address.address,
         assetAmount
     );
+    const [isBatteryUnavailable, setIsBatteryUnavailable] = useState(false);
+    const availableTonSenderChoicesFiltered = useMemo(() => {
+        if (!isBatteryUnavailable) {
+            return availableTonSendersChoices;
+        }
+
+        return availableTonSendersChoices?.filter(choice => choice.type !== 'battery');
+    }, [availableTonSendersChoices, isBatteryUnavailable]);
     const availableSenderChoices = isTonBlockchainAssetTransfer
-        ? availableTonSendersChoices
+        ? availableTonSenderChoicesFiltered
         : availableTronSendersChoices;
 
     const [selectedSenderType, setSelectedSenderType] = useState<AllChainsSenderType>();
@@ -138,17 +147,30 @@ export const ConfirmTransferView: FC<
     });
 
     useEffect(() => {
+        setIsBatteryUnavailable(false);
+    }, [rest.recipient, assetAmount, isMax]);
+
+    useEffect(() => {
+        if (selectedSenderType !== 'battery' || !(estimation.error instanceof NotEnoughBatteryBalanceError)) {
+            return;
+        }
+
+        setIsBatteryUnavailable(true);
+        setSelectedSenderType('external');
+    }, [selectedSenderType, estimation.error]);
+
+    useEffect(() => {
         if (!mutation.isIdle || !isTonBlockchainAssetTransfer || selectedSenderType) {
             return;
         }
 
-        if (availableTonSendersChoices) {
-            setSelectedSenderType(availableTonSendersChoices[0].type);
+        if (availableTonSenderChoicesFiltered) {
+            setSelectedSenderType(availableTonSenderChoicesFiltered[0].type);
         }
     }, [
         selectedSenderType,
         isTonBlockchainAssetTransfer,
-        JSON.stringify(availableTonSendersChoices),
+        JSON.stringify(availableTonSenderChoicesFiltered),
         mutation.isIdle
     ]);
     useEffect(() => {
