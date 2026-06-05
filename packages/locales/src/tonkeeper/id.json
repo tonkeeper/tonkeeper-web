@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "Cara lain untuk membeli"
     },
-    "exchange_other_ways": "Cara lain untuk membeli atau menjual TON",
-    "exchange_title": "Beli TON",
+    "exchange_other_ways": "Cara lain untuk membeli atau menjual %{coinSymbol}",
+    "exchange_title": "Beli %{coinSymbol}",
     "import_add_wallet": "Tambah Dompet",
     "import_add_wallet_description": "Buat dompet baru atau tambahkan dompet yang sudah ada.",
     "import_existing_wallet": "Dompet yang Ada",
@@ -152,7 +152,7 @@
     "import_wallet_wrong_words_err": "Frasa tidak benar",
     "info_about_inactive_back": "Kembali",
     "intro_continue_btn": "Mulai",
-    "intro_item1_caption": "Berkat arsitektur unik The Open Network, transaksi TON diselesaikan dalam hitungan detik.",
+    "intro_item1_caption": "Berkat arsitektur unik The Open Network, transaksi %{chainName} diselesaikan dalam hitungan detik.",
     "intro_item1_title": "Kecepatan kelas dunia",
     "intro_item2_caption": "Tonkeeper menyimpan kunci kriptografi Anda di perangkat Anda. Semua transaksi dilakukan melalui protokol terdesentralisasi sehingga kripto Anda tidak pernah jatuh ke tangan bursa terpusat.",
     "intro_item2_title": "Keamanan ujung-ke-ujung",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "Salin"
     },
-    "reminder_notifications_caption": "Dapatkan notifikasi saat Anda menerima TON, token, dan NFT.",
+    "reminder_notifications_caption": "Dapatkan notifikasi saat Anda menerima %{coinSymbol}, token, dan NFT.",
     "reminder_notifications_enable_button": "Aktifkan notifikasi",
     "reminder_notifications_later_button": "Nanti",
     "reminder_notifications_title": "Dapatkan pemberitahuan instan",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "Penghasilan tahunan yang diharapkan",
     "staking_enter_amount": "Masukkan jumlah",
     "staking_insufficient_balance": "Saldo tidak mencukupi",
-    "staking_insufficient_recommended_fee_reserve": "Dana tidak mencukupi: saldo dompet harus mencakup cadangan 1 TON dan biaya 0.05 TON.",
+    "staking_insufficient_recommended_fee_reserve": "Dana tidak mencukupi: saldo dompet harus mencakup cadangan 1 %{coinSymbol} dan biaya 0.05 %{coinSymbol}.",
     "staking_max": "MAKS",
     "staking_min_deposit_label": "Setoran minimum",
     "staking_next_cycle_desc_liquid": "Unstake instan tersedia",
     "staking_next_cycle_message": "Siklus berikutnya dalam {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · Deposit min. {minDeposit} TON",
+    "staking_pool_detail": "APY ≈ {apy}% · Deposit min. {minDeposit} %{coinSymbol}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} TON siap ditarik",
+    "staking_ready_withdraw": "{amount} %{coinSymbol} siap ditarik",
     "staking_rewards_after_stake": "Setelah setor",
     "staking_rewards_current": "Saat ini",
-    "staking_rewards_value": "≈ {value} TON",
+    "staking_rewards_value": "≈ {value} %{coinSymbol}",
     "staking_staked": "Dipertaruhkan",
     "staking_title": "Staking",
     "staking_top_up": "Isi ulang",
@@ -346,7 +346,7 @@
         "subtitle": "NFT mungkin tidak aman digunakan karena salah satu dari alasan berikut.",
         "title": "NFT yang belum diverifikasi"
     },
-    "swap_confirm_not_enough_ton_for_fee": "TON tidak cukup untuk biaya jaringan ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbol} tidak cukup untuk biaya jaringan ({required})",
     "swap_exchange_in": "Tukar masuk",
     "swap_expired_refresh": "Swap kedaluwarsa. Perbarui kuotasi",
     "swap_price_impact_description": "Perbedaan antara harga pasar dan perkiraan harga karena ukuran transaksi.",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "Transfer Token",
                 "nftItemTransfer": "Transfer NFT",
-                "tonTransfer": "Transfer TON",
+                "tonTransfer": "Transfer %{coinSymbol}",
                 "unknownTransaction": "Transaksi tidak dikenal"
             }
         }
@@ -1668,10 +1668,10 @@
     "wallet_swap": "Tukar",
     "wallet_title": "Dompet",
     "yesterday": "Kemarin",
-    "staking_pool_liquid_desc": "Saat Anda men-stake TON di pool Tonstakers, Anda menerima token bernama tsTON yang mewakili bagian Anda di pool. Seiring pool mengumpulkan keuntungan, tsTON Anda mewakili jumlah TON yang lebih besar.",
-    "staking_pool_withdraw_date": "{amount} TON akan ditarik pada {date}",
-    "staking_portfolio_pending_withdraw": "{amount} TON akan ditarik setelah siklus berakhir",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} TON akan ditarik dalam {value}",
+    "staking_pool_liquid_desc": "Saat Anda men-stake %{coinSymbol} di pool Tonstakers, Anda menerima token bernama tsTON yang mewakili bagian Anda di pool. Seiring pool mengumpulkan keuntungan, tsTON Anda mewakili jumlah %{coinSymbol} yang lebih besar.",
+    "staking_pool_withdraw_date": "{amount} %{coinSymbol} akan ditarik pada {date}",
+    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbol} akan ditarik setelah siklus berakhir",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbol} akan ditarik dalam {value}",
     "staking_confirm_modal_provider": "Penyedia",
     "staking_confirm_modal_amount": "Jumlah",
     "staking_confirm_modal_apy": "APY",
@@ -1680,7 +1680,7 @@
     "staking_tonstakers_notice": "Staking didasarkan pada smart contract pihak ketiga. Tonkeeper tidak bertanggung jawab atas pengalaman staking.",
     "staking_claim": "Klaim",
     "staking_details_pool_address_label": "Alamat pool",
-    "staking_pending_deposit": "{amount} TON menunggu stake",
-    "staking_pools_min_deposit": "Deposit min. {minDeposit} TON",
+    "staking_pending_deposit": "{amount} %{coinSymbol} menunggu stake",
+    "staking_pools_min_deposit": "Deposit min. {minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "Hanya penarikan penuh yang tersedia"
 }

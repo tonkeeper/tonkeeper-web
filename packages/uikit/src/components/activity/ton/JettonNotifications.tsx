@@ -1,4 +1,5 @@
 import { Address } from '@ton/core';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
     AccountEvent,
@@ -108,7 +109,7 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
         const result: string[] = [];
 
         if (jettonSwap.tonIn) {
-            result.push(`${format(jettonSwap.tonIn)} ${CryptoCurrency.TON}`);
+            result.push(`${format(jettonSwap.tonIn)} ${BRAND_CONFIG.coinSymbol}`);
         } else {
             result.push(
                 `${format(
@@ -122,7 +123,7 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
         }
 
         if (jettonSwap.tonOut) {
-            result.push(`${format(jettonSwap.tonOut)} ${CryptoCurrency.TON}`);
+            result.push(`${format(jettonSwap.tonOut)} ${BRAND_CONFIG.coinSymbol}`);
         } else {
             result.push(
                 `${format(

@@ -3,6 +3,7 @@ import {
     languages,
     localizationText
 } from '@tonkeeper/core/dist/entries/language';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import React, { useCallback, useContext } from 'react';
 
 export type Translation = (text: string, replaces?: Record<string, string | number>) => string;
@@ -48,13 +49,25 @@ export const tReplace = (product: string, replaces?: Record<string, string | num
 
 export const useTWithReplaces = (tSimple: Translation) => {
     return useCallback(
-        (val: string, replaces?: Record<string, string | number>) =>
+        (val: string, replaces?: Record<string, string | number>) => {
+            // Always expose the brand names so any locale string can reference the configurable
+            // native chain/coin via `%{chainName}` / `%{coinName}` / `%{coinSymbol}`. Per-call
+            // `replaces` win over the brand defaults.
+            const brand = BRAND_CONFIG;
+            const withBrand = {
+                chainName: brand.chainName,
+                coinName: brand.coinName,
+                coinSymbol: brand.coinSymbol,
+                ...replaces
+            };
+
             // Forward replaces so i18next can pick the correct plural variant
             // (`key_one` / `key_few` / `key_many` / `key_other`, etc.) per CLDR
             // rules when `count` is provided. Our `%{var}` interpolation is
             // still handled below by `tReplace`; i18next's `{{var}}` syntax is
             // left untouched because we don't use it in our source strings.
-            tReplace(tSimple(val, replaces), replaces),
+            return tReplace(tSimple(val, withBrand), withBrand);
+        },
         [tSimple]
     );
 };
