@@ -1,4 +1,5 @@
 import { Action, JettonSwapAction } from '@tonkeeper/core/dist/tonApiV2';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import React, { FC } from 'react';
 
 import {
@@ -34,7 +35,7 @@ export const swapValue = (
     if (jettonSwap.tonIn !== undefined) {
         assetIn = {
             amount: jettonSwap.tonIn,
-            symbol: CryptoCurrency.TON,
+            symbol: BRAND_CONFIG.coinSymbol,
             decimals: 9
         };
     } else {
@@ -48,7 +49,7 @@ export const swapValue = (
     if (jettonSwap.tonOut !== undefined) {
         assetOut = {
             amount: jettonSwap.tonOut,
-            symbol: CryptoCurrency.TON,
+            symbol: BRAND_CONFIG.coinSymbol,
             decimals: 9
         };
     } else {

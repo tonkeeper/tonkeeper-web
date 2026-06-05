@@ -1,4 +1,5 @@
 import { BLOCKCHAIN_NAME } from '../../crypto';
+import { BRAND_CONFIG } from '../../../config/brand';
 import { packAssetId } from './basic-asset';
 import { TonAsset } from './ton-asset';
 import { TronAsset } from './tron-asset';
@@ -33,9 +34,10 @@ export const TRON_TRX_ASSET: TronAsset = {
 
 export const TON_ASSET: TonAsset = {
     id: packAssetId(BLOCKCHAIN_NAME.TON, 'TON'),
-    symbol: 'TON',
-    name: 'Ton Coin',
+    symbol: BRAND_CONFIG.coinSymbol,
+    name: BRAND_CONFIG.coinName,
     decimals: 9,
+    // NOTE: `address` and the `id` above are protocol identifiers — keep the literal 'TON'.
     address: 'TON',
     blockchain: BLOCKCHAIN_NAME.TON,
     image: 'https://wallet.tonkeeper.com/img/toncoin.svg',

@@ -1,4 +1,5 @@
 import { styled } from 'styled-components';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Body3 } from '../Text';
 import { IconButton } from '../fields/IconButton';
 import { useState } from 'react';
@@ -176,7 +177,7 @@ export const SwapTransactionInfo = () => {
                         {!confirmation ? (
                             <InfoSkeleton />
                         ) : (
-                            <Body3>≈&nbsp;{gasBudgetTon} TON</Body3>
+                            <Body3>≈&nbsp;{gasBudgetTon} {TON_ASSET.symbol}</Body3>
                         )}
                     </InfoRowRight>
                 </InfoRow>

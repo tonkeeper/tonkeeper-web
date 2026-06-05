@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, useMemo } from 'react';
 import styled from 'styled-components';
@@ -31,7 +32,7 @@ const ExtraDetails: FC<{
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatAmount } = useFormatFiat(data, formatDecimals(feeAmount));
 
-    let value = `≈ ${amount} ${CryptoCurrency.TON}`;
+    let value = `≈ ${amount} ${BRAND_CONFIG.coinSymbol}`;
 
     if (fiatAmount) {
         value += ` · ${fiatAmount}`;

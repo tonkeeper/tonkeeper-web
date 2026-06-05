@@ -350,7 +350,7 @@ const AmountCell: FC<{ risk: Risk }> = ({ risk }) => {
     const format = useFormatCoinValue();
 
     const getTonText = () => {
-        return format(risk.ton, TON_ASSET.decimals) + ' TON';
+        return format(risk.ton, TON_ASSET.decimals) + ' ' + TON_ASSET.symbol;
     };
 
     const getJettonsText = () => {

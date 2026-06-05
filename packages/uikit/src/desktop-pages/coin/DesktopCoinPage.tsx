@@ -1,4 +1,5 @@
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
@@ -420,7 +421,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             return null;
         }
         if (token === CryptoCurrency.TON) {
-            return { assetSymbol: 'Toncoin', isUnverified: false };
+            return { assetSymbol: BRAND_CONFIG.coinName, isUnverified: false };
         }
 
         if (seeIfValidTonAddress(decodeURIComponent(token))) {
