@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import { build } from 'vite';
 import child_process from 'child_process';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 
 export const notify = (value: string) => console.log(`----------${value}----------`);
 
@@ -92,6 +93,35 @@ export class ExtensionBuilder {
     private copyLocales() {
         const srcDir = `../../packages/locales/dist/extension`;
         fs.copySync(srcDir, `${this.buildPath}/_locales`, { overwrite: true });
+        this.applyBrandToLocales();
+    }
+
+    /**
+     * The manifest name/description are localized by Chrome from _locales/<lang>/messages.json and
+     * do NOT run our runtime `%{...}` interpolation. Bake the brand values in here at build time so
+     * the extension name stays driven by the single BRAND_CONFIG source (edit it + rebuild).
+     */
+    private applyBrandToLocales() {
+        const localesDir = `${this.buildPath}/_locales`;
+        const subs: Record<string, string> = {
+            '%{chainName}': BRAND_CONFIG.chainName,
+            '%{coinName}': BRAND_CONFIG.coinName,
+            '%{coinSymbol}': BRAND_CONFIG.coinSymbol
+        };
+        for (const lang of fs.readdirSync(localesDir)) {
+            const file = `${localesDir}/${lang}/messages.json`;
+            if (!fs.existsSync(file)) continue;
+            const data = fs.readJsonSync(file) as Record<string, { message?: string }>;
+            for (const key of Object.keys(data)) {
+                const msg = data[key]?.message;
+                if (typeof msg !== 'string') continue;
+                data[key].message = Object.entries(subs).reduce(
+                    (acc, [ph, val]) => acc.split(ph).join(val),
+                    msg
+                );
+            }
+            fs.writeJsonSync(file, data, { spaces: 2 });
+        }
     }
 
     private updateManifestVersion() {
