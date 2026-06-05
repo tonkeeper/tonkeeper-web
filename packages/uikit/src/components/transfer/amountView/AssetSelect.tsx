@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { NATIVE_COIN_ICON } from '@tonkeeper/core/dist/config/coinIcon';
 import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
@@ -82,7 +83,7 @@ const AssetDropDown: FC<{
             >
                 <ListItemPayload>
                     <AssetInfo>
-                        <AssetImage src="https://wallet.tonkeeper.com/img/toncoin.svg"></AssetImage>
+                        <AssetImage src={NATIVE_COIN_ICON}></AssetImage>
                         <Label1>{BRAND_CONFIG.coinSymbol}</Label1>
                         <Amount>{format(info?.balance ?? 0)}</Amount>
                     </AssetInfo>
