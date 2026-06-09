@@ -17,16 +17,9 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 REPORT_TEMPLATE = SKILL_DIR / "report.md"
 TEST_COLLECTION_TEMPLATE = SKILL_DIR / "test-collection-template.txt"
 EXCLUDED_QA_IMPACT_PATHS_FILE = SKILL_DIR / "references" / "excluded-qa-impact-paths.txt"
-RELEASE_BRANCH_RE = re.compile(
-    r"^release/"
-    r"(?:"
-    r"(?P<yy>\d{2})\.(?P<mm>\d{2})\.(?P<it>\d+)"  # YY.MM.Iterator (iOS/Android style)
-    r"|"
-    r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"  # major.minor.patch (web style)
-    r")"
-    r"(?:-(?P<hotfix>\d+))?$"
-)
-# Matches release tags like v4.7.0 or v4.7.0-rc.1 (rc tags are excluded from auto-selection)
+# Releases are identified by tags only, e.g. v4.7.0. Pre-release tags such as
+# v4.7.0-rc.1 / -alpha / -beta / -test.0 carry a `pre` group and are skipped
+# during auto-selection. Release branches are intentionally NOT used.
 RELEASE_TAG_RE = re.compile(
     r"^v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?:-(?P<pre>.+))?$"
 )
@@ -401,10 +394,9 @@ class RegressEntry:
 
 @dataclass(frozen=True, order=True)
 class ReleaseVersion:
-    yy: int
-    mm: int
-    iterator: int
-    hotfix: int
+    major: int
+    minor: int
+    patch: int
 
 
 @dataclass(frozen=True)
@@ -529,7 +521,7 @@ def manual_rerun_message(platform: str, execution_date: str) -> str:
     reports_dir = SKILL_DIR / "reports" / execution_date / platform
     command = f"python3 .codex/skills/tk-impact-analysis/scripts/tk_impact_analysis.py --platform {platform} --write-raw"
     return (
-        "Failed to fetch release branches from `origin` because SSH authentication is required.\n"
+        "Failed to fetch release tags from `origin` because SSH authentication is required.\n"
         f"Run this command manually in your terminal and complete the SSH prompt:\n{command}\n"
         "After it finishes, tell Claude.\n"
         "Claude must verify that these files were updated recently before trusting the results:\n"
@@ -539,9 +531,9 @@ def manual_rerun_message(platform: str, execution_date: str) -> str:
     )
 
 
-def fetch_release_branches(repo: Path, platform: str, execution_date: str) -> str:
+def fetch_release_tags(repo: Path, platform: str, execution_date: str) -> str:
     proc = subprocess.run(
-        ["git", "-C", str(repo), "fetch", "origin", "+refs/heads/release/*:refs/remotes/origin/release/*"],
+        ["git", "-C", str(repo), "fetch", "--tags", "--force", "origin"],
         capture_output=True,
         text=True,
     )
@@ -551,33 +543,12 @@ def fetch_release_branches(repo: Path, platform: str, execution_date: str) -> st
             raise RuntimeError(manual_rerun_message(platform, execution_date))
         if "No such remote" in stderr or "couldn't find remote ref" in stderr:
             raise RuntimeError(
-                "Failed to fetch release branches from `origin`. "
+                "Failed to fetch release tags from `origin`. "
                 "Check that the repo has an `origin` remote and valid access."
             )
-        raise RuntimeError(stderr or "Failed to fetch release branches from `origin`.")
+        raise RuntimeError(stderr or "Failed to fetch release tags from `origin`.")
     output = proc.stderr.strip() or proc.stdout.strip()
-    return output or "Fetched remote release branches from `origin`"
-
-
-def parse_release_branch(branch: str) -> ReleaseVersion | None:
-    match = RELEASE_BRANCH_RE.fullmatch(branch)
-    if not match:
-        return None
-    if match.group("yy") is not None:
-        # YY.MM.Iterator style
-        return ReleaseVersion(
-            yy=int(match.group("yy")),
-            mm=int(match.group("mm")),
-            iterator=int(match.group("it")),
-            hotfix=int(match.group("hotfix") or 0),
-        )
-    # major.minor.patch style — map to the same tuple so sorting works
-    return ReleaseVersion(
-        yy=int(match.group("major")),
-        mm=int(match.group("minor")),
-        iterator=int(match.group("patch")),
-        hotfix=int(match.group("hotfix") or 0),
-    )
+    return output or "Fetched release tags from `origin`"
 
 
 def parse_release_tag(tag: str) -> ReleaseVersion | None:
@@ -586,12 +557,11 @@ def parse_release_tag(tag: str) -> ReleaseVersion | None:
         return None
     pre = match.group("pre")
     if pre:
-        return None  # skip rc/alpha/beta tags in auto-selection
+        return None  # skip rc/alpha/beta/test pre-release tags in auto-selection
     return ReleaseVersion(
-        yy=int(match.group("major")),
-        mm=int(match.group("minor")),
-        iterator=int(match.group("patch")),
-        hotfix=0,
+        major=int(match.group("major")),
+        minor=int(match.group("minor")),
+        patch=int(match.group("patch")),
     )
 
 
@@ -605,36 +575,16 @@ def list_release_tags(repo: Path) -> list[str]:
     return sorted(tags, key=lambda t: parse_release_tag(t))
 
 
-def list_release_branches(repo: Path) -> list[str]:
-    refs = set()
-    for raw in [
-        run_git(repo, "branch", "--format", "%(refname:short)"),
-        run_git(repo, "branch", "-r", "--format", "%(refname:short)"),
-    ]:
-        for line in raw.splitlines():
-            branch = line.strip()
-            if not branch or "->" in branch:
-                continue
-            if branch.startswith("origin/"):
-                branch = branch[len("origin/"):]
-            if parse_release_branch(branch):
-                refs.add(branch)
-    return sorted(refs, key=lambda item: parse_release_branch(item))
-
-
 def plan_comparison(repo: Path, explicit_current: str | None, explicit_compare: str | None) -> ComparisonPlan:
     source_branch = explicit_current or current_branch(repo)
     source_ref, _source_sha = resolve_ref(repo, source_branch)
 
-    # Prefer release tags (v4.7.0 style), fall back to release branches
-    release_tags = list_release_tags(repo)
-    release_branches = list_release_branches(repo)
-    releases = release_tags if release_tags else release_branches
-    release_type = "tag" if release_tags else "branch"
-
+    # Releases are identified by tags only (e.g. v4.7.0). Branches are never used.
+    releases = list_release_tags(repo)
     if not releases:
         raise RuntimeError(
-            "No release tags (v4.7.0) or release branches (release/X.Y.Z) were found."
+            "No release tags matching `vX.Y.Z` (e.g. `v4.7.0`) were found. "
+            "Fetch tags from `origin` or pass `--release-branch` with an explicit comparison ref."
         )
 
     latest_release = releases[-1]
@@ -646,23 +596,23 @@ def plan_comparison(repo: Path, explicit_current: str | None, explicit_compare: 
             current_ref=source_ref,
             compare_ref=compare_ref,
             latest_release=latest_release,
-            comparison_reason=f"Comparison ref was provided explicitly",
+            comparison_reason="Comparison ref was provided explicitly",
         )
 
-    parsed_current = parse_release_tag(source_branch) or parse_release_branch(source_branch)
+    parsed_current = parse_release_tag(source_branch)
     if parsed_current and source_branch == latest_release:
         if len(releases) < 2:
             raise RuntimeError(
-                f"The current {release_type} is the only known release, so there is no previous release to compare against."
+                "The current tag is the only known release, so there is no previous release to compare against."
             )
         compare_branch = releases[-2]
-        reason = f"Current ref is the latest release {release_type}, compared with the previous one"
+        reason = "Current ref is the latest release tag, compared with the previous tag"
     else:
         compare_branch = latest_release
         if parsed_current:
-            reason = f"Current ref is not the latest release {release_type}, compared with the latest ({latest_release})"
+            reason = f"Current ref is an older release tag, compared with the latest tag ({latest_release})"
         else:
-            reason = f"Current branch is not a release, compared with the latest release {release_type} ({latest_release})"
+            reason = f"Current branch is not a release tag, compared with the latest release tag ({latest_release})"
 
     return ComparisonPlan(
         current_branch=source_branch,
@@ -707,8 +657,11 @@ def is_excluded_qa_impact_path(path: str, patterns: list[str]) -> bool:
     return False
 
 
-def read_diff_files(repo: Path, current_ref: str, compare_ref: str) -> list[DiffFile]:
-    raw = run_git(repo, "diff", "--name-status", f"{current_ref}...{compare_ref}")
+def read_diff_files(repo: Path, base_ref: str, head_ref: str) -> list[DiffFile]:
+    # `git diff base...head` = diff from merge-base(base, head) to head, i.e. the
+    # changes introduced on `head`. The branch under analysis must be `head`, so
+    # callers pass (compare/baseline, current/branch-under-test) in that order.
+    raw = run_git(repo, "diff", "--name-status", f"{base_ref}...{head_ref}")
     files: list[DiffFile] = []
     for line in raw.splitlines():
         if not line.strip():
@@ -756,12 +709,18 @@ def read_regress_entries(regress_path: Path) -> list[RegressEntry]:
     return entries
 
 
+STOP_WORDS = {
+    "with", "from", "that", "this", "have", "show", "when", "will", "there",
+    "and", "the", "but", "are", "not", "all", "for", "into", "your", "you",
+}
+
+
 def normalize_words(text: str) -> set[str]:
     lowered = text.lower()
     return {
         word
         for word in re.findall(r"[a-z0-9а-яё]{3,}", lowered)
-        if word not in {"with", "from", "that", "this", "have", "show", "when", "will", "there"}
+        if word not in STOP_WORDS
     }
 
 
@@ -856,6 +815,9 @@ def build_path_signals(files: list[DiffFile]) -> dict[str, PathSignal]:
     return {diff_file.path: build_path_signal(diff_file.path) for diff_file in files}
 
 
+UNCATEGORIZED_CATEGORY = "Shared infrastructure and uncategorized changes"
+
+
 def categorize_files(files: list[DiffFile]) -> dict[str, list[str]]:
     categories: dict[str, list[str]] = {}
     for diff_file in files:
@@ -866,7 +828,7 @@ def categorize_files(files: list[DiffFile]) -> dict[str, list[str]]:
                 categories.setdefault(category, []).append(diff_file.path)
                 matched = True
         if not matched:
-            categories.setdefault("Shared infrastructure and uncategorized changes", []).append(diff_file.path)
+            categories.setdefault(UNCATEGORIZED_CATEGORY, []).append(diff_file.path)
     return {category: sorted(set(paths)) for category, paths in categories.items()}
 
 
@@ -911,30 +873,34 @@ def select_regress_entries(
     categories: dict[str, list[str]],
     regress_entries: list[RegressEntry],
     path_signals: dict[str, PathSignal],
-) -> list[tuple[str, RegressEntry]]:
-    recommendations: list[tuple[str, RegressEntry, int]] = []
-    seen: set[int] = set()
+) -> list[tuple[str, RegressEntry, list[str]]]:
+    # Attribute each regress row to the category that actually scored it highest,
+    # so the "Why" reflects the real overlap. Ties break toward a specific
+    # (non-catch-all) category, and the overlapping terms are kept for display.
+    best: dict[int, tuple[int, str, RegressEntry, list[str]]] = {}
     for category, paths in categories.items():
-        scored = score_regress_entries(
-            category_search_terms(category, paths, path_signals), regress_entries
-        )
-        for score, entry in scored[:8]:
-            if entry.line_no in seen:
-                continue
-            seen.add(entry.line_no)
-            recommendations.append((category, entry, score))
-    recommendations.sort(key=lambda item: item[1].line_no)
-    return [(category, entry) for category, entry, _score in recommendations]
+        # The catch-all bucket aggregates tokens from every unmatched file and its
+        # own name, which would let it outscore specific areas on noise. Those files
+        # are surfaced separately in "Changed Files Without Known QA Area" instead.
+        if category == UNCATEGORIZED_CATEGORY:
+            continue
+        terms = category_search_terms(category, paths, path_signals)
+        for score, entry in score_regress_entries(terms, regress_entries)[:8]:
+            current = best.get(entry.line_no)
+            if current is None or score > current[0]:
+                matched_terms = sorted(terms & normalize_words(" ".join(entry.chain)))
+                best[entry.line_no] = (score, category, entry, matched_terms)
+    recommendations = sorted(best.values(), key=lambda item: item[2].line_no)
+    return [(category, entry, matched_terms) for _score, category, entry, matched_terms in recommendations]
 
 
 def render_selected_regress_rows(
-    recommendations: list[tuple[str, RegressEntry]], regress_entries: list[RegressEntry]
+    recommendations: list[tuple[str, RegressEntry, list[str]]], regress_entries: list[RegressEntry]
 ) -> list[str]:
-    selected_line_nos = {entry.line_no for _category, entry in recommendations}
+    selected_line_nos = {entry.line_no for _category, entry, _terms in recommendations}
     if not selected_line_nos:
         return []
 
-    entries_by_line_no = {entry.line_no: entry for entry in regress_entries}
     included_section_line_nos: set[int] = set()
     for entry in regress_entries:
         if entry.line_no in selected_line_nos:
@@ -968,8 +934,8 @@ def build_scope_section(
         f"- Repo path: `{repo_path}`",
         f"- Regress path: `{regress_path}`",
         f"- Current branch: `{current_branch_name}` at `{current_sha}`",
-        f"- Compared against release branch: `{compare_branch_name}` at `{compare_sha}`",
-        f"- Latest discovered release branch: `{latest_release}`",
+        f"- Compared against release tag: `{compare_branch_name}` at `{compare_sha}`",
+        f"- Latest discovered release tag: `{latest_release}`",
         f"- Generated test collection path: `{tests_collection_path}`",
         f"- Execution date: `{execution_date}`",
         "- Assumptions:",
@@ -1040,7 +1006,7 @@ def build_unmatched_files_section(
     regress_entries: list[RegressEntry],
     path_signals: dict[str, PathSignal],
 ) -> list[str]:
-    unmatched_paths = categories.get("Shared infrastructure and uncategorized changes", [])
+    unmatched_paths = categories.get(UNCATEGORIZED_CATEGORY, [])
     if not unmatched_paths:
         return ["- All changed files matched at least one known QA area"]
     bullets = [f"- {len(unmatched_paths)} file(s) did not match a known QA area and need explicit review"]
@@ -1059,20 +1025,18 @@ def build_unmatched_files_section(
 
 
 def build_existing_blocks(
-    recommendations: list[tuple[str, RegressEntry]],
-    categories: dict[str, list[str]],
-    path_signals: dict[str, PathSignal],
+    recommendations: list[tuple[str, RegressEntry, list[str]]],
 ) -> list[str]:
     if not recommendations:
         return ["- No confident existing `regress.txt` matches were found from simple keyword heuristics"]
     bullets: list[str] = []
-    for category, entry in recommendations:
-        modules = dedupe_keep_order(
-            [module for path in categories.get(category, []) for module in display_modules(path_signals[path].modules)]
-        )
-        reason_target = ", ".join(f"`{module}`" for module in modules[:3]) if modules else f"`{category}`"
+    for category, entry, matched_terms in recommendations:
         bullets.append(f"- `{entry.line_no}`: {entry.display_text}")
-        bullets.append(f"- Why: matched the updated area {reason_target}")
+        if matched_terms:
+            terms = ", ".join(f"`{term}`" for term in matched_terms[:5])
+            bullets.append(f"- Why: changes in `{category}` overlap regress terms {terms}")
+        else:
+            bullets.append(f"- Why: matched the updated area `{category}`")
     return bullets
 
 
@@ -1088,7 +1052,7 @@ def build_missing_blocks(
             if item not in seen:
                 seen.add(item)
                 bullets.append(f"- {item}")
-    unmatched_paths = categories.get("Shared infrastructure and uncategorized changes", [])
+    unmatched_paths = categories.get(UNCATEGORIZED_CATEGORY, [])
     for path in unmatched_paths:
         signal = path_signals[path]
         if score_regress_entries(set(signal.search_terms), regress_entries):
@@ -1127,7 +1091,7 @@ def build_open_questions(
     ]
     if not recommendations:
         bullets.append("- No strong `regress.txt` matches were found, so the report likely needs manual QA curation")
-    if "Shared infrastructure and uncategorized changes" in categories:
+    if UNCATEGORIZED_CATEGORY in categories:
         bullets.append("- Some files did not match a known QA area and may need manual triage")
     return bullets
 
@@ -1174,7 +1138,7 @@ def build_test_collection(
     lines = [f"{platform} {current_branch_name} vs {compare_branch_name} impact suite"]
     selected_regress_lines = render_selected_regress_rows(recommendations, regress_entries)
     lines.extend(selected_regress_lines)
-    unmatched_paths = categories.get("Shared infrastructure and uncategorized changes", [])
+    unmatched_paths = categories.get(UNCATEGORIZED_CATEGORY, [])
     if unmatched_paths:
         lines.append("    Changed files without known QA area")
         for path in unmatched_paths[:12]:
@@ -1253,12 +1217,14 @@ def main() -> int:
         return 1
 
     try:
-        fetch_summary = fetch_release_branches(repo_path, args.platform, args.date)
+        fetch_summary = fetch_release_tags(repo_path, args.platform, args.date)
         comparison = plan_comparison(repo_path, args.base_branch, args.release_branch)
         current_sha, compare_sha = ensure_git_inputs(repo_path, comparison.current_ref, comparison.compare_ref)
-        diff_files = read_diff_files(repo_path, comparison.current_ref, comparison.compare_ref)
+        # Diff/stat must report changes introduced on the branch under analysis
+        # (current), so the baseline release ref (compare) is the merge-base side.
+        diff_files = read_diff_files(repo_path, comparison.compare_ref, comparison.current_ref)
         diff_stat = run_git(
-            repo_path, "diff", "--stat", f"{comparison.current_ref}...{comparison.compare_ref}"
+            repo_path, "diff", "--stat", f"{comparison.compare_ref}...{comparison.current_ref}"
         )
         log_output = run_git(
             repo_path,
@@ -1266,7 +1232,7 @@ def main() -> int:
             "--left-right",
             "--cherry-pick",
             "--oneline",
-            f"{comparison.current_ref}...{comparison.compare_ref}",
+            f"{comparison.compare_ref}...{comparison.current_ref}",
         )
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
@@ -1314,7 +1280,7 @@ def main() -> int:
         "Changed Files Without Known QA Area": build_unmatched_files_section(
             categories, regress_entries, path_signals
         ),
-        "Run These Existing Regression Blocks": build_existing_blocks(recommendations, categories, path_signals),
+        "Run These Existing Regression Blocks": build_existing_blocks(recommendations),
         "Add These Missing Blocks": missing_blocks,
         "Additional Checks": additional_checks,
         "Open Questions": build_open_questions(categories, recommendations),

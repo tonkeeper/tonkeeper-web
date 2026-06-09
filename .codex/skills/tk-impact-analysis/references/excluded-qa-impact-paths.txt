@@ -25,6 +25,10 @@ package-lock.json
 # Type declaration files that don't affect behavior
 **/*.d.ts
 
+# Agent skills and their generated reports (not shipped to users)
+.codex/**
+.claude/**
+
 # CI and tooling config (no runtime effect)
 .github/**
 .husky/**

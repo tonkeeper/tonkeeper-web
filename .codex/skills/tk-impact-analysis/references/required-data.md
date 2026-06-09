@@ -44,7 +44,7 @@ If `regress.txt` is missing, the skill must stop and report this clearly.
 
 - A valid git repository
 - The current branch or an explicit `BASE_BRANCH`
-- At least one release tag matching `vX.Y.Z` (e.g. `v4.7.0`), or a release branch matching `release/X.Y.Z` or `release/YY.MM.Iterator`
+- At least one release tag matching `vX.Y.Z` (e.g. `v4.7.0`). Release branches are not used.
 - `sources/Web/regress.txt`
 
 ## Recommended Commands
@@ -66,4 +66,4 @@ Branch selection rules:
 
 - if `CURRENT_BRANCH` is the latest release, compare it with the previous release
 - if `CURRENT_BRANCH` is a release but not the latest release, compare it with the latest release
-- if `CURRENT_BRANCH` is not a release branch, compare it with the latest release
+- if `CURRENT_BRANCH` is not a release tag, compare it with the latest release tag

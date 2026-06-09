@@ -1,6 +1,6 @@
 # tk-impact-analysis
 
-Compares the current branch with the relevant release branch and suggests test cases from the Web regress set based on the code changes.
+Compares the current branch with the relevant release tag and suggests test cases from the Web regress set based on the code changes.
 
 ## What It Does
 
@@ -11,7 +11,7 @@ The skill:
 - auto-detects release refs in this priority order:
   1. git tags matching `vX.Y.Z` (e.g. `v4.7.0`), skipping pre-release tags (`rc`, `alpha`, `beta`)
   2. branches matching `release/X.Y.Z` (e.g. `release/4.7.0`) or `release/YY.MM.Iterator`
-- compares the current branch with the right release ref automatically:
+- compares the current branch with the right release tag automatically:
   - current ref is the latest release → compare with the previous release
   - current ref is an older release → compare with the latest release
   - current ref is not a release → compare with the latest release
@@ -58,7 +58,7 @@ Optional:
 
 ```text
 Use $tk-impact-analysis to perform QA impact analysis for PLATFORM=Web.
-Detect the current branch and compare it with the correct release branch automatically.
+Detect the current branch and compare it with the correct release tag automatically.
 Use the current source repository for git comparison and the default regress.txt.
 ```
 

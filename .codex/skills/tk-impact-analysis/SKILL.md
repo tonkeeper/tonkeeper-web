@@ -1,6 +1,6 @@
 ---
 name: tk-impact-analysis
-description: Analyze QA regression impact for Tonkeeper Web by comparing the current branch with the relevant release branch, reviewing sources/Web/regress.txt, and recommending test blocks, missing coverage, extra checks, and a generated TXT test collection.
+description: Analyze QA regression impact for Tonkeeper Web by comparing the current branch with the relevant release tag, reviewing sources/Web/regress.txt, and recommending test blocks, missing coverage, extra checks, and a generated TXT test collection.
 ---
 
 # TK Impact Analysis
@@ -45,26 +45,26 @@ For the reusable invocation prompt, read [references/prompt-template.md](referen
 
 3. Validate the git inputs inside the selected repository.
 - Confirm the repo exists and is a git worktree.
-- In the local-script flow, fetch release refs from `origin` first so the latest release set is available locally.
+- In the local-script flow, fetch release tags from `origin` first (`git fetch --tags --force origin`) so the latest release set is available locally.
 - If fetch fails with SSH authentication errors, stop and ask the user to run `python3 .codex/skills/tk-impact-analysis/scripts/tk_impact_analysis.py --platform Web --write-raw` manually in their terminal.
 - After the user says it is done, verify that `reports/<execution-date>/Web/raw-git-data.txt`, `report.md`, and `test-collection.txt` were updated recently before using them.
 - Detect the current branch unless `BASE_BRANCH` was provided explicitly.
-- Prefer release tags over release branches for comparison:
-  - Discover tags matching `vX.Y.Z` (e.g. `v4.7.0`); skip pre-release tags (`rc`, `alpha`, `beta`).
-  - If no tags are found, fall back to branches matching `release/X.Y.Z` or `release/YY.MM.Iterator`.
+- Releases are identified by tags only:
+  - Discover tags matching `vX.Y.Z` (e.g. `v4.7.0`); skip pre-release tags (`rc`, `alpha`, `beta`, `test`).
+  - Release branches are intentionally NOT used. If no release tags exist, stop and ask for an explicit `RELEASE_BRANCH` comparison ref.
 - Select the correct comparison ref:
-  - If `BASE_BRANCH` resolves to the latest release ref, compare it with the previous release ref.
-  - If `BASE_BRANCH` resolves to an older release ref, compare it with the latest release ref.
-  - If `BASE_BRANCH` is not a release ref, compare it with the latest release ref.
+  - If `BASE_BRANCH` resolves to the latest release tag, compare it with the previous release tag.
+  - If `BASE_BRANCH` resolves to an older release tag, compare it with the latest release tag.
+  - If `BASE_BRANCH` is not a release tag, compare it with the latest release tag.
 - If `RELEASE_BRANCH` was provided explicitly, use it as the comparison target.
 - Confirm both comparison refs exist locally or as remote refs.
-- Prefer comparing `CURRENT_BRANCH...RELEASE_BRANCH` so the diff is relative to the merge base.
+- The branch under analysis must be the `head` of the three-dot diff so it reports the changes that branch introduced relative to the merge base: `git diff RELEASE_TAG...CURRENT_BRANCH`.
 
 4. Inspect branch delta with git, paying special attention to dependency and config changes.
-- Start with:
-  - `git diff --name-status CURRENT_BRANCH...RELEASE_BRANCH`
-  - `git diff --stat CURRENT_BRANCH...RELEASE_BRANCH`
-  - `git log --left-right --cherry-pick --oneline CURRENT_BRANCH...RELEASE_BRANCH`
+- Start with (release tag first, current branch last):
+  - `git diff --name-status RELEASE_TAG...CURRENT_BRANCH`
+  - `git diff --stat RELEASE_TAG...CURRENT_BRANCH`
+  - `git log --left-right --cherry-pick --oneline RELEASE_TAG...CURRENT_BRANCH`
 - Then inspect important changed files directly.
 - **Dependency and config changes require expanded scope — do not skip them:**
   - If any `package.json` changed: read its diff and identify which packages were added, removed, or version-bumped. For each changed package, map it to the functional areas it affects and add those areas to the test scope. Examples:
@@ -142,7 +142,7 @@ Return these sections in this order:
 - repo path
 - regress path
 - current branch
-- compared release branch
+- compared release tag
 - generated test collection path
 - assumptions and missing inputs
 
