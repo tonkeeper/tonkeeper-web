@@ -1,4 +1,5 @@
 import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { createSlidingWindowRateLimiter } from '@tonkeeper/core/dist/utils/rateLimiter';
 import memoryStore from '../store/memoryStore';
 import ExtensionPlatform from './extension';
 
@@ -22,13 +23,47 @@ const getToken = async (url: string) => {
     return token;
 };
 
-export const createTonapiRequest = async (url: string, options: RequestInit = {}) => {
+/**
+ * Page-controlled headers that must never be forwarded upstream:
+ * - Cookie would attach the user's tonapi.io session to a proxied request.
+ * - X-Forwarded-* / Forwarded / X-Real-IP would let the page spoof the
+ *   originating IP seen by tonapi.io.
+ * - X-Authorization is set by us (from the dApp `Authorization` header); a page
+ *   must not be able to inject it directly.
+ */
+const UNSAFE_FORWARD_HEADERS = [
+    'Cookie',
+    'X-Forwarded-For',
+    'X-Forwarded-Host',
+    'X-Forwarded-Proto',
+    'Forwarded',
+    'X-Real-IP',
+    'X-Authorization'
+];
+
+const tonapiRateLimiter = createSlidingWindowRateLimiter({
+    windowMs: 60 * 1000,
+    maxRequests: 60
+});
+
+export const createTonapiRequest = async (
+    origin: string,
+    url: string,
+    options: RequestInit = {}
+) => {
     if (!isTonapiUrl(url)) {
         throw new Error('Unsupported endpoint');
     }
 
+    if (!tonapiRateLimiter.tryConsume(origin)) {
+        throw new Error('Too many requests');
+    }
+
     const token = await getToken(url);
     const reqHeaders = new Headers(options.headers);
+
+    UNSAFE_FORWARD_HEADERS.forEach(header => reqHeaders.delete(header));
+
     const userToken = reqHeaders.get('Authorization');
     if (userToken) {
         reqHeaders.append('X-Authorization', userToken);
