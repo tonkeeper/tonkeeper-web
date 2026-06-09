@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "Інші способи покупки"
     },
-    "exchange_other_ways": "Інші способи купівлі або продажу TON",
-    "exchange_title": "Купити TON",
+    "exchange_other_ways": "Інші способи купівлі або продажу %{coinSymbolWithEx}",
+    "exchange_title": "Купити %{coinSymbolWithEx}",
     "import_add_wallet": "Додати гаманець",
     "import_add_wallet_description": "Створіть новий гаманець або додайте існуючий.",
     "import_existing_wallet": "Імпортувати існуючий гаманець",
@@ -152,7 +152,7 @@
     "import_wallet_wrong_words_err": "Неправильна фраза",
     "info_about_inactive_back": "Повернутися назад",
     "intro_continue_btn": "Почати",
-    "intro_item1_caption": "Завдяки унікальній архітектурі The Open Network, TON-транзакції виконуються за секунди.",
+    "intro_item1_caption": "Завдяки унікальній архітектурі The Open Network, %{chainName}-транзакції виконуються за секунди.",
     "intro_item1_title": "Світова швидкість",
     "intro_item2_caption": "Tonkeeper зберігає ваші криптографічні ключі на вашому пристрої. Усі транзакції виконуються через децентралізовані протоколи, тому ваша криптовалюта ніколи не потрапить до централізованих бірж.",
     "intro_item2_title": "Сквозна безпека",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "Копіювати"
     },
-    "reminder_notifications_caption": "Отримуйте сповіщення при отриманні TON, токенів та NFT.",
+    "reminder_notifications_caption": "Отримуйте сповіщення при отриманні %{coinSymbolWithEx}, токенів та NFT.",
     "reminder_notifications_enable_button": "Увімкнути сповіщення",
     "reminder_notifications_later_button": "Пізніше",
     "reminder_notifications_title": "Отримуйте миттєві сповіщення",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "Очікуваний річний дохід",
     "staking_enter_amount": "Введіть суму",
     "staking_insufficient_balance": "Недостатній баланс",
-    "staking_insufficient_recommended_fee_reserve": "Недостатньо коштів: на балансі гаманця мають бути 1 TON у резерві та 0.05 TON на комісію.",
+    "staking_insufficient_recommended_fee_reserve": "Недостатньо коштів: на балансі гаманця мають бути 1 %{coinSymbolWithEx} у резерві та 0.05 %{coinSymbolWithEx} на комісію.",
     "staking_max": "МАКС",
     "staking_min_deposit_label": "Мінімальний депозит",
     "staking_next_cycle_desc_liquid": "Доступне миттєве зняття",
     "staking_next_cycle_message": "Наступний цикл через {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · Мін. депозит {minDeposit} TON",
+    "staking_pool_detail": "APY ≈ {apy}% · Мін. депозит {minDeposit} %{coinSymbolWithEx}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} TON готові до виведення",
+    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} готові до виведення",
     "staking_rewards_after_stake": "Після стейкінгу",
     "staking_rewards_current": "Поточна",
-    "staking_rewards_value": "≈ {value} TON",
+    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
     "staking_staked": "Стейкінг",
     "staking_title": "Стейкінг",
     "staking_top_up": "Внести",
@@ -346,7 +346,7 @@
         "subtitle": "NFT може бути небезпечним з однієї з наступних причин.",
         "title": "Неперевірений NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "Недостатньо TON для комісії мережі ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "Недостатньо %{coinSymbolWithEx} для комісії мережі ({required})",
     "swap_exchange_in": "Обміняти в",
     "swap_expired_refresh": "Своп закінчився. Оновіть котирування",
     "swap_price_impact_description": "Різниця між ринковою ціною та розрахунковою ціною через розмір угоди.",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "Трансфер токена",
                 "nftItemTransfer": "Трансфер NFT",
-                "tonTransfer": "Відправка TON",
+                "tonTransfer": "Відправка %{coinSymbolWithEx}",
                 "unknownTransaction": "Невідома транзакція"
             }
         }
@@ -1680,10 +1680,10 @@
     "wallet_swap": "Обмін",
     "wallet_title": "Гаманець",
     "yesterday": "Вчора",
-    "staking_pool_liquid_desc": "Коли ви стейкаєте TON у пулі Tonstakers, ви отримуєте токен tsTON, який представляє вашу частку в пулі. У міру накопичення прибутку пулу ваш tsTON відповідає більшій кількості TON.",
-    "staking_pool_withdraw_date": "{amount} TON буде виведено {date}",
-    "staking_portfolio_pending_withdraw": "{amount} TON буде виведено після закінчення циклу",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} TON буде виведено за {value}",
+    "staking_pool_liquid_desc": "Коли ви стейкаєте %{coinSymbolWithEx} у пулі Tonstakers, ви отримуєте токен tsTON, який представляє вашу частку в пулі. У міру накопичення прибутку пулу ваш tsTON відповідає більшій кількості %{coinSymbolWithEx}.",
+    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} буде виведено {date}",
+    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} буде виведено після закінчення циклу",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} буде виведено за {value}",
     "staking_confirm_modal_provider": "Провайдер",
     "staking_confirm_modal_amount": "Сума",
     "staking_confirm_modal_apy": "APY",
@@ -1692,7 +1692,7 @@
     "staking_tonstakers_notice": "Стейкінг базується на смарт-контрактах третіх сторін. Tonkeeper не несе відповідальності за стабільність і результат.",
     "staking_claim": "Отримати",
     "staking_details_pool_address_label": "Адреса пулу",
-    "staking_pending_deposit": "{amount} TON очікують на стейкінг",
-    "staking_pools_min_deposit": "Мін. депозит {minDeposit} TON",
+    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} очікують на стейкінг",
+    "staking_pools_min_deposit": "Мін. депозит {minDeposit} %{coinSymbolWithEx}",
     "staking_tf_full_withdrawal_only": "Доступний лише повний вивід"
 }

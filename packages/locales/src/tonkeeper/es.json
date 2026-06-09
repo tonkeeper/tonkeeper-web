@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "Otras formas de comprar"
     },
-    "exchange_other_ways": "Otras formas de comprar o vender TON",
-    "exchange_title": "Comprar TON",
+    "exchange_other_ways": "Otras formas de comprar o vender %{coinSymbolWithEx}",
+    "exchange_title": "Comprar %{coinSymbolWithEx}",
     "import_add_wallet": "Añadir billetera",
     "import_add_wallet_description": "Cree una nueva billetera o añada una existente.",
     "import_existing_wallet": "Billetera Existente",
@@ -152,7 +152,7 @@
     "import_wallet_wrong_words_err": "Frase incorrecta",
     "info_about_inactive_back": "Volver",
     "intro_continue_btn": "Empieza",
-    "intro_item1_caption": "Gracias a la arquitectura única de The Open Network, las transacciones TON se realizan en segundos.",
+    "intro_item1_caption": "Gracias a la arquitectura única de The Open Network, las transacciones %{chainName} se realizan en segundos.",
     "intro_item1_title": "Velocidad de primera clase",
     "intro_item2_caption": "Tonkeeper almacena sus llaves criptográficas en su dispositivo. Todas las transacciones se ejecutan a través de protocolos descentralizados, por lo que su criptomoneda nunca llega a manos de intercambios centralizados.",
     "intro_item2_title": "Seguridad de extremo a extremo",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "Copiar"
     },
-    "reminder_notifications_caption": "Recibe notificaciones cuando recibas TON, tokens y NFT.",
+    "reminder_notifications_caption": "Recibe notificaciones cuando recibas %{coinSymbolWithEx}, tokens y NFT.",
     "reminder_notifications_enable_button": "Habilitar notificaciones",
     "reminder_notifications_later_button": "Más tarde",
     "reminder_notifications_title": "Recibe notificaciones instantáneas",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "Ganancia anual esperada",
     "staking_enter_amount": "Ingresar la cantidad",
     "staking_insufficient_balance": "Saldo insuficiente",
-    "staking_insufficient_recommended_fee_reserve": "Fondos insuficientes: el saldo de la billetera debe incluir 1 TON de reserva y 0.05 TON de comisión.",
+    "staking_insufficient_recommended_fee_reserve": "Fondos insuficientes: el saldo de la billetera debe incluir 1 %{coinSymbolWithEx} de reserva y 0.05 %{coinSymbolWithEx} de comisión.",
     "staking_max": "MÁX",
     "staking_min_deposit_label": "Depósito mínimo",
     "staking_next_cycle_desc_liquid": "Deshacer participación instantánea disponible",
     "staking_next_cycle_message": "Próximo ciclo en {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · Depósito mín. {minDeposit} TON",
+    "staking_pool_detail": "APY ≈ {apy}% · Depósito mín. {minDeposit} %{coinSymbolWithEx}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} TON listo para retirar",
+    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} listo para retirar",
     "staking_rewards_after_stake": "Después del depósito",
     "staking_rewards_current": "Actual",
-    "staking_rewards_value": "≈ {value} TON",
+    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
     "staking_staked": "Apostado",
     "staking_title": "Participación",
     "staking_top_up": "Recargar",
@@ -346,7 +346,7 @@
         "subtitle": "NFT puede no ser seguro por una de las siguientes razones.",
         "title": "NFT no verificado"
     },
-    "swap_confirm_not_enough_ton_for_fee": "TON insuficiente para comisión de red ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbolWithEx} insuficiente para comisión de red ({required})",
     "swap_exchange_in": "Intercambiar en",
     "swap_expired_refresh": "Intercambio caducado. Actualiza la cotización",
     "swap_price_impact_description": "La diferencia entre el precio de mercado y el precio estimado debido al tamaño de la operación.",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "Transferencia de tokens",
                 "nftItemTransfer": "Transferencia de NFT",
-                "tonTransfer": "Transferencia TON",
+                "tonTransfer": "Transferencia %{coinSymbolWithEx}",
                 "unknownTransaction": "Transacción desconocida"
             }
         }
@@ -1677,10 +1677,10 @@
     "wallet_swap": "Intercambiar",
     "wallet_title": "Billetera",
     "yesterday": "Ayer",
-    "staking_pool_liquid_desc": "Cuando depositas TON en un pool de Tonstakers, recibes un token llamado tsTON que representa tu participación en el pool. A medida que el pool acumula beneficios, tu tsTON representa una cantidad mayor de TON.",
-    "staking_pool_withdraw_date": "Se retirarán {amount} TON el {date}",
-    "staking_portfolio_pending_withdraw": "Se retirarán {amount} TON al final del ciclo",
-    "staking_portfolio_pending_withdraw_countdown": "Se retirarán {amount} TON en {value}",
+    "staking_pool_liquid_desc": "Cuando depositas %{coinSymbolWithEx} en un pool de Tonstakers, recibes un token llamado tsTON que representa tu participación en el pool. A medida que el pool acumula beneficios, tu tsTON representa una cantidad mayor de %{coinSymbolWithEx}.",
+    "staking_pool_withdraw_date": "Se retirarán {amount} %{coinSymbolWithEx} el {date}",
+    "staking_portfolio_pending_withdraw": "Se retirarán {amount} %{coinSymbolWithEx} al final del ciclo",
+    "staking_portfolio_pending_withdraw_countdown": "Se retirarán {amount} %{coinSymbolWithEx} en {value}",
     "staking_confirm_modal_provider": "Proveedor",
     "staking_confirm_modal_amount": "Importe",
     "staking_confirm_modal_apy": "APY",
@@ -1689,7 +1689,7 @@
     "staking_tonstakers_notice": "El staking se basa en contratos inteligentes de terceros. Tonkeeper no es responsable de la experiencia de staking.",
     "staking_claim": "Reclamar",
     "staking_details_pool_address_label": "Dirección del pool",
-    "staking_pending_deposit": "{amount} TON en depósito pendiente",
-    "staking_pools_min_deposit": "Depósito mín. {minDeposit} TON",
+    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} en depósito pendiente",
+    "staking_pools_min_deposit": "Depósito mín. {minDeposit} %{coinSymbolWithEx}",
     "staking_tf_full_withdrawal_only": "Solo está disponible el retiro completo"
 }

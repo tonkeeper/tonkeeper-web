@@ -1,3 +1,5 @@
+import { BRAND_CONFIG } from '../config/brand';
+
 export enum FiatCurrencies {
     USD = 'USD',
     EUR = 'EUR',
@@ -91,7 +93,7 @@ export const FiatCurrencySymbolsConfig: Record<FiatCurrency, CurrencyState> = {
         maximumFractionDigits: 2
     },
     [FiatCurrencies.TON]: {
-        symbol: 'TON',
+        symbol: BRAND_CONFIG.coinSymbolWithEx,
         side: 'end',
         maximumFractionDigits: 2
     }

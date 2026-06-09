@@ -1,4 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { NATIVE_COIN_ICON } from '@tonkeeper/core/dist/config/coinIcon';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
@@ -503,10 +505,10 @@ function convertJettonToTokenMeta(
     if ('isNative' in asset) {
         return {
             address: 'TON',
-            name: 'TON',
-            symbol: 'TON',
+            name: BRAND_CONFIG.coinName,
+            symbol: BRAND_CONFIG.coinSymbolWithEx,
             color: tokenColor('TON'),
-            image: 'https://wallet.tonkeeper.com/img/toncoin.svg',
+            image: NATIVE_COIN_ICON,
             price,
             balance: new BigNumber(asset.balance)
         };

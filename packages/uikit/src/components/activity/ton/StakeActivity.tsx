@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
@@ -30,7 +31,7 @@ export const DepositStakeAction: FC<{
             <ColumnLayout
                 title={t('staking_deposit')}
                 amount={<>-&thinsp;{format(depositStake.amount)}</>}
-                entry={CryptoCurrency.TON}
+                entry={BRAND_CONFIG.coinSymbolWithEx}
                 address={toAddressTextValue(
                     depositStake.pool.name,
                     formatAddress(depositStake.pool.address, network, true)
@@ -61,7 +62,7 @@ export const WithdrawStakeAction: FC<{
             <ColumnLayout
                 title={t('staking_withdraw')}
                 amount={<>+&thinsp;{format(withdrawStake.amount)}</>}
-                entry={CryptoCurrency.TON}
+                entry={BRAND_CONFIG.coinSymbolWithEx}
                 green
                 address={toAddressTextValue(
                     withdrawStake.pool.name,
@@ -94,7 +95,7 @@ export const WithdrawRequestStakeAction: FC<{
         entry = stakeMeta.tokenName;
     } else if (withdrawStakeRequest.amount) {
         amountNode = <>+&thinsp;{format(withdrawStakeRequest.amount)}</>;
-        entry = CryptoCurrency.TON;
+        entry = BRAND_CONFIG.coinSymbolWithEx;
     }
 
     return (

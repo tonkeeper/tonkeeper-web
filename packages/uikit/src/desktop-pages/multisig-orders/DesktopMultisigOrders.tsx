@@ -3,6 +3,7 @@ import {
     DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Body2, Body2Class, Label2 } from '../../components/Text';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { useTranslation } from '../../hooks/translation';
@@ -350,7 +351,7 @@ const AmountCell: FC<{ risk: Risk }> = ({ risk }) => {
     const format = useFormatCoinValue();
 
     const getTonText = () => {
-        return format(risk.ton, TON_ASSET.decimals) + ' TON';
+        return format(risk.ton, TON_ASSET.decimals) + ' ' + BRAND_CONFIG.coinSymbolWithEx;
     };
 
     const getJettonsText = () => {

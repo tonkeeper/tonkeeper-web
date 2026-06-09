@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Action, ActionTypeEnum } from '@tonkeeper/core/dist/tonApiV2';
 
 import {
@@ -75,7 +76,7 @@ export const ExtensionDesktopActions: FC<{
                 {amount && !isScam ? (
                     <HistoryCellAmount
                         amount={amount}
-                        symbol={CryptoCurrency.TON}
+                        symbol={BRAND_CONFIG.coinSymbolWithEx}
                         decimals={9}
                         isFailed={action.status === 'failed'}
                         isNegative

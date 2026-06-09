@@ -1,4 +1,5 @@
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
@@ -308,7 +309,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             const amount = assets.ton.info.balance;
             return {
                 image: TON_ASSET.image!,
-                symbol: TON_ASSET.symbol,
+                symbol: BRAND_CONFIG.coinSymbolWithEx,
                 amount: format(amount),
                 fiatAmount: formatFiatCurrency(
                     fiat,
@@ -420,7 +421,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             return null;
         }
         if (token === CryptoCurrency.TON) {
-            return { assetSymbol: 'Toncoin', isUnverified: false };
+            return { assetSymbol: BRAND_CONFIG.coinName, isUnverified: false };
         }
 
         if (seeIfValidTonAddress(decodeURIComponent(token))) {

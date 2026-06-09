@@ -1,4 +1,6 @@
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { NATIVE_COIN_ICON } from '@tonkeeper/core/dist/config/coinIcon';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 
 import { Account } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -26,10 +28,10 @@ const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     return (
         <CoinInfo
             amount={total}
-            symbol="TON"
+            symbol={BRAND_CONFIG.coinSymbolWithEx}
             price={fiatAmount}
             description={t('Ton_page_description')}
-            image="https://wallet.tonkeeper.com/img/toncoin.svg"
+            image={NATIVE_COIN_ICON}
         />
     );
 };

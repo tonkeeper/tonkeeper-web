@@ -1,4 +1,6 @@
 import { ChangeEvent, FC, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { styled } from 'styled-components';
 import { Body2, Body2Class, Body3 } from '../Text';
 import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
@@ -263,7 +265,7 @@ export const AmountField: FC<AmountFieldProps> = ({
                         $widthPx={inputWidthPx}
                         disabled={disabled}
                     />
-                    <TokenLabel>TON</TokenLabel>
+                    <TokenLabel>{BRAND_CONFIG.coinSymbolWithEx}</TokenLabel>
                 </InputLeft>
                 <FiatAmount>{fiatDisplay}</FiatAmount>
             </InputBorderedBox>

@@ -1,4 +1,5 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { AccountAddress, AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
@@ -656,7 +657,7 @@ const SenderDropdownItem: FC<{ sender: AllChainsSenderOptions }> = ({ sender }) 
             return (
                 <>
                     <TokenImage src={TON_ASSET.image} />
-                    <Label2>{TON_ASSET.symbol}</Label2>
+                    <Label2>{BRAND_CONFIG.coinSymbolWithEx}</Label2>
                 </>
             );
         case 'gasless':

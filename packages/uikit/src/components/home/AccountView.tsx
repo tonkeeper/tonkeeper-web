@@ -1,4 +1,5 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { NATIVE_COIN_ICON } from '@tonkeeper/core/dist/config/coinIcon';
 import {
     formatAddress,
     formatTransferUrl,
@@ -191,7 +192,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                             address,
                             jetton
                         })}
-                        logoImage={assetImage || 'https://wallet.tonkeeper.com/img/toncoin.svg'}
+                        logoImage={assetImage || NATIVE_COIN_ICON}
                         logoPadding={8}
                         qrStyle="dots"
                         eyeRadius={{

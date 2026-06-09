@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "Diğer satın alma seçenekleri"
     },
-    "exchange_other_ways": "TON satın almak veya satmak için diğer seçenekler",
-    "exchange_title": "TON satın alın",
+    "exchange_other_ways": "%{coinSymbolWithEx} satın almak veya satmak için diğer seçenekler",
+    "exchange_title": "%{coinSymbolWithEx} satın alın",
     "import_add_wallet": "Cüzdan Ekle",
     "import_add_wallet_description": "Yeni bir cüzdan oluşturun veya mevcut bir cüzdan ekleyin.",
     "import_existing_wallet": "Mevcut Cüzdan",
@@ -152,7 +152,7 @@
     "import_wallet_wrong_words_err": "Gizli kurtarma ifadesi hatalı",
     "info_about_inactive_back": "Geri",
     "intro_continue_btn": "Başlayın",
-    "intro_item1_caption": "The Open Network'ün benzersiz mimarisi sayesinde, TON'daki işlemler saniyeler içinde gerçekleştirilir.",
+    "intro_item1_caption": "The Open Network'ün benzersiz mimarisi sayesinde, %{chainName}'daki işlemler saniyeler içinde gerçekleştirilir.",
     "intro_item1_title": "Birinci sınıf hız",
     "intro_item2_caption": "Tonkeeper, şifreleme anahtarlarınızı cihazınızda saklar. Tüm işlemler merkeziyetsiz protokoller aracılığıyla gerçekleştirildiğinden kripto paralarınız hiçbir zaman merkezi borsaların eline geçmez.",
     "intro_item2_title": "Uçtan uca güvenlik",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "Kopyala"
     },
-    "reminder_notifications_caption": "Cüzdanınıza TON, token ve NFT geldiğinde bildirimler alın.",
+    "reminder_notifications_caption": "Cüzdanınıza %{coinSymbolWithEx}, token ve NFT geldiğinde bildirimler alın.",
     "reminder_notifications_enable_button": "Bildirimleri etkinleştirin",
     "reminder_notifications_later_button": "Daha sonra",
     "reminder_notifications_title": "Anlık bildirimler alın",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "Beklenen yıllık kazanç",
     "staking_enter_amount": "Bir tutar girin",
     "staking_insufficient_balance": "Yetersiz bakiye",
-    "staking_insufficient_recommended_fee_reserve": "Yetersiz bakiye: cüzdan bakiyesinde 1 TON rezerv ve 0.05 TON işlem ücreti bulunmalıdır.",
+    "staking_insufficient_recommended_fee_reserve": "Yetersiz bakiye: cüzdan bakiyesinde 1 %{coinSymbolWithEx} rezerv ve 0.05 %{coinSymbolWithEx} işlem ücreti bulunmalıdır.",
     "staking_max": "MAKS",
     "staking_min_deposit_label": "Minimum yatırabilecek tutar",
     "staking_next_cycle_desc_liquid": "Anında stake geri alma mevcut",
     "staking_next_cycle_message": "Sonraki döngü {value} içinde",
-    "staking_pool_detail": "APY ≈ {apy}% · Min. yatırım {minDeposit} TON",
+    "staking_pool_detail": "APY ≈ {apy}% · Min. yatırım {minDeposit} %{coinSymbolWithEx}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} TON çekilmeye hazır",
+    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} çekilmeye hazır",
     "staking_rewards_after_stake": "Yatırma işleminden sonra",
     "staking_rewards_current": "Güncel",
-    "staking_rewards_value": "≈ {value} TON",
+    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
     "staking_staked": "Stake Edildi",
     "staking_title": "Stake Etme",
     "staking_top_up": "Yatırma",
@@ -346,7 +346,7 @@
         "subtitle": "NFT aşağıdaki nedenlerden biri nedeniyle güvenli olmayabilir.",
         "title": "Doğrulanmamış NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "Ağ ücreti için yeterli TON yok ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "Ağ ücreti için yeterli %{coinSymbolWithEx} yok ({required})",
     "swap_exchange_in": "Takas giriş",
     "swap_expired_refresh": "Takas süresi doldu. Fiyat teklifini yenile",
     "swap_price_impact_description": "İşlem büyüklüğü nedeniyle piyasa fiyatı ile tahmini fiyat arasındaki fark.",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "Token Transferi",
                 "nftItemTransfer": "NFT Transferi",
-                "tonTransfer": "TON Transferi",
+                "tonTransfer": "%{coinSymbolWithEx} Transferi",
                 "unknownTransaction": "Bilinmeyen işlem"
             }
         }
@@ -1677,10 +1677,10 @@
     "wallet_swap": "Takas",
     "wallet_title": "Cüzdan",
     "yesterday": "Dün",
-    "staking_pool_liquid_desc": "TON’u bir Tonstakers havuzunda stake ettiğinizde, havuzdaki payınızı temsil eden tsTON adlı bir jeton alırsınız. Havuz kar biriktirdikçe tsTON’unuz daha fazla TON’u temsil eder.",
-    "staking_pool_withdraw_date": "{amount} TON {date} tarihinde çekilecek",
-    "staking_portfolio_pending_withdraw": "{amount} TON döngü sonunda çekilecek",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} TON {value} içinde çekilecek",
+    "staking_pool_liquid_desc": "%{coinSymbolWithEx}’u bir Tonstakers havuzunda stake ettiğinizde, havuzdaki payınızı temsil eden tsTON adlı bir jeton alırsınız. Havuz kar biriktirdikçe tsTON’unuz daha fazla %{coinSymbolWithEx}’u temsil eder.",
+    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} {date} tarihinde çekilecek",
+    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} döngü sonunda çekilecek",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} {value} içinde çekilecek",
     "staking_confirm_modal_provider": "Sağlayıcı",
     "staking_confirm_modal_amount": "Tutar",
     "staking_confirm_modal_apy": "APY",
@@ -1689,7 +1689,7 @@
     "staking_tonstakers_notice": "Stake, üçüncü taraf akıllı sözleşmelere dayanır. Tonkeeper stake deneyiminden sorumlu değildir.",
     "staking_claim": "Talep et",
     "staking_details_pool_address_label": "Havuz adresi",
-    "staking_pending_deposit": "{amount} TON stake bekliyor",
-    "staking_pools_min_deposit": "Min. yatırma {minDeposit} TON",
+    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} stake bekliyor",
+    "staking_pools_min_deposit": "Min. yatırma {minDeposit} %{coinSymbolWithEx}",
     "staking_tf_full_withdrawal_only": "Yalnızca tam çekim mümkün"
 }

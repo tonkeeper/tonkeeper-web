@@ -1,4 +1,5 @@
 import React, { FC, ReactNode } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { useTranslation } from '../../../../hooks/translation';
 import {
@@ -36,7 +37,7 @@ export const DepositStakeDesktopAction: FC<{
                 <HistoryCellComment />
                 <HistoryCellAmount
                     amount={depositStake.amount}
-                    symbol={CryptoCurrency.TON}
+                    symbol={BRAND_CONFIG.coinSymbolWithEx}
                     decimals={9}
                     isFailed={isFailed}
                     isNegative
@@ -68,7 +69,7 @@ export const WithdrawStakeDesktopAction: FC<{
                 <HistoryCellComment />
                 <HistoryCellAmount
                     amount={withdrawStake.amount}
-                    symbol={CryptoCurrency.TON}
+                    symbol={BRAND_CONFIG.coinSymbolWithEx}
                     decimals={9}
                     isFailed={action.status === 'failed'}
                 />
@@ -109,7 +110,7 @@ export const WithdrawRequestStakeDesktopAction: FC<{
         amountNode = (
             <HistoryCellAmount
                 amount={withdrawStakeRequest.amount}
-                symbol={CryptoCurrency.TON}
+                symbol={BRAND_CONFIG.coinSymbolWithEx}
                 decimals={9}
                 isFailed={isFailed}
             />

@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useMemo } from 'react';
@@ -66,7 +67,7 @@ const TonTransferAction: FC<{
                     tonTransfer.sender.name,
                     formatAddress(tonTransfer.sender.address, network)
                 )}
-                symbol={CryptoCurrency.TON}
+                symbol={BRAND_CONFIG.coinSymbolWithEx}
                 date={date}
                 isScam={tonTransfer.sender.isScam || isScam}
                 comment={tonTransfer.comment}
@@ -77,7 +78,7 @@ const TonTransferAction: FC<{
     return (
         <SendActivityAction
             amount={format(tonTransfer.amount)}
-            symbol={CryptoCurrency.TON}
+            symbol={BRAND_CONFIG.coinSymbolWithEx}
             recipient={toAddressTextValue(
                 tonTransfer.recipient.name,
                 formatAddress(tonTransfer.recipient.address, network)
@@ -164,7 +165,7 @@ export const SmartContractExecAction: FC<{
                     title={t('transactions_smartcontract_exec')}
                     amount={<>+&thinsp;{format(smartContractExec.tonAttached)}</>}
                     green
-                    entry={CryptoCurrency.TON}
+                    entry={BRAND_CONFIG.coinSymbolWithEx}
                     address={formatAddress(smartContractExec.contract.address, network)}
                     date={date}
                 />
@@ -180,7 +181,7 @@ export const SmartContractExecAction: FC<{
                 <ColumnLayout
                     title={t('transactions_smartcontract_exec')}
                     amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
-                    entry={CryptoCurrency.TON}
+                    entry={BRAND_CONFIG.coinSymbolWithEx}
                     address={formatAddress(smartContractExec.contract.address, network, true)}
                     date={date}
                 />

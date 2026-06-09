@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { BRAND_CONFIG } from '../config/brand';
 import { JettonsBalances } from '../tonApiV2';
 import { getBrowserLocale, getDecimalSeparator, getGroupSeparator } from './formatting';
 
@@ -55,6 +56,9 @@ export function formatSendValue(str: string) {
 }
 
 export const getJettonSymbol = (address: string, jettons: JettonsBalances): string => {
+    if (address === 'TON') {
+        return BRAND_CONFIG.coinSymbolWithEx;
+    }
     const jetton = jettons.balances.find(item => item.jetton.address === address);
     return jetton?.jetton.symbol ?? address;
 };

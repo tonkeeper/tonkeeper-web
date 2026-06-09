@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { FC } from 'react';
 
@@ -34,7 +35,7 @@ export const TonTransferDesktopAction: FC<{
                     <HistoryCellComment comment={tonTransfer.comment} isScam={isScam} />
                     <HistoryCellAmount
                         amount={tonTransfer.amount}
-                        symbol={CryptoCurrency.TON}
+                        symbol={BRAND_CONFIG.coinSymbolWithEx}
                         decimals={9}
                         isFailed={action.status === 'failed'}
                         isSpam={isScam}
@@ -51,7 +52,7 @@ export const TonTransferDesktopAction: FC<{
                 <HistoryCellComment comment={tonTransfer.comment} />
                 <HistoryCellAmount
                     amount={tonTransfer.amount}
-                    symbol={CryptoCurrency.TON}
+                    symbol={BRAND_CONFIG.coinSymbolWithEx}
                     decimals={9}
                     isFailed={action.status === 'failed'}
                     isNegative
