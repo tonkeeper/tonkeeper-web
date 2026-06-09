@@ -10,7 +10,8 @@ import { Configuration, DefaultApi, EmulationApi } from '../../../batteryApi';
 import BigNumber from 'bignumber.js';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
-import { TonEstimation } from "../../../entries/send";
+import { TonEstimation } from '../../../entries/send';
+import { NotEnoughBatteryBalanceError } from '../../../errors/NotEnoughBatteryBalanceError';
 
 export class BatteryMessageSender implements ISender {
     constructor(
@@ -48,13 +49,18 @@ export class BatteryMessageSender implements ISender {
     public async estimate(outgoing: WalletOutgoingMessage) {
         const external = await this.toExternal(outgoing);
 
-        const result = await new EmulationApi(this.api.batteryApi).emulateMessageToWallet({
+        const response = await new EmulationApi(this.api.batteryApi).emulateMessageToWalletRaw({
             xTonConnectAuth: this.batteryConfig.authToken,
             emulateMessageToWalletRequest: {
                 boc: external.toBoc().toString('base64')
             },
             enableValidation: true
         });
+        if (response.raw.headers.get('Allowed-By-Battery')?.toLowerCase() === 'false') {
+            throw new NotEnoughBatteryBalanceError('Not enough battery balance');
+        }
+
+        const result = await response.value();
 
         const extra = new AssetAmount({
             asset: TON_ASSET,
