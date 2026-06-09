@@ -106,7 +106,8 @@ export class ExtensionBuilder {
         const subs: Record<string, string> = {
             '%{chainName}': BRAND_CONFIG.chainName,
             '%{coinName}': BRAND_CONFIG.coinName,
-            '%{coinSymbol}': BRAND_CONFIG.coinSymbol
+            '%{coinSymbol}': BRAND_CONFIG.coinSymbol,
+            '%{coinSymbolWithEx}': BRAND_CONFIG.coinSymbolWithEx
         };
         for (const lang of fs.readdirSync(localesDir)) {
             const file = `${localesDir}/${lang}/messages.json`;

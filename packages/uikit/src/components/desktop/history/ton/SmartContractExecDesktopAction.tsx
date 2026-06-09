@@ -40,7 +40,7 @@ export const SmartContractExecDesktopAction: FC<{
                 <HistoryCellComment />
                 <HistoryCellAmount
                     amount={smartContractExec.tonAttached}
-                    symbol={BRAND_CONFIG.coinSymbol}
+                    symbol={BRAND_CONFIG.coinSymbolWithEx}
                     decimals={9}
                     isFailed={action.status === 'failed'}
                     isSpam={isScam}

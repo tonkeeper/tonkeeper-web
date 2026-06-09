@@ -309,7 +309,7 @@ const FirstParticipantCard: FC<{ skipBalanceCheck?: boolean }> = ({ skipBalanceC
             const wallet = await new AccountsApi(api.tonApiV2).getAccount({ accountId });
 
             if (deployMultisigAssetAmount.weiAmount.gt(wallet.balance)) {
-                return { message: `Not enough ${BRAND_CONFIG.coinSymbol} balance for deploy` };
+                return { message: `Not enough ${BRAND_CONFIG.coinSymbolWithEx} balance for deploy` };
             }
         },
         [api, skipBalanceCheck]

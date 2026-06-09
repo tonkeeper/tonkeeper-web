@@ -309,7 +309,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             const amount = assets.ton.info.balance;
             return {
                 image: TON_ASSET.image!,
-                symbol: TON_ASSET.symbol,
+                symbol: BRAND_CONFIG.coinSymbolWithEx,
                 amount: format(amount),
                 fiatAmount: formatFiatCurrency(
                     fiat,

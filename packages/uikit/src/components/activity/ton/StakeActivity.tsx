@@ -31,7 +31,7 @@ export const DepositStakeAction: FC<{
             <ColumnLayout
                 title={t('staking_deposit')}
                 amount={<>-&thinsp;{format(depositStake.amount)}</>}
-                entry={BRAND_CONFIG.coinSymbol}
+                entry={BRAND_CONFIG.coinSymbolWithEx}
                 address={toAddressTextValue(
                     depositStake.pool.name,
                     formatAddress(depositStake.pool.address, network, true)
@@ -62,7 +62,7 @@ export const WithdrawStakeAction: FC<{
             <ColumnLayout
                 title={t('staking_withdraw')}
                 amount={<>+&thinsp;{format(withdrawStake.amount)}</>}
-                entry={BRAND_CONFIG.coinSymbol}
+                entry={BRAND_CONFIG.coinSymbolWithEx}
                 green
                 address={toAddressTextValue(
                     withdrawStake.pool.name,
@@ -95,7 +95,7 @@ export const WithdrawRequestStakeAction: FC<{
         entry = stakeMeta.tokenName;
     } else if (withdrawStakeRequest.amount) {
         amountNode = <>+&thinsp;{format(withdrawStakeRequest.amount)}</>;
-        entry = BRAND_CONFIG.coinSymbol;
+        entry = BRAND_CONFIG.coinSymbolWithEx;
     }
 
     return (

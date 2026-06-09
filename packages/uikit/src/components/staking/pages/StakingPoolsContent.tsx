@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { FC, MouseEvent, useMemo } from 'react';
 import { styled } from 'styled-components';
@@ -192,7 +193,7 @@ const PoolListRow: FC<PoolListRowProps> = ({
     );
 
     const displayAmount = useMemo(() => {
-        return formatTokenDisplay(tonAmount, TON_ASSET.symbol);
+        return formatTokenDisplay(tonAmount, BRAND_CONFIG.coinSymbolWithEx);
     }, [tonAmount]);
 
     const minStakeTON = shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0);

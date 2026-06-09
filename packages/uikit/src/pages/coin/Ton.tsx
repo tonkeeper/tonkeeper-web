@@ -28,7 +28,7 @@ const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     return (
         <CoinInfo
             amount={total}
-            symbol={BRAND_CONFIG.coinSymbol}
+            symbol={BRAND_CONFIG.coinSymbolWithEx}
             price={fiatAmount}
             description={t('Ton_page_description')}
             image={NATIVE_COIN_ICON}

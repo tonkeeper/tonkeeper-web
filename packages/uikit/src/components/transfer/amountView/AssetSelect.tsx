@@ -84,7 +84,7 @@ const AssetDropDown: FC<{
                 <ListItemPayload>
                     <AssetInfo>
                         <AssetImage src={NATIVE_COIN_ICON}></AssetImage>
-                        <Label1>{BRAND_CONFIG.coinSymbol}</Label1>
+                        <Label1>{BRAND_CONFIG.coinSymbolWithEx}</Label1>
                         <Amount>{format(info?.balance ?? 0)}</Amount>
                     </AssetInfo>
                     {CryptoCurrency.TON === jetton ? (

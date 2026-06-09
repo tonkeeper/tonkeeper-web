@@ -35,7 +35,7 @@ export const swapValue = (
     if (jettonSwap.tonIn !== undefined) {
         assetIn = {
             amount: jettonSwap.tonIn,
-            symbol: BRAND_CONFIG.coinSymbol,
+            symbol: BRAND_CONFIG.coinSymbolWithEx,
             decimals: 9
         };
     } else {
@@ -49,7 +49,7 @@ export const swapValue = (
     if (jettonSwap.tonOut !== undefined) {
         assetOut = {
             amount: jettonSwap.tonOut,
-            symbol: BRAND_CONFIG.coinSymbol,
+            symbol: BRAND_CONFIG.coinSymbolWithEx,
             decimals: 9
         };
     } else {

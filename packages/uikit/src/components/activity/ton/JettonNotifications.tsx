@@ -109,7 +109,7 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
         const result: string[] = [];
 
         if (jettonSwap.tonIn) {
-            result.push(`${format(jettonSwap.tonIn)} ${BRAND_CONFIG.coinSymbol}`);
+            result.push(`${format(jettonSwap.tonIn)} ${BRAND_CONFIG.coinSymbolWithEx}`);
         } else {
             result.push(
                 `${format(
@@ -123,7 +123,7 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
         }
 
         if (jettonSwap.tonOut) {
-            result.push(`${format(jettonSwap.tonOut)} ${BRAND_CONFIG.coinSymbol}`);
+            result.push(`${format(jettonSwap.tonOut)} ${BRAND_CONFIG.coinSymbolWithEx}`);
         } else {
             result.push(
                 `${format(

@@ -67,7 +67,7 @@ const TonTransferAction: FC<{
                     tonTransfer.sender.name,
                     formatAddress(tonTransfer.sender.address, network)
                 )}
-                symbol={BRAND_CONFIG.coinSymbol}
+                symbol={BRAND_CONFIG.coinSymbolWithEx}
                 date={date}
                 isScam={tonTransfer.sender.isScam || isScam}
                 comment={tonTransfer.comment}
@@ -78,7 +78,7 @@ const TonTransferAction: FC<{
     return (
         <SendActivityAction
             amount={format(tonTransfer.amount)}
-            symbol={BRAND_CONFIG.coinSymbol}
+            symbol={BRAND_CONFIG.coinSymbolWithEx}
             recipient={toAddressTextValue(
                 tonTransfer.recipient.name,
                 formatAddress(tonTransfer.recipient.address, network)
@@ -165,7 +165,7 @@ export const SmartContractExecAction: FC<{
                     title={t('transactions_smartcontract_exec')}
                     amount={<>+&thinsp;{format(smartContractExec.tonAttached)}</>}
                     green
-                    entry={BRAND_CONFIG.coinSymbol}
+                    entry={BRAND_CONFIG.coinSymbolWithEx}
                     address={formatAddress(smartContractExec.contract.address, network)}
                     date={date}
                 />
@@ -181,7 +181,7 @@ export const SmartContractExecAction: FC<{
                 <ColumnLayout
                     title={t('transactions_smartcontract_exec')}
                     amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
-                    entry={BRAND_CONFIG.coinSymbol}
+                    entry={BRAND_CONFIG.coinSymbolWithEx}
                     address={formatAddress(smartContractExec.contract.address, network, true)}
                     date={date}
                 />
