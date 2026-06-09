@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "روش‌های دیگر برای خرید"
     },
-    "exchange_other_ways": "راه‌های دیگر خرید یا فروش %{coinSymbol}",
-    "exchange_title": "خرید %{coinSymbol}",
+    "exchange_other_ways": "راه‌های دیگر خرید یا فروش %{coinSymbolWithEx}",
+    "exchange_title": "خرید %{coinSymbolWithEx}",
     "import_add_wallet": "کیف پول اضافه کنید",
     "import_add_wallet_description": "یک کیف پول جدید بسازید یا یک کیف پول موجود را اضافه کنید.",
     "import_existing_wallet": "کیف پول موجود",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "کپی"
     },
-    "reminder_notifications_caption": "هنگامی که %{coinSymbol}، توکن‌ها و NFT دریافت می‌کنید، اعلان‌ها را دریافت کنید.",
+    "reminder_notifications_caption": "هنگامی که %{coinSymbolWithEx}، توکن‌ها و NFT دریافت می‌کنید، اعلان‌ها را دریافت کنید.",
     "reminder_notifications_enable_button": "اعلان‌ها را فعال کنید",
     "reminder_notifications_later_button": "بعداً",
     "reminder_notifications_title": "اعلان‌های فوری دریافت کنید",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "درآمد سالانه پیش‌بینی‌شده",
     "staking_enter_amount": "مقدار را وارد کنید",
     "staking_insufficient_balance": "موجودی کافی نیست",
-    "staking_insufficient_recommended_fee_reserve": "موجودی کافی نیست: موجودی کیف پول باید شامل 1 %{coinSymbol} ذخیره و 0.05 %{coinSymbol} کارمزد باشد.",
+    "staking_insufficient_recommended_fee_reserve": "موجودی کافی نیست: موجودی کیف پول باید شامل 1 %{coinSymbolWithEx} ذخیره و 0.05 %{coinSymbolWithEx} کارمزد باشد.",
     "staking_max": "حداکثر",
     "staking_min_deposit_label": "حداقل واریز",
     "staking_next_cycle_desc_liquid": "برداشت فوری موجود است",
     "staking_next_cycle_message": "چرخه بعدی در {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · حداقل واریز {minDeposit} %{coinSymbol}",
+    "staking_pool_detail": "APY ≈ {apy}% · حداقل واریز {minDeposit} %{coinSymbolWithEx}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbol} آماده برداشت",
+    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} آماده برداشت",
     "staking_rewards_after_stake": "پس از استیک",
     "staking_rewards_current": "فعلی",
-    "staking_rewards_value": "≈ {value} %{coinSymbol}",
+    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
     "staking_staked": "استیک شده",
     "staking_title": "استیکینگ",
     "staking_top_up": "واریز",
@@ -346,7 +346,7 @@
         "subtitle": "NFT ممکن است به یکی از دلایل زیر امن نباشد.",
         "title": "NFT تاییدنشده"
     },
-    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbol} کافی برای کارمزد شبکه وجود ندارد ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbolWithEx} کافی برای کارمزد شبکه وجود ندارد ({required})",
     "swap_exchange_in": "تبادل در",
     "swap_expired_refresh": "مبادله منقضی شد. قیمت را بروزرسانی کنید",
     "swap_price_impact_description": "تفاوت بین قیمت بازار و قیمت تخمینی به دلیل حجم معامله.",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "انتقال توکن",
                 "nftItemTransfer": "انتقال NFT",
-                "tonTransfer": "انتقال %{coinSymbol}",
+                "tonTransfer": "انتقال %{coinSymbolWithEx}",
                 "unknownTransaction": "تراکنش ناشناخته"
             }
         }
@@ -573,10 +573,10 @@
     "wallet_swap": "مبادله",
     "wallet_title": "کیف پول",
     "yesterday": "دیروز",
-    "staking_pool_liquid_desc": "وقتی %{coinSymbol} را در استخر Tonstakers استیک می‌کنید، توکنی به نام tsTON دریافت می‌کنید که سهم شما در استخر را نشان می‌دهد. با انباشت سود استخر، tsTON شما مقدار بیشتری %{coinSymbol} را نشان می‌دهد.",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbol} در {date} برداشت می‌شود",
-    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbol} پس از پایان دوره برداشت می‌شود",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbol} در {value} برداشت می‌شود",
+    "staking_pool_liquid_desc": "وقتی %{coinSymbolWithEx} را در استخر Tonstakers استیک می‌کنید، توکنی به نام tsTON دریافت می‌کنید که سهم شما در استخر را نشان می‌دهد. با انباشت سود استخر، tsTON شما مقدار بیشتری %{coinSymbolWithEx} را نشان می‌دهد.",
+    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} در {date} برداشت می‌شود",
+    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} پس از پایان دوره برداشت می‌شود",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} در {value} برداشت می‌شود",
     "staking_confirm_modal_provider": "ارائه‌دهنده",
     "staking_confirm_modal_amount": "مبلغ",
     "staking_confirm_modal_apy": "APY",
@@ -585,7 +585,7 @@
     "staking_tonstakers_notice": "استیکینگ بر قراردادهای هوشمند اشخاص ثالث استوار است. Tonkeeper مسئول تجربه استیکینگ نیست.",
     "staking_claim": "دریافت",
     "staking_details_pool_address_label": "آدرس استخر",
-    "staking_pending_deposit": "{amount} %{coinSymbol} در انتظار استیک",
-    "staking_pools_min_deposit": "حداقل واریز {minDeposit} %{coinSymbol}",
+    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} در انتظار استیک",
+    "staking_pools_min_deposit": "حداقل واریز {minDeposit} %{coinSymbolWithEx}",
     "staking_tf_full_withdrawal_only": "فقط برداشت کامل ممکن است"
 }

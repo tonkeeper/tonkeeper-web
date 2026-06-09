@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import { FC, forwardRef, useMemo } from 'react';
@@ -71,7 +72,7 @@ export const TonAsset = forwardRef<
                 <TokenLogo src={TON_ASSET.image} noRadius={TON_ASSET.noImageCorners} />
                 <TokenLayout
                     name={t('Toncoin')}
-                    symbol={balance.asset.symbol}
+                    symbol={BRAND_CONFIG.coinSymbolWithEx}
                     balance={balance.stringRelativeAmount}
                     secondary={fiatPrice}
                     fiatAmount={fiatAmount}

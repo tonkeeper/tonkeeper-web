@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "Other ways to buy"
     },
-    "exchange_other_ways": "Other ways to buy or sell %{coinSymbol}",
-    "exchange_title": "Buy %{coinSymbol}",
+    "exchange_other_ways": "Other ways to buy or sell %{coinSymbolWithEx}",
+    "exchange_title": "Buy %{coinSymbolWithEx}",
     "import_add_wallet": "Add Wallet",
     "import_add_wallet_description": "Create a new wallet or add an existing one.",
     "import_existing_wallet": "Import Wallet",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "Copy"
     },
-    "reminder_notifications_caption": "Get notifications when you receive %{coinSymbol}, tokens and NFTs.",
+    "reminder_notifications_caption": "Get notifications when you receive %{coinSymbolWithEx}, tokens and NFTs.",
     "reminder_notifications_enable_button": "Enable notifications",
     "reminder_notifications_later_button": "Later",
     "reminder_notifications_title": "Get instant notifications",
@@ -293,21 +293,21 @@
     "staking_earnings_section_title": "Expected annual earning",
     "staking_enter_amount": "Enter an amount",
     "staking_insufficient_balance": "Insufficient balance",
-    "staking_insufficient_recommended_fee_reserve": "Insufficient funds: 1 %{coinSymbol} reserve + 0.05 %{coinSymbol} fee required in wallet balance.",
+    "staking_insufficient_recommended_fee_reserve": "Insufficient funds: 1 %{coinSymbolWithEx} reserve + 0.05 %{coinSymbolWithEx} fee required in wallet balance.",
     "staking_max": "MAX",
     "staking_min_deposit_label": "Minimum deposit",
     "staking_next_cycle_desc_liquid": "Instant unstake available",
     "staking_next_cycle_message": "Next cycle in {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · Min. deposit {minDeposit} %{coinSymbol}",
-    "staking_pool_liquid_desc": "When you stake %{coinSymbol} in a Tonstakers pool, you receive a token called tsTON that represents your share in the pool. As the pool accumulates profits, your tsTON represents larger amount of %{coinSymbol}.",
+    "staking_pool_detail": "APY ≈ {apy}% · Min. deposit {minDeposit} %{coinSymbolWithEx}",
+    "staking_pool_liquid_desc": "When you stake %{coinSymbolWithEx} in a Tonstakers pool, you receive a token called tsTON that represents your share in the pool. As the pool accumulates profits, your tsTON represents larger amount of %{coinSymbolWithEx}.",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbol} will be withdrawn on {date}",
-    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbol} will be withdrawn after the end of the cycle",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbol} will be withdrawn in {value}",
-    "staking_ready_withdraw": "{amount} %{coinSymbol} ready to withdraw",
+    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} will be withdrawn on {date}",
+    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} will be withdrawn after the end of the cycle",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} will be withdrawn in {value}",
+    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} ready to withdraw",
     "staking_rewards_after_stake": "After stake",
     "staking_rewards_current": "Current",
-    "staking_rewards_value": "≈ {value} %{coinSymbol}",
+    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
     "staking_staked": "Staked",
     "staking_title": "Staking",
     "staking_top_up": "Stake",
@@ -320,8 +320,8 @@
     "staking_tonstakers_notice": "Staking is based on smart contracts by third parties. Tonkeeper is not responsible for staking experience.",
     "staking_claim": "Claim",
     "staking_details_pool_address_label": "Pool address",
-    "staking_pending_deposit": "{amount} %{coinSymbol} pending stake",
-    "staking_pools_min_deposit": "Min. deposit {minDeposit} %{coinSymbol}",
+    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} pending stake",
+    "staking_pools_min_deposit": "Min. deposit {minDeposit} %{coinSymbolWithEx}",
     "staking_tf_full_withdrawal_only": "Only full withdrawal is available",
     "start_screen": {
         "create_wallet_button": "Create New Wallet",
@@ -361,7 +361,7 @@
         "subtitle": "NFT may not be safe to use for one of the following reasons.",
         "title": "Unverified NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "Not enough %{coinSymbol} for network fee ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "Not enough %{coinSymbolWithEx} for network fee ({required})",
     "swap_exchange_in": "Exchange in",
     "swap_expired_refresh": "Swap expired. Refresh the quote",
     "swap_price_impact_description": "The difference between the market price and estimated price due to trade size.",
@@ -426,7 +426,7 @@
             "types": {
                 "jettonTransfer": "Token Transfer",
                 "nftItemTransfer": "NFT Transfer",
-                "tonTransfer": "%{coinSymbol} Transfer",
+                "tonTransfer": "%{coinSymbolWithEx} Transfer",
                 "unknownTransaction": "Unknown transaction"
             }
         }

@@ -42,7 +42,10 @@ export const tReplace = (product: string, replaces?: Record<string, string | num
     }
 
     return Object.entries(replaces).reduce(
-        (acc, [key, val]) => acc.replace(new RegExp('%{' + key + '}'), val.toString()),
+        // Global flag so placeholders that appear more than once in a string are all replaced
+        // (e.g. "%{coinSymbolWithEx} … amount of %{coinSymbolWithEx}"). Braces escaped; replacement
+        // passed as a function so a literal `$` in the value isn't treated as a backreference.
+        (acc, [key, val]) => acc.replace(new RegExp('%\\{' + key + '\\}', 'g'), () => val.toString()),
         product
     );
 };
@@ -51,13 +54,14 @@ export const useTWithReplaces = (tSimple: Translation) => {
     return useCallback(
         (val: string, replaces?: Record<string, string | number>) => {
             // Always expose the brand names so any locale string can reference the configurable
-            // native chain/coin via `%{chainName}` / `%{coinName}` / `%{coinSymbol}`. Per-call
-            // `replaces` win over the brand defaults.
+            // native chain/coin via `%{chainName}` / `%{coinName}` / `%{coinSymbol}` /
+            // `%{coinSymbolWithEx}`. Per-call `replaces` win over the brand defaults.
             const brand = BRAND_CONFIG;
             const withBrand = {
                 chainName: brand.chainName,
                 coinName: brand.coinName,
                 coinSymbol: brand.coinSymbol,
+                coinSymbolWithEx: brand.coinSymbolWithEx,
                 ...replaces
             };
 

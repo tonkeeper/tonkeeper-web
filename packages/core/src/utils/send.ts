@@ -57,7 +57,7 @@ export function formatSendValue(str: string) {
 
 export const getJettonSymbol = (address: string, jettons: JettonsBalances): string => {
     if (address === 'TON') {
-        return BRAND_CONFIG.coinSymbol;
+        return BRAND_CONFIG.coinSymbolWithEx;
     }
     const jetton = jettons.balances.find(item => item.jetton.address === address);
     return jetton?.jetton.symbol ?? address;

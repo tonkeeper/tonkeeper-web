@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "طرق أخرى للشراء"
     },
-    "exchange_other_ways": "طرق أخرى لشراء أو بيع %{coinSymbol}",
-    "exchange_title": "شراء %{coinSymbol}",
+    "exchange_other_ways": "طرق أخرى لشراء أو بيع %{coinSymbolWithEx}",
+    "exchange_title": "شراء %{coinSymbolWithEx}",
     "import_add_wallet": "إضافة محفظة",
     "import_add_wallet_description": "إنشاء محفظة جديدة أو إضافة محفظة موجودة.",
     "import_existing_wallet": "محفظة موجودة",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "نسخ"
     },
-    "reminder_notifications_caption": "احصل على إشعارات عند استلام %{coinSymbol} والرموز المميزة و NFTs",
+    "reminder_notifications_caption": "احصل على إشعارات عند استلام %{coinSymbolWithEx} والرموز المميزة و NFTs",
     "reminder_notifications_enable_button": "تمكين الإشعارات",
     "reminder_notifications_later_button": "لاحقا",
     "reminder_notifications_title": "احصل على إشعارات فورية",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "الأرباح السنوية المتوقعة",
     "staking_enter_amount": "ادخل مبلغ",
     "staking_insufficient_balance": "الرصيد غير كافٍ",
-    "staking_insufficient_recommended_fee_reserve": "الأموال غير كافية: يجب أن يتضمن رصيد المحفظة 1 %{coinSymbol} كاحتياطي و0.05 %{coinSymbol} كرسوم.",
+    "staking_insufficient_recommended_fee_reserve": "الأموال غير كافية: يجب أن يتضمن رصيد المحفظة 1 %{coinSymbolWithEx} كاحتياطي و0.05 %{coinSymbolWithEx} كرسوم.",
     "staking_max": "الحد الأقصى",
     "staking_min_deposit_label": "الحد الأدنى للإيداع",
     "staking_next_cycle_desc_liquid": "إلغاء التحصيص الفوري متاح",
     "staking_next_cycle_message": "الدورة التالية خلال {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · الحد الأدنى للإيداع {minDeposit} %{coinSymbol}",
+    "staking_pool_detail": "APY ≈ {apy}% · الحد الأدنى للإيداع {minDeposit} %{coinSymbolWithEx}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbol} جاهز للسحب",
+    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} جاهز للسحب",
     "staking_rewards_after_stake": "بعد التحصيص",
     "staking_rewards_current": "حاليا",
-    "staking_rewards_value": "≈ {value} %{coinSymbol}",
+    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
     "staking_staked": "محصصة",
     "staking_title": "التحصيص",
     "staking_top_up": "تحصيص",
@@ -346,7 +346,7 @@
         "subtitle": "قد يكون الـNFT غير آمن للاستخدام بسبب أحد الأسباب التالية.",
         "title": "لم يتم التحقق منه NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "لا يوجد %{coinSymbol} كافٍ لرسوم الشبكة ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "لا يوجد %{coinSymbolWithEx} كافٍ لرسوم الشبكة ({required})",
     "swap_exchange_in": "التبادل في",
     "swap_expired_refresh": "انتهت صلاحية المبادلة. حدّث عرض السعر",
     "swap_price_impact_description": "الفرق بين سعر السوق والسعر المقدر بسبب حجم الصفقة.",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "تحويل رمز",
                 "nftItemTransfer": "NFT تحويل",
-                "tonTransfer": "تحويل %{coinSymbol}",
+                "tonTransfer": "تحويل %{coinSymbolWithEx}",
                 "unknownTransaction": "معاملة غير معروفة"
             }
         }
@@ -1634,10 +1634,10 @@
     "wallet_swap": "تبادل",
     "wallet_title": "المحفظة",
     "yesterday": "أمس",
-    "staking_pool_liquid_desc": "عند تخزين %{coinSymbol} في مجموعة Tonstakers، تستلم رمزًا يُسمى tsTON يمثّل حصتك في المجموعة. مع تراكم أرباح المجموعة، يمثّل tsTON كمية أكبر من %{coinSymbol}.",
-    "staking_pool_withdraw_date": "سيتم سحب {amount} %{coinSymbol} في {date}",
-    "staking_portfolio_pending_withdraw": "سيتم سحب {amount} %{coinSymbol} بعد انتهاء الدورة",
-    "staking_portfolio_pending_withdraw_countdown": "سيتم سحب {amount} %{coinSymbol} خلال {value}",
+    "staking_pool_liquid_desc": "عند تخزين %{coinSymbolWithEx} في مجموعة Tonstakers، تستلم رمزًا يُسمى tsTON يمثّل حصتك في المجموعة. مع تراكم أرباح المجموعة، يمثّل tsTON كمية أكبر من %{coinSymbolWithEx}.",
+    "staking_pool_withdraw_date": "سيتم سحب {amount} %{coinSymbolWithEx} في {date}",
+    "staking_portfolio_pending_withdraw": "سيتم سحب {amount} %{coinSymbolWithEx} بعد انتهاء الدورة",
+    "staking_portfolio_pending_withdraw_countdown": "سيتم سحب {amount} %{coinSymbolWithEx} خلال {value}",
     "staking_confirm_modal_provider": "المزوّد",
     "staking_confirm_modal_amount": "المبلغ",
     "staking_confirm_modal_apy": "APY",
@@ -1646,7 +1646,7 @@
     "staking_tonstakers_notice": "يعتمد التخزين على عقود ذكية من أطراف ثالثة. Tonkeeper غير مسؤول عن تجربة التخزين.",
     "staking_claim": "المطالبة",
     "staking_details_pool_address_label": "عنوان المجموعة",
-    "staking_pending_deposit": "{amount} %{coinSymbol} قيد التخزين",
-    "staking_pools_min_deposit": "الحد الأدنى للإيداع {minDeposit} %{coinSymbol}",
+    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} قيد التخزين",
+    "staking_pools_min_deposit": "الحد الأدنى للإيداع {minDeposit} %{coinSymbolWithEx}",
     "staking_tf_full_withdrawal_only": "السحب الكامل متاح فقط"
 }

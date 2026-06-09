@@ -1,4 +1,5 @@
 import { Action, ActionTypeEnum } from '@tonkeeper/core/dist/tonApiV2';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useTranslation } from '../../../hooks/translation';
@@ -146,7 +147,7 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, 
                         ? `- ${new AssetAmount({
                               asset: TON_ASSET,
                               weiAmount: amount
-                          }).toStringAssetAbsoluteRelativeAmount()}`
+                          }).toStringAbsoluteRelativeAmount()} ${BRAND_CONFIG.coinSymbolWithEx}`
                         : ''
                 }
                 address={
