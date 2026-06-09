@@ -93,7 +93,7 @@ jobs:
                   echo '### Successful WEB deployment 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
                   echo 'Well done!' >> $GITHUB_STEP_SUMMARY
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
-                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
             - name: Comment PR
               uses: thollander/actions-comment-pull-request@v3
@@ -103,5 +103,5 @@ jobs:
                       ### Successful WEB deployment 🚀🚀🚀
                       Well done!
                       Link to test environment:
-                      ${{ steps.deploy.outputs.deployment-url }}
+                      ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
                   comment-tag: web_deploy
