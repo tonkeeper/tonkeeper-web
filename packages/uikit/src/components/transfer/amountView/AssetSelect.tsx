@@ -38,15 +38,16 @@ const AssetImage = styled(Image)`
 
 const AssetInfo = styled.div`
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    width: 200px;
-    overflow: hidden;
+    flex: 1;
+    min-width: 0;
 `;
 
 const Amount = styled(Body1)`
     color: ${props => props.theme.textSecondary};
-    text-overflow: ellipsis;
-    overflow: hidden;
+    overflow-wrap: anywhere;
 `;
 
 const Icon = styled.span`
