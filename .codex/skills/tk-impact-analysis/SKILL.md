@@ -48,17 +48,26 @@ For the reusable invocation prompt, read [references/prompt-template.md](referen
 - In the local-script flow, fetch release tags from `origin` first (`git fetch --tags --force origin`) so the latest release set is available locally.
 - If fetch fails with SSH authentication errors, stop and ask the user to run `python3 .codex/skills/tk-impact-analysis/scripts/tk_impact_analysis.py --platform Web --write-raw` manually in their terminal.
 - After the user says it is done, verify that `reports/<execution-date>/Web/raw-git-data.txt`, `report.md`, and `test-collection.txt` were updated recently before using them.
-- Detect the current branch unless `BASE_BRANCH` was provided explicitly.
-- Releases are identified by tags only:
-  - Discover tags matching `vX.Y.Z` (e.g. `v4.7.0`); skip pre-release tags (`rc`, `alpha`, `beta`, `test`).
-  - Release branches are intentionally NOT used. If no release tags exist, stop and ask for an explicit `RELEASE_BRANCH` comparison ref.
-- Select the correct comparison ref:
-  - If `BASE_BRANCH` resolves to the latest release tag, compare it with the previous release tag.
-  - If `BASE_BRANCH` resolves to an older release tag, compare it with the latest release tag.
-  - If `BASE_BRANCH` is not a release tag, compare it with the latest release tag.
+
+**Resolving BASE_BRANCH — do this before any git diff:**
+- If `BASE_BRANCH` was provided explicitly, use it exactly as given. Do not substitute the current git branch.
+- If `BASE_BRANCH` was NOT provided, run `git branch --show-current` to detect the current branch.
+  - **STOP and ask** if the detected branch does not look like a release artifact. A branch looks like a release artifact when it matches one of: `vX.Y.Z`, `vX.Y.Z-rc.N`, `release/*`, `hotfix/*`. Any other name (e.g. `main`, `feature/*`, `fix/*`, a skill or tooling branch) must be confirmed by the user before proceeding. Show the detected branch name and ask: "Подтвердите ветку для анализа или передайте BASE_BRANCH явно."
+  - Only proceed without asking when the detected branch clearly matches a release pattern.
+- Echo back the resolved BASE_BRANCH and the planned comparison ref **before running git diff**, so the user can catch a wrong target immediately.
+
+**Resolving the comparison ref (RELEASE_BRANCH):**
 - If `RELEASE_BRANCH` was provided explicitly, use it as the comparison target.
-- Confirm both comparison refs exist locally or as remote refs.
-- The branch under analysis must be the `head` of the three-dot diff so it reports the changes that branch introduced relative to the merge base: `git diff RELEASE_TAG...CURRENT_BRANCH`.
+- Otherwise discover it from tags:
+  - Stable release tags match `vX.Y.Z` with no suffix (e.g. `v4.7.0`). RC / pre-release tags (`-rc`, `-alpha`, `-beta`, `-test`) are **excluded** from this set — they must not be chosen as the comparison baseline.
+  - RC tags such as `vX.Y.Z-rc.N` are valid `BASE_BRANCH` targets (the thing being tested); they are not valid comparison baselines.
+  - If no stable release tags exist, stop and ask for an explicit `RELEASE_BRANCH`.
+- Select the correct stable comparison ref:
+  - If `BASE_BRANCH` is the latest stable tag → compare with the previous stable tag.
+  - If `BASE_BRANCH` is an older stable tag → compare with the latest stable tag.
+  - If `BASE_BRANCH` is an RC tag or any non-tag ref → compare with the latest stable tag.
+- Confirm both refs exist locally or as remote refs.
+- The branch under analysis must be the `head` of the three-dot diff: `git diff STABLE_TAG...BASE_BRANCH`.
 
 4. Inspect branch delta with git, paying special attention to dependency and config changes.
 - Start with (release tag first, current branch last):
@@ -94,6 +103,7 @@ For the reusable invocation prompt, read [references/prompt-template.md](referen
 - Identify the existing regression blocks already covering the changed areas.
 - Call out weak coverage, stale wording, duplicated checks, overly broad blocks, or missing negative cases.
 - Do not just keyword-match titles; reason from the changed code paths and user flows.
+- **Always include release-version-targeted blocks:** scan `regress.txt` for any line that contains the resolved `BASE_BRANCH` version string (e.g. `v26.06.0`) or the execution-date release label (e.g. `26.06`). These blocks were written in advance for this specific release and must be included in the recommended set regardless of whether their code change appears in the diff.
 
 6. Build the impact recommendation.
 - Recommend regression blocks from `regress.txt` that should be executed.
@@ -189,6 +199,7 @@ Also include the unmatched-file test suggestions, Missing Blocks, and Additional
 
 - Template path: `tk-impact-analysis/test-collection-template.txt`
 - Default run test collection path: `tk-impact-analysis/reports/<execution-date>/Web/test-collection.txt`
+- **Language:** write all test cases in English — the same language as `sources/Web/regress.txt`. Do not mix languages within a file.
 - Keep the structure compatible with `sources/Web/regress.txt`:
   - one test or block per line
   - indentation defines nesting
