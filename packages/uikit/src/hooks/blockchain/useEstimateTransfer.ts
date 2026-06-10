@@ -13,7 +13,7 @@ import {
 } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { useToQueryKeyPart } from '../useToQueryKeyPart';
 import { useMemo } from 'react';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
@@ -89,7 +89,7 @@ export function useEstimateTransfer({
                         throw new Error('Invalid recipient');
                     }
                     return await transferService.estimate(await getSender!(), {
-                        to: seeIfValidTonAddress(recipient.address.address)
+                        to: isTonAddress(recipient.address.address)
                             ? recipient.address.address
                             : recipient.toAccount.address,
                         amount: amount as AssetAmount<TonAsset>,

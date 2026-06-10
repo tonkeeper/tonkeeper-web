@@ -54,7 +54,8 @@ import {
     sortWalletsByVersion,
     WalletId
 } from '@tonkeeper/core/dist/entries/wallet';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { useMultisigsOfAccountToDisplay } from '../../state/multisig';
 import { SelectDropDown } from '../../components/fields/Select';

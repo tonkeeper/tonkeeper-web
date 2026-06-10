@@ -2,7 +2,8 @@ import { FC, ReactNode, useId } from 'react';
 import styled from 'styled-components';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { TonWalletStandard, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 
 import { Body2 } from '../Text';
 import { ListItem, ListItemPayload } from '../List';

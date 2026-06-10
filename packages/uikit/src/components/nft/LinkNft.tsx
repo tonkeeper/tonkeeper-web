@@ -4,7 +4,8 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { getWalletsAddresses } from '@tonkeeper/core/dist/service/walletService';
-import { areEqAddresses, formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { eqAddresses, formatAddress } from '@tonkeeper/core/dist/utils/address';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
@@ -133,7 +134,7 @@ const LinkNftUnlinked: FC<{
         linkToAddress
     });
 
-    const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.rawAddress);
+    const isSelectedCurrentAddress = eqAddresses(linkToAddress, walletState.rawAddress);
     const network = useActiveTonNetwork();
 
     const confirmChild = () => (
@@ -351,7 +352,7 @@ const LinkNftLinked: FC<{
 
     const isLinkedWithAnotherWallet = Object.values<{ address: Address; version: WalletVersion }>(
         isStandardTonWallet(walletState) ? getWalletsAddresses(walletState.publicKey, network) : {}
-    ).every(({ address }) => !areEqAddresses(address.toRawString(), linkedAddress));
+    ).every(({ address }) => !eqAddresses(address.toRawString(), linkedAddress));
 
     return (
         <>

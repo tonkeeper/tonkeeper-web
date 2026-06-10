@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Notification } from '../../Notification';
 import styled from 'styled-components';
 import { Body2 } from '../../Text';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { MultiSendFormTokenized } from '../../../hooks/blockchain/useSendMultiTransfer';
 import { formatFiatCurrency, formatter } from '../../../hooks/balance';
 import { useAppContext } from '../../../hooks/appContext';

@@ -10,7 +10,7 @@ import React, {
 import styled from 'styled-components';
 import { replaceTypedDecimalSeparator, seeIfValueValid } from '../transfer/amountView/AmountViewUI';
 import { getTextWidth } from '../../hooks/textWidth';
-import { formatSendValue, isNumeric, removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
+import { formatSendValue, inputToBigNumber, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import BigNumber from 'bignumber.js';
 import { formatter } from '../../hooks/balance';
@@ -190,10 +190,7 @@ export const AmountDoubleInput = forwardRef<
         }
     }, [currencyAmount.inputValue, fontSize]);
 
-    const inputValueToBN = useCallback(
-        (v: string) => new BigNumber(removeGroupSeparator(v).replace(getDecimalSeparator(), '.')),
-        []
-    );
+    const inputValueToBN = inputToBigNumber;
 
     const activeCurrency = currencies.find(c => c.id === currencyAmount.activeCurrencyId)!;
     const notActiveCurrency = currencies.find(c => c.id !== currencyAmount.activeCurrencyId)!;

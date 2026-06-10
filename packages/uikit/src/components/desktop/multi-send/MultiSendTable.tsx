@@ -47,8 +47,7 @@ import { SaveListNotification } from './SaveListNotification';
 import { UpdateListNotification } from './UpdateListNotification';
 import { ImportListNotification } from './import-list/ImportListNotification';
 import { getWillBeMultiSendValue } from './utils';
-import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
-import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
+import { inputToBigNumber } from '@tonkeeper/core/dist/utils/send';
 import { useActiveStandardTonWallet } from '../../../state/wallet';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useNavigate } from '../../../hooks/router/useNavigate';
@@ -668,12 +667,7 @@ const FormRow: FC<{ index: number; asset: TonAsset }> = ({ index, asset }) => {
 
                         let value;
                         try {
-                            value = new BigNumber(
-                                removeGroupSeparator(amount.value).replace(
-                                    getDecimalSeparator(),
-                                    '.'
-                                )
-                            );
+                            value = inputToBigNumber(amount.value);
                         } catch (e) {
                             return 'Wrong value format';
                         }

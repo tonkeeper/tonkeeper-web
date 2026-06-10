@@ -5,7 +5,8 @@ import {
     sortDerivationsByIndex,
     sortWalletsByVersion
 } from '@tonkeeper/core/dist/entries/wallet';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { FC, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';

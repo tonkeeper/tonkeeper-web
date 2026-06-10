@@ -22,7 +22,7 @@ import {
 import { Button, ButtonResponsiveSize } from '../fields/Button';
 import styled from 'styled-components';
 import { Body2, Body3, Body3Class, Label2 } from '../Text';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { Address } from '@ton/core';
 import { InputBlock, InputField } from '../fields/Input';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
@@ -235,7 +235,7 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
         <Controller
             rules={{
                 validate: v => {
-                    if (!seeIfValidTonAddress(v)) {
+                    if (!isTonAddress(v)) {
                         return t('create_multisig_invalid_address_error');
                     }
 

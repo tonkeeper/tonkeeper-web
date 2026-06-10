@@ -20,6 +20,10 @@ permissions:
 # This prevents unrelated label changes from re-running builds.
 
 jobs:
+    unit-tests:
+        uses: ./.github/workflows/unit-tests.yaml
+        secrets: inherit
+
     web-build:
         # Skip on label events so adding labels doesn't redeploy the preview.
         if: github.event.action != 'labeled'

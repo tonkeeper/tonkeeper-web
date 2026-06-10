@@ -52,7 +52,7 @@ import {
 } from './SendNotificationHeader';
 import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress, isTronAddress } from '@tonkeeper/core/dist/utils/address';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 
 const Body = styled.div`
@@ -233,7 +233,7 @@ const SendContent: FC<{
             return;
         }
 
-        if (seeIfValidTronAddress(signature)) {
+        if (isTronAddress(signature)) {
             return processTron(signature);
         }
 
@@ -377,7 +377,7 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
             }
 
             getAccountAsync({ address: wallet.rawAddress }).then(fromAccount => {
-                if (transfer.address && seeIfValidTonAddress(transfer.address)) {
+                if (transfer.address && isTonAddress(transfer.address)) {
                     getAccountAsync({ address: transfer.address }).then(toAccount => {
                         setTransferParams(
                             makeTonTransferInitData(transfer, fromAccount, toAccount, jettons)

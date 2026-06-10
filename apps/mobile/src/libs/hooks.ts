@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { throttle } from 'es-toolkit';
 import { Analytics, Aptabase, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect, useState } from 'react';
@@ -17,7 +17,7 @@ export const useAppHeight = () => {
         const appHeight = throttle(() => {
             const doc = document.documentElement;
             doc.style.setProperty('--app-height', `${window.innerHeight}px`);
-        }, 50);
+        }, 50, { edges: ['trailing'] });
         window.addEventListener('resize', appHeight);
         appHeight();
 
@@ -36,7 +36,7 @@ export const useAppWidth = () => {
             ) as HTMLDivElement;
 
             doc.style.setProperty('--app-width', `${app.clientWidth}px`);
-        }, 50);
+        }, 50, { edges: ['trailing'] });
         window.addEventListener('resize', appWidth);
 
         appWidth();
@@ -109,7 +109,7 @@ export const useLayout = () => {
                     return true;
                 });
             }
-        }, 50);
+        }, 50, { edges: ['trailing'] });
 
         window.addEventListener('resize', appWidth);
 

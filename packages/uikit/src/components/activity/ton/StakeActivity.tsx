@@ -1,6 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';

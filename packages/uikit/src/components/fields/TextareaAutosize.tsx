@@ -1,4 +1,4 @@
-import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { debounce } from 'es-toolkit';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import styled, { css } from 'styled-components';

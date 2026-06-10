@@ -11,7 +11,7 @@ import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET, TON_USDT_ASSET } from './constants';
 import { AssetAmount } from './asset-amount';
 import { TronAsset } from './tron-asset';
-import { seeIfValidTonAddress } from '../../../utils/common';
+import { isTonAddress } from '../../../utils/address';
 import { parseJettonScaledUIMultiplier, scaledUIMultiplierOne } from './scaled-ui';
 
 export type TonAssetAddress = TonAsset['address'];
@@ -44,7 +44,7 @@ export function tonAssetAddressToString(address: TonAsset['address']): string {
 }
 
 export function tonAssetAddressFromString(address: string): TonAsset['address'] {
-    return seeIfValidTonAddress(address) ? Address.parse(address) : address;
+    return isTonAddress(address) ? Address.parse(address) : address;
 }
 
 export function assetAddressToString(address: TonAsset['address'] | TronAsset['address']): string {
@@ -74,7 +74,7 @@ export function tokenToTonAsset(
         return TON_ASSET;
     }
 
-    if (seeIfValidTonAddress(token)) {
+    if (isTonAddress(token)) {
         return jettonToTonAsset(token, jettons);
     }
 

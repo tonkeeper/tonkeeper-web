@@ -1,7 +1,8 @@
 import { Body2 } from '../Text';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { Dot } from '../Dot';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useActiveAccount, useActiveTonNetwork } from '../../state/wallet';
 import { FC } from 'react';

@@ -1,5 +1,5 @@
 import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { throttle } from 'es-toolkit';
 import React, { PropsWithChildren, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../hooks/appContext';
@@ -80,7 +80,7 @@ export const useWindowsScroll = (addHidden = true) => {
             timer = setTimeout(function () {
                 document.body.classList.remove('disable-hover');
             }, 500);
-        }, 50);
+        }, 50, { edges: ['trailing'] });
 
         window.addEventListener('scroll', handler);
         sdk.uiEvents.on('loading', handler);
@@ -120,7 +120,7 @@ export const useAppSelection = (elementRef: React.MutableRefObject<HTMLDivElemen
 
         const handlerTouchMove = throttle(() => {
             handlerTouchUp();
-        }, 50);
+        }, 50, { edges: ['trailing'] });
 
         window.addEventListener('touchstart', handlerTouchStart);
         window.addEventListener('touchmove', handlerTouchMove);
@@ -180,7 +180,7 @@ export const InnerBody = React.forwardRef<
             }, 300);
 
             sdk.twaExpand?.();
-        }, 50);
+        }, 50, { edges: ['trailing'] });
 
         element.addEventListener('scroll', handlerScroll);
         sdk.uiEvents.on('loading', handlerScroll);

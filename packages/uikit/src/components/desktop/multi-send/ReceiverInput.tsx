@@ -1,5 +1,6 @@
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form/dist/types/controller';

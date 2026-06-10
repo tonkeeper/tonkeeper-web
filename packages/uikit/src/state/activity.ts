@@ -12,7 +12,8 @@ import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
 import { seeIfExtraCurrencyTransfer, seeIfTonTransfer } from './ton/tonActivity';
 import { useActiveApi, useActiveWallet } from './wallet';
-import { debounce, seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
+import { debounce } from 'es-toolkit';
 import { useTwoFAWalletConfig } from './two-fa';
 import { useActiveTronWallet, useTronApi } from './tron/tron';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
@@ -349,7 +350,7 @@ async function fetchTonActivity({
             acceptLanguage
         });
     } else {
-        if (seeIfValidTonAddress(assetTonApiId)) {
+        if (isTonAddress(assetTonApiId)) {
             tonActivity = await new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
                 accountId: wallet.rawAddress,
                 jettonId: assetTonApiId!,

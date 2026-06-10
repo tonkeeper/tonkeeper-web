@@ -15,7 +15,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { JettonsApi, JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { useAppContext } from '../../hooks/appContext';
@@ -77,7 +77,7 @@ const customAssetMatchesQuery = (asset: TonAsset, query: string) => {
         return true;
     }
 
-    if (seeIfValidTonAddress(query)) {
+    if (isTonAddress(query)) {
         return Address.isAddress(asset.address) && Address.parse(query).equals(asset.address);
     }
 
@@ -236,7 +236,7 @@ export const useSwapAssetSearch = (query: string | undefined) => {
             return undefined;
         }
 
-        if (seeIfValidTonAddress(normalizedQuery)) {
+        if (isTonAddress(normalizedQuery)) {
             const address = Address.parse(normalizedQuery);
             return (
                 swapAssets.find(
@@ -259,7 +259,7 @@ export const useSwapAssetSearch = (query: string | undefined) => {
 export const useSwapCustomTokenSearch = () => {
     const [filter] = useSwapTokensFilter();
 
-    const isAddress = seeIfValidTonAddress(filter);
+    const isAddress = isTonAddress(filter);
     const { fiat } = useAppContext();
     const api = useActiveApi();
     const { data: jettons } = useJettonList();

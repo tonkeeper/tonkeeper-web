@@ -38,6 +38,7 @@
         "@zxing/library": "^0.21.3",
         "bignumber.js": "^9.1.1",
         "dayjs": "^1.11.10",
+        "es-toolkit": "^1.46.1",
         "ethers": "^6.13.4",
         "framer-motion": "^11.3.28",
         "lottie-react": "^2.4.1",

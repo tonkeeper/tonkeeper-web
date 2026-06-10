@@ -10,6 +10,7 @@
         "@tonkeeper/uikit": "0.1.0",
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",
+        "es-toolkit": "^1.46.1",
         "i18next": "^22.1.4",
         "i18next-browser-languagedetector": "^7.0.2",
         "i18next-http-backend": "^2.0.2",

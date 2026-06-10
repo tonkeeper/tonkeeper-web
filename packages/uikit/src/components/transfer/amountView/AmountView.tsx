@@ -5,7 +5,7 @@ import {
     TonAsset
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { isNumeric } from '@tonkeeper/core/dist/utils/send';
+import { inputToBigNumber, isNumeric } from '@tonkeeper/core/dist/utils/send';
 import React, {
     FC,
     useCallback,
@@ -40,7 +40,6 @@ import {
     AmountBlock,
     AssetBadge,
     InputBlock,
-    inputToBigNumber,
     MaxButton,
     MaxRow,
     RecipientAddress,

@@ -4,7 +4,8 @@ import {
     WalletVersions,
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { FC, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';

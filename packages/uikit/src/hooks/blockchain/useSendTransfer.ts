@@ -15,7 +15,7 @@ import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 import { BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE, useGetSender } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { TronSenderType, useGetTronSender } from './sender/useTronSender';
@@ -74,7 +74,7 @@ export function useSendTransfer<T extends Asset>({
                     await getSender(senderChoice),
                     estimation as Estimation<TonAsset>,
                     {
-                        to: seeIfValidTonAddress(recipient.address.address)
+                        to: isTonAddress(recipient.address.address)
                             ? recipient.address.address
                             : recipient.toAccount.address,
                         amount: amount as AssetAmount<TonAsset>,

@@ -1,5 +1,5 @@
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
+import { eqAddresses, isTonAddress } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useMemo } from 'react';
@@ -46,7 +46,6 @@ import { useSendTransferNotification } from '../../components/modals/useSendTran
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
 import { useParams } from '../../hooks/router/useParams';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { ExternalLink } from '../../components/shared/ExternalLink';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
@@ -315,7 +314,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             };
         }
 
-        if (seeIfValidTonAddress(token)) {
+        if (isTonAddress(token)) {
             const jettonBalance = assets.ton.jettons.balances.find(b =>
                 eqAddresses(b.jetton.address, token)
             );
@@ -420,7 +419,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             return { assetSymbol: 'Toncoin', isUnverified: false };
         }
 
-        if (seeIfValidTonAddress(decodeURIComponent(token))) {
+        if (isTonAddress(decodeURIComponent(token))) {
             const item = assets.ton.jettons.balances.find(b =>
                 eqAddresses(b.jetton.address, token)
             );

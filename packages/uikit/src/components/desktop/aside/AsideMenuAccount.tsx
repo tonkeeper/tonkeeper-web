@@ -7,7 +7,8 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Label2 } from '../../Text';
 import { GearIconEmpty } from '../../Icon';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import {
     AccountKeystone,
     AccountLedger,

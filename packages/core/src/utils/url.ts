@@ -1,3 +1,5 @@
+import { Address } from '@ton/core';
+
 export const removeLastSlash = (url: string) => url.replace(/\/$/, '');
 
 export function eqOrigins(origin1: string, origin2: string | undefined): boolean {
@@ -21,4 +23,29 @@ export function isLocalhost(url: string): boolean {
     }
 
     return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+}
+
+export function formatTransferUrl(options: {
+    address: string;
+    amount?: string;
+    text?: string;
+    jetton?: string;
+}) {
+    const url = 'ton://transfer/' + options.address;
+
+    const params = [];
+
+    if (options.amount) {
+        params.push('amount=' + options.amount);
+    }
+    if (options.text) {
+        params.push('text=' + encodeURIComponent(options.text));
+    }
+    if (options.jetton) {
+        params.push('jetton=' + Address.parse(options.jetton).toString());
+    }
+
+    if (params.length === 0) return url;
+
+    return url + '?' + params.join('&');
 }

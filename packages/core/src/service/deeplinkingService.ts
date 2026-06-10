@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { seeIfValidTonAddress, seeIfValidTronAddress } from '../utils/common';
+import { isTonAddress, isTronAddress } from '../utils/address';
 import { TON_CONNECT_MSG_VARIANTS_ID, TonConnectTransactionPayload } from '../entries/tonConnect';
 import {
     Address,
@@ -55,7 +55,7 @@ export const normalizeSwapDeeplinkToken = (value: string) =>
 export const findSwapAssetByDeeplinkToken = (assets: TonAsset[], token: string) => {
     const trimmedToken = token.trim();
     const normalizedToken = normalizeSwapDeeplinkToken(trimmedToken);
-    const tokenAddress = seeIfValidTonAddress(trimmedToken)
+    const tokenAddress = isTonAddress(trimmedToken)
         ? Address.parse(trimmedToken)
         : undefined;
 
@@ -163,11 +163,11 @@ export function parseTonTransferWithAddress(options: { url: string }) {
         let linkAddress: string;
         if (paths.length === 0) {
             throw new Error('Empty link');
-        } else if (paths.length === 1 && seeIfValidTonAddress(options.url)) {
+        } else if (paths.length === 1 && isTonAddress(options.url)) {
             linkAddress = paths[0];
         } else {
             const [operator, address] = paths.slice(-2);
-            if (operator === 'transfer' && seeIfValidTonAddress(address)) {
+            if (operator === 'transfer' && isTonAddress(address)) {
                 linkAddress = address;
             } else {
                 throw new Error('unknown operator ' + data.url);
@@ -231,11 +231,11 @@ export async function parseTonTransaction(
         }
 
         let to = undefined;
-        if (seeIfValidTonAddress(addrParam)) {
+        if (isTonAddress(addrParam)) {
             to = addrParam;
         } else {
             const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: addrParam });
-            if (result.wallet?.address && seeIfValidTonAddress(result.wallet?.address)) {
+            if (result.wallet?.address && isTonAddress(result.wallet?.address)) {
                 to = result.wallet?.address;
             } else {
                 throw new Error('Unsupported link: wrong dns');
@@ -287,7 +287,7 @@ export async function parseTonTransaction(
 
         if (data.query.jetton && typeof data.query.jetton === 'string') {
             const jetton = data.query.jetton;
-            if (!seeIfValidTonAddress(jetton)) {
+            if (!isTonAddress(jetton)) {
                 throw new Error('Unsupported link: wrong jetton address');
             }
 
@@ -377,7 +377,7 @@ export function parseTronTransferWithAddress(options: { url: string }) {
             throw new Error('Empty link');
         }
 
-        if (!seeIfValidTronAddress(url)) {
+        if (!isTronAddress(url)) {
             throw new Error('Unsupported link');
         }
 

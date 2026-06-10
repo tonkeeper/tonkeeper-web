@@ -4,7 +4,8 @@ import { Body2, Mono } from '../../Text';
 import { toTimeLeft } from '@tonkeeper/core/dist/utils/date';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { MultisigOrderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 import { useActiveConfig } from '../../../state/wallet';
 

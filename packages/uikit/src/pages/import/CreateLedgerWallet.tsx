@@ -15,7 +15,7 @@ import { AppRoute } from '../../libs/routes';
 import { useNativeBackButton } from '../../components/BackButton';
 import { SpinnerIcon } from '../../components/Icon';
 import { ListBlock, ListItem } from '../../components/List';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/address';
 import { Checkbox } from '../../components/fields/Checkbox';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { toFormattedTonBalance } from '../../hooks/balance';
