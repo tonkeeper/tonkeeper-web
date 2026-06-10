@@ -1,0 +1,3 @@
+TK Web impact suite
+    [SECTION] Impact block [Module name][Another module name]
+        Concrete test item [regress: TBD]
