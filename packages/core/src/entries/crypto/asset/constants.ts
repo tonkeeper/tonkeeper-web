@@ -1,5 +1,4 @@
 import { BLOCKCHAIN_NAME } from '../../crypto';
-import { NATIVE_COIN_ICON } from '../../../config/coinIcon';
 import { BRAND_CONFIG } from '../../../config/brand';
 import { packAssetId } from './basic-asset';
 import { TonAsset } from './ton-asset';
@@ -41,7 +40,7 @@ export const TON_ASSET: TonAsset = {
     // NOTE: `address` and the `id` above are protocol identifiers — keep the literal 'TON'.
     address: 'TON',
     blockchain: BLOCKCHAIN_NAME.TON,
-    image: NATIVE_COIN_ICON,
+    image: BRAND_CONFIG.coinIcon,
     verification: JettonVerificationType.Whitelist,
     scaledUIMultiplier: scaledUIMultiplierOne
 };

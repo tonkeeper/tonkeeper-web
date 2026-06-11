@@ -1,5 +1,4 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { NATIVE_COIN_ICON } from '@tonkeeper/core/dist/config/coinIcon';
 import {
     formatAddress,
     formatTransferUrl,
@@ -9,6 +8,7 @@ import { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled, { css } from 'styled-components';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -30,13 +30,10 @@ import {
     useIsActiveWalletWatchOnly
 } from '../../state/wallet';
 import { AccountBadge } from '../account/AccountBadge';
-import { useTonAssetImage } from '../../state/asset';
 import {
-    TON_ASSET,
     TRON_TRX_ASSET,
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { Address } from '@ton/core';
 import { Tabs } from '../Tabs';
 import { useActiveTronWallet, useCanReceiveTron } from '../../state/tron/tron';
 
@@ -168,11 +165,6 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
 
-    const assetImage = useTonAssetImage({
-        blockchain: BLOCKCHAIN_NAME.TON,
-        address: jetton ? Address.parse(jetton) : TON_ASSET.address
-    });
-
     const address = formatAddress(wallet.rawAddress, network);
     return (
         <NotificationBlock>
@@ -192,7 +184,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                             address,
                             jetton
                         })}
-                        logoImage={assetImage || NATIVE_COIN_ICON}
+                        logoImage={BRAND_CONFIG.chainIcon}
                         logoPadding={8}
                         qrStyle="dots"
                         eyeRadius={{

@@ -14,6 +14,8 @@ import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../Text';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 
 const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
     text-align: right;
@@ -65,6 +67,7 @@ export const AmountInput: FC<{
     fieldState: ControllerFieldState;
 }> = ({ asset, fieldState, field }) => {
     const { fiat } = useAppContext();
+    const fiatDisplay = fiat === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : fiat;
     const [focus, setFocus] = useState(false);
     const [currencyAmount, setCurrencyAmount] = useState({
         inFiat: false,
@@ -239,7 +242,7 @@ export const AmountInput: FC<{
                     onFocus(true);
                 }}
             >
-                {fiat}
+                {fiatDisplay}
             </AmountInputFieldRight>
         </InputBlockStyled>
     );

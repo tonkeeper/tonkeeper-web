@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { NATIVE_COIN_ICON } from '@tonkeeper/core/dist/config/coinIcon';
 import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
@@ -508,7 +507,7 @@ function convertJettonToTokenMeta(
             name: BRAND_CONFIG.coinName,
             symbol: BRAND_CONFIG.coinSymbolWithEx,
             color: tokenColor('TON'),
-            image: NATIVE_COIN_ICON,
+            image: BRAND_CONFIG.coinIcon,
             price,
             balance: new BigNumber(asset.balance)
         };

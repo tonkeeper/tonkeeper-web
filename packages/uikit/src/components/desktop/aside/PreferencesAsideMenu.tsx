@@ -42,6 +42,8 @@ import { createMultiTap } from '@tonkeeper/core/dist/utils/common';
 import { useToast } from '../../../hooks/useNotification';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useDevMenuVisibility, useMutateDevMenuVisibility } from '../../../state/dev';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -130,6 +132,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const wallets = useAccountsState();
     const { data: isDevMenuVisible } = useDevMenuVisibility();
     const { mutate: setIsDevMenuVisible } = useMutateDevMenuVisibility();
+    const fiatDisplay = fiat === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : fiat;
 
     const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
 
@@ -218,7 +221,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                             <BankIcon />
                             <AsideMenuItemLargeBody>
                                 <Label2>{t('settings_primary_currency')}</Label2>
-                                <Body3>{fiat}</Body3>
+                                <Body3>{fiatDisplay}</Body3>
                             </AsideMenuItemLargeBody>
                         </AsideMenuItemLarge>
                     )}

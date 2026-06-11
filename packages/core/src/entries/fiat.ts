@@ -93,7 +93,7 @@ export const FiatCurrencySymbolsConfig: Record<FiatCurrency, CurrencyState> = {
         maximumFractionDigits: 2
     },
     [FiatCurrencies.TON]: {
-        symbol: BRAND_CONFIG.coinSymbolWithEx,
+        symbol: BRAND_CONFIG.coinSymbol,
         side: 'end',
         maximumFractionDigits: 2
     }

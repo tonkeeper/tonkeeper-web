@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -14,6 +16,7 @@ export const ThemeSettings = () => {
     const navigate = useNavigate();
 
     const { fiat } = useAppContext();
+    const fiatDisplay = fiat === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : fiat;
 
     const secondaryItems = useMemo(() => {
         const items: SettingsItem[] = [];
@@ -27,7 +30,7 @@ export const ThemeSettings = () => {
         }
         items.push({
             name: t('settings_primary_currency'),
-            icon: fiat,
+            icon: fiatDisplay,
             action: () => navigate(relative(SettingsRoute.fiat))
         });
 
@@ -47,7 +50,7 @@ export const ThemeSettings = () => {
             });
         }
         return items;
-    }, [t, i18n.enable, navigate, fiat]);
+    }, [t, i18n.enable, navigate, fiatDisplay, sdk.notifications, sdk.linksInterceptorAvailable]);
 
     return <SettingsList items={secondaryItems} />;
 };
