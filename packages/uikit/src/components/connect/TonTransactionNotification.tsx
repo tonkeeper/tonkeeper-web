@@ -401,7 +401,9 @@ export const TonTransactionNotification: FC<{
     waitInvalidation?: boolean;
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
-    const wallets = useAccountsState();
+    // This modal is mounted eagerly by ModalsRoot, so it can render before the
+    // accounts query resolves; `useAccountsState()` returns undefined until then.
+    const wallets = useAccountsState() ?? [];
     const isActiveAccountMultisig = useIsActiveAccountMultisig();
     const [multisigTTL, setMultisigTTL] = useState<MultisigOrderLifetimeMinutes | undefined>();
 

@@ -9,6 +9,7 @@ import {
     getServerConfig,
     BootParams
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { setAppVersionHeaders } from '@tonkeeper/core/dist/utils/appVersion';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
@@ -32,6 +33,10 @@ export const useTonendpoint = ({
     storeCountryCode?: string | null;
 }) => {
     return useMemo(() => {
+        // Seed the X-App-* headers used by the header-based backends (TonAPI,
+        // Battery, 2FA, Pro). Done here because this is the one place every app
+        // supplies both the build version and the platform.
+        setAppVersionHeaders({ version: build, platform });
         return new Tonendpoint({
             build,
             network,

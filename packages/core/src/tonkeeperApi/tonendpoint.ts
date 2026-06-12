@@ -1,5 +1,6 @@
 import { Network } from '../entries/network';
 import { removeLastSlash } from '../utils/url';
+import { trimBuildVersion } from '../utils/appVersion';
 import { intlLocale } from '../entries/language';
 import { Configuration, Middleware, SystemApi } from '../tonkeeperApiGenerated';
 import type {
@@ -245,7 +246,7 @@ const toCommonQuery = (
 
     const query: Record<string, string> = {
         lang: intlLocale(rewrite?.lang ?? params.lang),
-        build: rewrite?.build ?? params.build,
+        build: trimBuildVersion(rewrite?.build ?? params.build),
         chainName: network === Network.TESTNET ? 'testnet' : 'mainnet',
         platform: rewrite?.platform ?? params.platform
     };
@@ -299,6 +300,15 @@ export class Tonendpoint {
     }: BootParams) {
         this.params = { lang, build, network, platform, store_country_code, device_country_code };
     }
+
+    /**
+     * The common query params (`lang`, `build`, `chainName`, `platform`) sent to
+     * every Tonkeeper backend. Exposed so other clients (e.g. the swaps API) can
+     * attach the exact same identification params that boot/api already send.
+     */
+    public getCommonQueryParams = (rewrite?: Partial<BootParams>): Record<string, string> => {
+        return toCommonQuery(this.params, rewrite);
+    };
 
     boot = async (network: Network): Promise<TonendpointConfig> => {
         /**

@@ -30,7 +30,7 @@ const DEBOUNCE_MS = 300;
  */
 export function useSwapStreamEffect() {
     const wallet = useActiveWallet();
-    const { baseUrl } = useSwapsConfig();
+    const { baseUrl, queryParams } = useSwapsConfig();
     const [fromAsset] = useSwapFromAsset();
     const [toAsset] = useSwapToAsset();
     const [fromAmountRelative] = useSwapFromAmount();
@@ -78,6 +78,7 @@ export function useSwapStreamEffect() {
             fromAmount: fromAmountWei.toFixed(0),
             userAddress: wallet.rawAddress,
             slippageBps,
+            query: queryParams,
             onQuote: confirmation => {
                 setConfirmation(confirmation);
                 setIsFetching(false);
@@ -95,6 +96,7 @@ export function useSwapStreamEffect() {
         };
     }, [
         baseUrl,
+        queryParams,
         fromAsset,
         toAsset,
         fromAmountRelative,
