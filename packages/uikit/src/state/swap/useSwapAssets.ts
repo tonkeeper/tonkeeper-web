@@ -93,7 +93,7 @@ export function useSwapAssetsSearch(
     limit?: number,
     options: { enabled?: boolean; keepPreviousData?: boolean } = {}
 ) {
-    const { baseUrl } = useSwapsConfig();
+    const { baseUrl, queryParams } = useSwapsConfig();
     const { data: customAssets } = useUserCustomSwapAssets();
     const enabledUSDe = useIsFeatureEnabled(FLAGGED_FEATURE.ETHENA);
     const normalizedQuery = query.trim();
@@ -102,10 +102,14 @@ export function useSwapAssetsSearch(
         queryKey: [QueryKey.swapAllAssets, normalizedQuery, limit, customAssets, enabledUSDe],
         queryFn: async () => {
             try {
-                const assets = await fetchSwapAssets(baseUrl, {
-                    q: normalizedQuery || undefined,
-                    limit
-                });
+                const assets = await fetchSwapAssets(
+                    baseUrl,
+                    {
+                        q: normalizedQuery || undefined,
+                        limit
+                    },
+                    queryParams
+                );
                 const fetchedAssets = assets
                     .map(toTonAsset)
                     .filter(asset => !(customAssets || []).some(ca => ca.id === asset.id));

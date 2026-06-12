@@ -1,14 +1,35 @@
-import { Configuration, SwapApi } from '../swapsApiGenerated';
+import { Configuration, Middleware, SwapApi } from '../swapsApiGenerated';
 import type { OmnistonSwapMessages, SwapAsset } from '../swapsApiGenerated';
 import { removeLastSlash } from '../utils/url';
 
+/**
+ * Pre-middleware that merges the shared Tonkeeper identification params
+ * (`lang`, `build`, `chainName`, `platform`) into every swaps request, mirroring
+ * what the boot/api backends already receive.
+ */
+const extraQueryMiddleware = (extraQuery: Record<string, string>): Middleware => ({
+    pre: async ({ url, init }) => {
+        const parsed = new URL(url);
+        for (const [key, value] of Object.entries(extraQuery)) {
+            if (!parsed.searchParams.has(key)) {
+                parsed.searchParams.set(key, value);
+            }
+        }
+        return { url: parsed.toString(), init };
+    }
+});
+
 export async function fetchSwapAssets(
     baseUrl: string,
-    params: { q?: string; limit?: number } = {}
+    params: { q?: string; limit?: number } = {},
+    query: Record<string, string> = {}
 ): Promise<SwapAsset[]> {
-    return new SwapApi(new Configuration({ basePath: removeLastSlash(baseUrl) })).swapAssets(
-        params
-    );
+    return new SwapApi(
+        new Configuration({
+            basePath: removeLastSlash(baseUrl),
+            middleware: [extraQueryMiddleware(query)]
+        })
+    ).swapAssets(params);
 }
 
 const QUOTE_TIMEOUT_MS = 10_000;
@@ -20,6 +41,7 @@ export function subscribeToOmnistonStream(params: {
     fromAmount: string;
     userAddress: string;
     slippageBps?: number;
+    query?: Record<string, string>;
     onQuote: (confirmation: OmnistonSwapMessages) => void;
     onError: (error: Error) => void;
     signal?: AbortSignal;
@@ -31,6 +53,11 @@ export function subscribeToOmnistonStream(params: {
     url.searchParams.set('userAddress', params.userAddress);
     if (params.slippageBps !== undefined) {
         url.searchParams.set('slippage', String(params.slippageBps));
+    }
+    for (const [key, value] of Object.entries(params.query ?? {})) {
+        if (!url.searchParams.has(key)) {
+            url.searchParams.set(key, value);
+        }
     }
 
     const eventSource = new EventSource(url.toString());

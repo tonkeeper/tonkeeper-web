@@ -22,6 +22,7 @@ import { toNano } from '@ton/core';
 import type { Config } from '@tonkeeper/core/dist/batteryApi/models/Config';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import { Configuration, ConnectApi, DefaultApi, WalletApi } from '@tonkeeper/core/dist/batteryApi';
+import { getAppVersionHeaders } from '@tonkeeper/core/dist/utils/appVersion';
 import {
     isTon,
     TonAsset,
@@ -76,7 +77,8 @@ export const useBatteryApi = () => {
     const config = useActiveConfig();
     return useMemo(() => {
         return new Configuration({
-            basePath: config.batteryHost
+            basePath: config.batteryHost,
+            headers: getAppVersionHeaders()
         });
     }, []);
 };
