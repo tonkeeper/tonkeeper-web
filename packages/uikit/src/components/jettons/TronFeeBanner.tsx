@@ -1,7 +1,6 @@
 import styled, { css, useTheme } from 'styled-components';
-import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Body1Class, Body2Class, Body3, Body3Class, Label1Class } from '../Text';
-import { useTranslation } from '../../hooks/translation';
+import { useBrandCoinName, useTranslation } from '../../hooks/translation';
 import {
     useTrc20FreeTransfersConfig,
     useTrc20TransferDefaultFees,
@@ -257,6 +256,7 @@ const FooterLinkText = styled(Body3)`
 
 const FeeTable = () => {
     const { t } = useTranslation();
+    const coinName = useBrandCoinName();
     const sdk = useAppSdk();
     const navigate = useNavigate();
 
@@ -376,7 +376,7 @@ const FeeTable = () => {
             )}
             {isTronEnabled && (
                 <TableRowTemplate
-                    heading={BRAND_CONFIG.coinName}
+                    heading={coinName}
                     formattedBalance={tonBalance?.stringAssetRelativeAmount}
                     transfersNumber={tonTransfers}
                     fiatPerTransfer={tonSenderFee.fiatAmount}

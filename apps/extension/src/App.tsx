@@ -116,7 +116,7 @@ const ExtensionGlobalStyle = createGlobalStyle`
 
 export const App: FC<{ isInCustomPopup: boolean }> = ({ isInCustomPopup }) => {
     const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
-    const t = useTWithReplaces(browserT);
+    const t = useTWithReplaces(browserT, browser.i18n.getUILanguage());
 
     sdk.addWalletPage.isInCustomPopup = isInCustomPopup;
 

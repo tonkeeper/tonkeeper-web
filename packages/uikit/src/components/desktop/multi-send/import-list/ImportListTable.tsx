@@ -100,7 +100,7 @@ export const ImportListTable = () => {
                 <Body2>1000{getDecimalSeparator()}01</Body2>
             </TD>
             <TD>
-                <Body2>{BRAND_CONFIG.coinSymbolWithEx}</Body2>
+                <Body2>{BRAND_CONFIG.coinSymbol}</Body2>
             </TD>
             <TD>
                 <Body2>Salary</Body2>

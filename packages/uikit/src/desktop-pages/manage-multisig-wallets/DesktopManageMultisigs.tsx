@@ -17,6 +17,7 @@ import React, { FC, useMemo } from 'react';
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { PencilIcon, PinIconOutline, PlusIconSmall, UnpinIconOutline } from '../../components/Icon';
 import { Button } from '../../components/fields/Button';
@@ -239,7 +240,7 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                             <Body3>
                                 {toShortValue(formatAddress(item.address))}
                                 <Dot />
-                                {toFormattedTonBalance(item.balance)}&nbsp;TON
+                                {toFormattedTonBalance(item.balance)}&nbsp;{BRAND_CONFIG.coinSymbol}
                             </Body3>
                         </TextContainer>
 

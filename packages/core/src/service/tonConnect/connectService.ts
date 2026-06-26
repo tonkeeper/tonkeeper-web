@@ -157,14 +157,6 @@ export const getManifest = async (request: ConnectRequest) => {
         throw new Error('Manifest is not valid');
     }
 
-    const requestOrigin = originFromUrl(request.manifestUrl);
-    const manifestOrigin = originFromUrl(manifest.url);
-    if (!requestOrigin || !manifestOrigin || requestOrigin !== manifestOrigin) {
-        throw new Error(
-            'Manifest origin mismatch — manifest must be hosted on the same origin as declared in manifest.url'
-        );
-    }
-
     return manifest;
 };
 

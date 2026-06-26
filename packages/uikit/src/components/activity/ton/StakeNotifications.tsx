@@ -42,7 +42,7 @@ const DepositStakeActionContent: FC<{
             <div>
                 <Title>{t('staking_deposit')}</Title>
                 <Amount>
-                    -&thinsp;{format(depositStake.amount)} {BRAND_CONFIG.coinSymbolWithEx}
+                    -&thinsp;{format(depositStake.amount)} {BRAND_CONFIG.coinSymbol}
                 </Amount>
                 <Amount>≈&thinsp;{fiatAmount}</Amount>
                 <ActionDate kind="send" timestamp={timestamp} />
@@ -97,7 +97,7 @@ const WithdrawStakeActionContent: FC<{
             <div>
                 <Title>{t('staking_withdraw')}</Title>
                 <Amount>
-                    +&thinsp;{format(withdrawStake.amount)} {BRAND_CONFIG.coinSymbolWithEx}
+                    +&thinsp;{format(withdrawStake.amount)} {BRAND_CONFIG.coinSymbol}
                 </Amount>
                 <Amount>≈&thinsp;{fiatAmount}</Amount>
                 <ActionDate kind="send" timestamp={timestamp} />
@@ -160,7 +160,8 @@ const WithdrawRequestStakeActionContent: FC<{
                     withdrawStakeRequest.amount && (
                         <>
                             <Amount>
-                                +&thinsp;{format(withdrawStakeRequest.amount)} {BRAND_CONFIG.coinSymbolWithEx}
+                                +&thinsp;{format(withdrawStakeRequest.amount)}{' '}
+                                {BRAND_CONFIG.coinSymbol}
                             </Amount>
                             <Amount>≈&thinsp;{fiatAmount}</Amount>
                         </>

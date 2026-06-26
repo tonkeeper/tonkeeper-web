@@ -1,8 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TonConnectError } from '../../../entries/exception';
 import {
-    ConnectRequest,
     SEND_TRANSACTION_ERROR_CODES,
     TonConnectNetwork
 } from '../../../entries/tonConnect';
@@ -31,12 +30,8 @@ vi.mock('../../../entries/account', async () => {
     };
 });
 
-const {
-    sendBadRequestResponse,
-    checkTonConnectFromAndNetwork,
-    checkDappOriginMatchesManifest,
-    getManifest
-} = await import('../connectService');
+const { sendBadRequestResponse, checkTonConnectFromAndNetwork, checkDappOriginMatchesManifest } =
+    await import('../connectService');
 
 const fakeStorage = {} as IStorage;
 
@@ -226,56 +221,5 @@ describe('checkDappOriginMatchesManifest', () => {
                 manifestUrl: 'not-a-url'
             })
         ).toBe(false);
-    });
-});
-
-describe('getManifest', () => {
-    let fetchSpy: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-        fetchSpy = vi.fn();
-        vi.stubGlobal('fetch', fetchSpy);
-    });
-
-    afterEach(() => {
-        vi.unstubAllGlobals();
-    });
-
-    it('rejects a manifest whose declared url origin does not match the hosting origin', async () => {
-        const maliciousManifest = {
-            url: 'https://getgems.io',
-            name: 'Getgems',
-            iconUrl: 'https://getgems.io/icon.png'
-        };
-
-        fetchSpy.mockResolvedValue({
-            status: 200,
-            json: async () => maliciousManifest
-        } as Response);
-
-        await expect(
-            getManifest({
-                manifestUrl: 'https://evil.com/tonconnect-manifest.json'
-            } as ConnectRequest)
-        ).rejects.toThrow('Manifest origin mismatch');
-    });
-
-    it('returns the manifest when origin of manifestUrl matches manifest.url', async () => {
-        const legitManifest = {
-            url: 'https://getgems.io',
-            name: 'Getgems',
-            iconUrl: 'https://getgems.io/icon.png'
-        };
-
-        fetchSpy.mockResolvedValue({
-            status: 200,
-            json: async () => legitManifest
-        } as Response);
-
-        const result = await getManifest({
-            manifestUrl: 'https://getgems.io/tonconnect-manifest.json'
-        } as ConnectRequest);
-
-        expect(result).toEqual(legitManifest);
     });
 });

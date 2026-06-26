@@ -16,6 +16,7 @@ import { useNativeBackButton } from '../../components/BackButton';
 import { SpinnerIcon } from '../../components/Icon';
 import { ListBlock, ListItem } from '../../components/List';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Checkbox } from '../../components/fields/Checkbox';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { toFormattedTonBalance } from '../../hooks/balance';
@@ -266,7 +267,8 @@ const ChooseLedgerAccounts: FC<{
                                 <Dot>·</Dot>
                                 &nbsp;
                                 <Body2Secondary>
-                                    {toFormattedTonBalance(account.balance)}&nbsp;TON
+                                    {toFormattedTonBalance(account.balance)}&nbsp;
+                                    {BRAND_CONFIG.coinSymbol}
                                 </Body2Secondary>
                                 <CheckboxStyled
                                     checked={selectedIndexes[account.accountIndex]}

@@ -1,6 +1,6 @@
 import { FiatCurrencies, FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/entries/fiat';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
-import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
+import { BRAND_CONFIG, getBrandCoinName } from '@tonkeeper/core/dist/config/brand';
 import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon, SpinnerIcon } from '../../components/Icon';
@@ -36,7 +36,7 @@ export const FiatCurrency = () => {
                 name: key === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : key,
                 secondary:
                     key === FiatCurrencies.TON
-                        ? BRAND_CONFIG.coinName
+                        ? getBrandCoinName(i18n.language)
                         : new Intl.DisplayNames([intlLocale(i18n.language)], {
                               type: 'currency'
                           }).of(key),

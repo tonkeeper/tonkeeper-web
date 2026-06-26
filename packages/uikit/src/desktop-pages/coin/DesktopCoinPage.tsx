@@ -18,7 +18,7 @@ import { BuyNotification } from '../../components/home/BuyAction';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
+import { useBrandCoinName, useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
@@ -309,7 +309,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             const amount = assets.ton.info.balance;
             return {
                 image: TON_ASSET.image!,
-                symbol: BRAND_CONFIG.coinSymbolWithEx,
+                symbol: BRAND_CONFIG.coinSymbol,
                 amount: format(amount),
                 fiatAmount: formatFiatCurrency(
                     fiat,
@@ -403,6 +403,7 @@ const LabelWithBadge = styled(Label2)`
 
 const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
+    const coinName = useBrandCoinName();
     const {
         fetchNextPage,
         hasNextPage,
@@ -421,7 +422,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             return null;
         }
         if (token === CryptoCurrency.TON) {
-            return { assetSymbol: BRAND_CONFIG.coinName, isUnverified: false };
+            return { assetSymbol: coinName, isUnverified: false };
         }
 
         if (seeIfValidTonAddress(decodeURIComponent(token))) {
@@ -438,7 +439,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         } else {
             return undefined;
         }
-    }, [assets, t, token]);
+    }, [assets, token, coinName]);
 
     const { mainnetConfig } = useAppContext();
     const tonviewer = new URL(mainnetConfig.accountExplorer).origin;

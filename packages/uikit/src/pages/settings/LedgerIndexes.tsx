@@ -1,5 +1,6 @@
 import { AccountLedger } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
@@ -145,7 +146,8 @@ export const LedgerIndexesPageContent: FC<{
                                 <Label1># {derivationIndex + 1}</Label1>
                                 <Body2Secondary>
                                     {toShortValue(formatAddress(balance.address)) + ' '}·
-                                    {' ' + toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
+                                    {' ' + toFormattedTonBalance(balance.tonBalance)}&nbsp;
+                                    {BRAND_CONFIG.coinSymbol}
                                 </Body2Secondary>
                             </TextContainer>
                             {isDerivationAdded ? (

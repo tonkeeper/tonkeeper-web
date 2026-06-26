@@ -59,7 +59,7 @@ const TonTransferActionContent: FC<{
             <ActivityDetailsHeader
                 isScam={isScam}
                 amount={tonTransfer.amount}
-                symbol={BRAND_CONFIG.coinSymbolWithEx}
+                symbol={BRAND_CONFIG.coinSymbol}
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind={kind}
@@ -166,7 +166,7 @@ export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timesta
         <ActionDetailsBlock event={event}>
             <div>
                 <Title>
-                    -&thinsp;{format(smartContractExec.tonAttached)} {BRAND_CONFIG.coinSymbolWithEx}
+                    -&thinsp;{format(smartContractExec.tonAttached)} {BRAND_CONFIG.coinSymbol}
                 </Title>
                 {fiatAmount && <Amount>≈&thinsp;{fiatAmount}</Amount>}
                 <ActionDate kind="call" timestamp={timestamp} />

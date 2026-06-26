@@ -71,7 +71,7 @@ export const App: FC = () => {
 const Providers: FC<PropsWithChildren> = () => {
     const { t: tSimple, i18n } = useTranslation();
 
-    const t = useTWithReplaces(tSimple);
+    const t = useTWithReplaces(tSimple, i18n.language);
 
     const translation = useMemo(() => {
         const client: I18nContext = {

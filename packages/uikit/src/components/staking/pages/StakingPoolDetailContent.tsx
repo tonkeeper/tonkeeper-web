@@ -397,7 +397,9 @@ export const StakingPoolDetailContent = ({
     const liquidJettonMaster = isLiquid ? pool?.liquidJettonMaster : undefined;
     const { data: poolIconJettonInfo } = useJettonInfo(liquidJettonMaster ?? '');
     const { fiatAmount } = useFormatFiat(tonRate, stakedAmount);
-    const displayAmount = stakedAmount ? formatTokenDisplay(stakedAmount, BRAND_CONFIG.coinSymbolWithEx) : `— ${BRAND_CONFIG.coinSymbolWithEx}`;
+    const displayAmount = stakedAmount
+        ? formatTokenDisplay(stakedAmount, BRAND_CONFIG.coinSymbol)
+        : `— ${BRAND_CONFIG.coinSymbol}`;
     const { pendingWithdraw = 0, pendingDeposit = 0, readyWithdraw = 0 } = position ?? {};
 
     const cycleEndDate = pool && pendingWithdraw > 0 ? pool.cycleEnd * 1000 : undefined;

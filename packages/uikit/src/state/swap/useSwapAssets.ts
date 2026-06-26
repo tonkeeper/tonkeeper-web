@@ -18,8 +18,10 @@ import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
+import { useBrandCoinName } from '../../hooks/translation';
 import { useAtom } from '../../libs/useAtom';
 import { QueryKey } from '../../libs/queryKey';
 import { useAssets } from '../home';
@@ -40,14 +42,16 @@ import {
 
 export const SWAP_ASSETS_SEARCH_LIMIT = 25;
 
-const toTonAsset = (asset: SwapAsset): TonAsset => {
+const toTonAsset = (asset: SwapAsset, coinName: string): TonAsset => {
     const address = asset.address === 'ton' ? 'TON' : Address.parse(asset.address);
 
     return {
         id: packAssetId(BLOCKCHAIN_NAME.TON, address),
         symbol: asset.symbol,
         decimals: asset.decimals,
-        name: asset.name,
+        // The API returns a single, non-localized name for the native coin (e.g. always
+        // "Gram (ex Toncoin)"). Identify it by its symbol and show the language-aware name instead.
+        name: asset.symbol === BRAND_CONFIG.coinSymbol ? coinName : asset.name,
         image: patchedTokenImage(tonAssetAddressToString(address), asset.image),
         blockchain: BLOCKCHAIN_NAME.TON,
         noImageCorners: shouldHideTonJettonImageCorners(tonAssetAddressToString(address)),
@@ -96,10 +100,18 @@ export function useSwapAssetsSearch(
     const { baseUrl, queryParams } = useSwapsConfig();
     const { data: customAssets } = useUserCustomSwapAssets();
     const enabledUSDe = useIsFeatureEnabled(FLAGGED_FEATURE.ETHENA);
+    const coinName = useBrandCoinName();
     const normalizedQuery = query.trim();
 
     return useQuery<TonAsset[]>({
-        queryKey: [QueryKey.swapAllAssets, normalizedQuery, limit, customAssets, enabledUSDe],
+        queryKey: [
+            QueryKey.swapAllAssets,
+            normalizedQuery,
+            limit,
+            customAssets,
+            enabledUSDe,
+            coinName
+        ],
         queryFn: async () => {
             try {
                 const assets = await fetchSwapAssets(
@@ -111,7 +123,7 @@ export function useSwapAssetsSearch(
                     queryParams
                 );
                 const fetchedAssets = assets
-                    .map(toTonAsset)
+                    .map(asset => toTonAsset(asset, coinName))
                     .filter(asset => !(customAssets || []).some(ca => ca.id === asset.id));
                 const matchingCustomAssets = (customAssets || []).filter(asset =>
                     customAssetMatchesQuery(asset, normalizedQuery)

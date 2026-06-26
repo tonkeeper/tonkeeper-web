@@ -10,7 +10,7 @@ import { SubHeader } from '../../components/SubHeader';
 import { HomeActions } from '../../components/home/TonActions';
 import { CoinInfo } from '../../components/jettons/Info';
 import { useFormatBalance } from '../../hooks/balance';
-import { useTranslation } from '../../hooks/translation';
+import { useBrandCoinName, useTranslation } from '../../hooks/translation';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useWalletAccountInfo } from '../../state/wallet';
 import { MobileAssetHistory } from './Jetton';
@@ -27,7 +27,7 @@ const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     return (
         <CoinInfo
             amount={total}
-            symbol={BRAND_CONFIG.coinSymbolWithEx}
+            symbol={BRAND_CONFIG.coinSymbol}
             price={fiatAmount}
             description={t('Ton_page_description')}
             image={BRAND_CONFIG.coinIcon}
@@ -36,7 +36,7 @@ const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
 };
 
 export const TonPage = () => {
-    const { t } = useTranslation();
+    const coinName = useBrandCoinName();
     const ref = useRef<HTMLDivElement>(null);
 
     const { data: info } = useWalletAccountInfo();
@@ -47,7 +47,7 @@ export const TonPage = () => {
 
     return (
         <>
-            <SubHeader title={t('Toncoin')} />
+            <SubHeader title={coinName} />
             <InnerBody ref={ref}>
                 <TonHeader info={info} />
                 <HomeActions chain={BLOCKCHAIN_NAME.TON} />

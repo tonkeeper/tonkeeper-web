@@ -178,7 +178,9 @@ export const SwapTransactionInfo = () => {
                         {!confirmation ? (
                             <InfoSkeleton />
                         ) : (
-                            <Body3>≈&nbsp;{gasBudgetTon} {BRAND_CONFIG.coinSymbolWithEx}</Body3>
+                            <Body3>
+                                ≈&nbsp;{gasBudgetTon} {BRAND_CONFIG.coinSymbol}
+                            </Body3>
                         )}
                     </InfoRowRight>
                 </InfoRow>

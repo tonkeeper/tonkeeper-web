@@ -4,7 +4,11 @@ import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import { FC, forwardRef, useMemo } from 'react';
 import { useAppContext } from '../../hooks/appContext';
-import { useTranslation } from '../../hooks/translation';
+import {
+    useBrandCoinName,
+    useBrandCoinSymbolWithEx,
+    useTranslation
+} from '../../hooks/translation';
 import { AppRoute, StakingRoute } from '../../libs/routes';
 import { toTokenRate, useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock, ListItem } from '../List';
@@ -54,8 +58,10 @@ export const TonAsset = forwardRef<
         className?: string;
     }
 >(({ balance, className }, ref) => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
+    // Home-page coin cell is the ONLY place that surfaces the transitional with-ex ticker/name.
+    const coinName = useBrandCoinName();
+    const coinSymbolWithEx = useBrandCoinSymbolWithEx();
 
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatPrice, fiatAmount } = useFormatFiat(data, balance.relativeAmount);
@@ -71,8 +77,8 @@ export const TonAsset = forwardRef<
             <ListItemPayload>
                 <TokenLogo src={TON_ASSET.image} noRadius={TON_ASSET.noImageCorners} />
                 <TokenLayout
-                    name={t('Toncoin')}
-                    symbol={BRAND_CONFIG.coinSymbolWithEx}
+                    name={coinName}
+                    symbol={coinSymbolWithEx}
                     balance={balance.stringRelativeAmount}
                     secondary={fiatPrice}
                     fiatAmount={fiatAmount}
@@ -201,7 +207,7 @@ export const StakingPositionAsset = forwardRef<
         [stakingPosition.position.amount]
     );
     const balanceStr = useMemo(
-        () => `${tonAmount.toFixed(2, BigNumber.ROUND_DOWN)} TON`,
+        () => `${tonAmount.toFixed(2, BigNumber.ROUND_DOWN)} ${BRAND_CONFIG.coinSymbol}`,
         [tonAmount]
     );
     const { fiatAmount } = useFormatFiat(tonRate, tonAmount);

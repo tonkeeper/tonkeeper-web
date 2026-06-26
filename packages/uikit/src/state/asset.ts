@@ -49,6 +49,7 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
 import { useAppSdk } from '../hooks/appSdk';
+import { useBrandCoinName } from '../hooks/translation';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -409,10 +410,11 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
     const [assets] = useAssets();
     const { fiat } = useAppContext();
     const { data: tonRate } = useRate(CryptoCurrency.TON);
+    const coinName = useBrandCoinName();
 
     const client = useQueryClient();
     return useQuery<TokenDistribution[]>(
-        [QueryKey.distribution, fiat, assets, tonRate, maxGropusNumber],
+        [QueryKey.distribution, fiat, assets, tonRate, maxGropusNumber, coinName],
         () => {
             if (!assets) {
                 return [];
@@ -422,7 +424,8 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
                 fiatBalance: getTonFiatAmount(client, fiat, assets),
                 meta: convertJettonToTokenMeta(
                     { isNative: true, balance: assets.ton.info.balance },
-                    getTokenRate(client, fiat, CryptoCurrency.TON)?.prices || 0
+                    getTokenRate(client, fiat, CryptoCurrency.TON)?.prices || 0,
+                    coinName
                 )
             };
 
@@ -434,7 +437,7 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
 
                     return {
                         fiatBalance,
-                        meta: convertJettonToTokenMeta(b, price)
+                        meta: convertJettonToTokenMeta(b, price, coinName)
                     };
                 })
             );
@@ -446,7 +449,8 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
                         fiatBalance: new BigNumber(0),
                         meta: convertJettonToTokenMeta(
                             { isNative: true, balance: Number(extra.amount) },
-                            0
+                            0,
+                            coinName
                         )
                     };
                     tokensOmited.push(dist);
@@ -499,13 +503,14 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
 
 function convertJettonToTokenMeta(
     asset: JettonBalance | { isNative: true; balance: number },
-    price: number
+    price: number,
+    coinName: string
 ): TokenMeta {
     if ('isNative' in asset) {
         return {
             address: 'TON',
-            name: BRAND_CONFIG.coinName,
-            symbol: BRAND_CONFIG.coinSymbolWithEx,
+            name: coinName,
+            symbol: BRAND_CONFIG.coinSymbol,
             color: tokenColor('TON'),
             image: BRAND_CONFIG.coinIcon,
             price,

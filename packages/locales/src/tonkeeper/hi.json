@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "खरीदने के अन्य तरीके"
     },
-    "exchange_other_ways": "%{coinSymbolWithEx} खरीदने या बेचने के अन्य तरीके",
-    "exchange_title": "%{coinSymbolWithEx} खरीदें",
+    "exchange_other_ways": "%{coinSymbol} खरीदने या बेचने के अन्य तरीके",
+    "exchange_title": "%{coinSymbol} खरीदें",
     "import_add_wallet": "वॉलेट जोड़ें",
     "import_add_wallet_description": "एक नया बटुआ बनाएं या एक मौजूदा जोड़ें।",
     "import_existing_wallet": "मौजूदा वॉलेट",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "कॉपी करें"
     },
-    "reminder_notifications_caption": "जब आपको %{coinSymbolWithEx}, टोकन और NFT प्राप्त हों, तो सूचनाएँ पाएं।",
+    "reminder_notifications_caption": "जब आपको %{coinSymbol}, टोकन और NFT प्राप्त हों, तो सूचनाएँ पाएं।",
     "reminder_notifications_enable_button": "सूचनाएं सक्षम करें",
     "reminder_notifications_later_button": "बाद में",
     "reminder_notifications_title": "तुरंत सूचनाएँ प्राप्त करें",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "प्रत्याशित वार्षिक कमाई",
     "staking_enter_amount": "एक राशि दर्ज करें",
     "staking_insufficient_balance": "पर्याप्त शेष राशि नहीं है",
-    "staking_insufficient_recommended_fee_reserve": "अपर्याप्त धनराशि: वॉलेट बैलेंस में 1 %{coinSymbolWithEx} रिजर्व और 0.05 %{coinSymbolWithEx} शुल्क होना चाहिए।",
+    "staking_insufficient_recommended_fee_reserve": "अपर्याप्त धनराशि: वॉलेट बैलेंस में 1 %{coinSymbol} रिजर्व और 0.05 %{coinSymbol} शुल्क होना चाहिए।",
     "staking_max": "अधिकतम",
     "staking_min_deposit_label": "न्यूनतम जमा",
     "staking_next_cycle_desc_liquid": "तत्काल अनस्टेक उपलब्ध",
     "staking_next_cycle_message": "अगला चक्र {value} में",
-    "staking_pool_detail": "APY ≈ {apy}% · न्यूनतम जमा {minDeposit} %{coinSymbolWithEx}",
+    "staking_pool_detail": "APY ≈ {apy}% · न्यूनतम जमा {minDeposit} %{coinSymbol}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} निकासी के लिए तैयार",
+    "staking_ready_withdraw": "{amount} %{coinSymbol} निकासी के लिए तैयार",
     "staking_rewards_after_stake": "दांव के बाद",
     "staking_rewards_current": "वर्तमान",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ {value} %{coinSymbol}",
     "staking_staked": "जमा किया गया",
     "staking_title": "स्टेकिंग",
     "staking_top_up": "जमा करें",
@@ -346,7 +346,7 @@
         "subtitle": "NFT may not be safe to use for one of the following reasons.",
         "title": "Unverified NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "नेटवर्क शुल्क के लिए पर्याप्त %{coinSymbolWithEx} नहीं है ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "नेटवर्क शुल्क के लिए पर्याप्त %{coinSymbol} नहीं है ({required})",
     "swap_exchange_in": "एक्सचेंज इन",
     "swap_expired_refresh": "स्वैप समाप्त हो गया। कोट रिफ्रेश करें",
     "swap_price_impact_description": "व्यापार आकार के कारण बाजार मूल्य और अनुमानित मूल्य के बीच का अंतर।",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "टोकन ट्रांसफर",
                 "nftItemTransfer": "NFT ट्रांसफ़र",
-                "tonTransfer": "%{coinSymbolWithEx} ट्रांसफर",
+                "tonTransfer": "%{coinSymbol} ट्रांसफर",
                 "unknownTransaction": "अज्ञात लेनदेन"
             }
         }
@@ -599,10 +599,10 @@
     "wallet_swap": "स्वैप",
     "wallet_title": "वॉलेट",
     "yesterday": "कल",
-    "staking_pool_liquid_desc": "जब आप Tonstakers पूल में %{coinSymbolWithEx} स्टेक करते हैं, आपको tsTON नाम का टोकन मिलता है जो पूल में आपके हिस्से को दर्शाता है। जैसे-जैसे पूल लाभ जमा करता है, आपका tsTON अधिक %{coinSymbolWithEx} दर्शाता है।",
-    "staking_pool_withdraw_date": "{date} को {amount} %{coinSymbolWithEx} निकाले जाएंगे",
-    "staking_portfolio_pending_withdraw": "चक्र समाप्त होने पर {amount} %{coinSymbolWithEx} निकाले जाएंगे",
-    "staking_portfolio_pending_withdraw_countdown": "{value} में {amount} %{coinSymbolWithEx} निकाले जाएंगे",
+    "staking_pool_liquid_desc": "जब आप Tonstakers पूल में %{coinSymbol} स्टेक करते हैं, आपको tsTON नाम का टोकन मिलता है जो पूल में आपके हिस्से को दर्शाता है। जैसे-जैसे पूल लाभ जमा करता है, आपका tsTON अधिक %{coinSymbol} दर्शाता है।",
+    "staking_pool_withdraw_date": "{date} को {amount} %{coinSymbol} निकाले जाएंगे",
+    "staking_portfolio_pending_withdraw": "चक्र समाप्त होने पर {amount} %{coinSymbol} निकाले जाएंगे",
+    "staking_portfolio_pending_withdraw_countdown": "{value} में {amount} %{coinSymbol} निकाले जाएंगे",
     "staking_confirm_modal_provider": "प्रदाता",
     "staking_confirm_modal_amount": "राशि",
     "staking_confirm_modal_apy": "APY",
@@ -611,7 +611,7 @@
     "staking_tonstakers_notice": "स्टेकिंग तृतीय-पक्ष स्मार्ट कॉन्ट्रैक्ट पर आधारित है। Tonkeeper स्टेकिंग अनुभव के लिए जिम्मेदार नहीं है।",
     "staking_claim": "प्राप्त करें",
     "staking_details_pool_address_label": "पूल पता",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} स्टेकिंग लंबित",
-    "staking_pools_min_deposit": "न्यूनतम जमा {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "{amount} %{coinSymbol} स्टेकिंग लंबित",
+    "staking_pools_min_deposit": "न्यूनतम जमा {minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "केवल पूर्ण निकासी उपलब्ध है"
 }

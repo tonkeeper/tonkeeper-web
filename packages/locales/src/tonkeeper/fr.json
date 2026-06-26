@@ -137,8 +137,8 @@
   "exchange_modal": {
     "other_ways_to_buy": "Autres moyens d’acheter"
   },
-  "exchange_other_ways": "Autres moyens d'acheter ou de vendre du %{coinSymbolWithEx}",
-  "exchange_title": "Acheter %{coinSymbolWithEx}",
+  "exchange_other_ways": "Autres moyens d'acheter ou de vendre du %{coinSymbol}",
+  "exchange_title": "Acheter %{coinSymbol}",
   "import_add_wallet": "Ajouter un portefeuille",
   "import_add_wallet_description": "Créez un nouveau portefeuille ou ajoutez-en un existant.",
   "import_existing_wallet": "Portefeuille existant",
@@ -217,7 +217,7 @@
   "recovery_phrase": {
     "copy_button": "Copier"
   },
-  "reminder_notifications_caption": "Recevez des notifications lorsque vous recevez des %{coinSymbolWithEx}, des jetons et des NFT.",
+  "reminder_notifications_caption": "Recevez des notifications lorsque vous recevez des %{coinSymbol}, des jetons et des NFT.",
   "reminder_notifications_enable_button": "Activer les notifications",
   "reminder_notifications_later_button": "Plus tard",
   "reminder_notifications_title": "Recevez des notifications instantanées",
@@ -293,17 +293,17 @@
   "staking_earnings_section_title": "Gains annuels estimés",
   "staking_enter_amount": "Entrez un montant",
   "staking_insufficient_balance": "Solde insuffisant",
-  "staking_insufficient_recommended_fee_reserve": "Fonds insuffisants : le solde du portefeuille doit inclure 1 %{coinSymbolWithEx} de réserve et 0.05 %{coinSymbolWithEx} de frais.",
+  "staking_insufficient_recommended_fee_reserve": "Fonds insuffisants : le solde du portefeuille doit inclure 1 %{coinSymbol} de réserve et 0.05 %{coinSymbol} de frais.",
   "staking_max": "MAX",
   "staking_min_deposit_label": "Dépôt minimum",
   "staking_next_cycle_desc_liquid": "Déverrouillage instantané disponible",
   "staking_next_cycle_message": "Prochain cycle dans {value}",
-  "staking_pool_detail": "TAR ≈{apy}% · Dépôt min. {minDeposit} %{coinSymbolWithEx}",
+  "staking_pool_detail": "TAR ≈{apy}% · Dépôt min. {minDeposit} %{coinSymbol}",
   "staking_pools_apy": "TAR ≈{apy} %",
-  "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} prêt à retirer",
+  "staking_ready_withdraw": "{amount} %{coinSymbol} prêt à retirer",
   "staking_rewards_after_stake": "Après dépôt",
   "staking_rewards_current": "Actuel",
-  "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+  "staking_rewards_value": "≈ {value} %{coinSymbol}",
   "staking_staked": "Mis en dépôt",
   "staking_title": "Staking",
   "staking_top_up": "Dépôt",
@@ -346,7 +346,7 @@
     "subtitle": "NFT peut ne pas être sûr à utiliser pour l'une des raisons suivantes.",
     "title": "NFT non vérifié"
   },
-  "swap_confirm_not_enough_ton_for_fee": "%{coinSymbolWithEx} insuffisant pour les frais de réseau ({required})",
+  "swap_confirm_not_enough_ton_for_fee": "%{coinSymbol} insuffisant pour les frais de réseau ({required})",
   "swap_exchange_in": "Échanger en",
   "swap_expired_refresh": "Swap expiré. Actualiser le devis",
   "swap_price_impact_description": "La différence entre le prix du marché et le prix estimé en raison de la taille de la transaction.",
@@ -410,7 +410,7 @@
       "types": {
         "jettonTransfer": "Transfert de jeton",
         "nftItemTransfer": "Transfert de NFT",
-        "tonTransfer": "Transfert %{coinSymbolWithEx}",
+        "tonTransfer": "Transfert %{coinSymbol}",
         "unknownTransaction": "Transaction inconnue"
       }
     }
@@ -427,10 +427,10 @@
   "wallet_swap": "Échanger",
   "wallet_title": "Portefeuille",
   "yesterday": "Hier",
-  "staking_pool_liquid_desc": "Lorsque vous stakez des %{coinSymbolWithEx} dans un pool Tonstakers, vous recevez un jeton appelé tsTON qui représente votre part dans le pool. À mesure que le pool accumule des gains, votre tsTON représente une quantité plus importante de %{coinSymbolWithEx}.",
-  "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} seront retirés le {date}",
-  "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} seront retirés à la fin du cycle",
-  "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} seront retirés dans {value}",
+  "staking_pool_liquid_desc": "Lorsque vous stakez des %{coinSymbol} dans un pool Tonstakers, vous recevez un jeton appelé tsTON qui représente votre part dans le pool. À mesure que le pool accumule des gains, votre tsTON représente une quantité plus importante de %{coinSymbol}.",
+  "staking_pool_withdraw_date": "{amount} %{coinSymbol} seront retirés le {date}",
+  "staking_portfolio_pending_withdraw": "{amount} %{coinSymbol} seront retirés à la fin du cycle",
+  "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbol} seront retirés dans {value}",
   "staking_confirm_modal_provider": "Fournisseur",
   "staking_confirm_modal_amount": "Montant",
   "staking_confirm_modal_apy": "APY",
@@ -439,7 +439,7 @@
   "staking_tonstakers_notice": "Le staking repose sur des smart contracts tiers. Tonkeeper n’est pas responsable de l’expérience de staking.",
   "staking_claim": "Récupérer",
   "staking_details_pool_address_label": "Adresse du pool",
-  "staking_pending_deposit": "{amount} %{coinSymbolWithEx} en attente de dépôt",
-  "staking_pools_min_deposit": "Dépôt min. {minDeposit} %{coinSymbolWithEx}",
+  "staking_pending_deposit": "{amount} %{coinSymbol} en attente de dépôt",
+  "staking_pools_min_deposit": "Dépôt min. {minDeposit} %{coinSymbol}",
   "staking_tf_full_withdrawal_only": "Seul le retrait intégral est disponible"
 }

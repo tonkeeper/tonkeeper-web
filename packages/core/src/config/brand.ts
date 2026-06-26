@@ -13,28 +13,60 @@
  *   - rate/currency keys sent to backends (e.g. `getRates({ tokens: ['TON'] })`)
  * Changing any of those would break balances, asset matching and backend calls.
  *
+ * Naming rules (rebrand to Gram):
+ *   - The PURE ticker {@link BrandConfig.coinSymbol} ("GRAM") is shown EVERYWHERE a ticker appears
+ *     (history, Ton Connect, staking, etc.) — and is language-independent.
+ *   - The transitional ticker-with-old-name ({@link getBrandCoinSymbolWithEx}) is shown in EXACTLY
+ *     ONE place: the native-coin cell on the home page.
+ *   - The full coin name ({@link getBrandCoinName}) replaces every former "Toncoin" display string.
+ *   - Both transitional values are LANGUAGE-DEPENDENT: English uses "(prev. …)", every other
+ *     language uses "(ex-…)". Resolve them via the helpers below given the active UI language.
  */
 export interface BrandConfig {
     /** Display name of the chain, e.g. used in "... in the TON network". */
     chainName: string;
-    /** Full name of the native coin, e.g. "Toncoin". */
-    coinName: string;
+    /** Full name of the native coin in English, e.g. "Gram (prev. Toncoin)". */
+    coinName_En: string;
+    /** Full name of the native coin in non-English languages, e.g. "Gram (ex-Toncoin)". */
+    coinName_notEn: string;
     /**
      * PURE ticker/symbol of the native coin, e.g. "GRAM". Use this next to amounts and anywhere a
-     * value might be passed onward (analytics, etc.) — never the transitional {@link coinSymbolWithEx}.
+     * value might be passed onward (analytics, etc.) — never the transitional with-ex variants.
+     * Language-independent.
      */
     coinSymbol: string;
     /**
-     * Transitional DISPLAY-ONLY ticker with the old name in parentheses, e.g. "GRAM (ex TON)".
-     * Use only as a standalone label where we want to surface the rename; NEVER send to an API or
-     * use as an identifier — use {@link coinSymbol} for that.
+     * Transitional DISPLAY-ONLY ticker with the old name in parentheses, English variant,
+     * e.g. "GRAM (prev. TON)". Home-page coin cell only; NEVER send to an API or use as an id.
      */
-    coinSymbolWithEx: string;
+    coinSymbolWithEx_En: string;
+    /** Transitional DISPLAY-ONLY ticker with the old name, non-English variant, e.g. "GRAM (ex-TON)". */
+    coinSymbolWithEx_notEn: string;
     /** Native coin icon data URI. */
     coinIcon: string;
     /** Native chain/network icon data URI. */
     chainIcon: string;
 }
+
+/** True when the active UI language is English (the only language using the "(prev. …)" wording). */
+export const isEnglishLanguage = (language?: string): boolean =>
+    !language || language.toLowerCase().startsWith('en');
+
+/**
+ * Resolve the full native-coin name ("Gram (prev. Toncoin)" / "Gram (ex-Toncoin)") for the active
+ * UI language. Pass the i18n language; defaults to the English variant when unknown.
+ */
+export const getBrandCoinName = (language?: string): string =>
+    isEnglishLanguage(language) ? BRAND_CONFIG.coinName_En : BRAND_CONFIG.coinName_notEn;
+
+/**
+ * Resolve the transitional with-ex ticker ("GRAM (prev. TON)" / "GRAM (ex-TON)") for the active UI
+ * language. Used ONLY by the home-page coin cell.
+ */
+export const getBrandCoinSymbolWithEx = (language?: string): string =>
+    isEnglishLanguage(language)
+        ? BRAND_CONFIG.coinSymbolWithEx_En
+        : BRAND_CONFIG.coinSymbolWithEx_notEn;
 
 // Native coin icon, inlined so every platform (incl. desktop/iOS, which don't self-host static
 // assets) bundles it without a remote request or per-app copies. Edit the SVG markup below to
@@ -51,9 +83,11 @@ const NATIVE_CHAIN_ICON = `data:image/svg+xml,${encodeURIComponent(NATIVE_CHAIN_
 
 export const BRAND_CONFIG: BrandConfig = {
     chainName: 'TON',
-    coinName: 'Gram (ex\u00A0Toncoin)',
+    coinName_En: 'Gram (prev.\u00A0Toncoin)',
+    coinName_notEn: 'Gram (ex-Toncoin)',
     coinSymbol: 'GRAM',
-    coinSymbolWithEx: 'GRAM (ex\u00A0TON)',
+    coinSymbolWithEx_En: 'GRAM (prev.\u00A0TON)',
+    coinSymbolWithEx_notEn: 'GRAM (ex-TON)',
     coinIcon: NATIVE_COIN_ICON,
     chainIcon: NATIVE_CHAIN_ICON
 };

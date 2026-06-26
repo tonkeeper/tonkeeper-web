@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "其他购买方式"
     },
-    "exchange_other_ways": "其他购买或出售%{coinSymbolWithEx}的方式",
-    "exchange_title": "购买%{coinSymbolWithEx}",
+    "exchange_other_ways": "其他购买或出售%{coinSymbol}的方式",
+    "exchange_title": "购买%{coinSymbol}",
     "import_add_wallet": "添加钱包",
     "import_add_wallet_description": "创建一个新钱包或添加现有钱包。",
     "import_existing_wallet": "现有钱包",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "复制"
     },
-    "reminder_notifications_caption": "当您收到%{coinSymbolWithEx}、代币和NFT时获得通知。",
+    "reminder_notifications_caption": "当您收到%{coinSymbol}、代币和NFT时获得通知。",
     "reminder_notifications_enable_button": "启用通知",
     "reminder_notifications_later_button": "稍后",
     "reminder_notifications_title": "获得即时通知",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "预计年收益",
     "staking_enter_amount": "输入金额",
     "staking_insufficient_balance": "余额不足",
-    "staking_insufficient_recommended_fee_reserve": "资金不足：钱包余额中需要预留 1 %{coinSymbolWithEx} 储备金和 0.05 %{coinSymbolWithEx} 手续费。",
+    "staking_insufficient_recommended_fee_reserve": "资金不足：钱包余额中需要预留 1 %{coinSymbol} 储备金和 0.05 %{coinSymbol} 手续费。",
     "staking_max": "最大",
     "staking_min_deposit_label": "最低存款",
     "staking_next_cycle_desc_liquid": "即时取消质押可用",
     "staking_next_cycle_message": "下一个周期在 {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · 最低存款 {minDeposit} %{coinSymbolWithEx}",
+    "staking_pool_detail": "APY ≈ {apy}% · 最低存款 {minDeposit} %{coinSymbol}",
     "staking_pools_apy": "年化收益率 ≈{apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} 可提取",
+    "staking_ready_withdraw": "{amount} %{coinSymbol} 可提取",
     "staking_rewards_after_stake": "质押后",
     "staking_rewards_current": "当前的",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ {value} %{coinSymbol}",
     "staking_staked": "已质押",
     "staking_title": "质押",
     "staking_top_up": "充值",
@@ -346,7 +346,7 @@
         "subtitle": "NFT 可能因以下原因之一而不安全。",
         "title": "未验证的NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbolWithEx} 不足以支付网络费用（{required}）",
+    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbol} 不足以支付网络费用（{required}）",
     "swap_exchange_in": "兑换",
     "swap_expired_refresh": "兑换已过期。刷新报价",
     "swap_price_impact_description": "由于交易规模导致的市场价格与预估价格之间的差异。",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "代币转移",
                 "nftItemTransfer": "NFT转移",
-                "tonTransfer": "%{coinSymbolWithEx}转移",
+                "tonTransfer": "%{coinSymbol}转移",
                 "unknownTransaction": "未知交易"
             }
         }
@@ -1675,10 +1675,10 @@
     "wallet_swap": "交换",
     "wallet_title": "钱包",
     "yesterday": "昨天",
-    "staking_pool_liquid_desc": "在 Tonstakers 池中质押 %{coinSymbolWithEx} 时，您会收到名为 tsTON 的代币，代表您在池中的份额。随着池子累积收益，您的 tsTON 对应更多 %{coinSymbolWithEx}。",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} 将于 {date} 提取",
-    "staking_portfolio_pending_withdraw": "周期结束后将提取 {amount} %{coinSymbolWithEx}",
-    "staking_portfolio_pending_withdraw_countdown": "{value} 内将提取 {amount} %{coinSymbolWithEx}",
+    "staking_pool_liquid_desc": "在 Tonstakers 池中质押 %{coinSymbol} 时，您会收到名为 tsTON 的代币，代表您在池中的份额。随着池子累积收益，您的 tsTON 对应更多 %{coinSymbol}。",
+    "staking_pool_withdraw_date": "{amount} %{coinSymbol} 将于 {date} 提取",
+    "staking_portfolio_pending_withdraw": "周期结束后将提取 {amount} %{coinSymbol}",
+    "staking_portfolio_pending_withdraw_countdown": "{value} 内将提取 {amount} %{coinSymbol}",
     "staking_confirm_modal_provider": "提供商",
     "staking_confirm_modal_amount": "金额",
     "staking_confirm_modal_apy": "APY",
@@ -1687,7 +1687,7 @@
     "staking_tonstakers_notice": "质押基于第三方智能合约。Tonkeeper 不对质押体验负责。",
     "staking_claim": "领取",
     "staking_details_pool_address_label": "池地址",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} 待质押",
-    "staking_pools_min_deposit": "最低存入 {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "{amount} %{coinSymbol} 待质押",
+    "staking_pools_min_deposit": "最低存入 {minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "仅支持全额提取"
 }

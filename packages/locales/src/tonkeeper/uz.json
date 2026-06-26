@@ -137,8 +137,8 @@
     "exchange_modal": {
         "other_ways_to_buy": "Boshqa xarid qilish usullari"
     },
-    "exchange_other_ways": "%{coinSymbolWithEx} sotib olish yoki sotishning boshqa usullari",
-    "exchange_title": "%{coinSymbolWithEx} sotib oling",
+    "exchange_other_ways": "%{coinSymbol} sotib olish yoki sotishning boshqa usullari",
+    "exchange_title": "%{coinSymbol} sotib oling",
     "import_add_wallet": "Hamyon qo'shish",
     "import_add_wallet_description": "Yangi hamyon yarating yoki mavjud hamyonni qo'shing.",
     "import_existing_wallet": "Mavjud Hamyon",
@@ -217,7 +217,7 @@
     "recovery_phrase": {
         "copy_button": "Nusxalash"
     },
-    "reminder_notifications_caption": "%{coinSymbolWithEx}, tokenlar va NFT olganda bildirishnomalar oling.",
+    "reminder_notifications_caption": "%{coinSymbol}, tokenlar va NFT olganda bildirishnomalar oling.",
     "reminder_notifications_enable_button": "Bildirishnomalarni yoqing",
     "reminder_notifications_later_button": "Keyinroқ",
     "reminder_notifications_title": "Tezkor bildirishnomalarni oling",
@@ -293,17 +293,17 @@
     "staking_earnings_section_title": "Kutilayotgan yillik daromad",
     "staking_enter_amount": "Miqdorni kiriting",
     "staking_insufficient_balance": "Hisobda yetarli mablag' yo'q",
-    "staking_insufficient_recommended_fee_reserve": "Mablag' yetarli emas: hamyonda 1 %{coinSymbolWithEx} zaxira va 0.05 %{coinSymbolWithEx} komissiya uchun mablag' bo'lishi kerak.",
+    "staking_insufficient_recommended_fee_reserve": "Mablag' yetarli emas: hamyonda 1 %{coinSymbol} zaxira va 0.05 %{coinSymbol} komissiya uchun mablag' bo'lishi kerak.",
     "staking_max": "MAKS",
     "staking_min_deposit_label": "Minimal depozit",
     "staking_next_cycle_desc_liquid": "Tezkor qaytarib olish mavjud",
     "staking_next_cycle_message": "Keyingi tsikl {value} ichida",
-    "staking_pool_detail": "APY ≈ {apy}% · Min. depozit {minDeposit} %{coinSymbolWithEx}",
+    "staking_pool_detail": "APY ≈ {apy}% · Min. depozit {minDeposit} %{coinSymbol}",
     "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} yechib olishga tayyor",
+    "staking_ready_withdraw": "{amount} %{coinSymbol} yechib olishga tayyor",
     "staking_rewards_after_stake": "Staking qilgandan keyin",
     "staking_rewards_current": "Joriy",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ {value} %{coinSymbol}",
     "staking_staked": "Steykingda",
     "staking_title": "Staking",
     "staking_top_up": "To'ldirish",
@@ -346,7 +346,7 @@
         "subtitle": "NFT quyidagi sabablardan biri uchun xavfsiz bo'lmasligi mumkin.",
         "title": "Tasdiqlanmagan NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "Tarmoq to'lovi uchun %{coinSymbolWithEx} yetarli emas ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "Tarmoq to'lovi uchun %{coinSymbol} yetarli emas ({required})",
     "swap_exchange_in": "Almashtirish",
     "swap_expired_refresh": "Swap muddati tugadi. Kotirovkani yangilang",
     "swap_price_impact_description": "Savdo hajmi tufayli bozor narxi va taxminiy narx o'rtasidagi farq.",
@@ -410,7 +410,7 @@
             "types": {
                 "jettonTransfer": "Token o‘tkazish",
                 "nftItemTransfer": "NFT yuborish",
-                "tonTransfer": "%{coinSymbolWithEx} Yuborish",
+                "tonTransfer": "%{coinSymbol} Yuborish",
                 "unknownTransaction": "Noma'lum tranzaksiya"
             }
         }
@@ -1683,10 +1683,10 @@
     "wallet_swap": "Almashtirish",
     "wallet_title": "Hamyon",
     "yesterday": "Kecha",
-    "staking_pool_liquid_desc": "%{coinSymbolWithEx}’ni Tonstakers havuzida steyklasangiz, havuzdagi ulushingizni ifodalovchi tsTON tokenini olasiz. Havuz foyda to‘plagan sari tsTONingiz ko‘proq TONni anglatadi.",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} {date} kuni yechib olinadi",
-    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} tsikl tugagach yechib olinadi",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} {value} ichida yechib olinadi",
+    "staking_pool_liquid_desc": "%{coinSymbol}’ni Tonstakers havuzida steyklasangiz, havuzdagi ulushingizni ifodalovchi tsTON tokenini olasiz. Havuz foyda to‘plagan sari tsTONingiz ko‘proq TONni anglatadi.",
+    "staking_pool_withdraw_date": "{amount} %{coinSymbol} {date} kuni yechib olinadi",
+    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbol} tsikl tugagach yechib olinadi",
+    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbol} {value} ichida yechib olinadi",
     "staking_confirm_modal_provider": "Provayder",
     "staking_confirm_modal_amount": "Summa",
     "staking_confirm_modal_apy": "APY",
@@ -1695,7 +1695,7 @@
     "staking_tonstakers_notice": "Steyking uchinchi tomon smart-kontraktlariga asoslangan. Tonkeeper steyking tajribasi uchun javobgar emas.",
     "staking_claim": "Olish",
     "staking_details_pool_address_label": "Havuz manzili",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} steyk kutilmoqda",
-    "staking_pools_min_deposit": "Min. depozit {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "{amount} %{coinSymbol} steyk kutilmoqda",
+    "staking_pools_min_deposit": "Min. depozit {minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "Faqat to‘liq yechish mumkin"
 }

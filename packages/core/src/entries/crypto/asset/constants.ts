@@ -35,7 +35,9 @@ export const TRON_TRX_ASSET: TronAsset = {
 export const TON_ASSET: TonAsset = {
     id: packAssetId(BLOCKCHAIN_NAME.TON, 'TON'),
     symbol: BRAND_CONFIG.coinSymbol,
-    name: BRAND_CONFIG.coinName,
+    // `core` has no UI-language context, so the canonical asset name uses the English variant.
+    // UI surfaces that show the coin name should prefer the language-aware `useBrandCoinName()`.
+    name: BRAND_CONFIG.coinName_En,
     decimals: 9,
     // NOTE: `address` and the `id` above are protocol identifiers — keep the literal 'TON'.
     address: 'TON',

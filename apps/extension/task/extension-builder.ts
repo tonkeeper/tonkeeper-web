@@ -1,7 +1,11 @@
 import fs from 'fs-extra';
 import { build } from 'vite';
 import child_process from 'child_process';
-import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
+import {
+    BRAND_CONFIG,
+    getBrandCoinName,
+    getBrandCoinSymbolWithEx
+} from '@tonkeeper/core/dist/config/brand';
 
 export const notify = (value: string) => console.log(`----------${value}----------`);
 
@@ -103,15 +107,17 @@ export class ExtensionBuilder {
      */
     private applyBrandToLocales() {
         const localesDir = `${this.buildPath}/_locales`;
-        const subs: Record<string, string> = {
-            '%{chainName}': BRAND_CONFIG.chainName,
-            '%{coinName}': BRAND_CONFIG.coinName,
-            '%{coinSymbol}': BRAND_CONFIG.coinSymbol,
-            '%{coinSymbolWithEx}': BRAND_CONFIG.coinSymbolWithEx
-        };
         for (const lang of fs.readdirSync(localesDir)) {
             const file = `${localesDir}/${lang}/messages.json`;
             if (!fs.existsSync(file)) continue;
+            // `coinName`/`coinSymbolWithEx` are language-dependent ("prev." in English, "ex-"
+            // elsewhere), so resolve them per locale folder.
+            const subs: Record<string, string> = {
+                '%{chainName}': BRAND_CONFIG.chainName,
+                '%{coinName}': getBrandCoinName(lang),
+                '%{coinSymbol}': BRAND_CONFIG.coinSymbol,
+                '%{coinSymbolWithEx}': getBrandCoinSymbolWithEx(lang)
+            };
             const data = fs.readJsonSync(file) as Record<string, { message?: string }>;
             for (const key of Object.keys(data)) {
                 const msg = data[key]?.message;

@@ -657,7 +657,7 @@ const SenderDropdownItem: FC<{ sender: AllChainsSenderOptions }> = ({ sender }) 
             return (
                 <>
                     <TokenImage src={TON_ASSET.image} />
-                    <Label2>{BRAND_CONFIG.coinSymbolWithEx}</Label2>
+                    <Label2>{BRAND_CONFIG.coinSymbol}</Label2>
                 </>
             );
         case 'gasless':
