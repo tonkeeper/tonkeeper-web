@@ -55,6 +55,8 @@ jobs:
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
             DEBUG: electron*
+            LINUXDEPLOY_PATH: ${{ github.workspace }}/.cache/linuxdeploy-x86_64.AppImage
+            LIBSECRET_PATH: /usr/lib/x86_64-linux-gnu/libsecret-1.so.0
 
         steps:
             - name: Checkout to git repository
@@ -68,6 +70,17 @@ jobs:
             - name: Enable Corepack
               run: |
                   corepack enable
+
+            - name: Set up Linux AppImage packaging
+              if: runner.os == 'Linux' && matrix.command == 'make:intel'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install --yes fakeroot libarchive-tools libfuse2 libsecret-1-0 libsecret-1-dev rpm zip
+                  mkdir -p "$(dirname "$LINUXDEPLOY_PATH")"
+                  curl --fail --location --output "$LINUXDEPLOY_PATH" \
+                      https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20251107-1/linuxdeploy-x86_64.AppImage
+                  echo "c20cd71e3a4e3b80c3483cef793cda3f4e990aca14014d23c544ca3ce1270b4d  $LINUXDEPLOY_PATH" | sha256sum --check
+                  chmod +x "$LINUXDEPLOY_PATH"
 
             - name: Decode service account into a file
               if: runner.os == 'macOS'
