@@ -4,7 +4,7 @@ on:
     workflow_call:
         inputs:
             branch:
-                description: 'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
+                description: 'Cloudflare Pages branch name to deploy to (under the twa-recovery project)'
                 required: true
                 type: string
         secrets:
@@ -15,7 +15,7 @@ on:
     workflow_dispatch:
         inputs:
             branch:
-                description: 'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
+                description: 'Cloudflare Pages branch name to deploy to (under the twa-recovery project)'
                 required: true
                 type: string
                 default: 'twa-recovery'
@@ -69,7 +69,7 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   command:
-                      pages deploy apps/twa/dist --project-name=tonkeeper-web --branch=${{
+                      pages deploy apps/twa/dist --project-name=twa-recovery --branch=${{
                       inputs.branch }}
 
             - name: Summary
