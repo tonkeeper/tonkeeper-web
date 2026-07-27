@@ -14,6 +14,7 @@ import { Body2, H2, Label2 } from '@tonkeeper/uikit/dist/components/Text';
 import { Button } from '@tonkeeper/uikit/dist/components/fields/Button';
 import { ChevronRightIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { WalletEmoji } from '@tonkeeper/uikit/dist/components/shared/emoji/WalletEmoji';
+import { useAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { useAccountLabel } from '@tonkeeper/uikit/dist/hooks/accountUtils';
@@ -203,6 +204,7 @@ const DownloadButton: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
 export const MiniAppClosed: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { t } = useTranslation();
     const client = useQueryClient();
+    const { tracker } = useAppContext();
     const track = useAnalyticsTrack();
     const { data: accounts } = useAccountsStateQuery();
 
@@ -210,12 +212,12 @@ export const MiniAppClosed: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     // hardware and other non-mnemonic accounts have no recovery phrase to show.
     const recoverableAccounts = (accounts ?? []).filter(isMnemonicAndPassword);
 
-    // Reach metric: fire once per session, after the account list has loaded so
-    // has_wallets / wallets_count reflect the real state rather than the empty
-    // pre-load list.
+    // Reach metric: fire once per session, after the account list and analytics
+    // tracker have loaded so the event is not lost to the tracker's initial
+    // no-op state.
     const openTracked = useRef(false);
     useEffect(() => {
-        if (accounts === undefined || openTracked.current) return;
+        if (accounts === undefined || !tracker || openTracked.current) return;
         openTracked.current = true;
         track({
             eventName: 'twa_sunset_open',
@@ -223,7 +225,7 @@ export const MiniAppClosed: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
             has_wallets: recoverableAccounts.length > 0,
             wallets_count: recoverableAccounts.length
         });
-    }, [accounts, recoverableAccounts.length, sdk, track]);
+    }, [accounts, recoverableAccounts.length, sdk, track, tracker]);
 
     const [passwordAccount, setPasswordAccount] = useState<Account | null>(null);
     const [recovery, setRecovery] = useState<{ account: Account; secret: AccountSecret } | null>(
