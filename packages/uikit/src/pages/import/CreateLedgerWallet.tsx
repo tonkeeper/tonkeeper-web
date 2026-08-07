@@ -179,7 +179,7 @@ const ChooseLedgerAccounts: FC<{
     afterCompleted: () => void;
 }> = ({ tonTransport, onCancel, afterCompleted }) => {
     const { t } = useTranslation();
-    const totalAccounts = 10;
+    const totalAccounts = 20;
     const { mutateAsync: getLedgerWallets, data: ledgerAccountData } =
         useLedgerWallets(totalAccounts);
     const [selectedIndexes, setSelectedIndexes] = useState<Record<number, boolean>>({});
