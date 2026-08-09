@@ -62,9 +62,9 @@ export const PasswordUnlock: FC<{
 }> = ({ sdk, onClose, onSubmit, isError, isLoading, padding }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLInputElement | null>(null);
-    const [password, setPassword] = useState('');
-    const [active, setActive] = useState(false);
     const location = useLocation();
+    const previousLocation = useRef(location);
+    const [password, setPassword] = useState('');
 
     useEffect(() => {
         sdk.uiEvents.on('navigate', onClose);
@@ -85,12 +85,11 @@ export const PasswordUnlock: FC<{
     }, []);
 
     useEffect(() => {
-        if (!active) {
-            setActive(true);
-        } else {
+        if (previousLocation.current !== location) {
+            previousLocation.current = location;
             onClose();
         }
-    }, [location, active, onClose]);
+    }, [location, onClose]);
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
