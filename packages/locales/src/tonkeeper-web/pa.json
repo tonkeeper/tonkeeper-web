@@ -268,6 +268,7 @@
   "keychain_read_error": "ਕੀਚੇਨ ਤੋਂ ਡਾਟਾ ਲੈਣ ਵਿੱਚ ਅਸਫਲ ਰਹੇ",
   "keystone_pair_subtitle": "AIR-GAP ਹਾਰਡਵੇਅਰ ਵਾਲਿਟ ਨਾਲ ਉੱਚ ਪੱਧਰ ਦੀ ਸੁਰੱਖਿਆ",
   "keystone_pair_title": "Keystone ਨਾਲ ਜੋੜੋ",
+  "keystone_scan_not_keystone_qr": "ਇਹ Keystone QR ਕੋਡ ਨਹੀਂ ਹੈ",
   "keystone_sign_subtitle": "ਕਿਰਪਾ ਕਰਕੇ Keystone ਖੋਲ੍ਹੋ ਅਤੇ ਲੈਣ-ਦੇਣ ਨਾਲ QR ਕੋਡ ਸਕੈਨ ਕਰੋ",
   "keystone_sign_title": "Keystone ਕਨੈਕਟ ਕਰੋ",
   "learn_more": "ਹੋਰ ਜਾਣੋ",

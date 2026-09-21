@@ -268,6 +268,7 @@
   "keychain_read_error": "Fehler beim Abrufen der Daten aus dem Schlüsselbund",
   "keystone_pair_subtitle": "Ein höheres Maß an Sicherheit mit AIR-GAP-Hardware-Wallet",
   "keystone_pair_title": "Mit Keystone koppeln",
+  "keystone_scan_not_keystone_qr": "Dies ist kein Keystone-QR-Code",
   "keystone_sign_subtitle": "Bitte öffnen Sie Keystone und scannen Sie den QR-Code mit der Transaktion",
   "keystone_sign_title": "Keystone verbinden",
   "learn_more": "Mehr erfahren",

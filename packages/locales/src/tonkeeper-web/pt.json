@@ -268,6 +268,7 @@
   "keychain_read_error": "Falha ao obter dados do keychain",
   "keystone_pair_subtitle": "Um nível mais alto de segurança com a carteira física AIR-GAP",
   "keystone_pair_title": "Emparelhar com Keystone",
+  "keystone_scan_not_keystone_qr": "Este não é um código QR do Keystone",
   "keystone_sign_subtitle": "Por favor, abra o Keystone e escaneie o código QR com a transação",
   "keystone_sign_title": "Conectar Keystone",
   "learn_more": "Saiba mais",

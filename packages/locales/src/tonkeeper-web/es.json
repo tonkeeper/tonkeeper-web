@@ -268,6 +268,7 @@
   "keychain_read_error": "No se pudo obtener los datos del llavero",
   "keystone_pair_subtitle": "Un nivel de seguridad mayor con la billetera en hardware AIR-GAP",
   "keystone_pair_title": "Emparejar con Keystone",
+  "keystone_scan_not_keystone_qr": "Este no es un código QR de Keystone",
   "keystone_sign_subtitle": "Por favor abra Keystone y escanee el código QR de la transacción",
   "keystone_sign_title": "Conectar Keystone",
   "learn_more": "Aprender Más",

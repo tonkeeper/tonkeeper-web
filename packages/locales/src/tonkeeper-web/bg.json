@@ -268,6 +268,7 @@
   "keychain_read_error": "Неуспешно извличане на данни от keychain",
   "keystone_pair_subtitle": "По-високо ниво на сигурност с AIR-GAP хардуерен портфейл",
   "keystone_pair_title": "Свържете се с Keystone",
+  "keystone_scan_not_keystone_qr": "Това не е QR код на Keystone",
   "keystone_sign_subtitle": "Моля, отворете Keystone и сканирайте QR кода с транзакция",
   "keystone_sign_title": "Свържете Keystone",
   "learn_more": "Научете повече",

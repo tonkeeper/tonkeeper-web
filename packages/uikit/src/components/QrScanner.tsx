@@ -33,12 +33,14 @@ const QrScanner = () => {
 
     const onScan = useMemo(() => {
         return (data: string) => {
+            // Close first: a listener may synchronously request another scan (e.g. the next part
+            // of an animated QR code), and that request has to win over closing the scanner.
+            setScanId(undefined);
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: scanId,
                 params: data
             });
-            setScanId(undefined);
         };
     }, [sdk, scanId, setScanId]);
 

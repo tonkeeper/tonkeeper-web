@@ -268,6 +268,7 @@
   "keychain_read_error": "فشل في الحصول على البيانات من سلسلة المفاتيح",
   "keystone_pair_subtitle": "مستوى أعلى من الأمن مع محفظة أجهزة AIR-GAP",
   "keystone_pair_title": "اقتران مع Keystone",
+  "keystone_scan_not_keystone_qr": "هذا ليس رمز QR من Keystone",
   "keystone_sign_subtitle": "يرجى فتح Keystone ومسح رمز الاستجابة السريعة (QR) مع المعاملة.",
   "keystone_sign_title": "ربط Keystone",
   "learn_more": "اقرأ المزيد",

@@ -268,6 +268,7 @@
   "keychain_read_error": "Không lấy được dữ liệu từ keychain",
   "keystone_pair_subtitle": "Mức độ bảo mật cao hơn với ví phần cứng AIR-GAP",
   "keystone_pair_title": "Ghép đôi với Keystone",
+  "keystone_scan_not_keystone_qr": "Đây không phải là mã QR Keystone",
   "keystone_sign_subtitle": "Vui lòng mở Keystone và quét mã QR với giao dịch",
   "keystone_sign_title": "Kết nối Keystone",
   "learn_more": "Tìm hiểu thêm",

@@ -268,6 +268,7 @@
   "keychain_read_error": "未能从钥匙串获取数据",
   "keystone_pair_subtitle": "AIR-GAP 硬件钱包提供更高级别的安全性",
   "keystone_pair_title": "与 Keystone 配对",
+  "keystone_scan_not_keystone_qr": "这不是 Keystone 二维码",
   "keystone_sign_subtitle": "请打开Keystone并扫描交易的二维码",
   "keystone_sign_title": "连接 Keystone",
   "learn_more": "了解更多",

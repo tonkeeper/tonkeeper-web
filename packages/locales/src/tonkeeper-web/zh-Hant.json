@@ -268,6 +268,7 @@
   "keychain_read_error": "無法從鑰匙圈獲取資料",
   "keystone_pair_subtitle": "使用 AIR-GAP 硬體錢包提升安全等級",
   "keystone_pair_title": "與 Keystone 配對",
+  "keystone_scan_not_keystone_qr": "這不是 Keystone 二維碼",
   "keystone_sign_subtitle": "請打開 Keystone 並掃描交易二維碼",
   "keystone_sign_title": "連接Keystone",
   "learn_more": "了解更多",

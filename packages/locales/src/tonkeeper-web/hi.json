@@ -268,6 +268,7 @@
   "keychain_read_error": "कीचेन से डेटा प्राप्त करने में विफल रहा",
   "keystone_pair_subtitle": "एयर-गैप हार्डवेयर वॉलेट के साथ उच्च स्तर की सुरक्षा",
   "keystone_pair_title": "कीस्टोन के साथ जोड़ें",
+  "keystone_scan_not_keystone_qr": "यह Keystone QR कोड नहीं है",
   "keystone_sign_subtitle": "कृपया कीस्टोन खोलें और लेनदेन के साथ क्यूआर कोड स्कैन करें",
   "keystone_sign_title": "कीस्टोन से कनेक्ट करें",
   "learn_more": "और जानें",

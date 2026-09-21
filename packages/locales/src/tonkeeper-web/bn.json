@@ -268,6 +268,7 @@
   "keychain_read_error": "Keychain থেকে ডেটা আনতে ব্যর্থ হয়েছে",
   "keystone_pair_subtitle": "AIR-GAP হার্ডওয়্যার ওয়ালেট সহ উচ্চতর নিরাপত্তা",
   "keystone_pair_title": "Keystone এর সাথে জোড়া করুন",
+  "keystone_scan_not_keystone_qr": "এটি Keystone QR কোড নয়",
   "keystone_sign_subtitle": "অনুগ্রহ করে Keystone খুলুন এবং QR কোডটি স্ক্যান করুন",
   "keystone_sign_title": "Keystone সংযোগ করুন",
   "learn_more": "আরও জানুন",
