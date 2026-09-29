@@ -1,0 +1,119 @@
+/*
+ * Keeper UI Kit stylesheet: Tailwind preflight, the design tokens on `:root`,
+ * the fonts, and every utility the components use. Import it once at the app
+ * root, before the app's own styles.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /*
+     * TT Firs Neue ships as three static faces, self-hosted because the
+     * family is licensed rather than served from a public CDN. `font-weight`
+     * here is each face's own `usWeightClass`, so the type scale can name
+     * 450 / 500 / 600 and get the drawn weight instead of a synthesised one.
+     *
+     * The faces carry Latin, Cyrillic and roughly half of Vietnamese (the
+     * combining horn and hook-above marks are absent, so letters like ư ơ ả
+     * cannot be drawn) — no Greek, Arabic, Indic or CJK. Uncovered letters
+     * fall through the `--tk-font-sans` stack per glyph; the Vietnamese
+     * locale switches the whole UI to Inter instead (see `:root:lang(vi)`).
+     */
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('./fonts/TT-Firs-Neue-Normal.woff2') format('woff2');
+        font-weight: 450;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('./fonts/TT-Firs-Neue-Medium.woff2') format('woff2');
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('./fonts/TT-Firs-Neue-DemiBold.woff2') format('woff2');
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    /*
+     * Inter (OFL) subset to Latin + Vietnamese, variable weight axis kept so
+     * the 450/500/600 steps of the type scale resolve to drawn instances.
+     * Only ever downloaded when the `vi` stack below is active — browsers
+     * fetch a face on first use, not on declaration.
+     */
+    @font-face {
+        font-family: Inter;
+        src: url('./fonts/InterVariable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    body {
+        font-family: var(--tk-font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+@layer components {
+    /*
+     * Emitted by `useSkeletonMask` only while a `SkeletonScope` above the
+     * element is loading, so a bare attribute selector cannot leak into a
+     * loaded screen.
+     *
+     * The bar is a pseudo-element rather than a restyled box: the element keeps
+     * its own line box, so real typography goes on driving row heights and the
+     * mask never shifts the layout it is standing in for. `!important` is here
+     * to beat the Tailwind text-color utility on the same element.
+     */
+    [data-skeleton] {
+        position: relative;
+        color: transparent !important;
+    }
+
+    /* Children would otherwise show through the bar — chips, icons, badges. */
+    [data-skeleton] > * {
+        visibility: hidden;
+    }
+
+    [data-skeleton]::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        width: var(--tk-skeleton-w, 100%);
+        height: var(--tk-skeleton-h, 12px);
+        border-radius: var(--tk-skeleton-r, 8px);
+        background: var(--tk-skeleton-fill);
+        animation: tk-skeleton-pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes tk-skeleton-pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [data-skeleton]::after {
+            animation: none;
+        }
+    }
+}

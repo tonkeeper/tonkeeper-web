@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "useDefineForClassFields": true,
+        "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "types": ["vite/client"],
+        "baseUrl": ".",
+        "paths": {
+            "@tonkeeper/ui-kit": ["../../packages/ui-kit/src/index.ts"],
+            "@tonkeeper/ui-kit/icons/*": ["../../packages/ui-kit/src/icons/components/*"]
+        }
+    },
+    "include": ["src", "tailwind.config.ts"]
+}

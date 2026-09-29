@@ -18,6 +18,10 @@
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]
         },
+        "build:showcase": {
+            "dependsOn": ["^build:pkg"],
+            "outputs": ["dist/**"]
+        },
         "build:web": {
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]

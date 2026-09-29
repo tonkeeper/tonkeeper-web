@@ -1,0 +1,70 @@
+name: Tonkeeper UI Showcase Deploy
+
+on:
+    workflow_call:
+        inputs:
+            branch:
+                description: 'Cloudflare Pages branch name for the showcase preview'
+                required: true
+                type: string
+        secrets:
+            CLOUDFLARE_API_TOKEN:
+                required: true
+            CLOUDFLARE_ACCOUNT_ID:
+                required: true
+
+env:
+    node-version: 22.22.2
+    NODE_AUTH_TOKEN: ${{ github.token }}
+
+permissions:
+    contents: read
+    packages: read
+
+jobs:
+    showcase-deploy:
+        name: showcase-deploy
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              run: yarn install --immutable
+
+            - name: Run build
+              run: |
+                  yarn workspace @tonkeeper/ui-showcase build
+
+            - name: Publish to Cloudflare Pages
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command:
+                      pages deploy apps/ui-showcase/dist --project-name=tonkeeper-web --branch=${{
+                      inputs.branch }}
+
+            - name: Summary
+              run: |
+                  echo '### Successful UI showcase deployment' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
