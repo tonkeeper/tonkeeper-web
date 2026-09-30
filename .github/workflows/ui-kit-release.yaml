@@ -45,7 +45,7 @@ jobs:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
                   if [ -z "$NPM_TOKEN" ]; then
-                      echo "::error::NPM_TOKEN is required to read and publish the private package"; exit 1
+                      echo "::error::NPM_TOKEN is required to publish the package"; exit 1
                   fi
                   printf '//registry.npmjs.org/:_authToken=%s\n' "$NPM_TOKEN" > "$RUNNER_TEMP/.npmrc"
                   npm whoami --userconfig "$RUNNER_TEMP/.npmrc" --registry=https://registry.npmjs.org/ >/dev/null
@@ -110,7 +110,7 @@ jobs:
                   npm publish \
                       --userconfig "$RUNNER_TEMP/.npmrc" \
                       --registry=https://registry.npmjs.org/ \
-                      --access restricted \
+                      --access public \
                       --tag "$TAG"
 
             - name: Tag and release

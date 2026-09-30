@@ -778,6 +778,14 @@ export const Modal: FC<ModalProps> = ({
                             </>
                         )}
                     </div>
+                    {useMobileSheet && !isNested && visible && (
+                        // iOS Safari tints its bottom toolbar from fixed elements at the
+                        // viewport edge; without one it picks up the footer button colour.
+                        <div
+                            aria-hidden
+                            className="pointer-events-none fixed inset-x-0 bottom-0 h-1 bg-backgroundPage"
+                        />
+                    )}
                 </div>
             </ModalContext.Provider>
         </Portal>

@@ -117,10 +117,13 @@ const preset = {
                     // Not `100%`, which draws an ellipse on non-square boxes.
                     '--tk-rounding-full': '9999px',
                     '--tk-skeleton-fill': 'var(--tk-background-content)',
-                    // TT Firs Neue stylistic alternates: ss07 lowercase, ss09
-                    // capital G, ss17 at-sign, ss18 ampersand.
-                    '--tk-font-features': "'ss07' 1, 'ss09' 1, 'ss17' 1, 'ss18' 1",
-                    '--tk-font-sans': `'TT Firs Neue', ${FONT_FALLBACKS}`,
+                    // TT Firs Neue is licensed and not published: hosts that
+                    // declare it get it, the rest fall back to the bundled
+                    // Inter. Its stylistic alternates are switched on by
+                    // `tt-firs-neue.css`, since Inter maps the same tags to
+                    // different glyphs.
+                    '--tk-font-features': 'normal',
+                    '--tk-font-sans': `'TT Firs Neue', 'Inter', ${FONT_FALLBACKS}`,
                     fontFeatureSettings: 'var(--tk-font-features)',
                     colorScheme: 'dark'
                 },

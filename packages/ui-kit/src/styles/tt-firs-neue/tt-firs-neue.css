@@ -1,0 +1,52 @@
+/*
+ * TT Firs Neue, the Keeper brand face. Licensed separately from the kit's
+ * Apache-2.0 code, so it is not in the published package: the showcase and the
+ * component tests load it from here, and licensed hosts load it after
+ * `@tonkeeper/ui-kit/styles.css`. The kit's `--tk-font-sans` already names the
+ * family first, so declaring the faces is all a host needs.
+ *
+ * Three static faces. `font-weight` is each face's own `usWeightClass`, so the
+ * type scale can name 450 / 500 / 600 and get the drawn weight instead of a
+ * synthesised one.
+ *
+ * The faces carry Latin, Cyrillic and roughly half of Vietnamese (the
+ * combining horn and hook-above marks are absent, so letters like ư ơ ả cannot
+ * be drawn) — no Greek, Arabic, Indic or CJK. Uncovered letters fall through
+ * the `--tk-font-sans` stack per glyph; the Vietnamese locale switches the
+ * whole UI to Inter instead (see `:root:lang(vi)` in the preset).
+ */
+
+@font-face {
+    font-family: 'TT Firs Neue';
+    src: url('./TT-Firs-Neue-Normal.woff2') format('woff2');
+    font-weight: 450;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TT Firs Neue';
+    src: url('./TT-Firs-Neue-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TT Firs Neue';
+    src: url('./TT-Firs-Neue-DemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+/*
+ * Stylistic alternates: ss07 lowercase, ss09 capital G, ss17 at-sign, ss18
+ * ampersand. Switched on here rather than in the preset because in Inter the
+ * same tags draw different alternates (ss07 is square punctuation). `:not`
+ * outranks the preset's `:root` without depending on load order, and leaves
+ * the Vietnamese Inter stack untouched.
+ */
+:root:not(:lang(vi)) {
+    --tk-font-features: 'ss07' 1, 'ss09' 1, 'ss17' 1, 'ss18' 1;
+}

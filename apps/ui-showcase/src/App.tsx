@@ -1,11 +1,13 @@
 import { FC, useEffect, useState } from 'react';
 import {
+    COLOR_PALETTES,
     COLOR_THEMES,
     ColorThemeName,
     SegmentedControl,
     ThemeProvider,
     cn
 } from '@tonkeeper/ui-kit';
+import IcChevronDown16 from '@tonkeeper/ui-kit/icons/IcChevronDown16';
 import { ColorsPage } from './foundations/ColorsPage';
 import { TypographyPage } from './foundations/TypographyPage';
 import { RadiiPage } from './foundations/RadiiPage';
@@ -134,6 +136,38 @@ const useStoredTheme = () => {
     return [theme, setTheme] as const;
 };
 
+const ThemeSwatch: FC<{ theme: ColorThemeName }> = ({ theme }) => (
+    <span
+        className="size-5 shrink-0 rounded-full border border-solid border-separatorCommon"
+        style={{
+            background: `linear-gradient(135deg, ${COLOR_PALETTES[theme].backgroundPage} 50%, ${COLOR_PALETTES[theme].accentBlue} 50%)`
+        }}
+    />
+);
+
+// Compact picker for the mobile header: swatch trigger over an invisible native select
+const ThemeMenu: FC<{ value: ColorThemeName; onChange: (theme: ColorThemeName) => void }> = ({
+    value,
+    onChange
+}) => (
+    <label className="relative flex shrink-0 cursor-pointer items-center gap-1 rounded-extraSmall bg-backgroundContent px-2.5 py-2 text-iconSecondary transition-colors hover:bg-backgroundContentTint hover:text-iconPrimary">
+        <ThemeSwatch theme={value} />
+        <IcChevronDown16 className="size-4" />
+        <select
+            aria-label="Theme"
+            className="absolute inset-0 cursor-pointer opacity-0"
+            value={value}
+            onChange={e => isThemeName(e.target.value) && onChange(e.target.value)}
+        >
+            {THEME_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>
+                    {o.label}
+                </option>
+            ))}
+        </select>
+    </label>
+);
+
 const readHash = () => window.location.hash.replace(/^#\/?/, '') || ALL_PAGES[0].id;
 
 export const App: FC = () => {
@@ -190,10 +224,10 @@ export const App: FC = () => {
                     ))}
                 </nav>
                 <div className="flex min-w-0 grow flex-col">
-                    <header className="sticky top-0 z-10 flex items-center gap-3 md:hidden border-0 border-b border-solid border-separatorCommon bg-backgroundTransparent px-8 py-3 backdrop-blur">
+                    <header className="sticky top-0 z-10 flex items-center gap-3 md:hidden border-0 border-b border-solid border-separatorCommon bg-backgroundTransparent px-4 py-3 backdrop-blur">
                         <select
                             aria-label="Page"
-                            className="rounded-extraSmall border-0 bg-backgroundContent px-3 py-2 text-label2 text-textPrimary"
+                            className="min-w-0 flex-1 rounded-extraSmall border-0 bg-backgroundContent px-3 py-2 text-label2 text-textPrimary"
                             value={page.id}
                             onChange={e => (window.location.hash = e.target.value)}
                         >
@@ -203,12 +237,7 @@ export const App: FC = () => {
                                 </option>
                             ))}
                         </select>
-                        <SegmentedControl
-                            options={THEME_OPTIONS}
-                            value={colorTheme}
-                            onChange={setColorTheme}
-                            className="ml-auto max-w-[240px]"
-                        />
+                        <ThemeMenu value={colorTheme} onChange={setColorTheme} />
                     </header>
                     <main className="w-full max-w-[1200px] px-8 py-10 max-md:px-4">
                         <page.Component key={page.id} />

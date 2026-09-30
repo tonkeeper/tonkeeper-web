@@ -2,15 +2,7 @@
 
 The Keeper design system for React: components, colour themes, icons and Tailwind tokens.
 
-This is a private npm package. Ask the `@tonkeeper` npm organization for read access, then
-authenticate with npm before installing it. CI builds need a read-only npm token for this package.
-
-TT Firs Neue files included in the package are licensed separately from the Apache-2.0 code. Package
-access does not grant permission to use or redistribute the font outside Tonkeeper's licensed
-websites.
-
 ```sh
-npm login --registry=https://registry.npmjs.org/
 npm install @tonkeeper/ui-kit
 ```
 
@@ -32,13 +24,21 @@ export const App = () => (
 );
 ```
 
-`styles.css` carries Tailwind's preflight reset, the design tokens, the fonts, and every utility the
-components use, so it works without Tailwind in the host app.
+`styles.css` carries Tailwind's preflight reset, the design tokens, the Inter font, and every
+utility the components use, so it works without Tailwind in the host app.
 
 -   `theme` — `blue`, `dark` or `light`. The palette is written onto `:root` as `--tk-*` custom
     properties, so portalled content (modals, toasts) follows it too.
 -   `layout` — `desktop` (modals are centred cards) or `mobile` (bottom sheets). Omitted, it follows
     the viewport: `mobile` below 1024px.
+
+## Fonts
+
+The kit renders in Inter, which ships with the package. The Keeper brand face, TT Firs Neue, is
+licensed separately and is not included. The font stack names it first, so an app licensed to use it
+only has to declare the faces after `styles.css`; everything else picks it up. Its stylistic
+alternates switch on with it. See `src/styles/tt-firs-neue/tt-firs-neue.css` in this repo for the
+declarations.
 
 ## Icons
 
@@ -65,13 +65,13 @@ export default {
 };
 ```
 
-Keep importing `styles.css` — it holds the classes the components themselves use and the fonts.
+Keep importing `styles.css` — it holds the classes the components themselves use and the Inter font.
 
 ## Developing
 
 ```sh
 yarn dev:showcase                           # live catalogue, reads the kit from source
-yarn workspace @tonkeeper/ui-kit build      # dist/: ESM modules, types, styles.css, fonts
+yarn workspace @tonkeeper/ui-kit build      # dist/: ESM modules, types, styles.css, Inter
 yarn workspace @tonkeeper/ui-kit icons      # regenerate icon components from src/icons/svg
 ```
 
@@ -83,5 +83,5 @@ baselines, run the **UI Kit** workflow manually on your branch.
 Run the **UI Kit Release** workflow with a version: `patch`, `minor` or `major` bumps the latest npm
 release; an exact version such as `1.4.0` or `1.5.0-beta.1` is used as is. Stable versions publish
 from `main` under the `latest` tag; prereleases may publish from any branch under `next`. Each
-private release is tagged `ui-kit-v<version>` with a matching GitHub release. The workflow needs an
-`NPM_TOKEN` secret with read and publish access to this package.
+release is tagged `ui-kit-v<version>` with a matching GitHub release. The workflow needs an
+`NPM_TOKEN` secret with publish access to this package.

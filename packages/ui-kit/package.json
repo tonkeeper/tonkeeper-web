@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/ui-kit",
-    "version": "0.0.0",
+    "version": "0.1.0-alpha.0",
     "description": "Keeper design system: React components, colour themes, icons and Tailwind tokens",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "license": "Apache-2.0",
@@ -45,7 +45,7 @@
         "README.md"
     ],
     "publishConfig": {
-        "access": "restricted",
+        "access": "public",
         "registry": "https://registry.npmjs.org/"
     },
     "scripts": {
