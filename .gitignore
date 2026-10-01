@@ -57,3 +57,5 @@ Thumbs.db
 
 
 package-lock.json
+
+*.tsbuildinfo
