@@ -1,4 +1,5 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * Prints screenshot attachments (expected / actual / diff) of failed tests as
@@ -36,10 +37,10 @@ interface TestCaseLike {
 const OSC8 = '\u001b]8;;';
 const BEL = '\u0007';
 
-// This file lives at <repo>/packages/uikit/playwright, so the repo root is three
-// levels up. Deriving it from __dirname keeps the label correct regardless of the
-// cwd the suite happens to run from.
-const repoRoot = path.resolve(__dirname, '..', '..', '..');
+// This file lives at <repo>/packages/ui-kit/playwright, so the repo root is three
+// levels up. Deriving it from the module URL keeps the label correct regardless of
+// the cwd the suite happens to run from (the package is ESM, so no __dirname).
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
 function hyperlink(absolutePath: string): string {
     const url = `file://${absolutePath}`;

@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import IcDoneBold16 from '../icons/components/IcDoneBold16';
 import { cn } from '../utils/cn';
 
