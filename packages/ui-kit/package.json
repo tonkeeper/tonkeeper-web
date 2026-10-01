@@ -6,7 +6,7 @@
     "license": "Apache-2.0",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/tonkeeper/web_private.git",
+        "url": "git+https://github.com/tonkeeper/tonkeeper-web.git",
         "directory": "packages/ui-kit"
     },
     "type": "module",
