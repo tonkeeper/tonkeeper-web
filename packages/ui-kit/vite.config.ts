@@ -9,7 +9,7 @@ const iconEntries = readdirSync(resolve(__dirname, 'src/icons/components'))
 // One output file per source module, so a consumer's bundler drops every
 // component and icon it doesn't import.
 export default defineConfig({
-    esbuild: { jsx: 'automatic' },
+    oxc: { jsx: { runtime: 'automatic' } },
     build: {
         outDir: 'dist',
         emptyOutDir: false,
@@ -23,7 +23,7 @@ export default defineConfig({
             ],
             formats: ['es']
         },
-        rollupOptions: {
+        rolldownOptions: {
             external: [/^react($|\/)/, /^react-dom($|\/)/, /^tailwindcss($|\/)/],
             output: {
                 preserveModules: true,
