@@ -117,10 +117,8 @@ const preset = {
                     // Not `100%`, which draws an ellipse on non-square boxes.
                     '--tk-rounding-full': '9999px',
                     '--tk-skeleton-fill': 'var(--tk-background-content)',
-                    // TT Firs Neue is licensed and not published: hosts that
-                    // declare it get it, the rest fall back to the bundled
-                    // Inter. Its stylistic alternates are switched on by
-                    // `tt-firs-neue.css`, since Inter maps the same tags to
+                    // The hosted TT Firs Neue stylesheet switches on its
+                    // stylistic alternates; bundled Inter maps those tags to
                     // different glyphs.
                     '--tk-font-features': 'normal',
                     '--tk-font-sans': `'TT Firs Neue', 'Inter', ${FONT_FALLBACKS}`,

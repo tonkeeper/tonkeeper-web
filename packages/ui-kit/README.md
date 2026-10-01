@@ -6,8 +6,9 @@ The Keeper design system for React: components, colour themes, icons and Tailwin
 npm install @tonkeeper/ui-kit
 ```
 
-Requires React 18+. Browse every component and variant in the showcase (`yarn dev:showcase` in this
-repo).
+Requires React 18+. Browse every component and variant at
+[ui-showcase.keeperwallet.com](https://ui-showcase.keeperwallet.com), or run `yarn dev:showcase` in
+this repo.
 
 ## Setup
 
@@ -24,8 +25,9 @@ export const App = () => (
 );
 ```
 
-`styles.css` carries Tailwind's preflight reset, the design tokens, the Inter font, and every
-utility the components use, so it works without Tailwind in the host app.
+`styles.css` carries Tailwind's preflight reset, the design tokens, the bundled Inter face, the
+hosted brand face, and every utility the components use, so it works without Tailwind in the host
+app.
 
 -   `theme` — `blue`, `dark` or `light`. The palette is written onto `:root` as `--tk-*` custom
     properties, so portalled content (modals, toasts) follows it too.
@@ -34,11 +36,12 @@ utility the components use, so it works without Tailwind in the host app.
 
 ## Fonts
 
-The kit renders in Inter, which ships with the package. The Keeper brand face, TT Firs Neue, is
-licensed separately and is not included. The font stack names it first, so an app licensed to use it
-only has to declare the faces after `styles.css`; everything else picks it up. Its stylistic
-alternates switch on with it. See `src/styles/tt-firs-neue/tt-firs-neue.css` in this repo for the
-declarations.
+Inter ships with the package. `styles.css` also imports the TT Firs Neue stylesheet from
+[fonts.keeperwallet.com](https://fonts.keeperwallet.com/v1/tt-firs-neue.css). The font stack uses TT
+Firs Neue first and falls back to Inter for uncovered glyphs. TT Firs Neue is licensed separately
+from the kit's Apache-2.0 code; its font binaries are hosted separately and are not included in the
+source tree or published package. Browser access to the hosted fonts is limited to Keeper apps and
+their approved preview domains.
 
 ## Icons
 
@@ -65,7 +68,8 @@ export default {
 };
 ```
 
-Keep importing `styles.css` — it holds the classes the components themselves use and the Inter font.
+Keep importing `styles.css` — it holds the classes the components themselves use and both font
+declarations.
 
 ## Developing
 
@@ -74,6 +78,9 @@ yarn dev:showcase                           # live catalogue, reads the kit from
 yarn workspace @tonkeeper/ui-kit build      # dist/: ESM modules, types, styles.css, Inter
 yarn workspace @tonkeeper/ui-kit icons      # regenerate icon components from src/icons/svg
 ```
+
+The production showcase is [ui-showcase.keeperwallet.com](https://ui-showcase.keeperwallet.com)
+(Cloudflare Pages project `ui-showcase`).
 
 Component tests (`*.ct.tsx`) and their screenshot baselines run in CI only. To regenerate the
 baselines, run the **UI Kit** workflow manually on your branch.

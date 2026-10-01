@@ -1,7 +1,6 @@
 import { beforeMount } from '@playwright/experimental-ct-react/hooks';
 import { ThemeProvider } from '../src/theme/ThemeProvider';
 import '../src/styles/styles.css';
-import '../src/styles/tt-firs-neue/tt-firs-neue.css';
 
 /**
  * Component-test "mode", forwarded from each test via
