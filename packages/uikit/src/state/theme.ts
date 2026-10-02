@@ -29,6 +29,7 @@ export interface UIPreferences {
     showTokensChart: boolean;
     theme: 'dark' | 'pro';
     dismissMobileQRBanner: boolean;
+    preferredCameraId: string;
 }
 
 export const useUserUIPreferences = () => {
