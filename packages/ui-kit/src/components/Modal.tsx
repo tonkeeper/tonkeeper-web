@@ -642,10 +642,12 @@ export const Modal: FC<ModalProps> = ({
                                       // Height never exceeds viewport-minus-insets so the
                                       // body's `overflow-y-auto` engages instead of the card
                                       // running off screen with no way to reach the bottom.
+                                      // Hosts may set `--app-height` (the Tonkeeper apps track
+                                      // innerHeight with it); without it, the dynamic viewport.
                                       'w-full max-w-[520px] overflow-hidden rounded-large',
                                       isContentSized
-                                          ? 'h-[min(624px,calc(var(--app-height)-32px))]'
-                                          : 'max-h-[calc(var(--app-height)-32px)]'
+                                          ? 'h-[min(624px,calc(var(--app-height,100dvh)-32px))]'
+                                          : 'max-h-[calc(var(--app-height,100dvh)-32px)]'
                                   )
                                 : isMobileFull
                                 ? 'h-full w-full'
