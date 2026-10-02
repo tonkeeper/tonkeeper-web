@@ -5,6 +5,9 @@ dist
 tmp
 /out-tsc
 
+# Licensed TT Firs Neue font binaries are served from fonts.keeperwallet.com.
+TT-Firs-Neue-*
+
 # dependencies
 node_modules
 
@@ -55,3 +58,5 @@ Thumbs.db
 
 package-lock.json
 .playwright-mcp/
+
+*.tsbuildinfo

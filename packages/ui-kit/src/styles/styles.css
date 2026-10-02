@@ -1,0 +1,88 @@
+/*
+ * Keeper UI Kit stylesheet: Tailwind preflight, the design tokens on `:root`,
+ * the bundled Inter face, the hosted brand face, and every utility the
+ * components use. Import it once
+ * at the app root, before the app's own styles.
+ */
+
+@import url('https://fonts.keeperwallet.com/v1/tt-firs-neue.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /*
+     * Inter (OFL) subset to Latin + Vietnamese, variable weight axis kept so
+     * the 450/500/600 steps of the type scale resolve to drawn instances.
+     *
+     * The brand face, TT Firs Neue, is served by the hosted stylesheet above.
+     * `--tk-font-sans` names it first and falls back to bundled Inter for
+     * uncovered glyphs.
+     */
+    @font-face {
+        font-family: Inter;
+        src: url('./fonts/InterVariable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    body {
+        font-family: var(--tk-font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+@layer components {
+    /*
+     * Emitted by `useSkeletonMask` only while a `SkeletonScope` above the
+     * element is loading, so a bare attribute selector cannot leak into a
+     * loaded screen.
+     *
+     * The bar is a pseudo-element rather than a restyled box: the element keeps
+     * its own line box, so real typography goes on driving row heights and the
+     * mask never shifts the layout it is standing in for. `!important` is here
+     * to beat the Tailwind text-color utility on the same element.
+     */
+    [data-skeleton] {
+        position: relative;
+        color: transparent !important;
+    }
+
+    /* Children would otherwise show through the bar — chips, icons, badges. */
+    [data-skeleton] > * {
+        visibility: hidden;
+    }
+
+    [data-skeleton]::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        width: var(--tk-skeleton-w, 100%);
+        height: var(--tk-skeleton-h, 12px);
+        border-radius: var(--tk-skeleton-r, 8px);
+        background: var(--tk-skeleton-fill);
+        animation: tk-skeleton-pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes tk-skeleton-pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [data-skeleton]::after {
+            animation: none;
+        }
+    }
+}

@@ -1,10 +1,13 @@
 name: PR
-run-name: "PR #${{ github.event.pull_request.number }} — ${{ github.event.action == 'labeled' && format('label: {0}', github.event.label.name) || github.event.action }}"
+run-name:
+    "PR #${{ github.event.pull_request.number }} — ${{ github.event.action == 'labeled' &&
+    format('label: {0}', github.event.label.name) || github.event.action }}"
 on:
     pull_request:
         types: [opened, synchronize, reopened, labeled]
 
 permissions:
+    contents: read
     pull-requests: write
 
 # Opt-in builds gated by PR labels (save CI compute on routine PRs):

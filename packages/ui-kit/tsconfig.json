@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "target": "ES2020",
+        "lib": ["dom", "dom.iterable", "ES2020"],
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "strict": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true
+    },
+    "include": ["src", "playwright", "playwright-ct.config.ts", "tailwind.config.ts"]
+}

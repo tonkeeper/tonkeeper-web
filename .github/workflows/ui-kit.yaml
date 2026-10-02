@@ -1,0 +1,153 @@
+name: UI Kit
+
+on:
+    pull_request:
+        paths:
+            - 'packages/ui-kit/**'
+            - 'apps/ui-showcase/**'
+            - '.github/workflows/ui-kit.yaml'
+    push:
+        branches: [main]
+        paths:
+            - 'packages/ui-kit/**'
+            - 'apps/ui-showcase/**'
+            - '.github/workflows/ui-kit.yaml'
+    # Regenerates the component screenshot baselines in the CI container and
+    # commits them to the branch the run was started on.
+    workflow_dispatch:
+        inputs:
+            update-all:
+                description:
+                    Rewrite every baseline that changed at all, ignoring the small-diff tolerance
+                type: boolean
+                default: false
+
+env:
+    node-version: 22.22.2
+    NODE_AUTH_TOKEN: ${{ github.token }}
+
+permissions:
+    contents: read
+    packages: read
+
+jobs:
+    build:
+        name: build
+        if: github.event_name != 'workflow_dispatch'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - run: yarn install --immutable
+
+            - name: Typecheck kit
+              run: yarn workspace @tonkeeper/ui-kit typecheck
+
+            - name: Build kit
+              run: yarn workspace @tonkeeper/ui-kit build
+
+            - name: List package contents
+              working-directory: packages/ui-kit
+              run: npm pack --dry-run
+
+            - name: Typecheck showcase
+              run: yarn workspace @tonkeeper/ui-showcase typecheck
+
+            - name: Build showcase
+              run: yarn workspace @tonkeeper/ui-showcase build
+
+    component-tests:
+        name: component-tests
+        if: github.event_name != 'workflow_dispatch'
+        runs-on: ubuntu-latest
+        # The rendering environment the screenshot baselines are generated in.
+        # Keep the tag in sync with @playwright/experimental-ct-react.
+        container: mcr.microsoft.com/playwright:v1.62.1-jammy
+        timeout-minutes: 20
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Trust workspace
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - run: yarn install --immutable
+
+            - name: Run component tests
+              run: yarn workspace @tonkeeper/ui-kit test:ct
+
+            - name: Upload Playwright report
+              uses: actions/upload-artifact@v4
+              if: failure()
+              with:
+                  name: ui-kit-ct-report
+                  path: packages/ui-kit/playwright-report/
+                  retention-days: 7
+
+    update-snapshots:
+        name: update-snapshots
+        if: github.event_name == 'workflow_dispatch'
+        runs-on: ubuntu-latest
+        container: mcr.microsoft.com/playwright:v1.62.1-jammy
+        timeout-minutes: 20
+        permissions:
+            contents: write
+            packages: read
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Trust workspace
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - run: yarn install --immutable
+
+            - name: Update screenshot baselines
+              env:
+                  CT_UPDATE_ALL: ${{ inputs.update-all && '1' || '' }}
+              run: yarn workspace @tonkeeper/ui-kit test:ct:update
+
+            - name: Commit updated baselines
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  if [ -z "$(git status --porcelain -- ':(glob)packages/ui-kit/**/__screenshots__/**')" ]; then
+                      echo "No baseline changes."
+                  else
+                      git add -- ':(glob)packages/ui-kit/**/__screenshots__/**'
+                      git commit -m "test(ui-kit): update component screenshot baselines"
+                      git push
+                  fi

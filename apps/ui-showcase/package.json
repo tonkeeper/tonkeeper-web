@@ -1,0 +1,29 @@
+{
+    "name": "@tonkeeper/ui-showcase",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Catalogue of the @tonkeeper/ui-kit components in every variant",
+    "dependencies": {
+        "@tonkeeper/ui-kit": "workspace:^",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.10.3",
+        "@types/react": "^18.0.26",
+        "@types/react-dom": "^18.0.9",
+        "@vitejs/plugin-react": "^4.2.1",
+        "autoprefixer": "^10.4.20",
+        "postcss": "^8.4.49",
+        "tailwindcss": "^3.4.17",
+        "typescript": "5.2.2",
+        "vite": "^6.4.2"
+    },
+    "scripts": {
+        "dev": "vite dev",
+        "build": "vite build",
+        "build:showcase": "vite build",
+        "preview": "vite preview",
+        "typecheck": "tsc --noEmit"
+    }
+}

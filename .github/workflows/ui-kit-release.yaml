@@ -1,0 +1,126 @@
+name: UI Kit Release
+
+# Publishes @tonkeeper/ui-kit to npm. The version is not stored in the repo:
+# npm and the `ui-kit-v*` tags are the record, so a release never has to push
+# to a protected branch.
+#
+# Authenticates with npm Trusted Publishing (OIDC), so no npm token is stored.
+# The package's trusted publisher on npmjs.com must name this repository and
+# this workflow file.
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description:
+                    'patch | minor | major (bumps the latest npm release), or an exact version such
+                    as 1.4.0 or 1.5.0-beta.1'
+                required: true
+                default: patch
+
+env:
+    node-version: 22.22.2
+    NODE_AUTH_TOKEN: ${{ github.token }}
+    PACKAGE: '@tonkeeper/ui-kit'
+
+permissions:
+    contents: write
+    packages: read
+    id-token: write
+
+concurrency:
+    group: ui-kit-release
+    cancel-in-progress: false
+
+jobs:
+    release:
+        name: release
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - run: corepack enable
+
+            # Trusted Publishing needs npm >= 11.5.1; Node 22 ships npm 10.
+            - name: Upgrade npm
+              run: npm install -g npm@^11.5.1
+
+            - name: Resolve version
+              id: version
+              env:
+                  INPUT: ${{ inputs.version }}
+                  REF: ${{ github.ref }}
+              run: |
+                  LATEST=$(npm view "$PACKAGE" version --registry=https://registry.npmjs.org/ 2>/dev/null || echo 0.0.0)
+                  VERSION=$(node -e '
+                      const [input, latest] = process.argv.slice(1);
+                      const semver = /^(\d+)\.(\d+)\.(\d+)(-[0-9A-Za-z.-]+)?$/;
+                      const bump = { major: 0, minor: 1, patch: 2 }[input];
+                      if (bump === undefined) {
+                          if (!semver.test(input)) throw new Error(`Not a bump or a semver: ${input}`);
+                          console.log(input);
+                      } else {
+                          const parts = latest.match(semver).slice(1, 4).map(Number);
+                          parts[bump] += 1;
+                          parts.fill(0, bump + 1);
+                          console.log(parts.join("."));
+                      }
+                  ' "$INPUT" "$LATEST")
+                  if npm view "$PACKAGE@$VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
+                      echo "::error::$PACKAGE@$VERSION is already published"; exit 1
+                  fi
+                  case "$VERSION" in
+                      *-*) TAG=next ;;
+                      *)
+                          TAG=latest
+                          if [ "$REF" != "refs/heads/main" ]; then
+                              echo "::error::Stable versions are released from main only; use a prerelease version on other branches"; exit 1
+                          fi
+                          ;;
+                  esac
+                  echo "Releasing $PACKAGE@$VERSION (dist-tag $TAG, previous $LATEST)"
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                  echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - run: yarn install --immutable
+
+            - name: Build
+              run: yarn workspace @tonkeeper/ui-kit build
+
+            - name: Publish to npm
+              working-directory: packages/ui-kit
+              env:
+                  VERSION: ${{ steps.version.outputs.version }}
+                  TAG: ${{ steps.version.outputs.tag }}
+              run: |
+                  npm pkg set version="$VERSION"
+                  npm publish \
+                      --registry=https://registry.npmjs.org/ \
+                      --access public \
+                      --tag "$TAG"
+
+            - name: Tag and release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  VERSION: ${{ steps.version.outputs.version }}
+                  TAG: ${{ steps.version.outputs.tag }}
+              run: |
+                  git tag "ui-kit-v$VERSION"
+                  git push origin "ui-kit-v$VERSION"
+                  gh release create "ui-kit-v$VERSION" \
+                      --title "@tonkeeper/ui-kit $VERSION" \
+                      --notes "https://www.npmjs.com/package/@tonkeeper/ui-kit/v/$VERSION" \
+                      $([ "$TAG" = next ] && echo --prerelease) \
+                      --latest=false

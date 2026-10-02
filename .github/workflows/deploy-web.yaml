@@ -4,14 +4,16 @@ on:
         inputs:
             environment:
                 type: choice
-                description: Deploy to env
+                description: Deploy web to an environment or this branch's UI showcase
                 required: true
                 options:
                     - dev
                     - main
+                    - showcase
 
 jobs:
     web-deploy:
+        if: inputs.environment != 'showcase'
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: ${{ inputs.environment }}
@@ -22,4 +24,11 @@ jobs:
         uses: ./.github/workflows/web-tests.yaml
         with:
             base-url: ${{ needs.web-deploy.outputs.deployment-url }}
+        secrets: inherit
+
+    showcase-deploy:
+        if: inputs.environment == 'showcase'
+        uses: ./.github/workflows/showcase-deploy.yaml
+        with:
+            branch: ${{ github.ref_name }}-showcase
         secrets: inherit

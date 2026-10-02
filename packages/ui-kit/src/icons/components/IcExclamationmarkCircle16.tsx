@@ -1,0 +1,12 @@
+import type { SVGProps } from 'react';
+const SvgIcExclamationmarkCircle16 = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16" {...props}>
+        <path
+            fill="currentColor"
+            fillRule="evenodd"
+            d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0m-6 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0M8 4a.95.95 0 0 0-.95.999l.163 3.252a.788.788 0 0 0 1.574 0l.163-3.252A.95.95 0 0 0 8 4"
+            clipRule="evenodd"
+        />
+    </svg>
+);
+export default SvgIcExclamationmarkCircle16;
