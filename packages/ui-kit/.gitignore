@@ -2,3 +2,4 @@ dist
 playwright-report
 test-results
 playwright/.cache
+.cache/

@@ -14,6 +14,7 @@ export default defineConfig({
     testDir: './src',
     testMatch: /.*\.ct\.tsx$/,
     snapshotPathTemplate: '{snapshotDir}/{testFileDir}/__screenshots__/{testFileName}/{arg}{ext}',
+    globalSetup: './playwright/fontSetup.ts',
 
     timeout: 30_000,
     fullyParallel: true,
@@ -30,7 +31,7 @@ export default defineConfig({
         ctViteConfig: {
             css: {
                 postcss: {
-                    plugins: [tailwindcss({ config: './tailwind.config.ts' }), autoprefixer()]
+                    plugins: [tailwindcss({ config: './tailwind-ct.config.ts' }), autoprefixer()]
                 }
             }
         }

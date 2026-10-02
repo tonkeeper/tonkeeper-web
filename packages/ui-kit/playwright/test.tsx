@@ -6,11 +6,32 @@
 // only when the extensions differ (`.ts` vs `.tsx`). Matching `.tsx` suppresses that
 // rewrite, so path filters like `playwright test src/.../Foo.ct.tsx` keep working.
 import { test as base, expect } from '@playwright/experimental-ct-react';
+import { join } from 'node:path';
 import type { Locator, Page } from 'playwright-core';
 import type { TestMode } from './index';
+import { FONT_BASE_URL, FONT_CACHE_DIR, FONT_FILES } from './fontAssets';
 
 export { expect };
-export const test = base;
+// globalSetup downloads the licensed font faces once. Serve those cached files
+// to the localhost test page without changing the production origin allowlist.
+const fontUrls = new Set(FONT_FILES.map(filename => new URL(filename, FONT_BASE_URL).href));
+
+export const test = base.extend({
+    page: async ({ page }, use) => {
+        await page.route(
+            url => fontUrls.has(url.href),
+            async route => {
+                const url = route.request().url();
+                await route.fulfill({
+                    path: join(FONT_CACHE_DIR, new URL(url).pathname.split('/').pop()!),
+                    contentType: 'font/woff2',
+                    headers: { 'access-control-allow-origin': '*' }
+                });
+            }
+        );
+        await use(page);
+    }
+});
 export type { TestMode };
 type ScreenshotTarget = 'component' | 'dialog' | 'page';
 type ScreenshotOptions = {
