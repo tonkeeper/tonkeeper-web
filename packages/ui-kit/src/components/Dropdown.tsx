@@ -53,8 +53,11 @@ export function Dropdown<V>({
 
     const selected = options.find(option => option.value === value);
 
+    // `w-fit` keeps the anchor the trigger's size: a stretching parent (a
+    // `flex-col` column, a block) would otherwise widen it, and the menu would
+    // align to the parent's edge instead of the trigger's.
     return (
-        <div ref={wrapperRef} className="relative">
+        <div ref={wrapperRef} className="relative w-fit">
             {open && (
                 <div
                     style={{ width: menuWidth }}

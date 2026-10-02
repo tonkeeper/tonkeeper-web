@@ -43,3 +43,18 @@ test('SelectPill closes on an outside click without changing the value', async (
     await expect(c.getByText('Bitcoin')).not.toBeVisible();
     await expect(c.getByRole('button', { name: /All/ })).toBeVisible();
 });
+
+test('SelectPill menu stays anchored to the pill inside a stretching column', async ({ mount }) => {
+    const c = await mount(
+        <div className="flex h-[220px] w-[390px] flex-col bg-backgroundPage p-2">
+            <SelectPillHarness variant="secondary" menuPosition="below-end" />
+        </div>
+    );
+    // Measure before opening: the open menu has its own "All" row.
+    const pill = c.getByRole('button', { name: /All/ });
+    const pillBox = (await pill.boundingBox())!;
+    await pill.click();
+    const menu = c.getByRole('button', { name: 'Bitcoin' }).locator('..');
+    const menuBox = (await menu.boundingBox())!;
+    expect(Math.round(menuBox.x + menuBox.width)).toBe(Math.round(pillBox.x + pillBox.width));
+});
