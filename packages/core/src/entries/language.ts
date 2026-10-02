@@ -2,7 +2,7 @@ export enum Language {
     EN = 0,
     RU = 1,
     IT = 2,
-    zh_CN = 3,
+    ZH_CN = 3,
     TR = 4,
     BG = 5,
     ES = 6,
@@ -10,7 +10,7 @@ export enum Language {
     UK = 8,
     UZ = 9,
     BN = 10,
-    zh_TW = 11,
+    ZH_TW = 11,
     FR = 12,
     PA = 13,
     PT = 14,
@@ -27,8 +27,8 @@ export const languages = [
     Language.EN,
     Language.RU,
     Language.IT,
-    Language.zh_TW,
-    Language.zh_CN,
+    Language.ZH_TW,
+    Language.ZH_CN,
     Language.TR,
     Language.BG,
     Language.ES,
@@ -54,9 +54,9 @@ export const localizationText = (lang?: Language) => {
             return 'ru';
         case Language.IT:
             return 'it';
-        case Language.zh_CN:
+        case Language.ZH_CN:
             return 'zh_CN';
-        case Language.zh_TW:
+        case Language.ZH_TW:
             return 'zh_TW';
         case Language.TR:
             return 'tr';
@@ -102,9 +102,9 @@ export const localizationFrom = (lang: string) => {
         case 'it':
             return Language.IT;
         case 'zh_CN':
-            return Language.zh_CN;
+            return Language.ZH_CN;
         case 'zh_TW':
-            return Language.zh_TW;
+            return Language.ZH_TW;
         case 'tr':
             return Language.TR;
         case 'bg':

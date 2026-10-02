@@ -60,7 +60,6 @@ const Initialize: FC = () => {
     const sdk = useAppSdk();
 
     const onClick = () => {
-        sdk.twaExpand && sdk.twaExpand();
         sdk.requestExtensionPermission().then(() => addWallet());
     };
 

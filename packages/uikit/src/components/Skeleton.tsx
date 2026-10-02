@@ -214,7 +214,7 @@ export const CoinHistorySkeleton = React.memo(() => {
         return () => {
             sdk.uiEvents.emit('loading');
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     return (
         <HistoryBlock>
@@ -252,7 +252,7 @@ export const HomeSkeleton = React.memo(() => {
         return () => {
             sdk.uiEvents.emit('loading');
         };
-    }, []);
+    }, [sdk.uiEvents]);
 
     return (
         <>

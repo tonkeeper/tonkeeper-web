@@ -68,7 +68,7 @@ export const MAMTronMigrationNotification = () => {
                 </ExternalLink>
             </Wrapper>
         );
-    }, [onClose, params, t, mainnetConfig]);
+    }, [params, t, mainnetConfig]);
 
     return (
         <Notification isOpen={isOpen} handleClose={onClose} mobileFullScreen>

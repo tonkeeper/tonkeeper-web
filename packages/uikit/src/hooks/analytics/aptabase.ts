@@ -34,7 +34,7 @@ export class Aptabase implements Analytics {
     init = (params: {
         application: string;
         walletType: string;
-        activeAccount: Account;
+        activeAccount?: Account;
         accounts: Account[];
         network?: Network;
         platform?: string;

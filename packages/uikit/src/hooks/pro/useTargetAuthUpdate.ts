@@ -23,5 +23,5 @@ export const useTargetAuthUpdate = () => {
 
             setTargetAuth({ ...subscription.auth, tempToken });
         })();
-    }, [targetAuth, subscription]);
+    }, [targetAuth, subscription, sdk.subscriptionService, setTargetAuth]);
 };

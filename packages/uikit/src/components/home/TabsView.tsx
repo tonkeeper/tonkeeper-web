@@ -1,6 +1,5 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { Label1 } from '../Text';
@@ -94,14 +93,13 @@ export const TabsView: FC<{
     balances: PortfolioBalance[];
     nfts: NFT[];
 }> = ({ balances, nfts }) => {
-    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
     const tab = useMemo(() => {
         return new URLSearchParams(searchParams).get(collectibles) === 'open'
             ? HomeTabs.COLLECTIBLES
             : HomeTabs.TOKENS;
-    }, [searchParams, location]);
+    }, [searchParams]);
 
     const onTab = useCallback(
         (value: HomeTabs) => {

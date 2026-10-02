@@ -1,7 +1,7 @@
 export interface DAppMessage {
     id: number;
     method: string;
-    params: any;
+    params: unknown[];
     origin: string;
 }
 

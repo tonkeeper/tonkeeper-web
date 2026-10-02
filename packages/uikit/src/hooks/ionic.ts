@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export const useMenuController = (type: 'aside-nav' | 'wallet-nav') => {
-    const getMenu = () =>
-        document.querySelector(`ion-menu[menu-id="${type}"]`) as HTMLIonMenuElement | null;
+    const getMenu = useCallback(
+        () => document.querySelector(`ion-menu[menu-id="${type}"]`) as HTMLIonMenuElement | null,
+        [type]
+    );
 
     useEffect(() => {
         const menu = getMenu();
@@ -20,7 +22,7 @@ export const useMenuController = (type: 'aside-nav' | 'wallet-nav') => {
             menu?.removeEventListener('ionDidOpen', onMenuOpened);
             menu?.removeEventListener('ionDidClose', onMenuClosed);
         };
-    }, []);
+    }, [getMenu]);
 
     const [isOpen, setIsOpen] = useState(!!getMenu()?.classList.contains('show-menu'));
 
@@ -30,7 +32,7 @@ export const useMenuController = (type: 'aside-nav' | 'wallet-nav') => {
             close: () => getMenu()?.close(),
             isOpen
         };
-    }, [type, isOpen]);
+    }, [getMenu, isOpen]);
 };
 
 const getDialog = () => {

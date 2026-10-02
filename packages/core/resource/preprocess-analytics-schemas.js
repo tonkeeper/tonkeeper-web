@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Workaround for broken local $refs in tonkeeper/analytics-schemas (openapi/).
+ * Workaround for broken local $refs in tonkeeper/analytics-schemas (openapi-client/).
  *
  * The upstream `analytics.yaml` aliases cross-file schemas at the top level
  * (e.g. `RampSource: $ref: ./ramps-common.yaml#/.../RampSourceSchema`), but

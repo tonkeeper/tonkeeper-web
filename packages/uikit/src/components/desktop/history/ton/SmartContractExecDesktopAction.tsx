@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import {
     ActionRow,
@@ -9,7 +10,6 @@ import {
     HistoryCellComment
 } from './HistoryCell';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { CodeIcon } from '../../../Icon';
 import { useTranslation } from '../../../../hooks/translation';
 import { useActiveWallet } from '../../../../state/wallet';
@@ -39,7 +39,7 @@ export const SmartContractExecDesktopAction: FC<{
                 <HistoryCellComment />
                 <HistoryCellAmount
                     amount={smartContractExec.tonAttached}
-                    symbol={CryptoCurrency.TON}
+                    symbol={BRAND_CONFIG.coinSymbolWithEx}
                     decimals={9}
                     isFailed={action.status === 'failed'}
                     isSpam={isScam}

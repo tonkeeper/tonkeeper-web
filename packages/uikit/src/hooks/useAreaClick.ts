@@ -2,7 +2,6 @@ import { DAppSource, formatBrowserUrl, DAppTrack } from '@tonkeeper/core/dist/se
 import { useCallback, useRef } from 'react';
 import { useAppSdk } from './appSdk';
 import { useEventListener } from './useEventListener';
-import { useAppContext } from './appContext';
 import { useCountryContextTracker } from './analytics/events-hooks';
 import { useActiveConfig } from '../state/wallet';
 
@@ -51,7 +50,6 @@ export function useAreaClick<T extends HTMLElement = HTMLDivElement>({
 export function useOpenPromotedAppInExternalBrowser(url: string, source: DAppSource) {
     const sdk = useAppSdk();
     const track = useCountryContextTracker();
-    const { tonendpoint } = useAppContext();
     const config = useActiveConfig();
 
     return useCallback(() => {
@@ -64,5 +62,5 @@ export function useOpenPromotedAppInExternalBrowser(url: string, source: DAppSou
         sdk.openPage(formatBrowserUrl(url, source, config.tonkeeper_utm_track as DAppTrack), {
             forceExternalBrowser: true
         });
-    }, [url, sdk, track, tonendpoint]);
+    }, [url, sdk, track, config.tonkeeper_utm_track, source]);
 }

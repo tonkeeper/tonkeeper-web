@@ -16,7 +16,7 @@ export const ProStatusScreen = () => {
         if (!subscription && !isProStateLoading) {
             navigate(AppRoute.home);
         }
-    }, [subscription, isProStateLoading]);
+    }, [subscription, isProStateLoading, navigate]);
 
     if (!subscription) return null;
 

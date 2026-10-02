@@ -75,7 +75,7 @@ export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) 
         if (!isTronEnabledGlobally) {
             onContinue({ tron: false });
         }
-    }, [isTronEnabledGlobally]);
+    }, [isTronEnabledGlobally, onContinue]);
 
     if (!isTronEnabledGlobally) {
         return null;

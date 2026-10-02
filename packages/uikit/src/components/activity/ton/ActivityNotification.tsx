@@ -135,7 +135,7 @@ export const ActivityNotification: FC<{
         } else {
             return <ActivityContentTon {...value} />;
         }
-    }, [value, handleClose]);
+    }, [value]);
 
     return (
         <Notification isOpen={!!value} handleClose={handleClose}>

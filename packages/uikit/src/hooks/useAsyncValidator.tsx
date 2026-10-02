@@ -125,7 +125,7 @@ export function useAsyncValidator<
         return () => {
             shouldCancel = true;
         };
-    }, [fieldValue, clearErrors, setError, validator, context?.setFieldValidationState]);
+    }, [fieldValue, fieldName, validator, finalDebounceTime, clearErrors, setError, context]);
 
     return [validationState, validationProduct];
 }

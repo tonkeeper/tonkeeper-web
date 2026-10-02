@@ -3,6 +3,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { Label1, Label2 } from '../../components/Text';
 import { useElementSize } from '../../hooks/useElementSize';
+import { useTranslation } from '../../hooks/translation';
 
 import { DesktopCategoryGroupItem } from './DesktopPromotedItem';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -52,6 +53,7 @@ export const DesktopCategoryBlock: FC<{
     const [containerRef, { scrollHeight, height }] = useElementSize();
     const canExpand = scrollHeight > height;
     const { isOpen, onClose, onOpen } = useDisclosure(false);
+    const { t } = useTranslation();
 
     return (
         <div className={className}>
@@ -60,7 +62,7 @@ export const DesktopCategoryBlock: FC<{
                 <Label2>{category.title}</Label2>
                 {canExpand && (
                     <AllButton onClick={onOpen}>
-                        <Label1>All</Label1>
+                        <Label1>{t('apps_all')}</Label1>
                     </AllButton>
                 )}
             </Heading>

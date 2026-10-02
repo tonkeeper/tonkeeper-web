@@ -187,7 +187,7 @@ export function ConfirmView<T extends Asset = Asset>({
         if (estimation.error) {
             sdk.hapticNotification('error');
         }
-    }, [estimation.error]);
+    }, [estimation.error, sdk]);
 
     const handleSubmit = async () => {
         if (isLoading) return false;

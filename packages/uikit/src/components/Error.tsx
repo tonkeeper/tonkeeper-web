@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string -- error-boundary fallback may render before locales load */
 export function fallbackRenderOver(location: string) {
     return ({ error }: { error: Error }) => {
         return (

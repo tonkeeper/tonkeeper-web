@@ -51,6 +51,6 @@ export const toWalletSource = (account: Account): TransactionSentWalletSource =>
 };
 
 // We always send transactions as single-chain transactions, even when the account has active Tron wallet.
-export const toWalletChain = (account: Account): TransactionSentWalletChain => {
+export const toWalletChain = (_account: Account): TransactionSentWalletChain => {
     return 'single';
 };

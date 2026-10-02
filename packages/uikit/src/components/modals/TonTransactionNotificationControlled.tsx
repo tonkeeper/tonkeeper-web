@@ -22,7 +22,7 @@ export const TonTransactionNotificationControlled = () => {
             onClose();
             params?.afterClose?.(res?.boc);
         },
-        [onClose, params?.afterClose]
+        [onClose, params]
     );
 
     return (

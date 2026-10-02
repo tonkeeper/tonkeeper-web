@@ -12,16 +12,14 @@ import {
     initUtils,
     retrieveLaunchParams
 } from '@tma.js/sdk';
-import { BaseApp, NativeBackButton, NotificationService } from '@tonkeeper/core/dist/AppSdk';
+import { BaseApp, NativeBackButton } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
 import { TwaStorage } from './storage';
-import { TwaNotification } from './twaNotification';
 
 export class TwaAppSdk extends BaseApp {
     nativeBackButton: NativeBackButton;
-    notifications: NotificationService;
     hapticFeedback: HapticFeedback;
     public miniApp: MiniApp;
     public launchParams: LaunchParams;
@@ -34,8 +32,6 @@ export class TwaAppSdk extends BaseApp {
         this.miniApp = miniApp;
         this.hapticFeedback = initHapticFeedback();
         this.launchParams = retrieveLaunchParams();
-
-        this.notifications = new TwaNotification(miniApp, this.launchParams);
 
         const [backButton] = initBackButton();
 
@@ -62,12 +58,6 @@ export class TwaAppSdk extends BaseApp {
             this.utils.openTelegramLink(url);
         } else {
             this.utils.openLink(url);
-        }
-    };
-
-    twaExpand = () => {
-        if (!this.viewport.isExpanded) {
-            this.viewport.expand();
         }
     };
 

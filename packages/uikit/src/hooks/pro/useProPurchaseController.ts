@@ -68,7 +68,7 @@ export const useProPurchaseController = () => {
         }
 
         reset();
-    }, [isPurchasingError]);
+    }, [isPurchasingError, purchaseError, reset, toast, t]);
 
     useEffect(() => {
         if (!isPurchasingSuccess) return;
@@ -89,7 +89,7 @@ export const useProPurchaseController = () => {
 
         onCurrentClose();
         navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
-    }, [isPurchasingSuccess]);
+    }, [isPurchasingSuccess, status, onCurrentClose, navigate, toast, t]);
 
     const handlePurchase = async (props: IOnPurchaseProps) => {
         const { plans, selectedSource, selectedPlanId } = props;

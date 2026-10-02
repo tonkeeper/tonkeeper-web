@@ -49,7 +49,7 @@ export const StakingAmountInput: FC<StakingAmountInputProps> = ({ amount, onChan
     const isInsufficientRecommendedFeeReserve = useMemo(() => {
         if (!amountBN) return false;
         return balanceTON.lt(amountBN?.plus(GAS_RESERVE_TON));
-    }, [amountBN, maxAmount]);
+    }, [amountBN, balanceTON]);
 
     const onMaxClick = () => {
         if (maxAmount !== undefined) {

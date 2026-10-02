@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import { build } from 'vite';
 import child_process from 'child_process';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 
 export const notify = (value: string) => console.log(`----------${value}----------`);
 
@@ -10,6 +11,10 @@ export const BUILD_BASE_PATH = 'dist';
 
 export class ExtensionBuilder {
     public readonly version: string;
+
+    public readonly manifestVersion: string;
+
+    public readonly manifestVersionName: string | undefined;
 
     private readonly isDevMode = process.env.NODE_ENV === 'development';
 
@@ -31,6 +36,9 @@ export class ExtensionBuilder {
             throw new Error('Invalid package.json');
         }
         this.version = packageJson.version;
+        const { manifestVersion, manifestVersionName } = toManifestVersion(this.version);
+        this.manifestVersion = manifestVersion;
+        this.manifestVersionName = manifestVersionName;
 
         const { PATH, ...baseEnv } = process.env;
         this.env = {
@@ -85,12 +93,52 @@ export class ExtensionBuilder {
     private copyLocales() {
         const srcDir = `../../packages/locales/dist/extension`;
         fs.copySync(srcDir, `${this.buildPath}/_locales`, { overwrite: true });
+        this.applyBrandToLocales();
+    }
+
+    /**
+     * The manifest name/description are localized by Chrome from _locales/<lang>/messages.json and
+     * do NOT run our runtime `%{...}` interpolation. Bake the brand values in here at build time so
+     * the extension name stays driven by the single BRAND_CONFIG source (edit it + rebuild).
+     */
+    private applyBrandToLocales() {
+        const localesDir = `${this.buildPath}/_locales`;
+        const subs: Record<string, string> = {
+            '%{chainName}': BRAND_CONFIG.chainName,
+            '%{coinName}': BRAND_CONFIG.coinName,
+            '%{coinSymbol}': BRAND_CONFIG.coinSymbol,
+            '%{coinSymbolWithEx}': BRAND_CONFIG.coinSymbolWithEx
+        };
+        for (const lang of fs.readdirSync(localesDir)) {
+            const file = `${localesDir}/${lang}/messages.json`;
+            if (!fs.existsSync(file)) continue;
+            const data = fs.readJsonSync(file) as Record<string, { message?: string }>;
+            for (const key of Object.keys(data)) {
+                const msg = data[key]?.message;
+                if (typeof msg !== 'string') continue;
+                data[key].message = Object.entries(subs).reduce(
+                    (acc, [ph, val]) => acc.split(ph).join(val),
+                    msg
+                );
+            }
+            fs.writeJsonSync(file, data, { spaces: 2 });
+        }
     }
 
     private updateManifestVersion() {
         const manifestData = this.readManifest();
-        manifestData.version = this.version;
+        this.applyManifestVersion(manifestData);
         this.writeManifest(manifestData);
+    }
+
+    public applyManifestVersion(manifestData: any) {
+        manifestData.version = this.manifestVersion;
+        // `version_name` is Chrome-only; Firefox warns on unknown manifest keys.
+        if (this.directory === 'chrome' && this.manifestVersionName) {
+            manifestData.version_name = this.manifestVersionName;
+        } else {
+            delete manifestData.version_name;
+        }
     }
 
     public archive() {
@@ -109,4 +157,23 @@ export class ExtensionBuilder {
     public writeManifest(data: any) {
         fs.writeFileSync(`${this.buildPath}/manifest.json`, JSON.stringify(data));
     }
+}
+
+// Chrome/Firefox require manifest `version` to be 1-4 dot-separated integers (0-65536).
+// A semver like "4.6.2-pre.3" is rejected, so we map the pre-release counter into a
+// 4th numeric segment ("4.6.2.3") and keep the original semver in `version_name` for
+// display in chrome://extensions. Returns undefined name when no remap was needed.
+export function toManifestVersion(semver: string): {
+    manifestVersion: string;
+    manifestVersionName: string | undefined;
+} {
+    const [core, prerelease] = semver.split('-', 2);
+    if (!prerelease) {
+        return { manifestVersion: core, manifestVersionName: undefined };
+    }
+    const trailingInt = prerelease.match(/(\d+)$/);
+    const coreSegments = core.split('.');
+    const manifestVersion =
+        coreSegments.length < 4 && trailingInt ? `${core}.${trailingInt[1]}` : core;
+    return { manifestVersion, manifestVersionName: semver };
 }

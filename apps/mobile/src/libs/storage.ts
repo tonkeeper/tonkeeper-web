@@ -109,7 +109,7 @@ export class StorageMigrationService {
                         realKeysCount++;
                     }
                 } catch (error) {
-                    console.log(`Error checking key ${key}:`, error);
+                    console.error(`Error checking key ${key}:`, error);
                 }
             }
 
@@ -125,7 +125,7 @@ export class StorageMigrationService {
             const value = await this.oldStorage.get(key);
 
             await this.newStorage.set(key, value);
-            console.log(`Migrated key: ${key}`);
+            console.info(`Migrated key: ${key}`);
             return true;
         } catch (error) {
             console.error(`Error migrating key ${key}:`, error);
@@ -135,7 +135,7 @@ export class StorageMigrationService {
 
     private async cleanupOldStorage(migratedKeys: string[]): Promise<void> {
         try {
-            console.log(`Cleaning up ${migratedKeys.length} keys from old storage`);
+            console.info(`Cleaning up ${migratedKeys.length} keys from old storage`);
 
             for (const key of migratedKeys) {
                 try {
@@ -145,7 +145,7 @@ export class StorageMigrationService {
                 }
             }
 
-            console.log('Old storage cleanup completed');
+            console.info('Old storage cleanup completed');
         } catch (error) {
             console.error('Error during old storage cleanup:', error);
         }
@@ -156,7 +156,7 @@ export class StorageMigrationService {
             return;
         }
 
-        console.log('Starting storage migration from Preferences to Keychain...');
+        console.info('Starting storage migration from Preferences to Keychain...');
 
         const errors: string[] = [];
         let migratedCount = 0;
@@ -165,11 +165,11 @@ export class StorageMigrationService {
             const keysToMigrate = await this.oldStorage.keys();
 
             if (keysToMigrate.length === 0) {
-                console.log('No keys found in old storage, migration completed');
+                console.info('No keys found in old storage, migration completed');
                 return;
             }
 
-            console.log(`Found ${keysToMigrate.length} keys in old storage`);
+            console.info(`Found ${keysToMigrate.length} keys in old storage`);
             const migratedKeys: string[] = [];
 
             for (const key of keysToMigrate) {
@@ -188,12 +188,12 @@ export class StorageMigrationService {
 
             if (errors.length === 0) {
                 await this.cleanupOldStorage(migratedKeys);
-                console.log('Migration completed successfully');
+                console.info('Migration completed successfully');
             } else {
-                console.log('Migration completed with errors, skipping cleanup');
+                console.warn('Migration completed with errors, skipping cleanup');
             }
 
-            console.log(
+            console.info(
                 `Migration completed: ${migratedCount}/${keysToMigrate.length} keys migrated`
             );
         } catch (error) {

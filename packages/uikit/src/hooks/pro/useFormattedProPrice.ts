@@ -22,5 +22,5 @@ export const useFormattedProPrice = (price: ProPrice | undefined) => {
             : price.value;
 
         return { displayPrice, fiatEquivalent };
-    }, [price, rate, fiatEquivalent]);
+    }, [price, fiatEquivalent, isRaw]);
 };

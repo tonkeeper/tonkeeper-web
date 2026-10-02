@@ -56,7 +56,7 @@ export interface StakingEarningsInfoProps {
 export const StakingEarningsInfo: FC<StakingEarningsInfoProps> = ({ pool, amount }) => {
     const { t } = useTranslation();
     const { tonAmount } = usePoolStakedBalance(pool);
-    const currentStakedTON = tonAmount ?? new BigNumber(0);
+    const currentStakedTON = useMemo(() => tonAmount ?? new BigNumber(0), [tonAmount]);
 
     const inputAmountBN = useMemo(() => {
         if (!amount) return new BigNumber(0);

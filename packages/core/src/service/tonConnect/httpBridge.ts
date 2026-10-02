@@ -85,29 +85,31 @@ export const subscribeTonConnect = ({
         url += `&last_event_id=${lastEventId}`;
     }
 
-    console.log('sse connect', url);
+    console.debug('sse connect', url);
 
     const eventSource = new EventSource(url);
 
     const onMessage = (params: MessageEvent<string>) => {
-        console.log('sse message received', params.data);
         setLastEventId(storage, params.lastEventId);
 
-        const { from, message }: TonConnectRequest = JSON.parse(params.data);
+        try {
+            const { from, message }: TonConnectRequest = JSON.parse(params.data);
 
-        const connection = connections.find(item => item.clientSessionId === from);
-        if (!connection) return;
+            const connection = connections.find(item => item.clientSessionId === from);
+            if (!connection) return;
 
-        console.log('sse message processed', params.data);
-        handleMessage(decryptTonConnectMessage({ message, from, connection }));
+            handleMessage(decryptTonConnectMessage({ message, from, connection }));
+        } catch (e) {
+            console.warn('TON Connect: failed to process bridge message');
+        }
     };
 
     const onOpen = () => {
-        console.log('sse connect: opened');
+        console.debug('sse connect: opened');
     };
 
     const onError = (event: Event) => {
-        console.log('sse connect: error', event);
+        console.error('sse connect: error', event);
     };
 
     eventSource.addEventListener('message', onMessage);

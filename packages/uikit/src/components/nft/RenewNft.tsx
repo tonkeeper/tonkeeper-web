@@ -16,14 +16,7 @@ import { useNftDNSExpirationDate } from '../../state/nft';
 import { Notification } from '../Notification';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
-import {
-    ConfirmView,
-    ConfirmViewButtons,
-    ConfirmViewButtonsSlot,
-    ConfirmViewHeading,
-    ConfirmViewHeadingSlot
-} from '../transfer/ConfirmView';
-import { ConfirmAndCancelMainButton } from '../transfer/common';
+import { ConfirmView, ConfirmViewHeading, ConfirmViewHeadingSlot } from '../transfer/ConfirmView';
 import { useNotifyErrorHandle, useToast } from '../../hooks/useNotification';
 
 const RenewDNSBlock = styled.div`
@@ -75,7 +68,7 @@ export const RenewNft: FC<{
         if (isCompleted) {
             toast(t('renew_nft_renewed'));
         }
-    }, [isCompleted]);
+    }, [isCompleted, toast, t]);
 
     const renewUntilFormatted = useDateFormat(Date.now() + YEAR_MS, intlOptions);
 
@@ -109,21 +102,6 @@ export const RenewNft: FC<{
     if (!isExpirationInfoLoading && !expirationDate) {
         return null;
     }
-
-    const child = () => (
-        <ConfirmView
-            onClose={onClose}
-            recipient={recipient}
-            assetAmount={dnsRenewAssetAmount}
-            fitContent
-            estimation={estimation}
-            {...mutation}
-        >
-            <ConfirmViewButtonsSlot>
-                <ConfirmViewButtons MainButton={ConfirmAndCancelMainButton} />
-            </ConfirmViewButtonsSlot>
-        </ConfirmView>
-    );
 
     const daysLeft = toDaysLeft(expirationDate);
 

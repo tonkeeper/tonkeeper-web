@@ -10,7 +10,6 @@ import {
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { useTranslation } from '../../translation';
 import { QueryKey } from '../../../libs/queryKey';
 import { MetaEncryptionSerializedMap } from '@tonkeeper/core/dist/entries/wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
@@ -19,7 +18,6 @@ import { metaEncryptionMapSerializer } from '@tonkeeper/core/dist/utils/metadata
 export const useCreateSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
-    const { t } = useTranslation();
     const client = useQueryClient();
     const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
 

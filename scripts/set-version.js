@@ -8,8 +8,14 @@ const path = require('path');
 const tag = process.env.RELEASE_TAG || '';
 const version = tag.replace(/^v/, '');
 
-if (!/^\d+\.\d+\.\d+/.test(version)) {
-    console.error(`Invalid or missing RELEASE_TAG: "${tag}". Expected format: v1.2.3 or v1.2.3-beta.1`);
+// Desktop auto-update uses update.electronjs.org, which only considers releases
+// with valid SemVer tags. Numeric identifiers must not contain leading zeroes.
+const semverRegexp = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+
+if (!semverRegexp.test(version)) {
+    console.error(
+        `Invalid or missing RELEASE_TAG: "${tag}". Expected valid SemVer, e.g. v1.2.3 or v1.2.3-rc.1. Do not use leading zeroes like v26.06.0.`
+    );
     process.exit(1);
 }
 

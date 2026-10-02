@@ -108,7 +108,7 @@ const ProRemoveExtensionNotificationContent: FC<
                 inputUnit: 'seconds'
             })}`
         );
-    }, [removeMutation.isSuccess]);
+    }, [removeMutation.isSuccess, finalExpiresDate, toast, t, formatDate]);
 
     useEffect(() => {
         estimateFeeMutation.mutate({
@@ -116,7 +116,7 @@ const ProRemoveExtensionNotificationContent: FC<
             extensionContract,
             destroyValue
         });
-    }, [selectedWallet]);
+    }, [selectedWallet, extensionContract, destroyValue, estimateFeeMutation]);
 
     const removeMutate = async () =>
         removeMutation.mutateAsync({

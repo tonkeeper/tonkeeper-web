@@ -48,7 +48,7 @@ export const useMobileProPairSignerSubscription = () => {
                 onOpen({ accountId: acc.id });
             });
         });
-    }, []);
+    }, [mutateAsync, onOpen]);
 };
 
 const useInjectedBridgeConnectionSubscription = (
@@ -78,7 +78,7 @@ const useInjectedBridgeConnectionSubscription = (
                 });
             }
         );
-    }, []);
+    }, [setParams]);
 
     return ref;
 };
@@ -91,18 +91,21 @@ export const DeepLinkSubscription = () => {
         return subscribeToSignerResponse(val => {
             sdk.uiEvents.emit('signerTxResponse', { method: 'signerTxResponse', params: val });
         });
-    }, []);
+    }, [sdk.uiEvents]);
 
     const [params, setParams] = useState<TonConnectConnectionParams | null>(null);
     const paramsRef = useValueRef(params);
 
-    const onNewParamsReceived = useCallback((p: TonConnectConnectionParams | null) => {
-        if (p && paramsRef.current) {
-            throw new Error('New params received while old params not processed');
-        }
+    const onNewParamsReceived = useCallback(
+        (p: TonConnectConnectionParams | null) => {
+            if (p && paramsRef.current) {
+                throw new Error('New params received while old params not processed');
+            }
 
-        setParams(p);
-    }, []);
+            setParams(p);
+        },
+        [paramsRef]
+    );
 
     const injectedBridgeConnectionRef =
         useInjectedBridgeConnectionSubscription(onNewParamsReceived);
@@ -183,7 +186,7 @@ export const DeepLinkSubscription = () => {
                 notifyError(unsupportedLinkError);
             }
         });
-    }, []);
+    }, [reset, onNewParamsReceived, mutateAsync, notifyError]);
 
     return (
         <>

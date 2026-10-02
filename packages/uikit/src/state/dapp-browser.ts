@@ -337,8 +337,14 @@ const useRemoveBrowserTabFromState = () => {
     });
 };
 
+const SEARCH_ENGINE_URL = 'https://duckduckgo.com/';
+
 export const useSearchEngine = () => {
-    return useCallback((query: string) => `https://duckduckgo.com/?q=${query}`, []);
+    return useCallback((query: string) => {
+        const url = new URL(SEARCH_ENGINE_URL);
+        url.searchParams.set('q', query);
+        return url.toString();
+    }, []);
 };
 
 export const useSearchEngineName = () => {

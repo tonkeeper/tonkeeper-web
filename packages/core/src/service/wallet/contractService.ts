@@ -123,7 +123,7 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
     function countBitsAndCellsInMsg(msg: Cell, hashes: Set<Buffer>): [number, number] {
         const temp = hashes.size;
         hashes.add(msg.hash());
-        if (hashes.size == temp) {
+        if (hashes.size === temp) {
             return [0, 0];
         }
 

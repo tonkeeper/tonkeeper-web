@@ -59,6 +59,8 @@ export interface UIEvents {
     keyboard: KeyboardParams;
     addSuggestion: LatestSuggestion;
     editSuggestion: FavoriteSuggestion;
+    // generic response channel: each emitter/listener pair owns its own params shape
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     response: any;
     toast: string;
     signerTxResponse: {
@@ -165,7 +167,6 @@ export interface IAppSdk {
     prompt: (message: string, defaultValue?: string) => Promise<string | null>;
 
     requestExtensionPermission: () => Promise<void>;
-    twaExpand?: () => void;
     hapticNotification: (type: 'success' | 'error' | 'impact_medium' | 'impact_light') => void;
 
     notifications?: NotificationService;
@@ -288,13 +289,13 @@ export abstract class BaseApp implements IAppSdk {
     pasteFromClipboard = async () => navigator.clipboard.readText();
 
     copyToClipboard = (value: string, notification?: string) => {
-        console.log(value, notification);
+        console.debug(value, notification);
 
         this.topMessage(notification);
     };
 
     openPage = async (url: string): Promise<void> => {
-        console.log(url);
+        console.debug(url);
     };
 
     openNft = (nft: NFT) => {
@@ -322,8 +323,6 @@ export abstract class BaseApp implements IAppSdk {
     prompt = async (message: string, defaultValue?: string) => window.prompt(message, defaultValue);
 
     requestExtensionPermission = async () => {};
-
-    twaExpand = () => {};
 
     hapticNotification = (_: 'success' | 'error' | 'impact_medium' | 'impact_light') => {};
 

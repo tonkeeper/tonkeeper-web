@@ -1,4 +1,5 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import { getJettonSymbol } from '@tonkeeper/core/dist/utils/send';
 import React, { FC, useEffect, useRef } from 'react';
@@ -36,15 +37,16 @@ const AssetImage = styled(Image)`
 
 const AssetInfo = styled.div`
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    width: 200px;
-    overflow: hidden;
+    flex: 1;
+    min-width: 0;
 `;
 
 const Amount = styled(Body1)`
     color: ${props => props.theme.textSecondary};
-    text-overflow: ellipsis;
-    overflow: hidden;
+    overflow-wrap: anywhere;
 `;
 
 const Icon = styled.span`
@@ -81,8 +83,8 @@ const AssetDropDown: FC<{
             >
                 <ListItemPayload>
                     <AssetInfo>
-                        <AssetImage src="https://wallet.tonkeeper.com/img/toncoin.svg"></AssetImage>
-                        <Label1>{CryptoCurrency.TON}</Label1>
+                        <AssetImage src={BRAND_CONFIG.coinIcon}></AssetImage>
+                        <Label1>{BRAND_CONFIG.coinSymbolWithEx}</Label1>
                         <Amount>{format(info?.balance ?? 0)}</Amount>
                     </AssetInfo>
                     {CryptoCurrency.TON === jetton ? (

@@ -74,7 +74,7 @@ export const BatteryPacksSelect: FC<{
                     .multipliedBy(unitToTokenRate || 1),
                 asset: asset
             }),
-        [asset, unitToTokenRate]
+        [asset, unitToTokenRate, unitToTonRate]
     );
 
     const isPackAvailable = useCallback(
@@ -82,7 +82,7 @@ export const BatteryPacksSelect: FC<{
             assetWeiBalance &&
             packPriceInToken(packPrice).weiAmount.lt(assetWeiBalance) &&
             packPriceInToken(packPrice).isGT(minValue!),
-        [assetWeiBalance, packPriceInToken]
+        [assetWeiBalance, packPriceInToken, minValue]
     );
 
     const allDataFetched = unitToTokenRate && packs && tokenRate && assetWeiBalance && minValue;

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useId, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form/dist/types/controller';
 import { useAppContext } from '../../../hooks/appContext';
 import { useRate } from '../../../state/rates';
@@ -14,6 +14,8 @@ import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 import styled, { css } from 'styled-components';
 import { Body2 } from '../../Text';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 
 const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
     text-align: right;
@@ -63,6 +65,7 @@ export const AmountInput: FC<{
     fieldState: ControllerFieldState;
 }> = ({ asset, fieldState, field }) => {
     const { fiat } = useAppContext();
+    const fiatDisplay = fiat === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : fiat;
     const [focus, setFocus] = useState(false);
     const [currencyAmount, setCurrencyAmount] = useState({
         inFiat: false,
@@ -78,68 +81,71 @@ export const AmountInput: FC<{
     const price = data?.prices || 0;
     const isFiatInputDisabled = !price;
 
-    const onInput = (inFiat: boolean, newValue: string) => {
-        const decimals = currencyAmount.inFiat ? 2 : asset.decimals;
+    const onInput = useCallback(
+        (inFiat: boolean, newValue: string) => {
+            const decimals = currencyAmount.inFiat ? 2 : asset.decimals;
 
-        let inputValue = replaceTypedDecimalSeparator(newValue);
+            let inputValue = replaceTypedDecimalSeparator(newValue);
 
-        if (!inputValue) {
-            setCurrencyAmount(s => ({
-                ...s,
-                inputValue,
-                tokenValue: '',
-                fiatValue: ''
-            }));
-            field.onChange({
-                inFiat,
-                value: ''
-            });
-            return;
-        }
-
-        if (!seeIfValueValid(inputValue, decimals)) {
-            field.onChange({
-                inFiat,
-                value: ''
-            });
-            return;
-        }
-
-        let tokenValue = currencyAmount.tokenValue;
-        let fiatValue = currencyAmount.fiatValue;
-
-        if (isNumeric(inputValue) && !inputValue.endsWith(getDecimalSeparator())) {
-            const formattedInput = formatSendValue(inputValue);
-            const bnInput = new BigNumber(
-                removeGroupSeparator(inputValue).replace(getDecimalSeparator(), '.')
-            );
-            if (inFiat) {
-                tokenValue = formatter.format(!price ? new BigNumber(0) : bnInput.div(price), {
-                    decimals: asset.decimals
+            if (!inputValue) {
+                setCurrencyAmount(s => ({
+                    ...s,
+                    inputValue,
+                    tokenValue: '',
+                    fiatValue: ''
+                }));
+                field.onChange({
+                    inFiat,
+                    value: ''
                 });
-
-                fiatValue = formattedInput;
-            } else {
-                fiatValue = formatter.format(bnInput.multipliedBy(price), { decimals: 2 });
-
-                tokenValue = formattedInput;
+                return;
             }
 
-            inputValue = formatSendValue(inputValue);
-        }
+            if (!seeIfValueValid(inputValue, decimals)) {
+                field.onChange({
+                    inFiat,
+                    value: ''
+                });
+                return;
+            }
 
-        field.onChange({
-            inFiat,
-            value: inFiat ? fiatValue : tokenValue
-        });
+            let tokenValue = currencyAmount.tokenValue;
+            let fiatValue = currencyAmount.fiatValue;
 
-        setCurrencyAmount({
-            inFiat,
-            inputValue,
-            tokenValue,
-            fiatValue
-        });
-    };
+            if (isNumeric(inputValue) && !inputValue.endsWith(getDecimalSeparator())) {
+                const formattedInput = formatSendValue(inputValue);
+                const bnInput = new BigNumber(
+                    removeGroupSeparator(inputValue).replace(getDecimalSeparator(), '.')
+                );
+                if (inFiat) {
+                    tokenValue = formatter.format(!price ? new BigNumber(0) : bnInput.div(price), {
+                        decimals: asset.decimals
+                    });
+
+                    fiatValue = formattedInput;
+                } else {
+                    fiatValue = formatter.format(bnInput.multipliedBy(price), { decimals: 2 });
+
+                    tokenValue = formattedInput;
+                }
+
+                inputValue = formatSendValue(inputValue);
+            }
+
+            field.onChange({
+                inFiat,
+                value: inFiat ? fiatValue : tokenValue
+            });
+
+            setCurrencyAmount({
+                inFiat,
+                inputValue,
+                tokenValue,
+                fiatValue
+            });
+        },
+        [currencyAmount, asset, price, field]
+    );
 
     useEffect(() => {
         if (!field.value || !isFetched) {
@@ -152,7 +158,7 @@ export const AmountInput: FC<{
         } else {
             onInput(field.value.inFiat, field.value.value);
         }
-    }, [price, isFetched]);
+    }, [price, isFetched, field, onInput]);
 
     const tokenId = useId();
     const fiatId = useId();
@@ -237,7 +243,7 @@ export const AmountInput: FC<{
                     onFocus(true);
                 }}
             >
-                {fiat}
+                {fiatDisplay}
             </AmountInputFieldRight>
         </InputBlockStyled>
     );

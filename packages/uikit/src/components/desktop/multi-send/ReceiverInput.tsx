@@ -65,6 +65,7 @@ export const ReceiverInput: FC<{
             return;
         }
         field.onChange(validationProduct);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally ignoring `field` identity changes
     }, [field.onChange, validationProduct]);
 
     useEffect(() => {
@@ -77,14 +78,13 @@ export const ReceiverInput: FC<{
                 ? field.value.dns.account.name
                 : field.value.address
         );
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only init
     }, []);
 
     const { onCopy, copied } = useCopyToClipboard(validationProduct?.address ?? '');
 
     const onPaste = useCallback(
         async (e: React.ClipboardEvent<HTMLInputElement>) => {
-            console.log('paste');
-
             const clipText = e.clipboardData.getData('Text');
 
             const values = await getPastedTable(clipText, validator);
@@ -95,7 +95,7 @@ export const ReceiverInput: FC<{
             form.rows.splice(index, values.length, ...values);
             methods.reset(form);
         },
-        [methods, validator]
+        [methods, validator, index]
     );
 
     return (
@@ -107,7 +107,6 @@ export const ReceiverInput: FC<{
                 onChange={e => {
                     inputTouched.current = true;
                     setInputValue(e.target.value);
-                    console.log(e.target.value);
                 }}
                 value={inputValue}
                 placeholder={t('transactionDetails_recipient')}

@@ -261,7 +261,7 @@ const DesktopTokensPayload = () => {
                 );
             }
         },
-        [listBalances, listOffsetBeforeIndex, rowVirtualizer, rowVirtualizer.elementsCache, env]
+        [listBalances, listOffsetBeforeIndex, rowVirtualizer, env]
     );
 
     /**

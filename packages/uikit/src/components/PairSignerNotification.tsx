@@ -66,8 +66,6 @@ const PairSignerNotification = () => {
 
     const onSubmit = useCallback(
         (result: string) => {
-            console.log(result);
-
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: requestId,

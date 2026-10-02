@@ -352,7 +352,7 @@ export const SignDataNotification: FC<{
                 payload_type: params!.type
             });
         },
-        [handleClose]
+        [handleClose, track, origin, params]
     );
 
     const Content = useCallback(() => {

@@ -23,14 +23,22 @@ export const Description = styled.div`
 
 export const FirstLine = styled.div`
     display: grid;
-    grid-template-columns: min-content auto min-content;
+    grid-template-columns: minmax(5ch, 1fr) max-content minmax(0, max-content);
     gap: 0.25rem;
     width: 100%;
+
+    /* Token symbol (3rd column) wraps instead of forcing its full width and truncating the amount,
+       so the amount stays fully visible and a long ticker like "GRAM (ex TON)" breaks across lines. */
+    > *:nth-child(3) {
+        white-space: normal;
+        overflow-wrap: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
 `;
 
 export const AmountText = styled(Label1)<{ green?: boolean; isScam?: boolean }>`
-    text-overflow: ellipsis;
-    overflow: hidden;
+    white-space: nowrap;
     text-align: right;
 
     ${props =>
@@ -59,6 +67,10 @@ export const SecondLine = styled.div`
 
 export const FirstLabel = styled(Label1)`
     user-select: none;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 `;
 
 export const SecondaryText = styled(Body2)`

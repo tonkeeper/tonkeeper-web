@@ -97,7 +97,7 @@ const Container = forwardRef<
                 onClose();
             }
         },
-        [onClose]
+        [onClose, hostRef]
     );
 
     useOutsideAlerter(wrapperRef, onClick);

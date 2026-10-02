@@ -66,7 +66,7 @@ export const SettingsSocialList: FC = React.memo(() => {
                 action: () => navigate(relative(SettingsRoute.legal))
             }
         ]);
-    }, [t, navigate, sdk.openPage]);
+    }, [t, navigate, sdk, config, support]);
 
     return <SettingsList items={items} />;
 });

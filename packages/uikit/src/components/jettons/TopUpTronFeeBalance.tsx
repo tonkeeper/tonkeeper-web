@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import styled, { css } from 'styled-components';
 import { Notification } from '../Notification';
 import { Body2Class, Body3, Label1Class, Label2 } from '../Text';
@@ -304,7 +305,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                         <MethodImage src={TON_ASSET.image} />
                         <MobileBlockWrapper>
                             <MethodInfo>
-                                <CardTitle>{TON_ASSET.symbol}</CardTitle>
+                                <CardTitle>{BRAND_CONFIG.coinSymbolWithEx}</CardTitle>
                                 <CardSubtitle>{t('topup_tron_fee_ton_description')}</CardSubtitle>
                             </MethodInfo>
                             {tonSenderFee.fiatAmount ? (

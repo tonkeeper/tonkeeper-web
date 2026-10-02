@@ -65,5 +65,5 @@ export const useSubscriptionEndingVerification = () => {
 
             onOpen();
         })();
-    }, [subscription]);
+    }, [subscription, sdk, onOpen]);
 };

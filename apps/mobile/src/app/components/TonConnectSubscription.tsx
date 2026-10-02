@@ -49,7 +49,7 @@ const useInjectedBridgeRequestsSubscription = (
                 });
             }
         );
-    }, []);
+    }, [setRequest]);
 
     return ref;
 };
@@ -84,14 +84,17 @@ export const TonConnectSubscription = () => {
     );
     const queryClient = useQueryClient();
 
-    const onTransaction = useCallback(async (r: TonConnectAppRequestPayload) => {
-        if (requestRef.current) {
-            throw new Error('Request already in progress');
-        }
+    const onTransaction = useCallback(
+        async (r: TonConnectAppRequestPayload) => {
+            if (requestRef.current) {
+                throw new Error('Request already in progress');
+            }
 
-        await queryClient.invalidateQueries([QueryKey.account]);
-        setRequest(r);
-    }, []);
+            await queryClient.invalidateQueries([QueryKey.account]);
+            setRequest(r);
+        },
+        [requestRef, queryClient]
+    );
 
     const injectedBridgeResponseRef = useInjectedBridgeRequestsSubscription(onTransaction);
 
@@ -157,7 +160,7 @@ export const TonConnectSubscription = () => {
                 }
             }
         },
-        [responseAsync, request?.connection]
+        [responseAsync, request, injectedBridgeResponseRef]
     );
 
     return <TonConnectRequestNotification request={request} handleClose={handleClose} />;

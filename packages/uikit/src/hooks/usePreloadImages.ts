@@ -19,5 +19,5 @@ export function usePreloadImages(srcArray: string[]) {
                 img.src = '';
             });
         };
-    }, [JSON.stringify(srcArray)]);
+    }, [JSON.stringify(srcArray)]); // eslint-disable-line react-hooks/exhaustive-deps
 }

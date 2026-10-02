@@ -107,9 +107,13 @@ export function sendTgAuthResultToOpener(tgAuthResult: string): boolean {
 
     try {
         const authData: TGLoginData = JSON.parse(atob(tgAuthResult));
+        // Restrict delivery to a same-origin opener. The legitimate opener is the Tonkeeper
+        // app that opened this popup, so it always shares the popup's origin. Using '*' here
+        // would leak the Telegram identity to any cross-origin opener (e.g. a phishing site
+        // that opened the OAuth popup with return_to pointing back at us).
         currentWindow.opener.postMessage(
             JSON.stringify({ event: 'auth_result', result: authData }),
-            '*'
+            currentWindow.location.origin
         );
         currentWindow.close();
         return true;

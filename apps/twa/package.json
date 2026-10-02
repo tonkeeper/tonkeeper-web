@@ -47,6 +47,7 @@
         "vite": "^5.4.20"
     },
     "scripts": {
+        "dev": "vite",
         "locales": "ts-node ./task/locales",
         "build": "tsc && yarn locales && vite build",
         "generate:twaApi": "rm -fr src/twaApi && docker build -f task/Dockerfile.twaApi . -t twaapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local twaapisdk",

@@ -8,6 +8,7 @@ import React, {
     useRef,
     useState
 } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
@@ -308,7 +309,9 @@ const FirstParticipantCard: FC<{ skipBalanceCheck?: boolean }> = ({ skipBalanceC
             const wallet = await new AccountsApi(api.tonApiV2).getAccount({ accountId });
 
             if (deployMultisigAssetAmount.weiAmount.gt(wallet.balance)) {
-                return { message: 'Not enough TON balance for deploy' };
+                return {
+                    message: `Not enough ${BRAND_CONFIG.coinSymbolWithEx} balance for deploy`
+                };
             }
         },
         [api, skipBalanceCheck]
@@ -436,7 +439,7 @@ const QuorumInput = () => {
         if (selectedSignersNumber > totalSignersNumber) {
             setValue('quorum', totalSignersNumber);
         }
-    }, [totalSignersNumber, selectedSignersNumber]);
+    }, [totalSignersNumber, selectedSignersNumber, setValue]);
 
     return (
         <QuorumAndDeadlineInputsContainer>

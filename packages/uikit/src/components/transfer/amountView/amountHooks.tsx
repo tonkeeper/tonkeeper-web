@@ -52,7 +52,7 @@ export const useButtonPosition = (
         return () => {
             blurHandler();
         };
-    }, [ref.current, blockRef.current]);
+    }, [ios, standalone, ref, blockRef]);
 };
 
 export const defaultSize: InputSize = { size: 40, width: 30 };
@@ -82,5 +82,5 @@ export const useAutoFocusOnChange = (ref: React.RefObject<HTMLInputElement>, tok
         return () => {
             clearTimeout(timeout);
         };
-    }, [ref.current, token]);
+    }, [ref, token]);
 };

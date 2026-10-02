@@ -236,13 +236,6 @@ const TonTransactionContent: FC<{
         senderChoice
     });
 
-    useEffect(() => {
-        if (sdk.twaExpand) {
-            sdk.twaExpand();
-            sdk.hapticNotification('success');
-        }
-    }, []);
-
     const onSubmit = async () => {
         try {
             const result = await mutateAsync();
@@ -401,7 +394,9 @@ export const TonTransactionNotification: FC<{
     waitInvalidation?: boolean;
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
-    const wallets = useAccountsState();
+    // This modal is mounted eagerly by ModalsRoot, so it can render before the
+    // accounts query resolves; `useAccountsState()` returns undefined until then.
+    const wallets = useAccountsState() ?? [];
     const isActiveAccountMultisig = useIsActiveAccountMultisig();
     const [multisigTTL, setMultisigTTL] = useState<MultisigOrderLifetimeMinutes | undefined>();
 
@@ -445,7 +440,16 @@ export const TonTransactionNotification: FC<{
                 />
             </>
         );
-    }, [params, onClose, wallets.length, isActiveAccountMultisig, multisigTTL, setMultisigTTL]);
+    }, [
+        params,
+        onClose,
+        wallets.length,
+        isActiveAccountMultisig,
+        multisigTTL,
+        setMultisigTTL,
+        t,
+        waitInvalidation
+    ]);
 
     return (
         <>

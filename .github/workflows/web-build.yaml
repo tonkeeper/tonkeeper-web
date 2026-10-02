@@ -19,6 +19,17 @@ on:
             deployment-url:
                 description: 'The app deployment url'
                 value: ${{ jobs.web-build.outputs.deployment-url }}
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: 'Cloudflare Pages branch name to deploy to'
+                required: true
+                type: string
+            release_tag:
+                description: 'Release tag to stamp into package.json (e.g. v1.2.3). Leave empty for branch builds.'
+                required: false
+                type: string
+                default: ''
 env:
     node-version: 20.11.1
 
@@ -82,7 +93,7 @@ jobs:
                   echo '### Successful WEB deployment 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
                   echo 'Well done!' >> $GITHUB_STEP_SUMMARY
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
-                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
             - name: Comment PR
               uses: thollander/actions-comment-pull-request@v3
@@ -92,5 +103,5 @@ jobs:
                       ### Successful WEB deployment 🚀🚀🚀
                       Well done!
                       Link to test environment:
-                      ${{ steps.deploy.outputs.deployment-url }}
+                      ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
                   comment-tag: web_deploy

@@ -1,0 +1,48 @@
+# Paths excluded from QA impact mapping.
+# One glob pattern per line. Lines starting with # are comments.
+# Patterns follow fnmatch / pathlib.Path.match conventions.
+# Use **/ prefix to match any depth.
+
+# Dependency lock files
+yarn.lock
+package-lock.json
+**/yarn.lock
+**/package-lock.json
+
+# Build outputs
+**/dist/**
+**/out/**
+**/.turbo/**
+
+# Generated API clients (regenerated, not hand-authored)
+**/src/openapi/**
+**/src/generated/**
+
+# Test fixtures and snapshots
+**/__snapshots__/**
+**/__fixtures__/**
+
+# Type declaration files that don't affect behavior
+**/*.d.ts
+
+# Agent skills and their generated reports (not shipped to users)
+.codex/**
+.claude/**
+
+# CI and tooling config (no runtime effect)
+.github/**
+.husky/**
+**/.eslintrc*
+**/.eslintignore
+**/.prettierrc*
+
+# NOTE: tsconfig*.json and vite.config.* are intentionally NOT excluded.
+# Changes to compiler options (strict, target, lib) or bundler config
+# (chunk splitting, polyfills, env vars) can affect runtime behaviour and
+# must be mapped to QA impact areas.
+
+# Repository meta-docs (not user-facing)
+CLAUDE.md
+CONTRIBUTING.md
+CHANGELOG.md
+*.md

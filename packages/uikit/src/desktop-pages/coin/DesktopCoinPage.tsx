@@ -1,4 +1,5 @@
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
@@ -65,7 +66,7 @@ export const DesktopCoinPage = () => {
         if (!name) {
             navigate(AppRoute.home);
         }
-    }, [name]);
+    }, [name, navigate]);
 
     const canUseTron = useCanReceiveTron();
 
@@ -306,7 +307,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             const amount = assets.ton.info.balance;
             return {
                 image: TON_ASSET.image!,
-                symbol: TON_ASSET.symbol,
+                symbol: BRAND_CONFIG.coinSymbolWithEx,
                 amount: format(amount),
                 fiatAmount: formatFiatCurrency(
                     fiat,
@@ -351,7 +352,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             amount: format(extra.amount, extra.preview.decimals),
             fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
         };
-    }, [assets, format, rate, fiat]);
+    }, [assets, format, rate, fiat, token]);
 
     if (!asset) {
         return <></>;
@@ -417,7 +418,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             return null;
         }
         if (token === CryptoCurrency.TON) {
-            return { assetSymbol: 'Toncoin', isUnverified: false };
+            return { assetSymbol: BRAND_CONFIG.coinName, isUnverified: false };
         }
 
         if (seeIfValidTonAddress(decodeURIComponent(token))) {
@@ -434,7 +435,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         } else {
             return undefined;
         }
-    }, [assets, t, token]);
+    }, [assets, token]);
 
     const { mainnetConfig } = useAppContext();
     const tonviewer = new URL(mainnetConfig.accountExplorer).origin;

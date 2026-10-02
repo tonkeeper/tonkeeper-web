@@ -57,5 +57,6 @@ Thumbs.db
 
 
 package-lock.json
+.playwright-mcp/
 
 *.tsbuildinfo

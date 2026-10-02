@@ -9,8 +9,11 @@ import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { ExtensionStorage } from '../storage';
 import { AptabaseBackground } from '../aptabase-background';
 
+type PopUpEventName = Parameters<typeof popUpEventEmitter.emit>[0];
+type PopUpEventMessage = Parameters<typeof popUpEventEmitter.emit>[1];
+
 let popUpPort: browser.Runtime.Port;
-const portMessagesQueue: any[] = [];
+const portMessagesQueue: unknown[] = [];
 export const handlePopUpConnection = (port: browser.Runtime.Port) => {
     popUpPort = port;
 
@@ -19,7 +22,7 @@ export const handlePopUpConnection = (port: browser.Runtime.Port) => {
             popUpPort = port;
             portMessagesQueue.forEach(msg => popUpPort.postMessage(msg));
         } else {
-            popUpEventEmitter.emit<any>(message.method, message);
+            popUpEventEmitter.emit(message.method as PopUpEventName, message as PopUpEventMessage);
         }
     });
 
@@ -28,7 +31,7 @@ export const handlePopUpConnection = (port: browser.Runtime.Port) => {
     });
 };
 
-export function postMessageToPopup(data: any) {
+export function postMessageToPopup(data: unknown) {
     if (popUpPort) {
         popUpPort.postMessage(data);
     } else {

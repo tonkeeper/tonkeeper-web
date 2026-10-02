@@ -39,7 +39,7 @@ export const AddressInput: FC<{
 
     useEffect(() => {
         onIsDirtyChange?.(!!recipient);
-    }, [recipient]);
+    }, [recipient, onIsDirtyChange]);
 
     useEffect(() => {
         if (ref.current) {

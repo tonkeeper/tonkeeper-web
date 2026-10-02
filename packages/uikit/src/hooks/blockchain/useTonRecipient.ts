@@ -15,7 +15,7 @@ export function useTonRecipient(address: string): {
     useEffect(() => {
         isFirstRender.current = false;
         mutateRecipient({ address });
-    }, [address]);
+    }, [address, mutateRecipient]);
     const recipient = useMemo(
         () => ({
             address: {
@@ -26,7 +26,7 @@ export function useTonRecipient(address: string): {
             done: false,
             toAccount: toAccount!
         }),
-        [toAccount, network]
+        [toAccount, network, address]
     );
 
     return {

@@ -66,7 +66,7 @@ const useDrawConnector = () => {
         if (left !== params?.$left || top !== params?.$top || right !== params?.$right) {
             setParams({ $left: left, $top: top, $right: right });
         }
-    });
+    }, [isFullWidth, params?.$left, params?.$top, params?.$right]);
 
     return {
         ref1,

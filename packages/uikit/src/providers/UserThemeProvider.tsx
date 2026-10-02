@@ -80,7 +80,7 @@ export const UserThemeProvider: FC<
         if (currentTheme && uiPreferences && currentThemeName !== uiPreferences.theme) {
             mutateAsync({ theme: currentThemeName as 'dark' | 'pro' });
         }
-    }, [mutateAsync, currentThemeName, uiPreferences]);
+    }, [mutateAsync, currentThemeName, uiPreferences, currentTheme]);
 
     if (!isUIPreferencesLoaded || (isPro === undefined && isProSupported)) {
         return <div></div>;

@@ -134,7 +134,7 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
     const isSuitableAccount = account.type === 'mnemonic' || account.type === 'mam';
     const serviceConfig = useTwoFAServiceConfig();
 
-    const isEnabled = isSuitableAccount && wallet.version == WalletVersion.V5R1;
+    const isEnabled = isSuitableAccount && wallet.version === WalletVersion.V5R1;
 
     const query = useQuery<TwoFAWalletConfig>(
         [QueryKey.twoFAWalletConfig, wallet.id],
@@ -362,7 +362,7 @@ export const useIsTwoFARemovingProcess = () => {
         ) {
             queryClient.setQueryData([QueryKey.twoFARemovingProcess, wallet.id], false);
         }
-    }, [config, wallet.id]);
+    }, [config, wallet.id, queryClient]);
 
     return useQuery(
         [QueryKey.twoFARemovingProcess, wallet.id],

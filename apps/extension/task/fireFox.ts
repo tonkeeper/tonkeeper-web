@@ -3,7 +3,7 @@ import { ExtensionBuilder, notify } from './extension-builder';
 const updateFireFoxManifest = (builder: ExtensionBuilder) => {
     const manifestFFData = builder.readManifest();
 
-    manifestFFData.version = builder.version;
+    builder.applyManifestVersion(manifestFFData);
     manifestFFData.background = {
         scripts: ['background.js']
     };

@@ -1,5 +1,6 @@
 import { Address } from '@ton/core';
-import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC } from 'react';
@@ -130,14 +131,14 @@ export const FeeListItem: FC<{ feeAmount: string; fiatFeeAmount?: string }> = ({
                         right
                         text={
                             <>
-                                {feeAmount} {CryptoCurrency.TON}
+                                {feeAmount} {BRAND_CONFIG.coinSymbolWithEx}
                             </>
                         }
                         secondary={<>≈&thinsp;{fiatFeeAmount}</>}
                     />
                 ) : (
                     <Label1>
-                        {feeAmount} {CryptoCurrency.TON}
+                        {feeAmount} {BRAND_CONFIG.coinSymbolWithEx}
                     </Label1>
                 )}
             </ListItemPayload>

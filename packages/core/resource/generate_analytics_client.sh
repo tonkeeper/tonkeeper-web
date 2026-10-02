@@ -36,7 +36,7 @@ git clone --depth 1 \
     "$TMP/schemas" >/dev/null 2>&1
 
 node "$SCRIPT_DIR/preprocess-analytics-schemas.js" \
-    "$TMP/schemas/openapi" \
+    "$TMP/schemas/openapi-client" \
     "$TMP/preprocessed"
 
 npx @redocly/cli bundle \
@@ -53,7 +53,7 @@ npx openapi-typescript-codegen \
 node "$SCRIPT_DIR/prune-redundant-aliases.js" "$GENERATED_DIR"
 
 node "$SCRIPT_DIR/generate-analytics-wrapper.js" \
-    "$TMP/schemas/openapi" \
+    "$TMP/schemas/openapi-client" \
     "$WRAPPER_OUT"
 
 echo "analytics types regenerated: $GENERATED_DIR + $WRAPPER_OUT"

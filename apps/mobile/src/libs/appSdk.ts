@@ -169,7 +169,9 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
         return value;
     }
 
-    version = packageJson.version ?? 'Unknown';
+    // Temporary: strip semver pre-release suffix (e.g. "4.7.0-rc.1" -> "4.7.0") so
+    // backend `build` parameter is purely numeric. Revert when backends accept it.
+    version = (packageJson.version ?? 'Unknown').replace(/[-+].*$/, '');
 
     targetEnv = CAPACITOR_APPLICATION_ID;
 

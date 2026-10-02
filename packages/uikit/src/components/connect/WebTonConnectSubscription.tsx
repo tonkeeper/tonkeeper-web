@@ -179,8 +179,10 @@ const WebTonConnectSubscription = () => {
         lastEventId,
         disconnect,
         setRequest,
+        setActiveWallet,
         badRequestResponse,
-        mainnetConfig.ton_connect_bridge
+        mainnetConfig.ton_connect_bridge,
+        wallet.rawAddress
     ]);
 
     const handleClose = useCallback(
@@ -199,7 +201,7 @@ const WebTonConnectSubscription = () => {
                 JSON.stringify({ event: 'close-tx-confirmation', id: request.id })
             );
         },
-        [request, setRequest]
+        [request, setRequest, sendResponse]
     );
 
     useEffect(() => {

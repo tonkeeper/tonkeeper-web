@@ -1,4 +1,5 @@
 import styled, { css, useTheme } from 'styled-components';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Body1Class, Body2Class, Body3, Body3Class, Label1Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -375,7 +376,7 @@ const FeeTable = () => {
             )}
             {isTronEnabled && (
                 <TableRowTemplate
-                    heading="Toncoin"
+                    heading={BRAND_CONFIG.coinName}
                     formattedBalance={tonBalance?.stringAssetRelativeAmount}
                     transfersNumber={tonTransfers}
                     fiatPerTransfer={tonSenderFee.fiatAmount}

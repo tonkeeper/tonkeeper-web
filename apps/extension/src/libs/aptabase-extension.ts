@@ -11,7 +11,7 @@ export class AptabaseExtension implements Analytics {
     init = (params: {
         application: string;
         walletType: string;
-        activeAccount: Account;
+        activeAccount?: Account;
         accounts: Account[];
         network?: Network;
     }) => {

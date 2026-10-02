@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- dev/debug tooling */
 import { useEffect } from 'react';
 
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -151,5 +152,5 @@ export const useDebuggingTools = () => {
                 }
             };
         }
-    }, [api, activeAccount, getSigner, metaEncryptionMap]);
+    }, [api, activeAccount, getSigner, metaEncryptionMap, sdk.storage]);
 };

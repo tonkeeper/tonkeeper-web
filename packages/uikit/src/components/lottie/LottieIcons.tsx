@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react';
 
+/* eslint-disable import/extensions -- adjacent .json files confuse the default resolver into thinking these resolve to JSON; they resolve to .tsx */
 const Check = React.lazy(() => import('./Check'));
 const Gear = React.lazy(() => import('./Gear'));
 const Write = React.lazy(() => import('./Write'));
+/* eslint-enable import/extensions */
 
 const Fallback = () => {
     return <div style={{ width: '160px', height: '160px' }}></div>;

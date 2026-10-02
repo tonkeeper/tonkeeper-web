@@ -27,7 +27,7 @@ export const Localization = () => {
             icon: language === i18n.language ? <CheckIcon /> : undefined,
             action: () => mutateAsync(localizationFrom(language))
         }));
-    }, [i18n.language, mutateAsync]);
+    }, [i18n.language, i18n.languages, mutateAsync]);
 
     if (isProDisplay) {
         return (

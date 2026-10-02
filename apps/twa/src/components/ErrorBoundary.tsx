@@ -1,4 +1,5 @@
 import React, { PropsWithChildren } from 'react';
+import { reportStubError } from '../libs/errorReporter';
 
 export default class StandardErrorBoundary extends React.Component<
     PropsWithChildren,
@@ -26,12 +27,12 @@ export default class StandardErrorBoundary extends React.Component<
 
     // defines what to do when an error gets caught
     componentDidCatch(error: Error, errorInfo: any) {
-        // log the error
-        console.log('Error caught!');
         console.error(error);
         console.error(errorInfo);
 
-        // record the error in an APM tool...
+        // A render crash blanks the whole stub, so it's the highest-signal
+        // failure to report; no-op until the Loader has registered a reporter.
+        reportStubError('fatal', error.message);
     }
 
     render() {

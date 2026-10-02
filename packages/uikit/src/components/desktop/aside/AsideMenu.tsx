@@ -198,7 +198,7 @@ export const AsideMenuDNDItem = forwardRef<
         } else {
             scrollToTop();
         }
-    }, [location.pathname, menuController]);
+    }, [location.pathname, menuController, navigate]);
 
     const onClickWallet = useCallback(
         async (walletId: WalletId) => {
@@ -329,7 +329,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                 scrollToTop();
             }
         },
-        [location.pathname, hideBrowser]
+        [location.pathname, hideBrowser, navigate, menuController]
     );
 
     const [asideWidth, setAsideWidth] = useState(250);

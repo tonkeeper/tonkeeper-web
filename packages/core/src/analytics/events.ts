@@ -74,6 +74,11 @@ import type { TradeSearchClickSchema } from './generated/models/TradeSearchClick
 import type { TradeSearchSchema } from './generated/models/TradeSearchSchema';
 import type { TradeStartedSchema } from './generated/models/TradeStartedSchema';
 import type { TransactionSentSchema } from './generated/models/TransactionSentSchema';
+import type { TwaSunsetDownloadClickSchema } from './generated/models/TwaSunsetDownloadClickSchema';
+import type { TwaSunsetOpenSchema } from './generated/models/TwaSunsetOpenSchema';
+import type { TwaSunsetRevealStartSchema } from './generated/models/TwaSunsetRevealStartSchema';
+import type { TwaSunsetRevealSuccessSchema } from './generated/models/TwaSunsetRevealSuccessSchema';
+import type { TwaSunsetSignOutSchema } from './generated/models/TwaSunsetSignOutSchema';
 import type { WalletOpenSchema } from './generated/models/WalletOpenSchema';
 import type { WithdrawClickAssetSchema } from './generated/models/WithdrawClickAssetSchema';
 import type { WithdrawClickFiatAssetSchema } from './generated/models/WithdrawClickFiatAssetSchema';
@@ -388,6 +393,26 @@ export type AnalyticsEventTransactionSent = Omit<TransactionSentSchema, 'eventNa
     eventName: 'transaction_sent';
 };
 
+export type AnalyticsEventTwaSunsetDownloadClick = Omit<TwaSunsetDownloadClickSchema, 'eventName'> & {
+    eventName: 'twa_sunset_download_click';
+};
+
+export type AnalyticsEventTwaSunsetOpen = Omit<TwaSunsetOpenSchema, 'eventName'> & {
+    eventName: 'twa_sunset_open';
+};
+
+export type AnalyticsEventTwaSunsetRevealStart = Omit<TwaSunsetRevealStartSchema, 'eventName'> & {
+    eventName: 'twa_sunset_reveal_start';
+};
+
+export type AnalyticsEventTwaSunsetRevealSuccess = Omit<TwaSunsetRevealSuccessSchema, 'eventName'> & {
+    eventName: 'twa_sunset_reveal_success';
+};
+
+export type AnalyticsEventTwaSunsetSignOut = Omit<TwaSunsetSignOutSchema, 'eventName'> & {
+    eventName: 'twa_sunset_sign_out';
+};
+
 export type AnalyticsEventWalletOpen = Omit<WalletOpenSchema, 'eventName'> & {
     eventName: 'wallet_open';
 };
@@ -546,6 +571,11 @@ export type AnalyticsEvent =
     | AnalyticsEventTradeSearch
     | AnalyticsEventTradeStarted
     | AnalyticsEventTransactionSent
+    | AnalyticsEventTwaSunsetDownloadClick
+    | AnalyticsEventTwaSunsetOpen
+    | AnalyticsEventTwaSunsetRevealStart
+    | AnalyticsEventTwaSunsetRevealSuccess
+    | AnalyticsEventTwaSunsetSignOut
     | AnalyticsEventWalletOpen
     | AnalyticsEventWithdrawClickAsset
     | AnalyticsEventWithdrawClickFiatAsset

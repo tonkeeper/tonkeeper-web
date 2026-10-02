@@ -71,12 +71,12 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     const onStartConnection = useCallback(() => {
         resetConnection();
         connectLedger();
-    }, []);
+    }, [resetConnection, connectLedger]);
 
     const onConnectionPageClosed = useCallback(() => {
         resetConnection();
         connectLedger({ skipOpenConnectionPage: true });
-    }, []);
+    }, [resetConnection, connectLedger]);
 
     useEffectOnLedgerConnectionPageClosed(onConnectionPageClosed);
 
@@ -84,13 +84,13 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         return () => {
             sdk.ledgerConnectionPage?.close();
         };
-    }, []);
+    }, [sdk.ledgerConnectionPage]);
 
     useEffect(() => {
         onStartConnection();
 
         return resetConnection;
-    }, []);
+    }, [onStartConnection, resetConnection]);
 
     useEffect(() => {
         if (tonTransport) {
@@ -173,15 +173,21 @@ const CheckboxStyled = styled(Checkbox)`
     padding-top: 0 !important;
 `;
 
+// How many derivation indexes (0..N-1) to query from the device during Ledger import.
+// Each index needs a Ledger getAddress round-trip, so N is a tradeoff: large enough to
+// cover wallets users keep on higher indexes, small enough that import stays responsive
+// and the selection list stays usable.
+const LEDGER_IMPORT_ACCOUNTS_COUNT = 20;
+
 const ChooseLedgerAccounts: FC<{
     tonTransport: LedgerTonTransport;
     onCancel: () => void;
     afterCompleted: () => void;
 }> = ({ tonTransport, onCancel, afterCompleted }) => {
     const { t } = useTranslation();
-    const totalAccounts = 10;
-    const { mutateAsync: getLedgerWallets, data: ledgerAccountData } =
-        useLedgerWallets(totalAccounts);
+    const { mutateAsync: getLedgerWallets, data: ledgerAccountData } = useLedgerWallets(
+        LEDGER_IMPORT_ACCOUNTS_COUNT
+    );
     const [selectedIndexes, setSelectedIndexes] = useState<Record<number, boolean>>({});
 
     const { mutateAsync: addAccountsMutation, isLoading: isAdding } = useAddLedgerAccountMutation();
@@ -190,7 +196,7 @@ const ChooseLedgerAccounts: FC<{
 
     useEffect(() => {
         getLedgerWallets(tonTransport).then(data => setSelectedIndexes(data.preselectedIndexes));
-    }, [tonTransport]);
+    }, [tonTransport, getLedgerWallets]);
 
     const chosenSomeAccounts = !!Object.values(selectedIndexes).filter(Boolean).length;
 

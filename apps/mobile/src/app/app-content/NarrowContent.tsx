@@ -13,6 +13,7 @@ import {
     StakingRoute,
     WalletSettingsRoute
 } from '@tonkeeper/uikit/dist/libs/routes';
+import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
@@ -182,7 +183,7 @@ const NarrowContentInitialPagesLock = () => {
                     setTimeout(() => setFaceIdValidation(undefined), 200);
                 });
         }
-    }, [biometry]);
+    }, [biometry, sdk.keychain, sdk.uiEvents]);
 
     const { mutateAsync: mutateLogOut } = useMutateDeleteAll();
     const accounts = useAccountsState();
@@ -276,6 +277,7 @@ const NarrowContentAppRouting = () => {
                             />
 
                             <Route path={AppRoute.activity} component={DesktopHistoryPage} />
+                            <Route path={AppRoute.browser} component={DesktopBrowser} />
                             <Route path={AppRoute.purchases} component={DesktopCollectables} />
                             <Route path={AppRoute.dns} component={DesktopDns} />
                             <Route

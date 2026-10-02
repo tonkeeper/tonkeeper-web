@@ -48,7 +48,6 @@ export class SessionCrypto {
     public decrypt(message: Buffer, senderPublicKey: Buffer): string {
         const nonce = message.subarray(0, this.nonceLength);
         const internalMessage = message.subarray(this.nonceLength);
-        console.log('senderPublicKey', senderPublicKey.length);
 
         const decrypted = nacl.box.open(
             internalMessage,
@@ -58,9 +57,7 @@ export class SessionCrypto {
         );
 
         if (!decrypted) {
-            throw new Error(
-                `Decryption error: \n message: ${message.toString()} \n sender pubkey: ${senderPublicKey.toString()} \n keypair pubkey: ${this.keyPair.publicKey.toString()} \n keypair secretkey: ${this.keyPair.secretKey.toString()}`
-            );
+            throw new Error('TON Connect decryption failed: AEAD tag mismatch');
         }
 
         return new TextDecoder().decode(decrypted);

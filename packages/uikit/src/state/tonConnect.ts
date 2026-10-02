@@ -139,7 +139,7 @@ export const useInjectedDappConnectionByOrigin = (origin: string | undefined) =>
             const data = origin ? getInjectedDappConnection(query.data, origin) : undefined;
             return { ...query, data };
         }
-    }, [query.data, origin]);
+    }, [query, origin]);
 };
 
 export const useGetTonConnectConnectResponse = () => {

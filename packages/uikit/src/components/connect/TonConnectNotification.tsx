@@ -11,7 +11,7 @@ import {
     getManifest,
     getTonConnectPlatform
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -110,12 +110,6 @@ const ConnectContent: FC<{
     const [done, setDone] = useState(false);
 
     const { t } = useTranslation();
-
-    useEffect(() => {
-        if (sdk.twaExpand) {
-            sdk.twaExpand();
-        }
-    }, []);
 
     const [error, setError] = useState<Error | null>(null);
     const { mutateAsync, isLoading } = useGetTonConnectConnectResponse();

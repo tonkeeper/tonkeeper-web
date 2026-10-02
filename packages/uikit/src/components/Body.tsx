@@ -93,7 +93,7 @@ export const useWindowsScroll = (addHidden = true) => {
             window.removeEventListener('scroll', handler);
             sdk.uiEvents.off('loading', handler);
         };
-    }, [standalone]);
+    }, [standalone, addHidden, ios, sdk.uiEvents]);
 };
 
 export const useAppSelection = (elementRef: React.MutableRefObject<HTMLDivElement | null>) => {
@@ -178,8 +178,6 @@ export const InnerBody = React.forwardRef<
             timer = setTimeout(function () {
                 document.body.classList.remove('scroll');
             }, 300);
-
-            sdk.twaExpand && sdk.twaExpand();
         }, 50);
 
         element.addEventListener('scroll', handlerScroll);
@@ -195,7 +193,7 @@ export const InnerBody = React.forwardRef<
 
             element.removeEventListener('scroll', handlerScroll);
         };
-    }, [elementRef]);
+    }, [elementRef, sdk, standalone]);
 
     const selection = useAppSelection(elementRef);
     const id = standalone ? 'body' : undefined;

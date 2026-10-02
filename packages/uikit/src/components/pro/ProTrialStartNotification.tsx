@@ -73,7 +73,7 @@ const ProTrialStartContent: FC<{
         if (isTrialSuccess) {
             onClose(true);
         }
-    }, [isTrialSuccess]);
+    }, [isTrialSuccess, onClose]);
 
     const handleChooseWallet = (id: string) => {
         if (isSelectLoading) return;

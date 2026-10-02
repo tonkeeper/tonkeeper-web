@@ -167,7 +167,9 @@ export class CapacitorFileLogger {
         if (!this.isConsoleOverridden) {
             const methods = ['log', 'error', 'warn', 'info', 'debug'] as const;
             methods.forEach(method => {
+                // eslint-disable-next-line no-console -- this is the logger that proxies console
                 const original = console[method]?.bind(console);
+                // eslint-disable-next-line no-console -- this is the logger that proxies console
                 console[method] = (...args: unknown[]) => {
                     this.write(method.toUpperCase(), args);
                     original(...args);

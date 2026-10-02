@@ -60,7 +60,7 @@ export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
         }
 
         setIsReady(true);
-    }, [sdk, lang, isOnReview]);
+    }, [sdk, lang, isOnReview, onProConfirmOpen, onRemoveExtensionConfirmOpen]);
 
     return isReady ? <>{children}</> : null;
 };

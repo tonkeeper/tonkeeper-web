@@ -54,12 +54,12 @@ export const ConfirmDiscardNotificationControlled = () => {
     const onContinue = useCallback(() => {
         onClose();
         params?.onClose(false);
-    }, [onClose, params?.onClose]);
+    }, [onClose, params]);
 
     const onDiscard = useCallback(() => {
         onClose();
         params?.onClose(true);
-    }, [onClose, params?.onClose]);
+    }, [onClose, params]);
 
     return (
         <NotificationStyled isOpen={isOpen} handleClose={onContinue}>

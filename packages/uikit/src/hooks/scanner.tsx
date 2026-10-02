@@ -13,7 +13,7 @@ export const useScanner = (initScan: number | null, onSubmit: (result: string) =
                 params: undefined
             });
         }
-    }, [scanId]);
+    }, [scanId, sdk.uiEvents]);
 
     useEffect(() => {
         const handler = (options: {

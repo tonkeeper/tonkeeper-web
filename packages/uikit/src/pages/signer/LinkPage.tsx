@@ -11,7 +11,7 @@ const SignerLinkPage = () => {
         const publicKey = searchParams.get('pk');
         const name = searchParams.get('name');
         mutate({ publicKey, name, source: 'deeplink' });
-    }, [searchParams]);
+    }, [searchParams, mutate]);
 
     return <Loading />;
 };

@@ -42,7 +42,7 @@ export const useKeystoneScanner = (initScan: number | null, onSubmit: (result: U
         return () => {
             sdk.uiEvents.off('response', handler);
         };
-    }, [sdk, scanId, onSubmit, requestQrCode]);
+    }, [sdk, scanId, onSubmit, requestQrCode, urDecoder]);
 
     return useCallback(() => {
         setScanId(Date.now());

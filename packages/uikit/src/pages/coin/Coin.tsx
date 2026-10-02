@@ -20,7 +20,7 @@ const CoinPage = () => {
         if (!name) {
             navigate(AppRoute.home);
         }
-    }, [name]);
+    }, [name, navigate]);
 
     if (!name) return <></>;
 

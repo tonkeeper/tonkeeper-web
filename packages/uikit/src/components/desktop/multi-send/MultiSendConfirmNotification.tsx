@@ -146,7 +146,7 @@ const MultiSendConfirmContent: FC<{
     );
     const { willBeSent, willBeSentBN, bnAmounts } = useMemo(
         () => getWillBeMultiSendValue(form.rows, asset, rate || { prices: 0 }),
-        [form.rows, asset, rate?.prices]
+        [form.rows, asset, rate]
     );
 
     const formTokenized = useMemo(() => {
@@ -203,7 +203,7 @@ const MultiSendConfirmContent: FC<{
         if (availableSendersChoices) {
             onSenderTypeChange(availableSendersChoices[0].type);
         }
-    }, [JSON.stringify(availableSendersChoices), mutation.isIdle]);
+    }, [JSON.stringify(availableSendersChoices), mutation.isIdle]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>

@@ -38,17 +38,17 @@ export function useEstimateTransfer({
             return undefined;
         }
 
-        senderType = senderType as TonSenderTypeUserAvailable;
+        const tonSenderType = senderType as TonSenderTypeUserAvailable;
 
-        if (senderType === 'external') {
+        if (tonSenderType === 'external') {
             return EXTERNAL_SENDER_CHOICE;
         }
 
-        if (senderType === 'battery') {
+        if (tonSenderType === 'battery') {
             return BATTERY_SENDER_CHOICE;
         }
 
-        if (senderType === 'gasless') {
+        if (tonSenderType === 'gasless') {
             if (!isTonAsset(amount.asset)) {
                 throw new Error('Unexpected asset');
             }
@@ -59,7 +59,7 @@ export function useEstimateTransfer({
             } as const;
         }
 
-        assertUnreachable(senderType);
+        assertUnreachable(tonSenderType);
     }, [senderType, amount]);
 
     const getSender = useGetEstimationSender(tonSenderChoice);

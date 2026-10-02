@@ -255,7 +255,7 @@ export const ConfirmNftView: FC<{
         if (availableSendersChoices) {
             onSenderTypeChange(availableSendersChoices[0].type);
         }
-    }, [JSON.stringify(availableSendersChoices), isIdle]);
+    }, [JSON.stringify(availableSendersChoices), isIdle]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const image = nftItem.previews?.find(item => item.resolution === '100x100');
 

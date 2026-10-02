@@ -66,5 +66,5 @@ export const useExtensionBalanceVerification = () => {
                 console.error('Failed to verify balance for extension: ', e);
             }
         })();
-    }, [subscription]);
+    }, [subscription, api, sdk, onOpen]);
 };

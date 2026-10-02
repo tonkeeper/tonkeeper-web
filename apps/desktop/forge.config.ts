@@ -17,10 +17,13 @@ import { existsSync, readdirSync, renameSync, rmSync, unlinkSync } from 'fs';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 import { mainWindowName } from './src/constants';
+import { getRequestedArchitecture } from './src/forgeCli';
 
 const isDev = process.env.NODE_ENV === 'development';
 const isPrerelease = process.env.GITHUB_REF_NAME?.includes('-') ?? false;
 const githubToken = process.env.GITHUB_TOKEN;
+const requestedArchitecture = getRequestedArchitecture(process.argv);
+const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 
 // Bundle libsecret + transitive deps into the AppImage so it runs on systems
 // where libsecret is not preinstalled. See github.com/tonkeeper/tonkeeper-web/issues/374
@@ -28,10 +31,9 @@ function bundleLibsecretIntoAppImage(appImagePath: string) {
     const workDir = path.dirname(appImagePath);
     const linuxdeploy = process.env.LINUXDEPLOY_PATH || 'linuxdeploy';
     const libsecret = process.env.LIBSECRET_PATH || '/usr/lib/x86_64-linux-gnu/libsecret-1.so.0';
-    const isRequired = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 
     const skipOrThrow = (message: string) => {
-        if (isRequired) throw new Error(message);
+        if (isCI) throw new Error(message);
         console.warn(`[libsecret bundling] ${message}, skipping ${appImagePath}`);
     };
 
@@ -68,7 +70,16 @@ function bundleLibsecretIntoAppImage(appImagePath: string) {
             '--output',
             'appimage'
         ],
-        { cwd: workDir, stdio: 'inherit' }
+        {
+            cwd: workDir,
+            stdio: 'inherit',
+            env: {
+                ...process.env,
+                LD_LIBRARY_PATH: [path.join(appDir, 'usr', 'lib'), process.env.LD_LIBRARY_PATH]
+                    .filter(Boolean)
+                    .join(path.delimiter)
+            }
+        }
     );
     if (deploy.status !== 0) throw new Error('linuxdeploy --output appimage failed');
 
@@ -181,7 +192,7 @@ const config: ForgeConfig = {
             },
             ['linux']
         ),
-        ...(['x64', 'arm64'].includes(process.argv[3])
+        ...(requestedArchitecture === 'x64'
             ? [
                   new MakerAppImage(
                       {
@@ -224,6 +235,21 @@ const config: ForgeConfig = {
     ],
     hooks: {
         postMake: async (_config, makeResults) => {
+            const linuxX64AppImages = makeResults
+                .filter(result => result.platform === 'linux' && result.arch === 'x64')
+                .flatMap(result =>
+                    result.artifacts.filter(artifact => artifact.endsWith('.AppImage'))
+                );
+
+            if (
+                isCI &&
+                process.platform === 'linux' &&
+                requestedArchitecture === 'x64' &&
+                linuxX64AppImages.length === 0
+            ) {
+                throw new Error('Linux x64 CI build did not produce an AppImage');
+            }
+
             for (const result of makeResults) {
                 if (result.platform !== 'linux' || result.arch !== 'x64') continue;
                 for (const artifact of result.artifacts) {

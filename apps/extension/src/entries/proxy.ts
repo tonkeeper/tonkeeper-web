@@ -14,10 +14,6 @@ export interface DisabledProxyConfiguration {
     enabled: false;
 }
 
-export const DisabledProxyConfiguration: ProxyConfiguration = {
-    enabled: false
-};
-
 /**
  * Source: https://ton.org/docs/#/web3/sites-and-proxy?id=running-entry-proxy
  */

@@ -4,6 +4,7 @@ import { Notification } from '../../Notification';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 import { Button } from '../../fields/Button';
+import { useTranslation } from '../../../hooks/translation';
 
 const NotificationBodyStyled = styled.div`
     display: flex;
@@ -41,15 +42,14 @@ export const SaveListNotification: FC<{
     willDiscard: boolean;
 }> = ({ isOpen, onCancel, onSave, listName, rowsNumber, totalValue, willDiscard }) => {
     const [inputValue, setInputValue] = useState(listName);
+    const { t } = useTranslation();
 
     return (
         <Notification isOpen={isOpen} handleClose={onCancel}>
             {() => (
                 <NotificationBodyStyled>
-                    <Label1>Save this List?</Label1>
-                    <Body2Secondary>
-                        Save the list with addresses, amounts, and comments for future use.
-                    </Body2Secondary>
+                    <Label1>{t('multi_send_save_title')}</Label1>
+                    <Body2Secondary>{t('multi_send_save_description')}</Body2Secondary>
                     <NameInput
                         inputValue={inputValue}
                         rowsNumber={rowsNumber}
@@ -58,10 +58,10 @@ export const SaveListNotification: FC<{
                     />
                     <ButtonsContainer>
                         <Button secondary onClick={onCancel}>
-                            {willDiscard ? 'Discard and Close' : 'Close'}
+                            {willDiscard ? t('multi_send_discard_and_close') : t('close')}
                         </Button>
                         <Button primary disabled={!inputValue} onClick={() => onSave(inputValue)}>
-                            Save
+                            {t('save')}
                         </Button>
                     </ButtonsContainer>
                 </NotificationBodyStyled>
@@ -97,6 +97,8 @@ const NameInput: FC<{
         }
     }, []);
 
+    const { t } = useTranslation();
+
     return (
         <InputBlockStyled valid={inputValue !== ''} focus={focus}>
             <InputFieldRegular
@@ -110,7 +112,9 @@ const NameInput: FC<{
                 placeholder="List name"
             />
             <InputRight>
-                <Body2>{rowsNumber}&nbsp;wallets</Body2>
+                <Body2>
+                    {rowsNumber}&nbsp;{t('multi_send_wallets')}
+                </Body2>
                 &nbsp;
                 <Dot>·</Dot>
                 &nbsp;

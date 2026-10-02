@@ -63,7 +63,7 @@ export const Notifications = () => {
                 setData(newData);
             }
         }
-    }, [backgroundEvent]);
+    }, [backgroundEvent, data, interceptTonLinks, processOpenedLink]);
 
     const { mutateAsync: completeInjectedConnection } = useCompleteInjectedConnection();
 

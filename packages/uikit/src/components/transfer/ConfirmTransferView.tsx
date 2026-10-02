@@ -31,8 +31,8 @@ import styled from 'styled-components';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
-import { useNavigate } from '../../hooks/router/useNavigate';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
+import { NotEnoughBatteryBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBatteryBalanceError';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     const k = asset.id === TON_USDT_ASSET.id ? 0.9 : 0.5;
@@ -97,12 +97,19 @@ export const ConfirmTransferView: FC<
         rest.recipient.address.address,
         assetAmount
     );
+    const [isBatteryUnavailable, setIsBatteryUnavailable] = useState(false);
+    const availableTonSenderChoicesFiltered = useMemo(() => {
+        if (!isBatteryUnavailable) {
+            return availableTonSendersChoices;
+        }
+
+        return availableTonSendersChoices?.filter(choice => choice.type !== 'battery');
+    }, [availableTonSendersChoices, isBatteryUnavailable]);
     const availableSenderChoices = isTonBlockchainAssetTransfer
-        ? availableTonSendersChoices
+        ? availableTonSenderChoicesFiltered
         : availableTronSendersChoices;
 
     const [selectedSenderType, setSelectedSenderType] = useState<AllChainsSenderType>();
-    const navigate = useNavigate();
 
     const onSenderTypeChange = useCallback(
         (type: AllChainsSenderType) => {
@@ -120,7 +127,7 @@ export const ConfirmTransferView: FC<
                 return setSelectedSenderType(type);
             }
         },
-        [availableSenderChoices, navigate, rest.onClose]
+        [availableSenderChoices]
     );
 
     const estimation = useEstimateTransfer({
@@ -137,18 +144,38 @@ export const ConfirmTransferView: FC<
         senderType: selectedSenderType!
     });
 
+    const availableTonSenderChoicesFilteredKey = JSON.stringify(availableTonSenderChoicesFiltered);
+    const availableTronSendersChoicesKey = JSON.stringify(availableTronSendersChoices);
+
+    useEffect(() => {
+        setIsBatteryUnavailable(false);
+    }, [rest.recipient, assetAmount, isMax]);
+
+    useEffect(() => {
+        if (
+            selectedSenderType !== 'battery' ||
+            !(estimation.error instanceof NotEnoughBatteryBalanceError)
+        ) {
+            return;
+        }
+
+        setIsBatteryUnavailable(true);
+        setSelectedSenderType('external');
+    }, [selectedSenderType, estimation.error]);
+
     useEffect(() => {
         if (!mutation.isIdle || !isTonBlockchainAssetTransfer || selectedSenderType) {
             return;
         }
 
-        if (availableTonSendersChoices) {
-            setSelectedSenderType(availableTonSendersChoices[0].type);
+        if (availableTonSenderChoicesFiltered) {
+            setSelectedSenderType(availableTonSenderChoicesFiltered[0].type);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         selectedSenderType,
         isTonBlockchainAssetTransfer,
-        JSON.stringify(availableTonSendersChoices),
+        availableTonSenderChoicesFilteredKey,
         mutation.isIdle
     ]);
     useEffect(() => {
@@ -160,10 +187,11 @@ export const ConfirmTransferView: FC<
         if (choice?.isEnoughBalance) {
             return setSelectedSenderType(choice.type);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         selectedSenderType,
         isTonBlockchainAssetTransfer,
-        JSON.stringify(availableTronSendersChoices),
+        availableTronSendersChoicesKey,
         mutation.isIdle
     ]);
 
@@ -195,6 +223,8 @@ export const ConfirmTransferView: FC<
         }
     );
 
+    const assetWeiBalanceKey = assetWeiBalance?.toFixed(0);
+
     useEffect(() => {
         if (!shouldPatchAmount) {
             return setAssetAmountPatched(assetAmount);
@@ -211,7 +241,8 @@ export const ConfirmTransferView: FC<
                 weiAmount: assetWeiBalance.minus(fee.weiAmount)
             })
         );
-    }, [isMax, assetAmount, selectedSenderType, assetWeiBalance?.toFixed(0), tokenToTonRate.data]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isMax, assetAmount, selectedSenderType, assetWeiBalanceKey, tokenToTonRate.data]);
 
     const noAvailableTronSenders = (
         availableSenderChoices as (TonSenderChoiceUserAvailable | TronSenderOption)[]

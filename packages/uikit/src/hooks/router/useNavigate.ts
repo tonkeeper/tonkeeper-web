@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useShouldReplaceNav } from './useShouldReplaceNav';
 import { useIonRouter } from '@ionic/react';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 
@@ -9,7 +8,6 @@ export const ionRouterAnimation$ = atom(true);
 export const useNavigate = () => {
     const history = useHistory();
     const location = useLocation();
-    const replaceNavigate = useShouldReplaceNav();
     const ionRouter = useIonRouter();
     return useCallback(
         (
@@ -79,6 +77,6 @@ export const useNavigate = () => {
                 }
             }
         },
-        [history, location, replaceNavigate, ionRouter]
+        [history, location, ionRouter]
     );
 };

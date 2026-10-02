@@ -1,4 +1,5 @@
 import { css, styled } from 'styled-components';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Body2, Body3 } from '../../../Text';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useTranslation } from '../../../../hooks/translation';
@@ -21,7 +22,7 @@ const TDBasic = styled.div<{ borderBottom?: boolean }>`
     ${p =>
         p.borderBottom &&
         css`
-            border-bottom: 1px solid ${p => p.theme.separatorCommon};
+            border-bottom: 1px solid ${p.theme.separatorCommon};
         `};
     border-right: 1px solid ${p => p.theme.separatorCommon};
 `;
@@ -93,6 +94,7 @@ export const ImportListTable = () => {
             <TD corner="top-right">
                 <Body2Secondary>D</Body2Secondary>
             </TD>
+            {/* eslint-disable i18next/no-literal-string -- example row showing what the import format looks like */}
             <TD>
                 <Body2>UQD2NmD_lH5f5u1Kj3KfGyTvhZSX0Eg6qp2a5IQUKXxOGzCi</Body2>
             </TD>
@@ -100,7 +102,7 @@ export const ImportListTable = () => {
                 <Body2>1000{getDecimalSeparator()}01</Body2>
             </TD>
             <TD>
-                <Body2>TON</Body2>
+                <Body2>{BRAND_CONFIG.coinSymbolWithEx}</Body2>
             </TD>
             <TD>
                 <Body2>Salary</Body2>
@@ -126,6 +128,7 @@ export const ImportListTable = () => {
             <TD borderBottom>
                 <Body2>UQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_p0p</Body2>
             </TD>
+            {/* eslint-enable i18next/no-literal-string */}
             <TD corner="bottom-right" borderBottom>
                 <Body2Tertiary>{t('import_multisend_table_comment')}</Body2Tertiary>
             </TD>

@@ -425,13 +425,6 @@ const StakingModalContent: FC<{
         senderChoice
     });
 
-    useEffect(() => {
-        if (sdk.twaExpand) {
-            sdk.twaExpand();
-            sdk.hapticNotification('success');
-        }
-    }, []);
-
     const amountBN = useMemo(() => {
         const bn = new BigNumber(amount);
         return bn.isNaN() ? new BigNumber(0) : bn;

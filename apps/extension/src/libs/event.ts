@@ -25,7 +25,7 @@ export type NotificationFields<Kind extends string, Value> = {
     logo?: string;
     origin: string;
     data: Value;
-} & (Kind extends 'tonConnectRequest' | 'tonLinkIntercept' ? {} : { manifest: DAppManifest });
+} & (Kind extends 'tonConnectRequest' | 'tonLinkIntercept' ? unknown : { manifest: DAppManifest });
 
 export type NotificationData =
     | NotificationFields<'tonConnectRequest', ConnectRequest>
@@ -46,6 +46,8 @@ export interface PupUpEvents {
     trackEvent: TrackEvent;
 }
 
+// generic popup-response channel: each emitter/listener pair owns its own payload shape
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface PayloadRequest<P = any> {
     id: number;
     payload: P;
@@ -55,7 +57,7 @@ export interface UserProperties {
     application: string;
     walletType: string;
     accounts: Account[];
-    activeAccount: Account;
+    activeAccount?: Account;
     network?: Network;
     aptabaseEndpoint: string;
     aptabaseKey: string;
@@ -63,7 +65,7 @@ export interface UserProperties {
 
 export interface TrackEvent {
     name: string;
-    params: Record<string, any>;
+    params: Record<string, string | number | boolean>;
 }
 
 export interface BackgroundEvents {

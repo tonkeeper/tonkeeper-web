@@ -60,7 +60,7 @@ export const EmojisList: FC<{ onClick: (emoji: string) => void; keepShortListFor
             if (keepShortListForMS) {
                 setTimeout(() => setEmojisList(emojis), keepShortListForMS);
             }
-        }, []);
+        }, [keepShortListForMS]);
 
         return (
             <EmojisListScroll>

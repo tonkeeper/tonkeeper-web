@@ -1,4 +1,4 @@
-import './global.d.ts';
+import './global';
 import type { ITonConnectInjectedBridge } from '@tonkeeper/core/dist/entries/tonConnect';
 import { MobileInjectedBridge } from './ton-connect';
 import { setupHistoryNotifier } from './history-notifier';
@@ -20,4 +20,4 @@ window.tonkeeper = {
 
 setupHistoryNotifier();
 
-console.log('Tonkeeper Pro inject script loaded');
+console.info('Tonkeeper Pro inject script loaded');

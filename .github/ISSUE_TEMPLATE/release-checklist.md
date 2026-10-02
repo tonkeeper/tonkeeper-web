@@ -55,27 +55,34 @@ assignees: ''
 - [ ] Release tag pushed (`v[VERSION]`)
 - [ ] Release workflow completed successfully
 - [ ] Web production deployed: https://wallet.tonkeeper.com
+- [ ] Web update date/time (UTC) set: `YYYY-MM-DD HH:mm`
 - [ ] GitHub release published and marked as latest
+- [ ] Windows manual build completed and signature verified
 
 ### Package Distribution
 
 **Automated — verify after release workflow**
 - [ ] Desktop auto-update available (existing installs receive the update)
+- [ ] Desktop update date/time (UTC) set: `YYYY-MM-DD HH:mm`
 
 **Chrome Web Store** — manual submission, review takes 1–7 days
 - [ ] `tonkeeper_chrome_v[VERSION].zip` uploaded to Chrome Web Store
 - [ ] Submitted for review
 - [ ] Approved and live
+- [ ] Chrome extension update date/time (UTC) set: `YYYY-MM-DD HH:mm`
 
 **Firefox Add-ons** — manual submission, review takes 1–7 days
 - [ ] `tonkeeper_firefox_v[VERSION].zip` uploaded to Firefox Add-ons
 - [ ] Submitted for review
 - [ ] Approved and live
+- [ ] Firefox extension update date/time (UTC) set: `YYYY-MM-DD HH:mm`
 
 **App Store (iPad)** — manual submission, Apple review takes 1–3 days
 - [ ] Build submitted to App Store Connect
+- [ ] iPad build number set: `[BUILD_NUMBER]`
 - [ ] Submitted for review
 - [ ] Approved and live
+- [ ] iPad update date/time (UTC) set: `YYYY-MM-DD HH:mm`
 
 ---
 

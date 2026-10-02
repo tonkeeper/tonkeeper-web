@@ -1,23 +1,13 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { Language, localizationText } from '@tonkeeper/core/dist/entries/language';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
+import { defaultTonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
-import { Header, HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
 import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
-import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
-import {
-    ActivitySkeletonPage,
-    BrowserSkeletonPage,
-    CoinSkeletonPage,
-    HomeSkeleton,
-    SettingsSkeletonPage
-} from '@tonkeeper/uikit/dist/components/Skeleton';
-import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
@@ -26,64 +16,24 @@ import {
     TranslationContext,
     useTWithReplaces
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
-import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-
-import { Platform as TwaPlatform, initViewport } from '@tma.js/sdk';
-import { SDKProvider } from '@tma.js/sdk-react';
-import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
-import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
-import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useSwapMobileNotification } from '@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import {
-    useAccountsStateQuery,
-    useActiveAccountQuery,
-    useActiveTonNetwork
-} from '@tonkeeper/uikit/dist/state/wallet';
+import { useAccountsStateQuery, useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { defaultTheme } from '@tonkeeper/uikit/dist/styles/defaultTheme';
-import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
-import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BrowserRouter, Route, Switch, useLocation } from "react-router-dom";
-import styled, { ThemeProvider } from 'styled-components';
-import StandardErrorBoundary from './components/ErrorBoundary';
-import { InitDataLogger } from './components/InitData';
-import { TwaReceiveNotification } from './components/ReceiveNotifications';
-import { TwaQrScanner } from './components/TwaQrScanner';
-import { TwaNftNotification } from './components/nft/NftNotification';
-import { SwapScreen } from './components/swap/SwapNotification';
-import { TwaSendNotification } from './components/transfer/SendNotifications';
-import { TwaAppSdk } from './libs/appSdk';
-import { useAnalytics, useTwaAppViewport } from './libs/hooks';
-import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
-import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
-import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
-import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
-import { RedirectFromDesktopSettings } from "@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings";
 
-const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
-const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
-const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
-const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
-const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
-const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
-const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const WebTonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
-);
-const PairSignerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
-);
-const PairKeystoneNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
-);
+import { initViewport } from '@tma.js/sdk';
+import { SDKProvider } from '@tma.js/sdk-react';
+import { FC, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
+import StandardErrorBoundary from './components/ErrorBoundary';
+import { TwaAppSdk } from './libs/appSdk';
+import { useStubAnalytics, useTwaAppViewport, useTwaErrorReporting } from './libs/hooks';
+import { MiniAppClosed } from './stub/MiniAppClosed';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -93,8 +43,6 @@ const queryClient = new QueryClient({
         }
     }
 });
-
-const TARGET_ENV = 'twa';
 
 export const App = () => {
     return (
@@ -115,7 +63,15 @@ const TwaLoader = () => {
     });
 
     useEffect(() => {
-        if (!sdk) return undefined;
+        if (!sdk) return;
+
+        // Telegram opens mini apps at partial height on mobile (iOS especially);
+        // expand to the full available height so the bottom button is reachable.
+        // Bots launched via the menu button aren't always in fullscreen mode, so
+        // we expand here rather than relying on the bot's Telegram configuration.
+        if (!sdk.viewport.isExpanded) {
+            sdk.viewport.expand();
+        }
 
         const theme = sdk.miniApp.isDark ? defaultTheme : lightTheme;
 
@@ -126,9 +82,6 @@ const TwaLoader = () => {
             sdk.miniApp.setHeaderColor(theme.backgroundPage);
         }
 
-        sdk.mainButton.setBgColor(theme.buttonPrimaryBackground);
-        sdk.mainButton.setTextColor(theme.buttonPrimaryForeground);
-
         document.body.style.backgroundColor = theme.backgroundPage;
     }, [sdk]);
 
@@ -136,8 +89,8 @@ const TwaLoader = () => {
         return <div>{error.message}</div>;
     }
 
-    if (!sdk || sdk == null) {
-        return <div></div>;
+    if (!sdk) {
+        return <div />;
     }
 
     return (
@@ -145,32 +98,20 @@ const TwaLoader = () => {
             <ThemeProvider theme={sdk.miniApp.isDark ? defaultTheme : lightTheme}>
                 <DarkThemeContext.Provider value={sdk.miniApp.isDark}>
                     <GlobalStyle />
-                    <TwaApp sdk={sdk} />
+                    <GlobalListStyle />
+                    <StubApp sdk={sdk} />
                 </DarkThemeContext.Provider>
             </ThemeProvider>
         </AppSdkContext.Provider>
     );
 };
 
-const getUsePadding = (platform: TwaPlatform): boolean => {
-    switch (platform) {
-        case 'ios':
-            return true;
-        case 'android':
-        case 'android_x':
-            return false;
-        default:
-            return false;
-    }
-};
-
-const TwaApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
+const StubApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { t: tSimple, i18n } = useTranslation();
-
     const t = useTWithReplaces(tSimple);
 
-    const translation = useMemo(() => {
-        const client: I18nContext = {
+    const translation = useMemo<I18nContext>(
+        () => ({
             t,
             i18n: {
                 enable: false,
@@ -179,64 +120,82 @@ const TwaApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
                 language: i18n.language,
                 languages: []
             }
-        };
-        return client;
-    }, [t, i18n]);
+        }),
+        [t, i18n]
+    );
 
     return (
         <BrowserRouter>
             <TranslationContext.Provider value={translation}>
                 <StorageContext.Provider value={sdk.storage}>
-                    <HeaderGlobalStyle />
-                    <FooterGlobalStyle />
-                    <SybHeaderGlobalStyle />
-                    <GlobalListStyle />
-
                     <Loader sdk={sdk} />
-                    <InitDataLogger />
-                    <UnlockNotification
-                        sdk={sdk}
-                        usePadding={getUsePadding(sdk.launchParams.platform)}
-                    />
                 </StorageContext.Provider>
             </TranslationContext.Provider>
         </BrowserRouter>
     );
 };
 
-const FullSizeWrapper = styled(Container)``;
+// The TWA never shipped a language picker, so almost no one has a stored
+// preference; fall back to the user's Telegram client language. Telegram gives
+// an IETF tag (e.g. 'ru', 'en-US', 'zh-hans'); map it to a locale we actually
+// ship, or undefined when we don't.
+const SUPPORTED_TWA_LOCALES = new Set([
+    'en',
+    'ru',
+    'it',
+    'tr',
+    'bg',
+    'es',
+    'id',
+    'uk',
+    'uz',
+    'bn',
+    'fr',
+    'pa',
+    'pt',
+    'vi',
+    'hi',
+    'ar',
+    'de',
+    'fa'
+]);
 
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
-    height: var(--app-height);
-    transition: height 0.4s ease;
-
-    box-sizing: border-box;
-    padding-top: 64px;
-    padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
-`;
-
-const seeIfShowQrScanner = (platform: TwaPlatform): boolean => {
-    switch (platform) {
-        case 'ios':
-        case 'android':
-        case 'android_x':
-            return true;
-        default:
-            return false;
+const telegramLangToLocale = (code?: string): string | undefined => {
+    if (!code) return undefined;
+    const normalized = code.toLowerCase();
+    if (normalized.startsWith('zh')) {
+        return /hant|tw|hk|mo/.test(normalized) ? 'zh_TW' : 'zh_CN';
     }
+    const base = normalized.split(/[-_]/)[0];
+    return SUPPORTED_TWA_LOCALES.has(base) ? base : undefined;
 };
 
-export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
-    const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
-    const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
+const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiatQuery();
-    const { data: devSettings } = useDevSettings();
-    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
-    const { isLoading: globalSetupLoading } = useGlobalSetup();
-
-    const lock = useLock(sdk);
+    const { data: accounts } = useAccountsStateQuery();
     const network = useActiveTonNetwork();
+    const { i18n } = useTranslation();
+
+    useTwaAppViewport(false, sdk);
+
+    // Pick the stub's locale. An explicit non-English preference saved in the
+    // old app always wins; otherwise fall back to the Telegram client language
+    // (mapped to a supported locale), and finally to English. `useUserLanguage`
+    // returns EN both when nothing was ever stored and — since Language.EN is
+    // 0/falsy and the picker never existed in the TWA — for every user without
+    // a real preference, so EN here reliably means "unset".
+    useEffect(() => {
+        if (lang === undefined) return;
+
+        const storedLocale = lang !== Language.EN ? localizationText(lang) : undefined;
+        const telegramLocale = telegramLangToLocale(sdk.launchParams.initData?.user?.languageCode);
+        const targetLocale = storedLocale ?? telegramLocale ?? 'en';
+
+        if (i18n.language !== targetLocale) {
+            i18n.reloadResources([targetLocale]).then(() => i18n.changeLanguage(targetLocale));
+        }
+    }, [lang, i18n, sdk]);
 
     const tonendpoint = useTonendpoint({
         build: sdk.version,
@@ -246,208 +205,62 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
-    const { data: tracker } = useAnalytics(
-        activeAccount || undefined,
+    const { data: tracker } = useStubAnalytics(
         accounts,
         network,
-        sdk.version
+        sdk.version,
+        serverConfig?.mainnetConfig
     );
 
-    if (
-        isWalletsLoading ||
-        activeWalletLoading ||
-        isLangLoading ||
-        serverConfig === undefined ||
-        lock === undefined ||
-        fiat === undefined ||
-        !devSettings ||
-        globalPreferencesLoading ||
-        globalSetupLoading
-    ) {
+    // Revealing a recovery phrase is pure client-side crypto over locally stored
+    // account data, so the stub must reach MiniAppClosed even with no network.
+    // The Tonendpoint config only feeds the api clients and analytics, neither of
+    // which the offline recovery path touches, so fall back to defaults until it
+    // loads rather than blocking the whole UI on it.
+    const context = useMemo<IAppContext>(() => {
+        const mainnetConfig = serverConfig?.mainnetConfig ?? defaultTonendpointConfig;
+        const testnetConfig = serverConfig?.testnetConfig ?? defaultTonendpointConfig;
+        return {
+            mainnetApi: getApiConfig(mainnetConfig),
+            testnetApi: getApiConfig(testnetConfig),
+            fiat: fiat ?? FiatCurrencies.USD,
+            mainnetConfig,
+            testnetConfig,
+            tonendpoint,
+            standalone: true,
+            extension: false,
+            ios: true,
+            proFeatures: false,
+            hideLedger: true,
+            hideSigner: true,
+            hideKeystone: true,
+            hideQrScanner: true,
+            hideMam: true,
+            hideMultisig: true,
+            hideFireblocks: true,
+            defaultWalletVersion: WalletVersion.V5R1,
+            browserLength: 4,
+            tracker: tracker?.track
+        };
+    }, [serverConfig, fiat, tonendpoint, tracker]);
+
+    if (isLangLoading) {
         return <Loading />;
     }
 
-    const showQrScan = seeIfShowQrScanner(sdk.launchParams.platform);
-
-    const context: IAppContext = {
-        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
-        testnetApi: getApiConfig(serverConfig.testnetConfig),
-        fiat,
-        mainnetConfig: serverConfig.mainnetConfig,
-        testnetConfig: serverConfig.testnetConfig,
-        tonendpoint,
-        standalone: true,
-        extension: false,
-        ios: true,
-        proFeatures: false,
-        hideLedger: true,
-        hideSigner: !showQrScan,
-        hideKeystone: !showQrScan,
-        hideQrScanner: !showQrScan,
-        hideMam: true,
-        hideMultisig: true,
-        hideFireblocks: true,
-        defaultWalletVersion: WalletVersion.V5R1,
-        browserLength: 4,
-        tracker: tracker?.track
-    };
-
     return (
         <AppContext.Provider value={context}>
-            <Content
-                activeAccount={activeAccount}
-                lock={lock}
-                showQrScan={showQrScan}
-                sdk={sdk}
-            />
+            {/* Registers the error reporter here, inside the provider, so
+                useAnalyticsTrack reads the real tracker instead of the default
+                context's undefined one. */}
+            <ErrorReporting />
+            <MiniAppClosed sdk={sdk} />
             <CopyNotification />
-            <ModalsRoot />
-            {showQrScan && <TwaQrScanner />}
         </AppContext.Provider>
     );
 };
 
-const InitWrapper = styled(Container)`
-    height: var(--app-height);
-    min-height: auto;
-
-    transition: height 0.4s ease;
-
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    box-sizing: border-box;
-    position: relative;
-`;
-
-const InitPages: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
-    useTwaAppViewport(true, sdk);
-    return (
-        <InitWrapper>
-            <Suspense fallback={<Loading />}>
-                <Initialize />
-            </Suspense>
-        </InitWrapper>
-    );
-};
-
-const Content: FC<{
-    sdk: TwaAppSdk;
-    activeAccount?: Account | null;
-    lock: boolean;
-    showQrScan: boolean;
-}> = ({ activeAccount, lock, showQrScan, sdk }) => {
-    const location = useLocation();
-    useWindowsScroll();
-    useTrackLocation();
-    useDebuggingTools();
-    useRealtimeUpdatesInvalidation();
-
-    if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
-    }
-
-    if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
-        return <InitPages sdk={sdk} />;
-    }
-
-    return (
-        <>
-            <Switch>
-                <Route path={AppRoute.swap} component={SwapScreen} />
-                <Route path="*">
-                    <MainPages showQrScan={showQrScan} sdk={sdk} />
-                </Route>
-            </Switch>
-            <Suspense>
-                <PairSignerNotification />
-                <PairKeystoneNotification />
-            </Suspense>
-        </>
-    );
-};
-
-const TwaNotification: FC<PropsWithChildren> = ({ children }) => {
-    return (
-        <TwaNftNotification>
-            <TwaReceiveNotification>
-                <TwaSendNotification>{children}</TwaSendNotification>
-            </TwaReceiveNotification>
-        </TwaNftNotification>
-    );
-};
-
-const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sdk }) => {
-    useTwaAppViewport(false, sdk);
-
-    const [isOpen] = useSwapMobileNotification();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (isOpen) {
-            navigate(AppRoute.swap);
-        }
-    }, [isOpen]);
-
-    return (
-        <TwaNotification>
-            <Wrapper standalone={getUsePadding(sdk.launchParams.platform)}>
-                <Switch>
-                    <Route
-                        path={AppRoute.activity}
-                    >
-                        <Suspense fallback={<ActivitySkeletonPage />}>
-                            <Activity />
-                        </Suspense>
-                    </Route>
-                    <Route
-                        path={AppRoute.browser}
-                    >
-                        <Suspense fallback={<BrowserSkeletonPage />}>
-                            <Browser />
-                        </Suspense>
-                    </Route>
-                    <Route
-                        path={AppRoute.settings}
-                    >
-                        <Suspense fallback={<SettingsSkeletonPage />}>
-                            <Settings />
-                        </Suspense>
-                    </Route>
-                    <Route
-                      path={AppRoute.walletSettings}
-                    >
-                      <RedirectFromDesktopSettings />
-                    </Route>
-                    <Route path={`${AppRoute.coins}/:name`}>
-                        <Suspense fallback={<CoinSkeletonPage />}>
-                            <Coin />
-                        </Suspense>
-                    </Route>
-                    <Route
-                        path="*"
-                    >
-                        <>
-                            <Header showQrScan={showQrScan} />
-                            <InnerBody>
-                                <Suspense fallback={<HomeSkeleton />}>
-                                    <Home />
-                                </Suspense>
-                            </InnerBody>
-                        </>
-                    </Route>
-                </Switch>
-                <Footer standalone={getUsePadding(sdk.launchParams.platform)} />
-                <MemoryScroll />
-                <Suspense>
-                    <WebTonConnectSubscription />
-                </Suspense>
-            </Wrapper>
-        </TwaNotification>
-    );
+const ErrorReporting: FC = () => {
+    useTwaErrorReporting();
+    return null;
 };

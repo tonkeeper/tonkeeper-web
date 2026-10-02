@@ -435,7 +435,14 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 )
             });
         }
-    }, [createdAccount, mnemonic, selectedMnemonicType, editNamePagePassed, selectNetworksPassed]);
+    }, [
+        createdAccount,
+        mnemonic,
+        selectedMnemonicType,
+        editNamePagePassed,
+        selectNetworksPassed,
+        tryAutoAuth
+    ]);
 
     if (!mnemonic) {
         return (

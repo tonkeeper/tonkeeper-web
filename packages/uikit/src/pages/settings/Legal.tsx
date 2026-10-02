@@ -64,7 +64,7 @@ export const Legal = React.memo(() => {
         }
 
         return val;
-    }, [t, isOnReview]);
+    }, [t, isOnReview, sdk, privacyLink, termsLink]);
 
     const licenses = useMemo<SettingsItem[]>(() => {
         return [
@@ -78,7 +78,7 @@ export const Legal = React.memo(() => {
                 action: () => sdk.openPage(privacyLink)
             }
         ];
-    }, [t]);
+    }, [t, sdk, privacyLink]);
 
     if (isProDisplay) {
         return (
