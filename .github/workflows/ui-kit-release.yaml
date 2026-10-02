@@ -3,6 +3,10 @@ name: UI Kit Release
 # Publishes @tonkeeper/ui-kit to npm. The version is not stored in the repo:
 # npm and the `ui-kit-v*` tags are the record, so a release never has to push
 # to a protected branch.
+#
+# Authenticates with npm Trusted Publishing (OIDC), so no npm token is stored.
+# The package's trusted publisher on npmjs.com must name this repository and
+# this workflow file.
 on:
     workflow_dispatch:
         inputs:
@@ -21,6 +25,7 @@ env:
 permissions:
     contents: write
     packages: read
+    id-token: write
 
 concurrency:
     group: ui-kit-release
@@ -40,15 +45,9 @@ jobs:
 
             - run: corepack enable
 
-            - name: Configure npm registry authentication
-              env:
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-              run: |
-                  if [ -z "$NPM_TOKEN" ]; then
-                      echo "::error::NPM_TOKEN is required to publish the package"; exit 1
-                  fi
-                  printf '//registry.npmjs.org/:_authToken=%s\n' "$NPM_TOKEN" > "$RUNNER_TEMP/.npmrc"
-                  npm whoami --userconfig "$RUNNER_TEMP/.npmrc" --registry=https://registry.npmjs.org/ >/dev/null
+            # Trusted Publishing needs npm >= 11.5.1; Node 22 ships npm 10.
+            - name: Upgrade npm
+              run: npm install -g npm@^11.5.1
 
             - name: Resolve version
               id: version
@@ -56,7 +55,7 @@ jobs:
                   INPUT: ${{ inputs.version }}
                   REF: ${{ github.ref }}
               run: |
-                  LATEST=$(npm view "$PACKAGE" version --userconfig "$RUNNER_TEMP/.npmrc" --registry=https://registry.npmjs.org/ 2>/dev/null || echo 0.0.0)
+                  LATEST=$(npm view "$PACKAGE" version --registry=https://registry.npmjs.org/ 2>/dev/null || echo 0.0.0)
                   VERSION=$(node -e '
                       const [input, latest] = process.argv.slice(1);
                       const semver = /^(\d+)\.(\d+)\.(\d+)(-[0-9A-Za-z.-]+)?$/;
@@ -71,7 +70,7 @@ jobs:
                           console.log(parts.join("."));
                       }
                   ' "$INPUT" "$LATEST")
-                  if npm view "$PACKAGE@$VERSION" version --userconfig "$RUNNER_TEMP/.npmrc" --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
+                  if npm view "$PACKAGE@$VERSION" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
                       echo "::error::$PACKAGE@$VERSION is already published"; exit 1
                   fi
                   case "$VERSION" in
@@ -108,7 +107,6 @@ jobs:
               run: |
                   npm pkg set version="$VERSION"
                   npm publish \
-                      --userconfig "$RUNNER_TEMP/.npmrc" \
                       --registry=https://registry.npmjs.org/ \
                       --access public \
                       --tag "$TAG"
