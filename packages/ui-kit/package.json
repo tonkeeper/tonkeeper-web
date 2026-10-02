@@ -50,7 +50,6 @@
     },
     "scripts": {
         "build": "rm -rf dist && vite build && tsc -p tsconfig.build.json && tailwindcss -c tailwind.config.ts -i src/styles/styles.css -o dist/styles.css --minify && cp -R src/styles/fonts dist/fonts",
-        "build:pkg": "yarn build",
         "typecheck": "tsc --noEmit",
         "icons": "svgr --config-file .svgrrc.cjs --out-dir src/icons/components -- src/icons/svg",
         "test:ct": "playwright test -c playwright-ct.config.ts",
