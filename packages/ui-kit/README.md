@@ -7,8 +7,7 @@ npm install @tonkeeper/ui-kit
 ```
 
 Requires React 18+. Browse every component and variant at
-[ui-showcase.keeperwallet.com](https://ui-showcase.keeperwallet.com), or run `yarn dev:showcase` in
-this repo.
+[ui-showcase.keeperwallet.com](https://ui-showcase.keeperwallet.com).
 
 ## Setup
 
@@ -39,9 +38,9 @@ app.
 Inter ships with the package. `styles.css` also imports the TT Firs Neue stylesheet from
 [fonts.keeperwallet.com](https://fonts.keeperwallet.com/v1/tt-firs-neue.css). The font stack uses TT
 Firs Neue first and falls back to Inter for uncovered glyphs. TT Firs Neue is licensed separately
-from the kit's Apache-2.0 code; its font binaries are hosted separately and are not included in the
-source tree or published package. Browser access to the hosted fonts is limited to Keeper apps and
-their approved preview domains.
+from the kit's Apache-2.0 code; its font files are hosted separately and are not included in the
+package. Browser access to the hosted fonts is limited to Keeper apps and their approved preview
+domains.
 
 ## Icons
 
@@ -70,25 +69,3 @@ export default {
 
 Keep importing `styles.css` — it holds the classes the components themselves use and both font
 declarations.
-
-## Developing
-
-```sh
-yarn dev:showcase                           # live catalogue, reads the kit from source
-yarn workspace @tonkeeper/ui-kit build      # dist/: ESM modules, types, styles.css, Inter
-yarn workspace @tonkeeper/ui-kit icons      # regenerate icon components from src/icons/svg
-```
-
-The production showcase is [ui-showcase.keeperwallet.com](https://ui-showcase.keeperwallet.com)
-(Cloudflare Pages project `ui-showcase`).
-
-Component tests (`*.ct.tsx`) and their screenshot baselines run in CI only. To regenerate the
-baselines, run the **UI Kit** workflow manually on your branch.
-
-## Releasing
-
-Run the **UI Kit Release** workflow with a version: `patch`, `minor` or `major` bumps the latest npm
-release; an exact version such as `1.4.0` or `1.5.0-beta.1` is used as is. Stable versions publish
-from `main` under the `latest` tag; prereleases may publish from any branch under `next`. Each
-release is tagged `ui-kit-v<version>` with a matching GitHub release. The workflow needs an
-`NPM_TOKEN` secret with publish access to this package.
