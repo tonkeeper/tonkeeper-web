@@ -45,10 +45,6 @@ jobs:
 
             - run: corepack enable
 
-            # Trusted Publishing needs npm >= 11.5.1; Node 22 ships npm 10.
-            - name: Upgrade npm
-              run: npm install -g npm@^11.5.1
-
             - name: Resolve version
               id: version
               env:
@@ -106,7 +102,9 @@ jobs:
                   TAG: ${{ steps.version.outputs.tag }}
               run: |
                   npm pkg set version="$VERSION"
-                  npm publish \
+                  # Trusted Publishing needs npm >= 11.5.1; Node 22 ships npm 10, and
+                  # upgrading it in place with `npm install -g npm` breaks it.
+                  npx --yes npm@^11.5.1 publish \
                       --registry=https://registry.npmjs.org/ \
                       --access public \
                       --tag "$TAG"
