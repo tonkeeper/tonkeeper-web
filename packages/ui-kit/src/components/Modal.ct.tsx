@@ -100,6 +100,25 @@ test('a nested modal at least as tall as its parent covers it', async ({ mount, 
     expect(nested.height).toBeCloseTo(parent.height, 0);
 });
 
+test('an action bar with a divider is opaque so content cannot show under the line', async ({
+    mount,
+    page
+}) => {
+    await page.setViewportSize(TEST_MODES.desktop);
+    await mount(<ActionBarModalStory />, { hooksConfig: { mode: 'desktop' } });
+    // The bar's root is the nearest ancestor of its buttons holding the divider line.
+    const background = await page
+        .getByRole('dialog')
+        .getByRole('button', { name: 'Cancel' })
+        .evaluate(button => {
+            let el: HTMLElement | null = button.parentElement;
+            while (el && !el.querySelector(':scope > .bg-separatorCommon')) el = el.parentElement;
+            return el ? getComputedStyle(el).backgroundColor : null;
+        });
+    expect(background).not.toBeNull();
+    expect(background).not.toBe('rgba(0, 0, 0, 0)');
+});
+
 test('Escape closes only the topmost modal', async ({ mount, page }) => {
     let parentClosed = 0;
     let nestedClosed = 0;

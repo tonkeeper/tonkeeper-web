@@ -878,7 +878,17 @@ export const ModalFooter: FC<ModalFooterProps> = ({
     children,
     className
 }) => (
-    <div className="relative flex w-full flex-col before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-backgroundPage before:[mask-image:linear-gradient(to_top,#000_0%,#000000eb_20%,#000000ab_40%,#00000054_60%,#00000014_80%,transparent_100%)]">
+    <div
+        className={cn(
+            'relative flex w-full flex-col',
+            // The bar floats over the scroll body. Without a divider, content fades
+            // out under it; a divider is a hard edge, so the bar is solid and
+            // nothing shows between the line and the buttons.
+            divider
+                ? 'bg-backgroundPage'
+                : 'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-backgroundPage before:[mask-image:linear-gradient(to_top,#000_0%,#000000eb_20%,#000000ab_40%,#00000054_60%,#00000014_80%,transparent_100%)]'
+        )}
+    >
         {divider && <div className="h-[0.5px] w-full bg-separatorCommon" />}
         <div
             className={cn(
