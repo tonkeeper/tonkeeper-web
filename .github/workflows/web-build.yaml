@@ -22,7 +22,7 @@ on:
     workflow_dispatch:
         inputs:
             environment:
-                description: 'Cloudflare Pages branch name to deploy to'
+                description: 'Worker Preview name, or main for production'
                 required: true
                 type: string
             release_tag:
@@ -31,7 +31,7 @@ on:
                 type: string
                 default: ''
 env:
-    node-version: 20.11.1
+    node-version: 22
 
 jobs:
     web-build:
@@ -78,22 +78,32 @@ jobs:
               with:
                   cmd: build:web
 
-            - name: Publish to Cloudflare Pages
+            - name: Test Worker deployment selection
+              run: yarn test:workers
+
+            - name: Select Worker deployment
+              id: worker
+              env:
+                  WORKER_APP: web
+                  DEPLOYMENT_REF: ${{ inputs.environment }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: node scripts/workers-deployment.mjs >> "$GITHUB_OUTPUT"
+
+            - name: Publish to Cloudflare Workers
               id: deploy
-              uses: cloudflare/wrangler-action@v3
+              uses: cloudflare/wrangler-action@v4
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command:
-                      pages deploy apps/web/dist --project-name=tonkeeper-web --branch=${{
-                      inputs.environment }}
+                  wranglerVersion: "4.152.0"
+                  command: ${{ steps.worker.outputs.command }}
 
             - name: Summary
               run: |
                   echo '### Successful WEB deployment 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
                   echo 'Well done!' >> $GITHUB_STEP_SUMMARY
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
-                  echo '${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
             - name: Comment PR
               uses: thollander/actions-comment-pull-request@v3
@@ -103,5 +113,5 @@ jobs:
                       ### Successful WEB deployment 🚀🚀🚀
                       Well done!
                       Link to test environment:
-                      ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
+                      ${{ steps.deploy.outputs.deployment-url }}
                   comment-tag: web_deploy

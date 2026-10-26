@@ -71,7 +71,7 @@ Or create PR via GitHub UI.
 
 ### 4. CI Checks
 
-When you open a PR, the **web preview deployment** runs automatically — every PR gets a Cloudflare Pages link in a comment.
+When you open a PR, the **web preview deployment** runs automatically — every PR gets a Cloudflare Worker Preview link in a comment.
 
 The heavier builds are **opt-in via PR labels** to save CI compute. Add a label on the PR and that build will run; remove and re-add it to re-trigger.
 
@@ -186,3 +186,23 @@ yarn build:web
 yarn build:desktop
 yarn build:extension
 ```
+
+## Cloudflare Workers
+
+Use Node.js 22 or newer. The web, TWA and UI showcase apps have their own `wrangler.jsonc` files. Each serves its `dist/` directory with SPA navigation fallback.
+
+```sh
+yarn install --immutable
+yarn test:workers
+yarn build:web
+yarn wrangler deploy --config apps/web/wrangler.jsonc --dry-run
+yarn wrangler dev --config apps/web/wrangler.jsonc
+```
+
+Use `yarn deploy:web`, `yarn deploy:twa` or `yarn deploy:showcase` to build and deploy production. TWA now uses its actual Vite output directory, `apps/twa/dist`.
+
+The web workflow deploys `main` to production; staging, dev and release-candidate refs create stable Worker Previews. Pull requests always use `pr-<number>`, including a PR whose branch is named `main`. TWA and showcase workflows also create Previews under their own Workers. Branch inputs are normalised before being passed to Wrangler. Closed PRs remove the matching web Preview; optional TWA Previews can be removed with `yarn wrangler preview delete --config apps/twa/wrangler.jsonc --name pr-123 --skip-confirmation`.
+
+For the Pages cutover, create the three Workers in the intended account and grant the CI token Workers Scripts Edit. Configure custom domains and recreate any account-side build variables or settings. Validate the new Worker URLs and deep links before transferring traffic. Update external `pages.dev` links and allowlists, then disable Pages automatic deployments; remove the Pages projects only after the cutover is complete. Staging/RC URLs now come from Workers Preview outputs and may require updates in external integrations.
+
+Migration references: [Wrangler v3 to v4](https://developers.cloudflare.com/workers/wrangler/migration/update-v3-to-v4/) and [Pages to Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/).

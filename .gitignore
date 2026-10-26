@@ -60,3 +60,6 @@ package-lock.json
 .playwright-mcp/
 
 *.tsbuildinfo
+
+# Wrangler local state
+.wrangler/

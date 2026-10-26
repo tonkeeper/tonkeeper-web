@@ -4,7 +4,7 @@ on:
     workflow_call:
         inputs:
             branch:
-                description: 'Cloudflare Pages branch name for the showcase preview'
+                description: 'Worker Preview name for the showcase'
                 required: true
                 type: string
         secrets:
@@ -14,7 +14,7 @@ on:
                 required: true
 
 env:
-    node-version: 22.22.2
+    node-version: 22
     NODE_AUTH_TOKEN: ${{ github.token }}
 
 permissions:
@@ -54,17 +54,27 @@ jobs:
               run: |
                   yarn workspace @tonkeeper/ui-showcase build
 
-            - name: Publish to Cloudflare Pages
+            - name: Test Worker deployment selection
+              run: yarn test:workers
+
+            - name: Select Worker deployment
+              id: worker
+              env:
+                  WORKER_APP: showcase
+                  DEPLOYMENT_REF: ${{ inputs.branch }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: node scripts/workers-deployment.mjs >> "$GITHUB_OUTPUT"
+
+            - name: Publish to Cloudflare Workers
               id: deploy
-              uses: cloudflare/wrangler-action@v3
+              uses: cloudflare/wrangler-action@v4
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command:
-                      pages deploy apps/ui-showcase/dist --project-name=ui-showcase --branch=${{
-                      inputs.branch }}
+                  wranglerVersion: "4.152.0"
+                  command: ${{ steps.worker.outputs.command }}
 
             - name: Summary
               run: |
                   echo '### Successful UI showcase deployment' >> $GITHUB_STEP_SUMMARY
-                  echo '${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY

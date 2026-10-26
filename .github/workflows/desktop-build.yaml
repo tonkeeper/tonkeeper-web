@@ -15,7 +15,7 @@ on:
     workflow_dispatch:
 
 env:
-    node-version: 20.11.1
+    node-version: 22
 
 jobs:
     desktop-build:

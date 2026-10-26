@@ -22,7 +22,7 @@ permissions:
     contents: write
 
 env:
-    node-version: 20.11.1
+    node-version: 22
     RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
 
 jobs:

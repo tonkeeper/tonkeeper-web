@@ -40,7 +40,7 @@ on:
                 type: string
                 default: ''
 env:
-    node-version: 20.18.1
+    node-version: 22
     ruby-version: 3.3.6
 
 jobs:

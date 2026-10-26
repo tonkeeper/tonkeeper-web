@@ -4,7 +4,7 @@ on:
     workflow_call:
         inputs:
             branch:
-                description: 'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
+                description: 'Worker Preview name to deploy to'
                 required: true
                 type: string
         secrets:
@@ -15,13 +15,13 @@ on:
     workflow_dispatch:
         inputs:
             branch:
-                description: 'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
+                description: 'Worker Preview name to deploy to'
                 required: true
                 type: string
                 default: 'twa-recovery'
 
 env:
-    node-version: 20.11.1
+    node-version: 22
 
 jobs:
     twa-build:
@@ -62,22 +62,32 @@ jobs:
               with:
                   cmd: build:twa
 
-            - name: Publish to Cloudflare Pages
+            - name: Test Worker deployment selection
+              run: yarn test:workers
+
+            - name: Select Worker deployment
+              id: worker
+              env:
+                  WORKER_APP: twa
+                  DEPLOYMENT_REF: ${{ inputs.branch }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: node scripts/workers-deployment.mjs >> "$GITHUB_OUTPUT"
+
+            - name: Publish to Cloudflare Workers
               id: deploy
-              uses: cloudflare/wrangler-action@v3
+              uses: cloudflare/wrangler-action@v4
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command:
-                      pages deploy apps/twa/dist --project-name=tonkeeper-web --branch=${{
-                      inputs.branch }}
+                  wranglerVersion: "4.152.0"
+                  command: ${{ steps.worker.outputs.command }}
 
             - name: Summary
               run: |
                   echo '### Successful TWA deployment 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
                   echo 'Well done!' >> $GITHUB_STEP_SUMMARY
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
-                  echo '${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
             - name: Comment PR
               uses: thollander/actions-comment-pull-request@v3
@@ -87,5 +97,5 @@ jobs:
                       ### Successful TWA deployment 🚀🚀🚀
                       Well done!
                       Link to test environment:
-                      ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
+                      ${{ steps.deploy.outputs.deployment-url }}
                   comment-tag: twa_deploy
