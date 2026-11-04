@@ -310,7 +310,7 @@ const FirstParticipantCard: FC<{ skipBalanceCheck?: boolean }> = ({ skipBalanceC
 
             if (deployMultisigAssetAmount.weiAmount.gt(wallet.balance)) {
                 return {
-                    message: `Not enough ${BRAND_CONFIG.coinSymbolWithEx} balance for deploy`
+                    message: `Not enough ${BRAND_CONFIG.coinSymbol} balance for deploy`
                 };
             }
         },

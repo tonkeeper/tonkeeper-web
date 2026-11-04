@@ -75,7 +75,7 @@ export const ExtensionDesktopActions: FC<{
                 {amount && !isScam ? (
                     <HistoryCellAmount
                         amount={amount}
-                        symbol={BRAND_CONFIG.coinSymbolWithEx}
+                        symbol={BRAND_CONFIG.coinSymbol}
                         decimals={9}
                         isFailed={action.status === 'failed'}
                         isNegative

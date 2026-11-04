@@ -29,20 +29,14 @@ import {
 export interface StoragePhase {
     /**
      * 
-     * @type {number}
-     * @memberof StoragePhase
      */
     feesCollected: number;
     /**
      * 
-     * @type {number}
-     * @memberof StoragePhase
      */
     feesDue?: number;
     /**
      * 
-     * @type {AccStatusChange}
-     * @memberof StoragePhase
      */
     statusChange: AccStatusChange;
 }
@@ -53,8 +47,8 @@ export interface StoragePhase {
  * Check if a given object implements the StoragePhase interface.
  */
 export function instanceOfStoragePhase(value: object): value is StoragePhase {
-    if (!('feesCollected' in value) || value['feesCollected'] === undefined) return false;
-    if (!('statusChange' in value) || value['statusChange'] === undefined) return false;
+    if ((!('feesCollected' in (value as Record<string, any>)) && !('fees_collected' in (value as Record<string, any>))) || ((value as Record<string, any>)['feesCollected'] === undefined && (value as Record<string, any>)['fees_collected'] === undefined)) return false;
+    if ((!('statusChange' in (value as Record<string, any>)) && !('status_change' in (value as Record<string, any>))) || ((value as Record<string, any>)['statusChange'] === undefined && (value as Record<string, any>)['status_change'] === undefined)) return false;
     return true;
 }
 
@@ -74,11 +68,11 @@ export function StoragePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function StoragePhaseToJSON(json: any): StoragePhase {
-      return StoragePhaseToJSONTyped(json, false);
-  }
+export function StoragePhaseToJSON(json: any): StoragePhase {
+    return StoragePhaseToJSONTyped(json, false);
+}
 
-  export function StoragePhaseToJSONTyped(value?: StoragePhase | null, ignoreDiscriminator: boolean = false): any {
+export function StoragePhaseToJSONTyped(value?: StoragePhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

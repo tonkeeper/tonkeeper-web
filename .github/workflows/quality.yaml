@@ -5,7 +5,12 @@ on:
         branches: [main]
 
 env:
-    node-version: 20.11.1
+    node-version: 22.22.2
+    NODE_AUTH_TOKEN: ${{ github.token }}
+
+permissions:
+    contents: read
+    packages: read
 
 jobs:
     lint:
@@ -35,19 +40,13 @@ jobs:
                       ${{ runner.os }}-yarn-
 
             - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
+              run: yarn install --immutable
 
             - name: Build shared packages
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:pkg
+              run: yarn build:pkg
 
             - name: Run lint
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: lint
+              run: yarn lint
 
     typecheck:
         name: typecheck
@@ -74,19 +73,46 @@ jobs:
                       ${{ runner.os }}-yarn-
 
             - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
+              run: yarn install --immutable
 
             - name: Build shared packages
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:pkg
+              run: yarn build:pkg
 
             - name: Run typecheck
-              uses: borales/actions-yarn@v5
+              run: yarn typecheck
+
+    test:
+        name: test
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
               with:
-                  cmd: typecheck
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              run: yarn install --immutable
+
+            - name: Build shared packages
+              run: yarn build:pkg
+
+            - name: Run unit tests
+              run: yarn test
 
     stylelint:
         name: stylelint
@@ -113,11 +139,7 @@ jobs:
                       ${{ runner.os }}-yarn-
 
             - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
+              run: yarn install --immutable
 
             - name: Run lint:css
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: lint:css
+              run: yarn lint:css

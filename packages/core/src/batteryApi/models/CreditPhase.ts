@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface CreditPhase {
     /**
      * 
-     * @type {number}
-     * @memberof CreditPhase
      */
     feesCollected: number;
     /**
      * 
-     * @type {number}
-     * @memberof CreditPhase
      */
     credit: number;
 }
@@ -37,7 +33,7 @@ export interface CreditPhase {
  * Check if a given object implements the CreditPhase interface.
  */
 export function instanceOfCreditPhase(value: object): value is CreditPhase {
-    if (!('feesCollected' in value) || value['feesCollected'] === undefined) return false;
+    if ((!('feesCollected' in (value as Record<string, any>)) && !('fees_collected' in (value as Record<string, any>))) || ((value as Record<string, any>)['feesCollected'] === undefined && (value as Record<string, any>)['fees_collected'] === undefined)) return false;
     if (!('credit' in value) || value['credit'] === undefined) return false;
     return true;
 }
@@ -57,11 +53,11 @@ export function CreditPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function CreditPhaseToJSON(json: any): CreditPhase {
-      return CreditPhaseToJSONTyped(json, false);
-  }
+export function CreditPhaseToJSON(json: any): CreditPhase {
+    return CreditPhaseToJSONTyped(json, false);
+}
 
-  export function CreditPhaseToJSONTyped(value?: CreditPhase | null, ignoreDiscriminator: boolean = false): any {
+export function CreditPhaseToJSONTyped(value?: CreditPhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

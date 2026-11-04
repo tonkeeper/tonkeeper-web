@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface AndroidBatteryPurchaseRequestPurchasesInner {
     /**
      * 
-     * @type {string}
-     * @memberof AndroidBatteryPurchaseRequestPurchasesInner
      */
     token: string;
     /**
      * 
-     * @type {string}
-     * @memberof AndroidBatteryPurchaseRequestPurchasesInner
      */
     productId: string;
     /**
      * 
-     * @type {string}
-     * @memberof AndroidBatteryPurchaseRequestPurchasesInner
      */
     promo?: string;
 }
@@ -44,7 +38,7 @@ export interface AndroidBatteryPurchaseRequestPurchasesInner {
  */
 export function instanceOfAndroidBatteryPurchaseRequestPurchasesInner(value: object): value is AndroidBatteryPurchaseRequestPurchasesInner {
     if (!('token' in value) || value['token'] === undefined) return false;
-    if (!('productId' in value) || value['productId'] === undefined) return false;
+    if ((!('productId' in (value as Record<string, any>)) && !('product_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['productId'] === undefined && (value as Record<string, any>)['product_id'] === undefined)) return false;
     return true;
 }
 
@@ -64,11 +58,11 @@ export function AndroidBatteryPurchaseRequestPurchasesInnerFromJSONTyped(json: a
     };
 }
 
-  export function AndroidBatteryPurchaseRequestPurchasesInnerToJSON(json: any): AndroidBatteryPurchaseRequestPurchasesInner {
-      return AndroidBatteryPurchaseRequestPurchasesInnerToJSONTyped(json, false);
-  }
+export function AndroidBatteryPurchaseRequestPurchasesInnerToJSON(json: any): AndroidBatteryPurchaseRequestPurchasesInner {
+    return AndroidBatteryPurchaseRequestPurchasesInnerToJSONTyped(json, false);
+}
 
-  export function AndroidBatteryPurchaseRequestPurchasesInnerToJSONTyped(value?: AndroidBatteryPurchaseRequestPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
+export function AndroidBatteryPurchaseRequestPurchasesInnerToJSONTyped(value?: AndroidBatteryPurchaseRequestPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

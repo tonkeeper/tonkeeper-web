@@ -34,9 +34,14 @@
     "approval": {
         "accepted": "दृश्य",
         "declined": "अस्वीकृत",
+        "details_collection": "कलेक्शन विवरण",
         "details_token": "टोकन विवरण",
         "id_collection": "कलेक्शन आईडी",
         "id_token": "टोकन आईडी",
+        "move_to_accepted_collection": "वॉलेट में कलेक्शन दिखाएँ",
+        "move_to_accepted_token": "वॉलेट में टोकन दिखाएँ",
+        "move_to_declined_collection": "वॉलेट से कलेक्शन छिपाएँ",
+        "move_to_declined_token": "वॉलेट से टोकन छिपाएँ",
         "name": "नाम",
         "not_spam": "स्पैम नहीं है",
         "spam": "स्पैम",
@@ -46,7 +51,7 @@
     "battery": {
         "other_ways": {
             "by_crypto": {
-                "title": "{symbol} से रीचार्ज करें"
+                "title": "%{symbol} से रीचार्ज करें"
             },
             "gift": {
                 "subtitle": "दोस्तों के साथ साझा करें",
@@ -54,22 +59,30 @@
             }
         },
         "packages": {
-            "disclaimer": "एक चार्ज औसत लेन-देन शुल्क को कवर करता है। कुछ लेन-देन की लागत अधिक हो सकती है।"
+            "disclaimer": "एक चार्ज औसत लेन-देन शुल्क को कवर करता है। कुछ लेन-देन की लागत अधिक हो सकती है।",
+            "title": {
+                "large": "बड़ा",
+                "medium": "मध्यम",
+                "small": "छोटा"
+            }
         },
         "please_wait": "बैटरी कुछ ही मिनटों में चार्ज हो जाएगी",
         "promocode": {
-            "title": "प्रोमो कोड"
+            "title": "प्रोमो कोड",
+            "apply": "लागू करें",
+            "success": "आपकी बैटरी चार्ज हो गई है"
         },
         "recharge_by_crypto": {
             "other": {
                 "subtitle": "राशि मैन्युअल रूप से दर्ज करें",
                 "title": "अन्य"
             },
-            "title": "रीचार्ज"
+            "title": "रीचार्ज",
+            "title_gift": "उपहार"
         },
-        "title": "Tonkeeper बैटरी",
+        "title": "Keeper बैटरी",
         "transactions": {
-            "description": "चयनित लेनदेन Tonkeeper बैटरी द्वारा किए जाएंगे।",
+            "description": "चयनित लेनदेन Keeper बैटरी द्वारा किए जाएंगे।",
             "settings": "बैटरी सेटिंग्स",
             "title": "लेन-देन",
             "types": {
@@ -131,14 +144,14 @@
     "dns_current_address": "आपका वर्तमान पता",
     "dns_expiration_date": "समाप्ति तिथि",
     "dns_renew_toast_success": "डोमेन नवीनीकृत",
-    "dns_renew_until_btn": "{जब तक नवीनीकृत करें}",
+    "dns_renew_until_btn": "%{जब तक नवीनीकृत करें}",
     "exchange_method_dont_show_again": "फिर से मत दिखाओ",
     "exchange_method_open_warning": "आप एक बाहरी ऐप खोल रहे हैं जो टोनकीपर द्वारा संचालित नहीं है।",
     "exchange_modal": {
         "other_ways_to_buy": "खरीदने के अन्य तरीके"
     },
-    "exchange_other_ways": "%{coinSymbolWithEx} खरीदने या बेचने के अन्य तरीके",
-    "exchange_title": "%{coinSymbolWithEx} खरीदें",
+    "exchange_other_ways": "%{coinSymbol} खरीदने या बेचने के अन्य तरीके",
+    "exchange_title": "%{coinSymbol} खरीदें",
     "import_add_wallet": "वॉलेट जोड़ें",
     "import_add_wallet_description": "एक नया बटुआ बनाएं या एक मौजूदा जोड़ें।",
     "import_existing_wallet": "मौजूदा वॉलेट",
@@ -157,15 +170,13 @@
     "intro_item2_caption": "टोनकीपर आपके डिवाइस पर आपकी क्रिप्टोग्राफिक कुंजियों को संग्रहीत करता है। सभी ट्रेडों को विकेंद्रीकृत प्रोटोकॉल के माध्यम से निष्पादित किया जाता है ताकि आपका क्रिप्टो केंद्रीकृत एक्सचेंजों के हाथों में कभी समाप्त न हो। ",
     "intro_item2_title": "एंड-टू-एंड सुरक्षा",
     "intro_title": "स्वागत है",
-    "jetton_id": "टोकन आईडी: {jettonAddress}",
+    "jetton_id": "टोकन आईडी: %{jettonAddress}",
     "jettons_list_title": "टोकन",
     "later": "बाद में",
     "ledger": {
         "operation_not_supported": "यह ऑपरेशन लेजर वॉलेट्स के लिए उपलब्ध नहीं है। कृपया कोई अन्य वॉलेट चुनें और पुनः प्रयास करें।"
     },
-    "legal_font_license": "Montserrat फ़ॉन्ट",
     "legal_header_title": "कानूनी",
-    "legal_licenses_title": "लाइसेंस",
     "legal_privacy": "गोपनीयता नीति",
     "legal_terms": "सेवा की शर्तें",
     "loading": "लोड हो रहा है",
@@ -197,7 +208,7 @@
         "title": "NFT स्थानांतरण"
     },
     "nft_transfer_title": "NFT स्थानांतरित करें",
-    "nft_unlink_domain_button": "'{{'address'}}' से जुड़ा हुआ",
+    "nft_unlink_domain_button": "{{address}} से जुड़ा हुआ",
     "nft_view_in_explorer": "एक्सप्लोरर में देखें",
     "notifications": {
         "alert": {
@@ -217,7 +228,7 @@
     "recovery_phrase": {
         "copy_button": "कॉपी करें"
     },
-    "reminder_notifications_caption": "जब आपको %{coinSymbolWithEx}, टोकन और NFT प्राप्त हों, तो सूचनाएँ पाएं।",
+    "reminder_notifications_caption": "जब आपको %{coinSymbol}, टोकन और NFT प्राप्त हों, तो सूचनाएँ पाएं।",
     "reminder_notifications_enable_button": "सूचनाएं सक्षम करें",
     "reminder_notifications_later_button": "बाद में",
     "reminder_notifications_title": "तुरंत सूचनाएँ प्राप्त करें",
@@ -230,7 +241,7 @@
     "send_publish_tx_error": "लेन-देन भेजने में विफल",
     "send_screen_steps": {
         "address": {
-            "delete_alert_text": "क्या आप वाकई «{name}» को अपनी पसंदीदा सूची से हटाना चाहते हैं?",
+            "delete_alert_text": "क्या आप वाकई «%{name}» को अपनी पसंदीदा सूची से हटाना चाहते हैं?",
             "suggest_actions": {
                 "add": "पसंदीदा में जोड़ें",
                 "delete": "हटाएँ",
@@ -241,7 +252,7 @@
         "amount": {
             "insufficient_balance": "पर्याप्त शेष राशि नहीं है",
             "max": "अधिकतम",
-            "remaining": "उपलब्ध: {amount}"
+            "remaining": "उपलब्ध: %{amount}"
         },
         "comfirm": {
             "comment_required_text": "भेजते समय, एक्सचेंज का मेमो या टैग अवश्य शामिल करें। इसके बिना, धनराशि जमा नहीं होगी और खो सकती है।",
@@ -250,7 +261,7 @@
         },
         "done": {
             "done_label": "हो गया",
-            "to": "{name} को"
+            "to": "%{name} को"
         }
     },
     "send_sending_wrong_time_description": "अपने डिवाइस की सेटिंग्स में स्वतः समय और तारीख चालू करें। फिर अपना ट्रांसफर पुनः प्रयास करें।",
@@ -260,10 +271,10 @@
     "settings_jettons_list": "टोकन",
     "settings_legal_documents": "कानूनी दस्तावेज़",
     "settings_network_alert_title": "नेटवर्क चुनें",
-    "settings_news": "Tonkeeper समाचार",
+    "settings_news": "Keeper समाचार",
     "settings_notifications": "सूचनाएँ",
     "settings_primary_currency": "मुद्रा",
-    "settings_rate": "Tonkeeper को रेट करें",
+    "settings_rate": "Keeper को रेट करें",
     "settings_recovery_phrase": "रिकवरी वाक्यांश",
     "settings_reset": "साइन आउट करें",
     "settings_reset_alert_title": "🚧 🚨 साइन आउट करें? 🚨 🚧",
@@ -293,17 +304,17 @@
     "staking_earnings_section_title": "प्रत्याशित वार्षिक कमाई",
     "staking_enter_amount": "एक राशि दर्ज करें",
     "staking_insufficient_balance": "पर्याप्त शेष राशि नहीं है",
-    "staking_insufficient_recommended_fee_reserve": "अपर्याप्त धनराशि: वॉलेट बैलेंस में 1 %{coinSymbolWithEx} रिजर्व और 0.05 %{coinSymbolWithEx} शुल्क होना चाहिए।",
+    "staking_insufficient_recommended_fee_reserve": "अपर्याप्त धनराशि: वॉलेट बैलेंस में 1 %{coinSymbol} रिजर्व और 0.05 %{coinSymbol} शुल्क होना चाहिए।",
     "staking_max": "अधिकतम",
     "staking_min_deposit_label": "न्यूनतम जमा",
     "staking_next_cycle_desc_liquid": "तत्काल अनस्टेक उपलब्ध",
-    "staking_next_cycle_message": "अगला चक्र {value} में",
-    "staking_pool_detail": "APY ≈ {apy}% · न्यूनतम जमा {minDeposit} %{coinSymbolWithEx}",
-    "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} निकासी के लिए तैयार",
+    "staking_next_cycle_message": "अगला चक्र %{value} में",
+    "staking_pool_detail": "APY ≈ %{apy}% · न्यूनतम जमा %{minDeposit} %{coinSymbol}",
+    "staking_pools_apy": "APY ≈ %{apy}%",
+    "staking_ready_withdraw": "%{amount} %{coinSymbol} निकासी के लिए तैयार",
     "staking_rewards_after_stake": "दांव के बाद",
     "staking_rewards_current": "वर्तमान",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ %{value} %{coinSymbol}",
     "staking_staked": "जमा किया गया",
     "staking_title": "स्टेकिंग",
     "staking_top_up": "जमा करें",
@@ -346,10 +357,9 @@
         "subtitle": "NFT may not be safe to use for one of the following reasons.",
         "title": "Unverified NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "नेटवर्क शुल्क के लिए पर्याप्त %{coinSymbolWithEx} नहीं है ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "नेटवर्क शुल्क के लिए पर्याप्त %{coinSymbol} नहीं है (%{required})",
     "swap_exchange_in": "एक्सचेंज इन",
     "swap_expired_refresh": "स्वैप समाप्त हो गया। कोट रिफ्रेश करें",
-    "swap_price_impact_description": "व्यापार आकार के कारण बाजार मूल्य और अनुमानित मूल्य के बीच का अंतर।",
     "swap_price_impact_ignore_variant": "अनदेखा करें",
     "swap_slippage_tolerance": "स्लिपेज सहनशीलता",
     "swap_slippage_tolerance_description": "ट्रेड रिवर्ट होने से पहले कीमत में कितना प्रतिकूल बदलाव हो सकता है।",
@@ -361,7 +371,7 @@
     },
     "tonkeeper_pro": "टोनकीपर प्रो",
     "tonkeeper_pro_description": "टोनकीपर प्रो की सदस्यता एक विस्तारित वॉलेट सुविधा के साथ आती है, जो क्रिप्टो प्रबंधन के लिए एक टूलसेट की पेशकश करती है। ",
-    "ton_login_caption": "{नाम} आपके वॉलेट पते तक पहुंच का अनुरोध कर रहा है",
+    "ton_login_caption": "%{नाम} आपके वॉलेट पते तक पहुंच का अनुरोध कर रहा है",
     "ton_login_connect_button": "कनेक्ट वॉलेट",
     "ton_login_notice": "वॉलेट को जोड़ने से पहले सेवा पते की जांच करना सुनिश्चित करें।",
     "ton_login_success": "किया",
@@ -375,7 +385,7 @@
     "transaction_fee": "शुल्क",
     "transaction_hash": "लेनदेन",
     "transaction_merchant": "व्यापारी",
-    "transaction_receive_date": "{दिनांक} पर प्राप्त",
+    "transaction_receive_date": "%{दिनांक} पर प्राप्त",
     "transaction_recipient": "प्राप्तकर्ता",
     "transaction_recipient_address": "प्राप्तकर्ता पता",
     "transactions": {
@@ -390,7 +400,7 @@
     },
     "transaction_sender": "प्रेषक",
     "transaction_sender_address": "प्रेषक पता",
-    "transaction_sent_date": "{दिनांक} पर भेजा गया",
+    "transaction_sent_date": "%{दिनांक} पर भेजा गया",
     "transaction_type_bid": "बोली",
     "transaction_type_contract_deploy": "अनुबंध की तैनाती",
     "transaction_type_pending": "लंबित",
@@ -410,7 +420,7 @@
             "types": {
                 "jettonTransfer": "टोकन ट्रांसफर",
                 "nftItemTransfer": "NFT ट्रांसफ़र",
-                "tonTransfer": "%{coinSymbolWithEx} ट्रांसफर",
+                "tonTransfer": "%{coinSymbol} ट्रांसफर",
                 "unknownTransaction": "अज्ञात लेनदेन"
             }
         }
@@ -437,7 +447,7 @@
             "received": "प्राप्त",
             "sent": "भेजा",
             "swapped": "बदली",
-            "time_on": "पर {time}",
+            "time_on": "पर %{time}",
             "withdraw": "दाँव से उतारना"
         },
         "activity": {
@@ -472,7 +482,7 @@
         "confirm_sending_liquid_warn_description": "अब आपको स्टैक्ड टन से पुरस्कार प्राप्त नहीं होंगे। नए मालिक को पुरस्कार मिलना शुरू हो जाएगा। ",
         "confirm_sending_liquid_warn_title": "नोट",
         "confirm_sending_message": "टिप्पणी",
-        "confirm_sending_method_title": "अपने धन को {नाम}? पर भेजें",
+        "confirm_sending_method_title": "अपने धन को %{नाम}? पर भेजें",
         "confirm_sending_recipient": "प्राप्तकर्ता",
         "confirm_sending_recipient_address": "प्राप्तकर्ता पता",
         "confirm_sending_sent_caption_btc": "आपका लेनदेन नेटवर्क पर भेजा जाता है और एक घंटे के भीतर संसाधित किया जाएगा।",
@@ -483,10 +493,10 @@
         "disable_nft_marketplace_banner_description": "लीजिए और एक्सचेंज करें।",
         "dns_link_title": "लेनदेन की पुष्टि करें",
         "dns_on_sale_text": "डोमेन अब बाज़ार में बिक्री पर है। स्थानांतरण के लिए, आपको इसे पहले बिक्री से हटा देना चाहिए। ",
-        "dns_renew_all_until_btn": "{जब तक} तक सभी को नवीनीकृत करें",
+        "dns_renew_all_until_btn": "%{जब तक} तक सभी को नवीनीकृत करें",
         "dns_renew_in_progress_btn": "डोमेन प्रगति में नवीनीकृत...",
         "dns_replace_button": "बदलें",
-        "dns_replace_description": "वॉलेट पता जोड़ें कि डोमेन '{{'डोमेन'}}' से लिंक होगा।",
+        "dns_replace_description": "वॉलेट पता जोड़ें कि डोमेन {{डोमेन}} से लिंक होगा।",
         "dns_replace_save": "सहेजें",
         "dns_unlink_title": "अनलिंक की पुष्टि करें",
         "dns_wallet_address": "वॉलेट पता",
@@ -500,7 +510,7 @@
         "form_optional_indicator": "वैकल्पिक",
         "import_wallet_reset_caption": "कृपया अपने बटुए तक पहुंच बहाल करें 8 आपके द्वारा लिखे गए 24 गुप्त शब्दों को दर्ज करके फिर वॉलेट बनाएं।",
         "indexer_latency_error": "त्रुटि भेजना, बाद में पुनः प्रयास करें",
-        "info_about_inactive_desc1": "Tonkeeper पता नहीं है कि यह पता एक बटुआ या एक स्मार्ट अनुबंध है.",
+        "info_about_inactive_desc1": "Keeper पता नहीं है कि यह पता एक बटुआ या एक स्मार्ट अनुबंध है.",
         "info_about_inactive_desc2": "यदि आप बस एक बटुए में पैसे जमा करना चाहते हैं - तो आप आगे बढ़ सकते हैं।",
         "info_about_inactive_desc3_1": "यदि आप एक स्मार्ट अनुबंध से स्वचालित कार्रवाई की उम्मीद करते हैं,",
         "info_about_inactive_desc3_2": "- आपका स्थानांतरण उस पते पर अटक सकता है।",
@@ -511,9 +521,9 @@
         "it_expires_on": "यह समाप्त हो रहा है",
         "jetton_buy_tether": "USD खरीदें",
         "jetton_id_copied": "टोकन आईडी कॉपी",
-        "jetton_locked_till": "{तारीख} तक बंद",
+        "jetton_locked_till": "%{तारीख} तक बंद",
         "jetton_migrate_tether": "स्वैप jUSDT करने के लिए USD₮",
-        "jetton_name": "{name} टोकन",
+        "jetton_name": "%{name} टोकन",
         "jetton_open_explorer": "विवरण देखें",
         "jetton_price": "मूल्य:",
         "jettons_manage_tokens": "टोकन प्रबंधित करें",
@@ -535,11 +545,11 @@
             "wrong_from": "Wrong 'from' parameter",
             "wrong_network": "Wrong network"
         },
-        "ton_login_back_to_button": "वापस {नाम}",
-        "ton_login_title": "{0, संख्या} omain से कनेक्ट करें?",
+        "ton_login_back_to_button": "वापस %{नाम}",
+        "ton_login_title": "%{0, संख्या} omain से कनेक्ट करें?",
         "transaction_bid_collection_name": "जारीकर्ता",
-        "transaction_bid_date": "बोली {तारीख}",
-        "transaction_buy_date": "{दिनांक} पर खरीदा गया",
+        "transaction_bid_date": "बोली %{तारीख}",
+        "transaction_buy_date": "%{दिनांक} पर खरीदा गया",
         "transaction_buy_status_failed": "विफल",
         "transaction_buy_status_pending": "लंबित",
         "transaction_buy_status_success": "सफलता",
@@ -553,7 +563,7 @@
         "transaction_show_subscription_button": "सदस्यता देखें",
         "transaction_status": "स्थिति",
         "transaction_subscription": "सदस्यता",
-        "transaction_subscription_date": "{दिनांक} पर चार्ज किया गया",
+        "transaction_subscription_date": "%{दिनांक} पर चार्ज किया गया",
         "transaction_transfer_name": "स्थानांतरण नाम",
         "transaction_type_buy": "खरीदा",
         "transaction_type_from": "से",
@@ -561,9 +571,9 @@
         "transaction_type_subscriber_lost": "सब्सक्राइबर खो गया",
         "transaction_type_to": "को",
         "transaction_unsubscription": "सदस्यता रद्द करें",
-        "transaction_unsubscription_date": "{दिनांक}",
+        "transaction_unsubscription_date": "%{दिनांक}",
         "transaction_view_in_explorer": "खोजकर्ता में देखें",
-        "transaction_wallet_initialized_date": "{दिनांक}",
+        "transaction_wallet_initialized_date": "%{दिनांक}",
         "transaction_your_bid": "आपकी बोली",
         "transfer_deeplink_address_error": "गलत प्राप्तकर्ता पता",
         "transfer_deeplink_amount_error": "गलत राशि अनुरोध",
@@ -599,21 +609,22 @@
     "wallet_swap": "स्वैप",
     "wallet_title": "वॉलेट",
     "yesterday": "कल",
-    "staking_pool_liquid_desc": "जब आप Tonstakers पूल में %{coinSymbolWithEx} स्टेक करते हैं, आपको tsTON नाम का टोकन मिलता है जो पूल में आपके हिस्से को दर्शाता है। जैसे-जैसे पूल लाभ जमा करता है, आपका tsTON अधिक %{coinSymbolWithEx} दर्शाता है।",
-    "staking_pool_withdraw_date": "{date} को {amount} %{coinSymbolWithEx} निकाले जाएंगे",
-    "staking_portfolio_pending_withdraw": "चक्र समाप्त होने पर {amount} %{coinSymbolWithEx} निकाले जाएंगे",
-    "staking_portfolio_pending_withdraw_countdown": "{value} में {amount} %{coinSymbolWithEx} निकाले जाएंगे",
+    "staking_pool_liquid_desc": "जब आप Tonstakers पूल में %{coinSymbol} स्टेक करते हैं, आपको tsTON नाम का टोकन मिलता है जो पूल में आपके हिस्से को दर्शाता है। जैसे-जैसे पूल लाभ जमा करता है, आपका tsTON अधिक %{coinSymbol} दर्शाता है।",
+    "staking_pool_withdraw_date": "%{date} को %{amount} %{coinSymbol} निकाले जाएंगे",
+    "staking_portfolio_pending_withdraw": "चक्र समाप्त होने पर %{amount} %{coinSymbol} निकाले जाएंगे",
+    "staking_portfolio_pending_withdraw_countdown": "%{value} में %{amount} %{coinSymbol} निकाले जाएंगे",
     "staking_confirm_modal_provider": "प्रदाता",
     "staking_confirm_modal_amount": "राशि",
     "staking_confirm_modal_apy": "APY",
     "staking_confirm_modal_wallet": "वॉलेट",
-    "staking_unstake_cycle_info": "सत्यापन चक्र समाप्त होने के {value} बाद अनुरोध संसाधित होगा",
-    "staking_tonstakers_notice": "स्टेकिंग तृतीय-पक्ष स्मार्ट कॉन्ट्रैक्ट पर आधारित है। Tonkeeper स्टेकिंग अनुभव के लिए जिम्मेदार नहीं है।",
+    "staking_unstake_cycle_info": "सत्यापन चक्र समाप्त होने के %{value} बाद अनुरोध संसाधित होगा",
+    "staking_tonstakers_notice": "स्टेकिंग तृतीय-पक्ष स्मार्ट कॉन्ट्रैक्ट पर आधारित है। Keeper स्टेकिंग अनुभव के लिए जिम्मेदार नहीं है।",
     "staking_claim": "प्राप्त करें",
     "staking_details_pool_address_label": "पूल पता",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} स्टेकिंग लंबित",
-    "staking_pools_min_deposit": "न्यूनतम जमा {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "%{amount} %{coinSymbol} स्टेकिंग लंबित",
+    "staking_pools_min_deposit": "न्यूनतम जमा %{minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "केवल पूर्ण निकासी उपलब्ध है",
+    "trc20_transfer_unavailable": "TRC20 भेजना अस्थायी रूप से अनुपलब्ध है",
     "twa_closed_title": "मिनी ऐप बंद हो गया",
     "twa_closed_subtitle": "iOS, Android या वेब पर वहीं से जारी रखें जहाँ आपने छोड़ा था।",
     "twa_closed_subtitle_wallets": "आपके वॉलेट सुरक्षित हैं। कृपया अपने रिकवरी वाक्यांश सहेजें और iOS, Android या वेब पर वहीं से जारी रखें जहाँ आपने छोड़ा था।",

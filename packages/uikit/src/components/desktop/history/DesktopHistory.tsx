@@ -1,5 +1,5 @@
 import { HistoryEvent, HistoryGridTimeCell } from './HistoryEvent';
-import { SpinnerRing } from '../../Icon';
+import { Loader } from '../../Loader';
 import React, { FC, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
@@ -224,7 +224,7 @@ export const DesktopHistory: FC<{
             />
             {(isFetchingNextPage || !activity) && (
                 <FetchingRows>
-                    <SpinnerRing />
+                    <Loader size="small" className="text-iconSecondary" />
                 </FetchingRows>
             )}
         </>

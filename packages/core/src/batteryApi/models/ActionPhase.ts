@@ -21,44 +21,30 @@ import { mapValues } from '../runtime';
 export interface ActionPhase {
     /**
      * 
-     * @type {boolean}
-     * @memberof ActionPhase
      */
     success: boolean;
     /**
      * 
-     * @type {number}
-     * @memberof ActionPhase
      */
     resultCode: number;
     /**
      * 
-     * @type {number}
-     * @memberof ActionPhase
      */
     totalActions: number;
     /**
      * 
-     * @type {number}
-     * @memberof ActionPhase
      */
     skippedActions: number;
     /**
      * 
-     * @type {number}
-     * @memberof ActionPhase
      */
     fwdFees: number;
     /**
      * 
-     * @type {number}
-     * @memberof ActionPhase
      */
     totalFees: number;
     /**
      * 
-     * @type {string}
-     * @memberof ActionPhase
      */
     resultCodeDescription?: string;
 }
@@ -68,11 +54,11 @@ export interface ActionPhase {
  */
 export function instanceOfActionPhase(value: object): value is ActionPhase {
     if (!('success' in value) || value['success'] === undefined) return false;
-    if (!('resultCode' in value) || value['resultCode'] === undefined) return false;
-    if (!('totalActions' in value) || value['totalActions'] === undefined) return false;
-    if (!('skippedActions' in value) || value['skippedActions'] === undefined) return false;
-    if (!('fwdFees' in value) || value['fwdFees'] === undefined) return false;
-    if (!('totalFees' in value) || value['totalFees'] === undefined) return false;
+    if ((!('resultCode' in (value as Record<string, any>)) && !('result_code' in (value as Record<string, any>))) || ((value as Record<string, any>)['resultCode'] === undefined && (value as Record<string, any>)['result_code'] === undefined)) return false;
+    if ((!('totalActions' in (value as Record<string, any>)) && !('total_actions' in (value as Record<string, any>))) || ((value as Record<string, any>)['totalActions'] === undefined && (value as Record<string, any>)['total_actions'] === undefined)) return false;
+    if ((!('skippedActions' in (value as Record<string, any>)) && !('skipped_actions' in (value as Record<string, any>))) || ((value as Record<string, any>)['skippedActions'] === undefined && (value as Record<string, any>)['skipped_actions'] === undefined)) return false;
+    if ((!('fwdFees' in (value as Record<string, any>)) && !('fwd_fees' in (value as Record<string, any>))) || ((value as Record<string, any>)['fwdFees'] === undefined && (value as Record<string, any>)['fwd_fees'] === undefined)) return false;
+    if ((!('totalFees' in (value as Record<string, any>)) && !('total_fees' in (value as Record<string, any>))) || ((value as Record<string, any>)['totalFees'] === undefined && (value as Record<string, any>)['total_fees'] === undefined)) return false;
     return true;
 }
 
@@ -96,11 +82,11 @@ export function ActionPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function ActionPhaseToJSON(json: any): ActionPhase {
-      return ActionPhaseToJSONTyped(json, false);
-  }
+export function ActionPhaseToJSON(json: any): ActionPhase {
+    return ActionPhaseToJSONTyped(json, false);
+}
 
-  export function ActionPhaseToJSONTyped(value?: ActionPhase | null, ignoreDiscriminator: boolean = false): any {
+export function ActionPhaseToJSONTyped(value?: ActionPhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -15,7 +15,7 @@
         "copy-to-clipboard": "^3.3.3",
         "i18next": "^22.1.4",
         "i18next-browser-languagedetector": "^7.0.2",
-        "i18next-http-backend": "^2.0.2",
+        "i18next-http-backend": "^3.0.5",
         "process": "^0.11.10",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
@@ -38,13 +38,13 @@
         "@types/react-router-dom": "^5.3.3",
         "@types/react-transition-group": "^4.4.5",
         "@types/styled-components": "^5.1.26",
-        "@vitejs/plugin-react": "^4.3.1",
+        "@vitejs/plugin-react": "^4.4.1",
         "react-app-rewired": "^2.2.1",
         "react-is": "^18.2.0",
         "source-map-explorer": "^2.5.3",
         "ts-node": "^10.9.1",
         "typescript": "^4.9.4",
-        "vite": "^5.4.20"
+        "vite": "^6.4.3"
     },
     "scripts": {
         "dev": "vite",

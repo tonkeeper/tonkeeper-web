@@ -20,7 +20,9 @@
 export const PoolImplementationType = {
     Whales: 'whales',
     Tf: 'tf',
-    LiquidTf: 'liquidTF'
+    LiquidTf: 'liquidTF',
+    Ffvault: 'ffvault',
+    Hipo: 'hipo',
 } as const;
 export type PoolImplementationType = typeof PoolImplementationType[keyof typeof PoolImplementationType];
 

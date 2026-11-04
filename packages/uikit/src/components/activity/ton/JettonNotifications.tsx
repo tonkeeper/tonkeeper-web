@@ -9,6 +9,7 @@ import {
     JettonTransferAction,
     JettonVerificationType
 } from '@tonkeeper/core/dist/tonApiV2';
+import { toScaledUIWeiAmount } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, useMemo } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -39,9 +40,10 @@ const JettonTransferActionContent: FC<{
 }> = ({ jettonTransfer, timestamp, event, isScam: isScamEvent, status }) => {
     const wallet = useActiveWallet();
     const { data } = useRate(Address.parse(jettonTransfer.jetton.address).toString());
+    const amount = toScaledUIWeiAmount(jettonTransfer.amount, jettonTransfer.jetton.scaledUi);
     const { fiatAmount } = useFormatFiat(
         data,
-        formatDecimals(jettonTransfer.amount, jettonTransfer.jetton.decimals)
+        formatDecimals(amount, jettonTransfer.jetton.decimals)
     );
     const blacklist = jettonTransfer.jetton.verification === 'blacklist';
     const kind = jettonTransfer.sender?.address === wallet.rawAddress ? 'send' : 'received';
@@ -51,7 +53,7 @@ const JettonTransferActionContent: FC<{
         <ActionDetailsBlock event={event}>
             <ActivityDetailsHeader
                 isScam={isScam}
-                amount={jettonTransfer.amount}
+                amount={amount}
                 decimals={jettonTransfer.jetton.decimals}
                 symbol={sanitizeJetton(
                     jettonTransfer.jetton.symbol,
@@ -108,11 +110,11 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
         const result: string[] = [];
 
         if (jettonSwap.tonIn) {
-            result.push(`${format(jettonSwap.tonIn)} ${BRAND_CONFIG.coinSymbolWithEx}`);
+            result.push(`${format(jettonSwap.tonIn)} ${BRAND_CONFIG.coinSymbol}`);
         } else {
             result.push(
                 `${format(
-                    jettonSwap.amountIn,
+                    toScaledUIWeiAmount(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.scaledUi),
                     jettonSwap.jettonMasterIn?.decimals
                 )} ${sanitizeJetton(
                     jettonSwap.jettonMasterIn?.symbol,
@@ -122,11 +124,11 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
         }
 
         if (jettonSwap.tonOut) {
-            result.push(`${format(jettonSwap.tonOut)} ${BRAND_CONFIG.coinSymbolWithEx}`);
+            result.push(`${format(jettonSwap.tonOut)} ${BRAND_CONFIG.coinSymbol}`);
         } else {
             result.push(
                 `${format(
-                    jettonSwap.amountOut,
+                    toScaledUIWeiAmount(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.scaledUi),
                     jettonSwap.jettonMasterOut?.decimals
                 )} ${sanitizeJetton(
                     jettonSwap.jettonMasterOut?.symbol,
@@ -188,17 +190,15 @@ const JettonMintActionContent: FC<{
     status?: ActionStatusEnum;
 }> = ({ jettonMint, timestamp, event, isScam: isScamEvent, status }) => {
     const { data } = useRate(Address.parse(jettonMint.jetton.address).toString());
-    const { fiatAmount } = useFormatFiat(
-        data,
-        formatDecimals(jettonMint.amount, jettonMint.jetton.decimals)
-    );
+    const amount = toScaledUIWeiAmount(jettonMint.amount, jettonMint.jetton.scaledUi);
+    const { fiatAmount } = useFormatFiat(data, formatDecimals(amount, jettonMint.jetton.decimals));
     const isScam = isScamEvent || jettonMint.jetton.verification === 'blacklist';
 
     return (
         <ActionDetailsBlock event={event}>
             <ActivityDetailsHeader
                 isScam={isScam}
-                amount={jettonMint.amount}
+                amount={amount}
                 decimals={jettonMint.jetton.decimals}
                 symbol={sanitizeJetton(
                     jettonMint.jetton.symbol,
@@ -249,16 +249,14 @@ const JettonBurnActionContent: FC<{
     status?: ActionStatusEnum;
 }> = ({ jettonBurn, timestamp, event, isScam, status }) => {
     const { data } = useRate(Address.parse(jettonBurn.jetton.address).toString());
-    const { fiatAmount } = useFormatFiat(
-        data,
-        formatDecimals(jettonBurn.amount, jettonBurn.jetton.decimals)
-    );
+    const amount = toScaledUIWeiAmount(jettonBurn.amount, jettonBurn.jetton.scaledUi);
+    const { fiatAmount } = useFormatFiat(data, formatDecimals(amount, jettonBurn.jetton.decimals));
 
     return (
         <ActionDetailsBlock event={event}>
             <ActivityDetailsHeader
                 isScam={isScam}
-                amount={jettonBurn.amount}
+                amount={amount}
                 decimals={jettonBurn.jetton.decimals}
                 symbol={jettonBurn.jetton.symbol}
                 total={fiatAmount}

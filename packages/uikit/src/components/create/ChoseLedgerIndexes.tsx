@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Body1, Body2, H2, Label1 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import React, { FC, useState } from 'react';
 import { useTonWalletsBalances } from '../../state/wallet';
 import { SkeletonListDesktopAdaptive } from '../Skeleton';
@@ -103,7 +104,8 @@ export const ChoseLedgerIndexes: FC<{
                                             <Body2Secondary>
                                                 {toShortValue(formatAddress(balance.address))}
                                                 &nbsp;·&nbsp;
-                                                {toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
+                                                {toFormattedTonBalance(balance.tonBalance)}&nbsp;
+                                                {BRAND_CONFIG.coinSymbol}
                                             </Body2Secondary>
                                         </TextContainer>
                                         <Checkbox

@@ -2,7 +2,7 @@
     "name": "@tonkeeper/mobile",
     "version": "0.0.0",
     "license": "Apache-2.0",
-    "description": "Your tablet wallet on The Open Network",
+    "description": "Secure multichain crypto wallet",
     "type": "module",
     "repository": {
         "type": "git",
@@ -32,7 +32,7 @@
         "@capacitor/dialog": "^7.0.1",
         "@capacitor/filesystem": "^7.0.1",
         "@capacitor/haptics": "^6.0.2",
-        "@capacitor/ios": "^6.1.2",
+        "@capacitor/ios": "^6.2.2",
         "@capacitor/keyboard": "^7.0.1",
         "@capacitor/network": "^7.0.0",
         "@capacitor/preferences": "^6.0.2",
@@ -55,7 +55,7 @@
         "react-i18next": "^13.5.0",
         "react-router-dom": "^5.3.4",
         "styled-components": "^6.1.1",
-        "uuid": "^11.0.2",
+        "uuid": "^11.1.1",
         "zod": "^3.25.36"
     },
     "devDependencies": {
@@ -66,8 +66,11 @@
         "@types/react-router-dom": "^5.3.3",
         "@types/styled-components": "^5.1.26",
         "@vitejs/plugin-react": "^4.2.1",
+        "autoprefixer": "^10.4.20",
+        "postcss": "^8.4.49",
+        "tailwindcss": "^3.4.17",
         "typescript": "^5.6.3",
-        "vite": "^6.4.2",
+        "vite": "^6.4.3",
         "vite-plugin-node-polyfills": "0.17.0"
     },
     "packageManager": "yarn@4.3.0"

@@ -29,14 +29,10 @@ import {
 export interface Purchases {
     /**
      * 
-     * @type {number}
-     * @memberof Purchases
      */
     totalPurchases: number;
     /**
      * 
-     * @type {Array<PurchasesPurchasesInner>}
-     * @memberof Purchases
      */
     purchases: Array<PurchasesPurchasesInner>;
 }
@@ -45,7 +41,7 @@ export interface Purchases {
  * Check if a given object implements the Purchases interface.
  */
 export function instanceOfPurchases(value: object): value is Purchases {
-    if (!('totalPurchases' in value) || value['totalPurchases'] === undefined) return false;
+    if ((!('totalPurchases' in (value as Record<string, any>)) && !('total_purchases' in (value as Record<string, any>))) || ((value as Record<string, any>)['totalPurchases'] === undefined && (value as Record<string, any>)['total_purchases'] === undefined)) return false;
     if (!('purchases' in value) || value['purchases'] === undefined) return false;
     return true;
 }
@@ -65,11 +61,11 @@ export function PurchasesFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function PurchasesToJSON(json: any): Purchases {
-      return PurchasesToJSONTyped(json, false);
-  }
+export function PurchasesToJSON(json: any): Purchases {
+    return PurchasesToJSONTyped(json, false);
+}
 
-  export function PurchasesToJSONTyped(value?: Purchases | null, ignoreDiscriminator: boolean = false): any {
+export function PurchasesToJSONTyped(value?: Purchases | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

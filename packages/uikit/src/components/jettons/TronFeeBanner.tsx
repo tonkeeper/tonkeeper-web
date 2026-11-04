@@ -1,6 +1,6 @@
 import styled, { css, useTheme } from 'styled-components';
-import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Body1Class, Body2Class, Body3, Body3Class, Label1Class } from '../Text';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { useTranslation } from '../../hooks/translation';
 import {
     useTrc20FreeTransfersConfig,
@@ -348,7 +348,7 @@ const FeeTable = () => {
             )}
             {(isTronEnabled || hasBatteryTransfers) && (
                 <TableRowTemplate
-                    heading="Tonkeeper Battery"
+                    heading="Keeper Battery"
                     formattedBalance={
                         batteryBalance
                             ? t('battery_charges', {

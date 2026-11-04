@@ -1,0 +1,10 @@
+import type { SVGProps } from 'react';
+const SvgIcChevronRight16 = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16" {...props}>
+        <path
+            fill="currentColor"
+            d="M6.32 2.386a.75.75 0 0 0-.184 1.044L9.335 8l-3.2 4.57a.75.75 0 1 0 1.23.86l3.5-5a.75.75 0 0 0 0-.86l-3.5-5a.75.75 0 0 0-1.045-.184"
+        />
+    </svg>
+);
+export default SvgIcChevronRight16;

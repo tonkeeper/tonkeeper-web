@@ -34,9 +34,14 @@
     "approval": {
         "accepted": "Прийнято",
         "declined": "Приховано",
+        "details_collection": "Деталі колекції",
         "details_token": "Докладніше про токен",
         "id_collection": "ID колекції",
         "id_token": "Ідентифікатор токена",
+        "move_to_accepted_collection": "Показувати колекцію в гаманці",
+        "move_to_accepted_token": "Показати токен у гаманці",
+        "move_to_declined_collection": "Приховати колекцію в гаманці",
+        "move_to_declined_token": "Приховати токен з гаманця",
         "name": "Ім'я",
         "not_spam": "Це не спам",
         "spam": "Спам",
@@ -46,7 +51,7 @@
     "battery": {
         "other_ways": {
             "by_crypto": {
-                "title": "Поповнити за {symbol}"
+                "title": "Поповнити за %{symbol}"
             },
             "gift": {
                 "subtitle": "Поділіться з друзями",
@@ -54,22 +59,30 @@
             }
         },
         "packages": {
-            "disclaimer": "Одна зарядка покриває середню комісію за транзакцію. Деякі транзакції можуть коштувати більше."
+            "disclaimer": "Одна зарядка покриває середню комісію за транзакцію. Деякі транзакції можуть коштувати більше.",
+            "title": {
+                "large": "Великий",
+                "medium": "Середній",
+                "small": "Малий"
+            }
         },
         "please_wait": "Батарейка зарядиться за пару хвилин",
         "promocode": {
-            "title": "Промокод"
+            "title": "Промокод",
+            "apply": "Застосувати",
+            "success": "Ваша батарейка заряджена"
         },
         "recharge_by_crypto": {
             "other": {
                 "subtitle": "Ввести суму вручну",
                 "title": "Інше"
             },
-            "title": "Зарядка"
+            "title": "Зарядка",
+            "title_gift": "Подарунок"
         },
-        "title": "Батарейка Tonkeeper",
+        "title": "Батарейка Keeper",
         "transactions": {
-            "description": "Обрані транзакції будуть оплачені батарейкою Tonkeeper.",
+            "description": "Обрані транзакції будуть оплачені батарейкою Keeper.",
             "settings": "Налаштування батареї",
             "title": "Транзакції",
             "types": {
@@ -98,7 +111,7 @@
         "title": "Браузер"
     },
     "cancel": "Скасувати",
-    "check_words_caption": "Щоб перевірити, чи правильно ви записали свою фразу відновлення, введіть {wordNum1}, {wordNum2} і {wordNum3} слова.",
+    "check_words_caption": "Щоб перевірити, чи правильно ви записали свою фразу відновлення, введіть %{wordNum1}, %{wordNum2} і %{wordNum3} слова.",
     "check_words_success": "Вітаємо! Ви налаштували свій гаманець",
     "check_words_title": "Давайте перевіримо",
     "choose_wallets": {
@@ -131,14 +144,14 @@
     "dns_current_address": "Ваш поточний адреса",
     "dns_expiration_date": "Дата закінчення",
     "dns_renew_toast_success": "Домен продовжено",
-    "dns_renew_until_btn": "Продовжити до {untilDate}",
+    "dns_renew_until_btn": "Продовжити до %{untilDate}",
     "exchange_method_dont_show_again": "Більше не показувати",
-    "exchange_method_open_warning": "Ви відкриваєте зовнішній додаток, яким не керує Tonkeeper.",
+    "exchange_method_open_warning": "Ви відкриваєте зовнішній додаток, яким не керує Keeper.",
     "exchange_modal": {
         "other_ways_to_buy": "Інші способи покупки"
     },
-    "exchange_other_ways": "Інші способи купівлі або продажу %{coinSymbolWithEx}",
-    "exchange_title": "Купити %{coinSymbolWithEx}",
+    "exchange_other_ways": "Інші способи купівлі або продажу %{coinSymbol}",
+    "exchange_title": "Купити %{coinSymbol}",
     "import_add_wallet": "Додати гаманець",
     "import_add_wallet_description": "Створіть новий гаманець або додайте існуючий.",
     "import_existing_wallet": "Імпортувати існуючий гаманець",
@@ -154,18 +167,16 @@
     "intro_continue_btn": "Почати",
     "intro_item1_caption": "Завдяки унікальній архітектурі The Open Network, %{chainName}-транзакції виконуються за секунди.",
     "intro_item1_title": "Світова швидкість",
-    "intro_item2_caption": "Tonkeeper зберігає ваші криптографічні ключі на вашому пристрої. Усі транзакції виконуються через децентралізовані протоколи, тому ваша криптовалюта ніколи не потрапить до централізованих бірж.",
+    "intro_item2_caption": "Keeper зберігає ваші криптографічні ключі на вашому пристрої. Усі транзакції виконуються через децентралізовані протоколи, тому ваша криптовалюта ніколи не потрапить до централізованих бірж.",
     "intro_item2_title": "Сквозна безпека",
     "intro_title": "Вітаємо в",
-    "jetton_id": "ID токена: {jettonAddress}",
+    "jetton_id": "ID токена: %{jettonAddress}",
     "jettons_list_title": "Токени",
     "later": "Пізніше",
     "ledger": {
         "operation_not_supported": "Операція недоступна для гаманців Ledger. Виберіть інший гаманець і повторіть спробу."
     },
-    "legal_font_license": "Шрифт Montserrat",
     "legal_header_title": "Юридичні документи",
-    "legal_licenses_title": "Ліцензії",
     "legal_privacy": "Політика конфіденційності",
     "legal_terms": "Умови використання",
     "loading": "Завантаження",
@@ -197,7 +208,7 @@
         "title": "Передача NFT"
     },
     "nft_transfer_title": "Перевести NFT",
-    "nft_unlink_domain_button": "Пов'язано з '{{'address'}}'",
+    "nft_unlink_domain_button": "Пов'язано з {{address}}",
     "nft_view_in_explorer": "Переглянути в провіднику",
     "notifications": {
         "alert": {
@@ -217,7 +228,7 @@
     "recovery_phrase": {
         "copy_button": "Копіювати"
     },
-    "reminder_notifications_caption": "Отримуйте сповіщення при отриманні %{coinSymbolWithEx}, токенів та NFT.",
+    "reminder_notifications_caption": "Отримуйте сповіщення при отриманні %{coinSymbol}, токенів та NFT.",
     "reminder_notifications_enable_button": "Увімкнути сповіщення",
     "reminder_notifications_later_button": "Пізніше",
     "reminder_notifications_title": "Отримуйте миттєві сповіщення",
@@ -230,7 +241,7 @@
     "send_publish_tx_error": "Не вдалося надіслати транзакцію",
     "send_screen_steps": {
         "address": {
-            "delete_alert_text": "Ви впевнені, що хочете видалити «{name}» з обраного?",
+            "delete_alert_text": "Ви впевнені, що хочете видалити «%{name}» з обраного?",
             "suggest_actions": {
                 "add": "Додати до вибраного",
                 "delete": "Видалити",
@@ -241,7 +252,7 @@
         "amount": {
             "insufficient_balance": "Недостатньо коштів",
             "max": "МАКС",
-            "remaining": "Доступно: {amount}"
+            "remaining": "Доступно: %{amount}"
         },
         "comfirm": {
             "comment_required_text": "Ви повинні включити примітку біржі для переказу. Без неї ваші кошти буде втрачено.",
@@ -250,7 +261,7 @@
         },
         "done": {
             "done_label": "Готово",
-            "to": "До: {name}"
+            "to": "До: %{name}"
         }
     },
     "send_sending_wrong_time_description": "Увімкніть автоматичне встановлення часу та дати в налаштуваннях вашого пристрою. Потім повторіть переказ.",
@@ -260,10 +271,10 @@
     "settings_jettons_list": "Токени",
     "settings_legal_documents": "Юридичні документи",
     "settings_network_alert_title": "Виберіть мережу",
-    "settings_news": "Новини Tonkeeper",
+    "settings_news": "Новини Keeper",
     "settings_notifications": "Сповіщення",
     "settings_primary_currency": "Валюта",
-    "settings_rate": "Оцініть Tonkeeper",
+    "settings_rate": "Оцініть Keeper",
     "settings_recovery_phrase": "Секретний ключ",
     "settings_reset": "Вийти",
     "settings_reset_alert_title": "🚧 🚨 Вийти з гаманця? 🚨 🚧",
@@ -293,17 +304,17 @@
     "staking_earnings_section_title": "Очікуваний річний дохід",
     "staking_enter_amount": "Введіть суму",
     "staking_insufficient_balance": "Недостатній баланс",
-    "staking_insufficient_recommended_fee_reserve": "Недостатньо коштів: на балансі гаманця мають бути 1 %{coinSymbolWithEx} у резерві та 0.05 %{coinSymbolWithEx} на комісію.",
+    "staking_insufficient_recommended_fee_reserve": "Недостатньо коштів: на балансі гаманця мають бути 1 %{coinSymbol} у резерві та 0.05 %{coinSymbol} на комісію.",
     "staking_max": "МАКС",
     "staking_min_deposit_label": "Мінімальний депозит",
     "staking_next_cycle_desc_liquid": "Доступне миттєве зняття",
-    "staking_next_cycle_message": "Наступний цикл через {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · Мін. депозит {minDeposit} %{coinSymbolWithEx}",
-    "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} готові до виведення",
+    "staking_next_cycle_message": "Наступний цикл через %{value}",
+    "staking_pool_detail": "APY ≈ %{apy}% · Мін. депозит %{minDeposit} %{coinSymbol}",
+    "staking_pools_apy": "APY ≈ %{apy}%",
+    "staking_ready_withdraw": "%{amount} %{coinSymbol} готові до виведення",
     "staking_rewards_after_stake": "Після стейкінгу",
     "staking_rewards_current": "Поточна",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ %{value} %{coinSymbol}",
     "staking_staked": "Стейкінг",
     "staking_title": "Стейкінг",
     "staking_top_up": "Внести",
@@ -346,10 +357,9 @@
         "subtitle": "NFT може бути небезпечним з однієї з наступних причин.",
         "title": "Неперевірений NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "Недостатньо %{coinSymbolWithEx} для комісії мережі ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "Недостатньо %{coinSymbol} для комісії мережі (%{required})",
     "swap_exchange_in": "Обміняти в",
     "swap_expired_refresh": "Своп закінчився. Оновіть котирування",
-    "swap_price_impact_description": "Різниця між ринковою ціною та розрахунковою ціною через розмір угоди.",
     "swap_price_impact_ignore_variant": "Ігнорувати",
     "swap_slippage_tolerance": "Допустиме проковзування",
     "swap_slippage_tolerance_description": "Величина, на яку ціна може змінитися несприятливо до скасування операції.",
@@ -359,9 +369,9 @@
     "tokenDetails": {
         "tonviewer_button": "Відкрити в Tonviewer"
     },
-    "tonkeeper_pro": "Tonkeeper Pro",
-    "tonkeeper_pro_description": "Підписка Tonkeeper Pro постачається з розширеною функцією гаманця, що пропонує набір інструментів для управління криптовалютою",
-    "ton_login_caption": "{name} запитує доступ до адреси вашого гаманця",
+    "tonkeeper_pro": "Keeper Pro",
+    "tonkeeper_pro_description": "Підписка Keeper Pro постачається з розширеною функцією гаманця, що пропонує набір інструментів для управління криптовалютою",
+    "ton_login_caption": "%{name} запитує доступ до адреси вашого гаманця",
     "ton_login_connect_button": "Підключити гаманець",
     "ton_login_notice": "Обов'язково перевірте адресу сервісу перед підключенням гаманця.",
     "ton_login_success": "Готово",
@@ -375,7 +385,7 @@
     "transaction_fee": "Комісія",
     "transaction_hash": "Транзакція",
     "transaction_merchant": "Продавець",
-    "transaction_receive_date": "Отримано {date}",
+    "transaction_receive_date": "Отримано %{date}",
     "transaction_recipient": "Отримувач",
     "transaction_recipient_address": "Адреса одержувача",
     "transactions": {
@@ -390,7 +400,7 @@
     },
     "transaction_sender": "Відправник",
     "transaction_sender_address": "Адреса відправника",
-    "transaction_sent_date": "Відправлено {date}",
+    "transaction_sent_date": "Відправлено %{date}",
     "transaction_type_bid": "Ставка",
     "transaction_type_contract_deploy": "Розгортання контракту",
     "transaction_type_pending": "В очікуванні",
@@ -410,7 +420,7 @@
             "types": {
                 "jettonTransfer": "Трансфер токена",
                 "nftItemTransfer": "Трансфер NFT",
-                "tonTransfer": "Відправка %{coinSymbolWithEx}",
+                "tonTransfer": "Відправка %{coinSymbol}",
                 "unknownTransaction": "Невідома транзакція"
             }
         }
@@ -437,7 +447,7 @@
             "received": "Отримано",
             "sent": "Надіслано",
             "swapped": "Обміняно",
-            "time_on": "{time}",
+            "time_on": "%{time}",
             "withdraw": "Виведення"
         },
         "activity": {
@@ -454,11 +464,11 @@
             "notification_desc_did_change": "Адреса вашого гаманця оновлено до формату UQ. Стара адреса також продовжує працювати.",
             "notification_desc_will_change": "5 жовтня ваша адреса гаманця оновиться до формату UQ, який є кращим. Стара адреса також буде працювати. Нічого робити не потрібно.",
             "old_style": "Стара адреса",
-            "post_dates": "\n5 жовтня 2023: всі адреси в Tonkeeper перейдуть на формат UQ.\n\n1 січня 2024: Tonkeeper припинить перевірку статусу контракту та використовуватиме у адресі прапорець \"bounceable\". Монети, відправлені на неопубліковані контракти з адресою EQ, повернуться назад відправнику.",
+            "post_dates": "\n5 жовтня 2023: всі адреси в Keeper перейдуть на формат UQ.\n\n1 січня 2024: Keeper припинить перевірку статусу контракту та використовуватиме у адресі прапорець \"bounceable\". Монети, відправлені на неопубліковані контракти з адресою EQ, повернуться назад відправнику.",
             "post_published_date": "Опубліковано: 27 вересня 2023",
             "post_rest": "У блокчейні TON існує два стилі адрес, і до сих пір для додатків і гаманців використовувався лише один з них.\n\nФормат EQ найкраще підходить для смарт-контрактів, що обробляють вхідні кошти. Якщо смарт-контракт ще не опублікований — тобто коду немає в блокчейні — то TONи, відправлені на цю адресу, повернуться назад до відправника. Це така функція безпеки: у разі будь-якої помилки TONи повертаються назад.\n\nФормат UQ найкраще підходить для гаманців. Монети ніколи не повертаються, тому що гаманці призначені для зберігання коштів. Кожен гаманець починається як звичайна адреса без коду в блокчейні. Тому немає сенсу у поверненні монет назад.\n\nЦього року ми переходимо на більш підходящий формат UQ для гаманців. Якщо ви продовжите відправляти кошти на стару адресу EQ, яку вам хтось дав, існує два варіанти:",
             "post_top": "До кінця цього року вся мережа TON відображатиме адреси гаманців інакше. Нова адреса починатиметься з UQ замість EQ. Також зміняться останні чотири літери. Стара адреса також працюватиме і направлятиме до того ж гаманця. Це жодним чином не вплине на безпеку коштів, які зберігаються у вашому гаманці.",
-            "second_option": "Менш ймовірно, що гаманець ніколи не використовувався для платежів. І Tonkeeper не надсилатиме монети на цю адресу наступного року. Вам потрібно буде попросити отримувача надати нову UQ-адресу.",
+            "second_option": "Менш ймовірно, що гаманець ніколи не використовувався для платежів. І Keeper не надсилатиме монети на цю адресу наступного року. Вам потрібно буде попросити отримувача надати нову UQ-адресу.",
             "title": "Оновлення адреси",
             "why_change": "Чому змінити?",
             "your_wallet": "Ваш гаманець"
@@ -497,7 +507,7 @@
             "azure": "Лазурний",
             "coral": "Кораловий",
             "cosmos": "Космос",
-            "default": "Tonkeeper",
+            "default": "Keeper",
             "flamingo": "Фламінго",
             "fluid": "Флюїд",
             "galaxy": "Галактика",
@@ -509,46 +519,41 @@
         "appearance_confirm": "Застосувати",
         "appearance_description": "TON Diamonds NFT зробить ваш гаманець більш яскравим і унікальним.",
         "appearance_title": "Тема",
-        "app_name": "Tonkeeper",
+        "app_name": "Keeper",
         "approval": {
             "accept": "Прийняти",
-            "accepted_at_collection": "Прийнято {date}",
-            "accepted_at_token": "Прийнято {date}",
+            "accepted_at_collection": "Прийнято %{date}",
+            "accepted_at_token": "Прийнято %{date}",
             "accepted_collection": "Прийнята колекція",
             "accepted_token": "Прийнятий токен",
             "approve_all": "Прийняти все",
-            "approve_collection_many": "Затвердити вхідні токени з колекції \"{collection}\"",
-            "approve_collection_one": "Схвалити вхідний токен із колекції \"{collection}\",",
-            "approve_many": "Підтвердьте {count} вхідних токенів",
-            "approve_many.few": "Затвердьте {count} вхідних токенів",
-            "approve_many.many": "Підтвердіть {count} вхідних токенів",
-            "approve_many.one": "Підтвердіть {count} вхідний токен",
-            "approve_many.other": "Погодьте {count} вхідних токенів",
-            "approve_token": "Підтвердьте вхідний токен \"{name}\"",
-            "approve_two_collections": "Схвалити вхідні токени з колекцій \"{collection1}\" \"{collection2}\"",
-            "approve_two_tokens": "Схваліть вхідні токени \",{name1}\", та \"{name2}\"",
+            "approve_collection_many": "Затвердити вхідні токени з колекції \"%{collection}\"",
+            "approve_collection_one": "Схвалити вхідний токен із колекції \"%{collection}\",",
+            "approve_many": "Підтвердьте %{count} вхідних токенів",
+            "approve_many.few": "Затвердьте %{count} вхідних токенів",
+            "approve_many.many": "Підтвердіть %{count} вхідних токенів",
+            "approve_many.one": "Підтвердіть %{count} вхідний токен",
+            "approve_many.other": "Погодьте %{count} вхідних токенів",
+            "approve_token": "Підтвердьте вхідний токен \"%{name}\"",
+            "approve_two_collections": "Схвалити вхідні токени з колекцій \"%{collection1}\" \"%{collection2}\"",
+            "approve_two_tokens": "Схваліть вхідні токени \",%{name1}\", та \"%{name2}\"",
             "blacklisted_collection": "Колекція в чорному списку",
             "blacklisted_token": "Заблокований токен",
             "decline": "Приховане",
-            "declined_at_collection": "Відхилено {date}",
-            "declined_at_token": "Відхилено {date}",
-            "details_collection": "Деталі колекції",
+            "declined_at_collection": "Відхилено %{date}",
+            "declined_at_token": "Відхилено %{date}",
             "manage_tokens": "Керувати токенами",
             "move_to_accepted": "Перемістити в Прийняті",
-            "move_to_accepted_collection": "Показувати колекцію в гаманці",
-            "move_to_accepted_token": "Показати токен у гаманці",
             "move_to_declined": "Перемістити в Відхилені",
-            "move_to_declined_collection": "Приховати колекцію в гаманці",
-            "move_to_declined_token": "Приховати токен з гаманця",
             "pending": "В очікуванні",
             "show_all": "Показати всі",
             "single_token": "Одинарний токен",
             "token_copied": "ID токена скопійовано",
             "token_count": {
-                "few": "{count} токена",
-                "many": "{count} токенів",
-                "one": "{count} токен",
-                "other": "{count} токенів"
+                "few": "%{count} токена",
+                "many": "%{count} токенів",
+                "one": "%{count} токен",
+                "other": "%{count} токенів"
             },
             "verify_collection": "Перевірте колекцію",
             "verify_description_collection": "Ці токени випущені невідомим емітентом. Для виявлення підробок перевірте ID колекції за офіційним джерелом емітента. Ви можете змінити видимість токенів пізніше в налаштуваннях.",
@@ -559,13 +564,13 @@
         },
         "auth_failed": "Автентифікація не вдалася",
         "backup_check": {
-            "caption": "Давайте перевіримо, чи все у вас вийшло правильно. Введіть слова {one}, {two} і {three}.",
+            "caption": "Давайте перевіримо, чи все у вас вийшло правильно. Введіть слова %{one}, %{two} і %{three}.",
             "done_button": "Готово",
             "title": "Перевірка резервної копії"
         },
         "backup_screen": {
-            "backup_warning": "Ваш баланс {totalFiat}, і його захищає лише секретний ключ, яку ви ще не записали. Зробіть резервну копію фрази, щоб уникнути втрати коштів у разі проблем з пристроєм.",
-            "last_backup_time": "Останнє резервне копіювання {time}",
+            "backup_warning": "Ваш баланс %{totalFiat}, і його захищає лише секретний ключ, яку ви ще не записали. Зробіть резервну копію фрази, щоб уникнути втрати коштів у разі проблем з пристроєм.",
+            "last_backup_time": "Останнє резервне копіювання %{time}",
             "manual_backup_on": "Резервне копіювання ввімкнено",
             "manual_button": "Зробити резервну копію вручну",
             "manual_caption": "Створіть резервну копію свого гаманця вручну, записавши ключову фразу.",
@@ -577,26 +582,26 @@
             "cancel_button": "Скасувати",
             "caption": "Будь ласка, уважно прочитайте наступне перед переглядом вашої фрази відновлення.",
             "continue_button": "Продовжити",
-            "p1": "Ніколи не вводьте свою ключову фразу в будь-якому іншому місці, окрім Tonkeeper, щоб отримати доступ до свого гаманця.",
-            "p2": "Підтримка Tonkeeper ніколи не запитує ключову фразу.",
+            "p1": "Ніколи не вводьте свою ключову фразу в будь-якому іншому місці, окрім Keeper, щоб отримати доступ до свого гаманця.",
+            "p2": "Підтримка Keeper ніколи не запитує ключову фразу.",
             "p3": "Усі, хто знає вашу фразу відновлення, можуть отримати доступ до вашого гаманця.",
             "title": "Увага"
         },
         "battery": {
             "description": {
-                "empty": "Обмінюйте через Tonkeeper, надсилайте токени та NFT.",
+                "empty": "Обмінюйте через Keeper, надсилайте токени та NFT.",
                 "less_10": "У вас достатньо заряду батареї для менше ніж 10 транзакцій.",
                 "other": "У вас достатньо заряду акумулятора для виконання більше ніж % транзакцій.",
-                "other.few": "{count} заряди",
-                "other.many": "{count} зарядів",
-                "other.one": "{count} заряд",
-                "other.other": "{count} зарядів"
+                "other.few": "%{count} заряди",
+                "other.many": "%{count} зарядів",
+                "other.one": "%{count} заряд",
+                "other.other": "%{count} зарядів"
             },
-            "max_input_amount": "Максимальна сума {amount}",
+            "max_input_amount": "Максимальна сума %{amount}",
             "ok": "OK",
             "other_ways": {
                 "by_crypto": {
-                    "subtitle": "Використовуємо {methods}"
+                    "subtitle": "Використовуємо %{methods}"
                 },
                 "promo": {
                     "subtitle": "Вам пощастило",
@@ -610,26 +615,18 @@
                 "refund": "Історія зарядів",
                 "restore": "Відновити покупки",
                 "subtitle": {
-                    "few": "{count} заряди",
-                    "many": "{count} зарядів",
-                    "one": "{count} заряд",
-                    "other": "{count} зарядів"
-                },
-                "title": {
-                    "large": "Великий",
-                    "medium": "Середній",
-                    "small": "Малий"
+                    "few": "%{count} заряди",
+                    "many": "%{count} зарядів",
+                    "one": "%{count} заряд",
+                    "other": "%{count} зарядів"
                 }
             },
             "promocode": {
-                "apply": "Застосувати",
                 "button": "Поповнити за промокоду",
-                "placeholder": "Промокод",
-                "success": "Ваша батарейка заряджена"
+                "placeholder": "Промокод"
             },
             "recharge_by_crypto": {
                 "continue": "Продовжити",
-                "title_gift": "Подарунок",
                 "tokens": "Токени"
             },
             "refilled": "Батарейка поповнена",
@@ -644,18 +641,18 @@
             "settings": "Батарейка",
             "transactions": {
                 "charges_per_action": {
-                    "few": "≈ {count} зарядів за {transactionName}",
-                    "many": "≈ {count} зарядок за {transactionName}",
-                    "one": "≈ {count} заряд за {transactionName}",
-                    "other": "≈ {count} зарядок за {transactionName}"
+                    "few": "≈ %{count} зарядів за %{transactionName}",
+                    "many": "≈ %{count} зарядок за %{transactionName}",
+                    "one": "≈ %{count} заряд за %{transactionName}",
+                    "other": "≈ %{count} зарядок за %{transactionName}"
                 },
                 "supported": "Підтримувані транзакції",
                 "types": {
                     "jetton": "трансфер токенів",
-                    "swap": "обмін через Tonkeeper",
+                    "swap": "обмін через Keeper",
                     "ton": "трансфер TON"
                 },
-                "will_be_paid": "Будуть сплачені: {enabledTransactions}"
+                "will_be_paid": "Будуть сплачені: %{enabledTransactions}"
             }
         },
         "biometry": {
@@ -693,14 +690,14 @@
             }
         },
         "browser": {
-            "about_dapps_caption": "Відкривайте додатки та сервіси, де можна використовувати Tonkeeper для входу та платежів.",
+            "about_dapps_caption": "Відкривайте додатки та сервіси, де можна використовувати Keeper для входу та платежів.",
             "about_dapps_learn_more": "Дізнатися більше",
-            "about_dapps_title": "Використовуйте Tonkeeper з додатками та сервісами TON",
+            "about_dapps_title": "Використовуйте Keeper з додатками та сервісами TON",
             "actions": {
                 "disconnect": "Відключити",
                 "mute": "Вимкнути звук"
             },
-            "connected_empty_text": "Досліджуйте програми і сервіси в браузері Tonkeeper.",
+            "connected_empty_text": "Досліджуйте програми і сервіси в браузері Keeper.",
             "connected_empty_title": "Ваші підключені додатки з'являться тут",
             "connected_title": "Підключено",
             "empty_search": "Ваш пошук не дав результатів",
@@ -712,11 +709,11 @@
             "popular_title": "Популярні",
             "remove_alert": {
                 "approve_button": "Видалити",
-                "title": "Видалити «{name}»?"
+                "title": "Видалити «%{name}»?"
             },
             "search_label": "Пошук або введіть адресу",
             "start_typing": "Введите адрес или поиск в интернете",
-            "web_search_title": "Пошук у {searchEngine}"
+            "web_search_title": "Пошук у %{searchEngine}"
         },
         "buy_ton": {
             "subtitle": "Миттєво з банківською картою",
@@ -787,7 +784,7 @@
         "confirm_sending_liquid_warn_description": "Ви більше не будете отримувати нагороди за надіслані застейкані TON. Нагороди почне отримувати новий власник.",
         "confirm_sending_liquid_warn_title": "Примітка",
         "confirm_sending_message": "Коментар",
-        "confirm_sending_method_title": "Відправити ваші кошти до {name}?",
+        "confirm_sending_method_title": "Відправити ваші кошти до %{name}?",
         "confirm_sending_recipient": "Отримувач",
         "confirm_sending_recipient_address": "Адреса отримувача",
         "confirm_sending_sent_caption_btc": "Ваша транзакція відправлена в мережу і буде оброблена протягом години.",
@@ -799,7 +796,7 @@
             "network_fee": "Мережевий збір",
             "refund": "Повернення коштів",
             "title": "Підтвердити дію",
-            "total_risk": "Всього: {totalAmount}",
+            "total_risk": "Всього: %{totalAmount}",
             "to_your_address": "На вашу адресу",
             "transaction_type": {
                 "burn": "Спалити",
@@ -819,30 +816,30 @@
         "deploy_contract_title": "Розгорнути контракт",
         "disable_nft_marketplace_banner_description": "Колекціонуйте і обмінюйте.",
         "dns_addresses": {
-            "few": "{count} адреси",
-            "many": "{count} адреси",
-            "one": "{count} адресa",
-            "other": "{count} адрес"
+            "few": "%{count} адреси",
+            "many": "%{count} адреси",
+            "one": "%{count} адресa",
+            "other": "%{count} адрес"
         },
         "dns_alert_expiring_many": {
-            "few": "У вас {count} доменів, що скоро закінчуються. Оновіть їх до {untilDate}.",
-            "many": "У вас є {count} доменів, що скоро протермінуються. Поновіть усі до {untilDate}.",
-            "one": "У вас є {count} домен із закінченням строку. Продовжіть усі до {untilDate}.",
-            "other": "У вас є {count} доменів, термін дії яких спливає. Поновіть усі до {untilDate}."
+            "few": "У вас %{count} доменів, що скоро закінчуються. Оновіть їх до %{untilDate}.",
+            "many": "У вас є %{count} доменів, що скоро протермінуються. Поновіть усі до %{untilDate}.",
+            "one": "У вас є %{count} домен із закінченням строку. Продовжіть усі до %{untilDate}.",
+            "other": "У вас є %{count} доменів, термін дії яких спливає. Поновіть усі до %{untilDate}."
         },
-        "dns_alert_expiring_one": "{domain} закінчується через {count} днів. Поновіть до {untilDate}.",
+        "dns_alert_expiring_one": "%{domain} закінчується через %{count} днів. Поновіть до %{untilDate}.",
         "dns_link_title": "Підтвердити транзакцію",
         "dns_on_sale_text": "Домен зараз виставлений на продаж на ринку. Для передачі ви повинні спершу зняти його з продажу.",
-        "dns_renew_all_until_btn": "Оновити все до {untilDate}",
+        "dns_renew_all_until_btn": "Оновити все до %{untilDate}",
         "dns_renew_in_progress_btn": "Виконується поновлення домену...",
         "dns_renew_valid_caption": {
-            "few": "Закінчується через {count} дні",
-            "many": "Закінчується через {count} днів",
-            "one": "Закінчується через {count} день",
-            "other": "Закінчується через {count} днів"
+            "few": "Закінчується через %{count} дні",
+            "many": "Закінчується через %{count} днів",
+            "one": "Закінчується через %{count} день",
+            "other": "Закінчується через %{count} днів"
         },
         "dns_replace_button": "Замінити",
-        "dns_replace_description": "Додайте адресу гаманця, на яку буде посилатися домен '{{'domain'}}'.",
+        "dns_replace_description": "Додайте адресу гаманця, на яку буде посилатися домен {{domain}}.",
         "dns_replace_save": "Зберегти",
         "dns_unlink_title": "Підтвердьте відв'язування",
         "dns_wallet_address": "Адреса гаманця",
@@ -883,16 +880,16 @@
             "done_button": "Готово",
             "enable_notifications": "Увімкніть сповіщення про транзакції",
             "header_title": "Завершити налаштування",
-            "join_tg": "Приєднуйтесь до каналу Tonkeeper",
-            "use_biometry": "Використовуйте {name} для підтвердження транзакції"
+            "join_tg": "Приєднуйтесь до каналу Keeper",
+            "use_biometry": "Використовуйте %{name} для підтвердження транзакції"
         },
         "form_optional_indicator": "Необов'язково",
         "gasless": {
-            "switch_label": "Натисніть, щоб оплатити в {currency}"
+            "switch_label": "Натисніть, щоб оплатити в %{currency}"
         },
         "import_wallet_reset_caption": "Поверніть доступ до свого гаманця, ввівши 24 секретні слова, які ви записали при створенні гаманця.",
         "indexer_latency_error": "Помилка відправлення. Спробуйте пізніше",
-        "info_about_inactive_desc1": "Tonkeeper не знає, чи ця адреса є гаманцем або смарт-контрактом.",
+        "info_about_inactive_desc1": "Keeper не знає, чи ця адреса є гаманцем або смарт-контрактом.",
         "info_about_inactive_desc2": "Якщо ви хочете просто перевести гроші на гаманець — ви можете продовжити.",
         "info_about_inactive_desc3_1": "Якщо ви очікуєте автоматичної дії від смарт-контракту,",
         "info_about_inactive_desc3_2": "— ваш переказ може зупинитися на цій адресі.",
@@ -903,9 +900,9 @@
         "it_expires_on": "Термін дії закінчується",
         "jetton_buy_tether": "Купити USD₮",
         "jetton_id_copied": "ID токена скопійовано",
-        "jetton_locked_till": "Заблоковано до {date}",
+        "jetton_locked_till": "Заблоковано до %{date}",
         "jetton_migrate_tether": "Обміняти jUSDT на USD₮",
-        "jetton_name": "{name} Токен",
+        "jetton_name": "%{name} Токен",
         "jetton_open_explorer": "Переглянути деталі",
         "jetton_price": "Ціна:",
         "jettons_manage_tokens": "Керувати токенами",
@@ -943,7 +940,7 @@
             "min_required_version": {
                 "button": "OK",
                 "subtitle": "Цей тип транзакції не підтримується у вашій поточній версії додатку.",
-                "title": "Оновіть додаток TON у Ledger до версії {version}"
+                "title": "Оновіть додаток TON у Ledger до версії %{version}"
             },
             "open_ton_app": "Розблокуйте його і відкрийте додаток TON"
         },
@@ -960,17 +957,17 @@
         },
         "manage_other_coins": "Керувати моїми криптовалютами",
         "migration_cancel_btn": "Не оновлювати зараз",
-        "migration_caption": "Tonkeeper запроваджує новий формат гаманця з підтримкою регулярних платежів. Ваш баланс буде перенесено на нову адресу. Ваша секретна фраза залишиться без змін.",
+        "migration_caption": "Keeper запроваджує новий формат гаманця з підтримкою регулярних платежів. Ваш баланс буде перенесено на нову адресу. Ваша секретна фраза залишиться без змін.",
         "migration_failed": "Помилка міграції. Ваш баланс не вдалося перенести.",
-        "migration_fee_info": "Комісія за транзакцію ≈{tonFee} TON ({fiatFee})",
+        "migration_fee_info": "Комісія за транзакцію ≈%{tonFee} TON (%{fiatFee})",
         "migration_in_progress": "Йде оновлення до версії гаманця v4",
         "migration_migrate_btn": "Оновити гаманець",
         "migration_new_wallet": "Новий гаманець",
         "migration_old_wallet": "Старий гаманець",
         "migration": {
             "subtitle": "Розблокуйте гаманець, щоб продовжити.",
-            "title": "Перенесіть свій гаманець у нову версію Tonkeeper",
-            "with_biometry": "Продовжити з {type}"
+            "title": "Перенесіть свій гаманець у нову версію Keeper",
+            "with_biometry": "Продовжити з %{type}"
         },
         "migration_title": "Оновіть гаманець",
         "nft_about_dns": "TON DNS — це сервіс, який дозволяє призначати криптогаманцям, смарт-контрактам і сайтам зрозумілі для людини назви. \n\nЗ TON DNS доступ до децентралізованих сервісів аналогічний доступу до веб-сайтів в інтернеті.",
@@ -985,7 +982,7 @@
         "nft_change_theme": "Змінити тему",
         "nft_collection_name": "Назва колекції",
         "nft_confirm_operation": "Підтвердити",
-        "nft_diamonds_description": "TON Diamonds мають здатність змінювати тему у вашому гаманці Tonkeeper та співставляти її з кольором вашого NFT.",
+        "nft_diamonds_description": "TON Diamonds мають здатність змінювати тему у вашому гаманці Keeper та співставляти її з кольором вашого NFT.",
         "nft_features": "Функції",
         "nft_fee": "Комісія",
         "nft_fee_and_royalties": "Комісії та роялті",
@@ -1024,7 +1021,7 @@
                 "fee": {
                     "label": "Комісія",
                     "refund_label": "Відшкодування",
-                    "value": "≈ {value} TON"
+                    "value": "≈ %{value} TON"
                 }
             }
         },
@@ -1034,16 +1031,16 @@
         "nft_unnamed_collection": "Колекція без назви",
         "nokyc": "без KYC",
         "notcoin": {
-            "all": "Обміняти все в Tonkeeper Pro",
+            "all": "Обміняти все в Keeper Pro",
             "burn_not_available": {
-                "hours": "Обмін буде доступний через {count} годин",
-                "minutes": "Обмін буде доступний через {count} хвилину",
-                "seconds": "Обмін буде доступний через {count} секунд"
+                "hours": "Обмін буде доступний через %{count} годин",
+                "minutes": "Обмін буде доступний через %{count} хвилину",
+                "seconds": "Обмін буде доступний через %{count} секунд"
             },
             "count": "Кількість ваучерів",
             "count_max": "Максимум 4 за обмін",
             "exchange": "Обміняти\nваучери на NOT",
-            "exchange_all": "Обміняти всі\nв Tonkeeper Pro",
+            "exchange_all": "Обміняти всі\nв Keeper Pro",
             "exchange_subtitle": "NOT з'являться на вашому балансі незабаром після обміну.",
             "exchange_title": "Обміняйте свої ваучери на NOT",
             "exchange_to_not": "Обміняти на NOT",
@@ -1065,7 +1062,7 @@
             "allow_notifications": "Увімкнути сповіщення",
             "apps": "Додатки",
             "apps_description": "Сповіщення від підключених застосунків у вашій активності",
-            "disconnect_app": "Відключити {app_name}",
+            "disconnect_app": "Відключити %{app_name}",
             "disconnected_app": "Відключено додаток",
             "earlier": "Раніше",
             "from_connected": "З пов'язаних застосунків",
@@ -1073,7 +1070,7 @@
             "mute_notifications": "Вимкнути сповіщення",
             "notifications": "Повідомлення",
             "placeholder": {
-                "description": "Досліджуйте застосунки та сервіси в браузері Tonkeeper.",
+                "description": "Досліджуйте застосунки та сервіси в браузері Keeper.",
                 "title": "Сповіщення будуть показані тут"
             },
             "report": "Поскаржитися"
@@ -1085,8 +1082,8 @@
         "notifications_switch_title": "Push-сповіщення",
         "notifications_title": "Сповіщення",
         "notification_switch_description": "Отримуйте сповіщення при отриманні TON, токенів і NFT. Сповіщення від підключених додатків.",
-        "notify_connection_err_caption": "{host} не відповідає. Спробуйте пізніше.",
-        "notify_connection_err_caption_few": "{hosts} і {lastHost} не відповідають. Спробуйте пізніше.",
+        "notify_connection_err_caption": "%{host} не відповідає. Спробуйте пізніше.",
+        "notify_connection_err_caption_few": "%{hosts} і %{lastHost} не відповідають. Спробуйте пізніше.",
         "notify_connection_err_title": "Не вдалося підключитися до серверу",
         "notify_incorrect_time_err_caption": "Увімкніть автоматичний час і дату у налаштуваннях пристрою. Відсутність автоматичного налаштування часу може вплинути на переказ коштів.",
         "notify_incorrect_time_err_title": "Час і дата невірні",
@@ -1122,7 +1119,7 @@
         "programmable_nfts": {
             "alert": {
                 "cancel": "Скасування",
-                "description": "Відвідуйте це зовнішнє посилання тільки в тому випадку, якщо ви довіряєте автору колекції.\n\n'{{'uri'}}'",
+                "description": "Відвідуйте це зовнішнє посилання тільки в тому випадку, якщо ви довіряєте автору колекції.\n\n{{uri}}",
                 "open": "Відкрити все одно",
                 "title": "Ви впевнені, що хочете відкрити зовнішнє посилання?"
             }
@@ -1133,14 +1130,14 @@
         "receive_copy": "Копіювати",
         "receiveModal": {
             "receive": "Отримати",
-            "receive_description": "Відправляйте на цю адресу тільки {tokenName} і токени в мережі TON, інакше ви можете втратити свої кошти.",
-            "receive_title": "Отримати {tokenName}",
+            "receive_description": "Відправляйте на цю адресу тільки %{tokenName} і токени в мережі TON, інакше ви можете втратити свої кошти.",
+            "receive_title": "Отримати %{tokenName}",
             "receive_ton": "Відправляйте на цю адресу тільки Toncoin TON і токени в мережі TON, інакше ви можете втратити свої кошти."
         },
         "receive_qr_title": "Показати QR-код для отримання",
-        "receive_received_title": "Ви отримали\n{amount} {currency}",
+        "receive_received_title": "Ви отримали\n%{amount} %{currency}",
         "receive_share": "Поділитися",
-        "receive_title": "Отримати {currency}",
+        "receive_title": "Отримати %{currency}",
         "receive_ton_and_jettons": "Отримуйте TON та інші токени",
         "recovery_phrase": {
             "caption": "Запишіть ці слова з їх номерами і збережіть їх у надійному місці.",
@@ -1150,8 +1147,8 @@
         "refresh_app": "Перезапустити",
         "region_nokyc": "Нейтральні води",
         "renew_in_progress": "Виконується продовження…",
-        "renew_progress_of": "{current} з {count}",
-        "require_create_wallet_modal_caption": "Вам потрібен підключений гаманець для використання\nTonkeeper. Створіть новий гаманець або імпортуйте наявний.",
+        "renew_progress_of": "%{current} з %{count}",
+        "require_create_wallet_modal_caption": "Вам потрібен підключений гаманець для використання\nKeeper. Створіть новий гаманець або імпортуйте наявний.",
         "require_create_wallet_modal_create_new": "Створити новий гаманець",
         "require_create_wallet_modal_import": "Імпортувати наявний гаманець",
         "require_create_wallet_modal_title": "Давайте налаштуємо ваш гаманець",
@@ -1159,13 +1156,13 @@
             "stake_into_step": "Внесіть доступний TON у Tonstakers.",
             "stake_into_tonstakers_action": "Внести у Tonstakers",
             "title": "Заробляйте більше TON із %apy в ліквідному стейкінгу Tonstakers.",
-            "unstake_action_all": "Вивести {amount}",
+            "unstake_action_all": "Вивести %{amount}",
             "unstake_action_manual": "Ввести вручну",
             "unstake_step": "Ви виводите TON з вашого поточного стейкінгу.",
             "wait_step": "Зачекайте, поки ваш TON стане доступним.",
             "wait_step_collect": "Зібрати",
             "wait_step_cooldown": "Ваш TON скоро буде доступний. Ви зможете забрати його у найближчий час.",
-            "wait_step_pending": "Ваш TON буде доступний через {0, number}uration. Після цього ви зможете їх забрати.",
+            "wait_step_pending": "Ваш TON буде доступний через %{0, number}uration. Після цього ви зможете їх забрати.",
             "wait_step_withdraw": "Заберіть доступний TON з вашого попереднього постачальника стейкінгу."
         },
         "scan_qr_open_settings": "Відкрити налаштування",
@@ -1178,7 +1175,7 @@
         "security_migration_title": "Оновіть безпеку гаманця",
         "security_reset_passcode": "Скинути пін-код",
         "security_title": "Безпека",
-        "security_use_biometry_switch": "Використовувати {biometryType}",
+        "security_use_biometry_switch": "Використовувати %{biometryType}",
         "security_use_biometry_tip": "Ви завжди можете розблокувати ваш гаманець за допомогою пароля.",
         "send_address_placeholder": "Адреса або ім'я",
         "send_all_warning_title": "Ви впевнені, що хочете відправити весь свій баланс?",
@@ -1202,8 +1199,8 @@
                 "title": "Отримувач"
             },
             "amount": {
-                "less_than_min": "Мінімум {minAmount} TON",
-                "less_than_min_with_symbol": "Мінімум {minAmount} {symbol}",
+                "less_than_min": "Мінімум %{minAmount} TON",
+                "less_than_min_with_symbol": "Мінімум %{minAmount} %{symbol}",
                 "liquid_jetton_note": "Надсилання токена ліквідності tsTON",
                 "recipient_label": "Кому:",
                 "title": "Сума"
@@ -1213,10 +1210,10 @@
                 "title": "Виберіть токен для відправки"
             },
             "comfirm": {
-                "action": "Переклад {coin}",
+                "action": "Переклад %{coin}",
                 "comment_ascii_text": "Використовуйте тільки ASCII-символи: цифри, літери латинського алфавіту і знаки пунктуації.",
-                "comment_characters_exceeded": "Розмір повідомлення перевищує {count} символів.",
-                "comment_characters_left": "Залишилося {count} символів.",
+                "comment_characters_exceeded": "Розмір повідомлення перевищує %{count} символів.",
+                "comment_characters_left": "Залишилося %{count} символів.",
                 "comment_decrypt": "Розшифрувати",
                 "comment_description": "Буде видно всім.",
                 "comment_description_encrypted": "Буде видно тільки отримувачу та вам.",
@@ -1227,22 +1224,22 @@
                 "comment_placeholder": "Повідомлення або посилання (необов'язково)",
                 "comment_placeholder_required": "Нотатка або тег",
                 "details_label": "Деталі",
-                "details_max_balance_label": "Відправка всього балансу {currency}",
+                "details_max_balance_label": "Відправка всього балансу %{currency}",
                 "will_be_paid_with_battery": "Буде оплачено батарейкою"
             },
             "done": {
                 "add_favorite": "Зберегти адресу в обране",
-                "address": "Адреса: {address}",
-                "comment": "Коментар: {comment}",
+                "address": "Адреса: %{address}",
+                "comment": "Коментар: %{comment}",
                 "description": "Ваша транзакція була відправлена в мережу і буде оброблена за кілька секунд.",
                 "favorite_saved": "Збережено в обране",
-                "fee": "Комісія: {fee}",
-                "title": "{currency} відправлено!"
+                "fee": "Комісія: %{fee}",
+                "title": "%{currency} відправлено!"
             }
         },
         "send_sending_failed": "Надсилання не вдалося",
         "send_sending_wrong_time_title": "Сталася помилка",
-        "send_title": "Відправити {currency}",
+        "send_title": "Відправити %{currency}",
         "settings_appearance": "Зовнішній вигляд",
         "settings_bank_card": "Банківська картка",
         "settings_delete_alert_button": "Видалити обліковий запис та дані",
@@ -1266,9 +1263,9 @@
         },
         "settings_to_mainnet": "Переключитися на Mainnet",
         "settings_to_testnet": "Переключитись на Testnet",
-        "setup_biometry_caption": "{biometryType} дозволяє вам швидше відкрити гаманець без введення пароля.",
-        "setup_biometry_enable_button": "Увімкнути {biometryType}",
-        "setup_biometry_title": "Швидкий вхід за допомогою {biometryType}",
+        "setup_biometry_caption": "%{biometryType} дозволяє вам швидше відкрити гаманець без введення пароля.",
+        "setup_biometry_enable_button": "Увімкнути %{biometryType}",
+        "setup_biometry_title": "Швидкий вхід за допомогою %{biometryType}",
         "setup_notifications_caption": "Отримуйте сповіщення при отриманні TON, токенів і NFT.",
         "setup_notifications_enable_button": "Увімкнути сповіщення",
         "setup_notifications_title": "Отримуйте миттєві сповіщення",
@@ -1276,7 +1273,7 @@
             "confirm": "Підтвердіть транзакцію в Signer",
             "scan_qr": "Скануйте QR-код за допомогою Signer",
             "scan_signed_qr": "Проскануйте QR-код підписаної транзакції з Signer",
-            "step": "Крок {value}",
+            "step": "Крок %{value}",
             "title": "Підтвердити дію"
         },
         "skip": "Пропустити",
@@ -1288,18 +1285,18 @@
                 },
                 "amount": {
                     "label": "Сума",
-                    "value": "{value} TON"
+                    "value": "%{value} TON"
                 },
                 "fee": {
                     "label": "Комісія",
-                    "value": "≈ {value} TON"
+                    "value": "≈ %{value} TON"
                 },
                 "recipient": {
                     "label": "Отримувач"
                 },
                 "withdraw_amount": {
                     "label": "Сума відклику",
-                    "value": "{value} TON"
+                    "value": "%{value} TON"
                 }
             },
             "confirm_deposit": "Підтвердити і внести",
@@ -1310,7 +1307,7 @@
                 "apy": {
                     "highest_tag": "МАКС",
                     "label": "Річний дохід",
-                    "value": "≈ {value}%"
+                    "value": "≈ %{value}%"
                 },
                 "balance": "Баланс стейкінгу",
                 "cooldown": {
@@ -1320,31 +1317,31 @@
                 },
                 "frequency": {
                     "label": "Частота винагород",
-                    "value": "Кожні {count} години",
-                    "value.few": "Кожні {count} години",
-                    "value.many": "Кожні {count} годин",
-                    "value.one": "Кожні {count} годину",
-                    "value.zero": "Кожні {count} годин"
+                    "value": "Кожні %{count} години",
+                    "value.few": "Кожні %{count} години",
+                    "value.many": "Кожні %{count} годин",
+                    "value.one": "Кожні %{count} годину",
+                    "value.zero": "Кожні %{count} годин"
                 },
                 "links_title": "Посилання",
                 "liquidity_token": {
-                    "label": "Токен ліквідності {token}",
+                    "label": "Токен ліквідності %{token}",
                     "value": "Дізнатися більше"
                 },
                 "min_deposit": {
                     "label": "Мінімальний депозит",
-                    "value": "{value} TON"
+                    "value": "%{value} TON"
                 },
                 "next_cycle": {
                     "desc": "Усі транзакції набудуть чинності після завершення циклу",
                     "desc_liquid": "Усі запити на виведення коштів набувають чинності після завершення циклу",
                     "in": "через",
-                    "message": "Запит на відстеження буде оброблено після закінчення циклу підтвердження через {value}",
+                    "message": "Запит на відстеження буде оброблено після закінчення циклу підтвердження через %{value}",
                     "reward_title": "Наступна винагорода",
-                    "time": "через {time}",
+                    "time": "через %{time}",
                     "title": "Наступний цикл"
                 },
-                "note": "Стейкінг базується на смарт-контрактах третіх сторін. Tonkeeper не несе відповідальності за досвід стейкінгу.",
+                "note": "Стейкінг базується на смарт-контрактах третіх сторін. Keeper не несе відповідальності за досвід стейкінгу.",
                 "pendingDeposit": "Очікується зарахування",
                 "pendingWithdraw": "Очікування виведення",
                 "pendingWithdrawDesc": "після закінчення циклу",
@@ -1356,17 +1353,17 @@
                 },
                 "tap_to_collect": "Натисніть, щоб зібрати"
             },
-            "estimated_profit": "{amount} TON – річний прибуток, якщо ви застейкаєте TON сьогодні",
-            "estimated_profit_compare": "На {amount} TON на рік прибутковіше, ніж ваш поточний стекинг",
+            "estimated_profit": "%{amount} TON – річний прибуток, якщо ви застейкаєте TON сьогодні",
+            "estimated_profit_compare": "На %{amount} TON на рік прибутковіше, ніж ваш поточний стекинг",
             "get_withdrawal": "Отримати виведення",
             "highest_apy": "MAX APY",
-            "jetton_note": "Коли ви робите стейкінг TON у пул {poolName}, ви отримуєте токен під назвою {token}, який представляє вашу частку в пулі. У міру накопичення прибутку в пулі ваш {token} представляє більшу кількість TON.",
+            "jetton_note": "Коли ви робите стейкінг TON у пул %{poolName}, ви отримуєте токен під назвою %{token}, який представляє вашу частку в пулі. У міру накопичення прибутку в пулі ваш %{token} представляє більшу кількість TON.",
             "learn_more": "Детальніше",
             "message": {
-                "pendingDeposit": "{amount} TON буде зараховано",
-                "pendingWithdraw": "{amount} TON буде виведено\n",
-                "pendingWithdrawLiquid": "{amount} TON буде виведено після завершення циклу",
-                "readyWithdraw": "{amount} TON готовий до зняття.\nНатисніть, щоб зібрати"
+                "pendingDeposit": "%{amount} TON буде зараховано",
+                "pendingWithdraw": "%{amount} TON буде виведено\n",
+                "pendingWithdrawLiquid": "%{amount} TON буде виведено після завершення циклу",
+                "readyWithdraw": "%{amount} TON готовий до зняття.\nНатисніть, щоб зібрати"
             },
             "no_funds": "Недостатньо коштів для зняття",
             "not_exists": "Невірна адреса пулу",
@@ -1376,29 +1373,29 @@
                 "after_top_up": "Після депозита",
                 "current": "Поточна",
                 "title": "Ваша річна доходність",
-                "value": "≈ {value} TON"
+                "value": "≈ %{value} TON"
             },
             "send_staked_ton": "Стейкінг TON",
             "staked": "Стейкінг",
             "staked_ton": "Застейканий TON",
-            "staking_desc": "Мінімальний депозит {minStake} TON.\nЗаробляйте до {maxApy}%.",
-            "staking_pool_desc": "APY ≈ {apy}%",
+            "staking_desc": "Мінімальний депозит %{minStake} TON.\nЗаробляйте до %{maxApy}%.",
+            "staking_pool_desc": "APY ≈ %{apy}%",
             "title": "Стейкінг",
             "title_large": "Стейкінг TON",
             "top_up": "Поповнити",
             "transaction": "Підтвердити дію",
             "warning": {
-                "about": "Про {name}",
+                "about": "Про %{name}",
                 "beta_desc": "Ми не несемо відповідальності за стабільність і результат стейкінгу. Використовуйте на свій страх і ризик.",
                 "desc": "Стейкінг заснований на сторонніх смарт-контрактах. Ми не несемо відповідальності за їх роботу.",
                 "title": "Попередження"
             },
-            "widget_desc": "Доходність до {apy}%",
+            "widget_desc": "Доходність до %{apy}%",
             "widget_staking_options": "Опції стейкінгу",
             "widget_title": "Стейк TON",
             "withdrawal_fee_warning": {
                 "continue": "Все равно продовжити",
-                "message": "Будь ласка, залиште мінімум '{{'amount'}}' TON на вашому балансі.",
+                "message": "Будь ласка, залиште мінімум {{amount}} TON на вашому балансі.",
                 "title": "У вас не залишиться коштів для виведення"
             },
             "withdrawal_request": "Запит на зняття"
@@ -1409,11 +1406,11 @@
         "stop_watch": "Видалити обліковий запис спостереження",
         "subscription_back_to_merchant_button": "Повернутися",
         "subscription_back_to_merchant_caption": "Транзакція обробляється. Ваша підписка незабаром буде активна.",
-        "subscription_back_to_merchant_name": "Повернутися до {merchantName}",
+        "subscription_back_to_merchant_name": "Повернутися до %{merchantName}",
         "subscription_back_to_merchant_title": "Повернутися до каналу?",
         "subscription_cancel": "Скасувати підписку",
         "subscription_cancel_alert_cancel_btn": "Не зараз",
-        "subscription_cancel_alert_caption": "Якщо ви скасуєте зараз, ви все ще зможете отримати доступ до своєї підписки до {nextBill}",
+        "subscription_cancel_alert_caption": "Якщо ви скасуєте зараз, ви все ще зможете отримати доступ до своєї підписки до %{nextBill}",
         "subscription_cancel_alert_submit_btn": "Так, скасувати",
         "subscription_cancel_alert_title": "Скасувати підписку?",
         "subscription_expiring": "Закінчується",
@@ -1421,20 +1418,20 @@
         "subscription_next_bill": "Наступний рахунок",
         "subscription_open_merchant": "Відкрити в Telegram",
         "subscription_period": "Інтервал",
-        "subscription_period_custom": "Кожні {period}",
+        "subscription_period_custom": "Кожні %{period}",
         "subscription_period_day": "Щоденно",
         "subscription_period_half_year": "Раз на півроку",
         "subscription_period_hour": "Щогодини",
         "subscription_period_month": "Щомісячно",
         "subscription_period_quarter": "Щоквартально",
         "subscription_period_week": "Щотижня",
-        "subscription_period_weeks": "Кожні {count} тижні",
+        "subscription_period_weeks": "Кожні %{count} тижні",
         "subscription_period_year": "Щорічно",
         "subscription_price": "Ціна",
         "subscription_sent": "Транзакція відправлена",
-        "subscriptions_item_caption": "{price} TON, наступний рахунок {nextBill}",
-        "subscriptions_item_caption_expired": "Закінчено {date}",
-        "subscriptions_item_caption_expiring": "{price} TON, завершується {date}",
+        "subscriptions_item_caption": "%{price} TON, наступний рахунок %{nextBill}",
+        "subscriptions_item_caption_expired": "Закінчено %{date}",
+        "subscriptions_item_caption_expiring": "%{price} TON, завершується %{date}",
         "subscriptions_section_active": "Активні",
         "subscriptions_section_expired": "Закінчено",
         "subscription_started": "Підписка розпочата",
@@ -1458,36 +1455,36 @@
             "wrong_from": "Неправильний параметр 'from''",
             "wrong_network": "Неправильна мережа"
         },
-        "ton_login_back_to_button": "Повернутися до {name}",
-        "ton_login_title": "Підключитися до {0, number}omain?",
+        "ton_login_back_to_button": "Повернутися до %{name}",
+        "ton_login_title": "Підключитися до %{0, number}omain?",
         "transaction_bid_collection_name": "Емітент",
-        "transaction_bid_date": "Ставка {date}",
-        "transaction_buy_date": "Дата покупки {date}",
+        "transaction_bid_date": "Ставка %{date}",
+        "transaction_buy_date": "Дата покупки %{date}",
         "transaction_buy_status_failed": "Не вдалося",
         "transaction_buy_status_pending": "В очікуванні",
         "transaction_buy_status_success": "Успішно",
         "transaction_confirmations": "Підтвердження",
         "transaction_confirm_bid": "Підтвердити ставку",
-        "transaction_contract_deploy_date": "Дата розгортання контракту {date}",
+        "transaction_contract_deploy_date": "Дата розгортання контракту %{date}",
         "transaction_copy_caution": "Будьте обережні із зовнішніми посиланнями. Ніколи не давайте свою секретну фразу стороннім ресурсам — ви можете втратити всі свої кошти.\n\n- - -",
         "transactionDetails": {
             "address": "Адреса",
             "bid_collection_name": "Емітент",
-            "bid_date": "Ставка о {time}",
+            "bid_date": "Ставка о %{time}",
             "bid_name": "Назва",
-            "call_contract_date": "Виклик контракту {time}",
+            "call_contract_date": "Виклик контракту %{time}",
             "description": "Опис",
             "payload": "Дані",
-            "purchase_date": "Покупка о {time}",
-            "received_date": "Отримано {time}",
+            "purchase_date": "Покупка о %{time}",
+            "received_date": "Отримано %{time}",
             "recipient_address": "Адреса одержувача",
             "sender": "Відправник",
             "sender_address": "Адреса відправника",
-            "sent_date": "Відправлено о {time}",
+            "sent_date": "Відправлено о %{time}",
             "spam": "СПАМ",
             "subscription_merchant_label": "Продавець",
             "subscription_product_label": "Підписка",
-            "swapped_date": "Обмін {time}",
+            "swapped_date": "Обмін %{time}",
             "transaction": "Транзакція",
             "unsubscription_title": "Скасування підписки",
             "withdraw_amount": "Сума зняття"
@@ -1513,7 +1510,7 @@
         "transaction_show_subscription_button": "Переглянути підписку",
         "transaction_status": "Статус",
         "transaction_subscription": "Підписка",
-        "transaction_subscription_date": "Списано {date}",
+        "transaction_subscription_date": "Списано %{date}",
         "transaction_transfer_name": "Назва переказу",
         "transaction_type_bounced": "Відправлено назад",
         "transaction_type_buy": "Куплено",
@@ -1522,9 +1519,9 @@
         "transaction_type_subscriber_lost": "Втрата підписника",
         "transaction_type_to": "До",
         "transaction_unsubscription": "Скасування підписки",
-        "transaction_unsubscription_date": "дата відписки {date}",
+        "transaction_unsubscription_date": "дата відписки %{date}",
         "transaction_view_in_explorer": "Подивитися в провіднику",
-        "transaction_wallet_initialized_date": "{date}",
+        "transaction_wallet_initialized_date": "%{date}",
         "transaction_your_bid": "Ваша ставка",
         "transfer_deeplink_address_error": "Неправильна адреса одержувача",
         "transfer_deeplink_amount_error": "Некоректний запит суми",
@@ -1534,7 +1531,7 @@
         "transfer_deeplink_unknown_token": "Невідомий токен",
         "transfer_deeplink_wrong_params": "Неправильні параметри",
         "transfer_from_old_wallet_btn": "Передати",
-        "transfer_from_old_wallet_caption": "Tonkeeper перенесе всі монети з вашої старої адреси на вашу поточну адресу.",
+        "transfer_from_old_wallet_caption": "Keeper перенесе всі монети з вашої старої адреси на вашу поточну адресу.",
         "transfer_from_old_wallet_in_progress": "Триває перенесення",
         "transfer_from_old_wallet_title": "Переведіть на поточну адресу",
         "transfer_pending_by_battery_error": "Ще одна транзакція оброблюється акумулятором",
@@ -1545,30 +1542,30 @@
                         "close": "Скасувати",
                         "description": "Перемкніть гаманець, щоб підтвердити дію.",
                         "switch": "Перемкнути й продовжити",
-                        "title": "Дія для вашого гаманця {value}"
+                        "title": "Дія для вашого гаманця %{value}"
                     },
                     "wrongVersion": {
                         "close": "Скасувати",
-                        "description": "Переключіть свою активну адресу на {version}, щоб підтвердити цю дію.",
+                        "description": "Переключіть свою активну адресу на %{version}, щоб підтвердити цю дію.",
                         "switch": "Переключити й продовжити",
                         "title": "Операція для іншої адреси вашого гаманця"
                     },
                     "wrongWallet": {
                         "close": "Добре",
-                        "description": "Ввійдіть в інший гаманець {address} і спробуйте ще раз.",
+                        "description": "Ввійдіть в інший гаманець %{address} і спробуйте ще раз.",
                         "title": "Дія для іншого гаманця"
                     }
                 },
                 "insufficientFunds": {
                     "rechargeBattery": "Зарядити батарею",
                     "rechargeWallet": "Поповнити гаманець",
-                    "stakingDeposit": "Мінімальний баланс для участі:\n{amount} {currency}\n",
-                    "stakingFee": "Для транзакції потрібно {count} TON. Орієнтовна комісія {fee} TON буде утримана, залишок буде повернуто.",
+                    "stakingDeposit": "Мінімальний баланс для участі:\n%{amount} %{currency}\n",
+                    "stakingFee": "Для транзакції потрібно %{count} TON. Орієнтовна комісія %{fee} TON буде утримана, залишок буде повернуто.",
                     "title": "Недостатньо коштів",
                     "title_multiwallet": "Недостатньо коштів у гаманці",
-                    "toBePaid": "До сплати: {amount} {currency}\n",
+                    "toBePaid": "До сплати: %{amount} %{currency}\n",
                     "withFees": "+ комісія блокчейну.\n",
-                    "yourBalance": "Ваш баланс: {balance} {currency}."
+                    "yourBalance": "Ваш баланс: %{balance} %{currency}."
                 },
                 "totalFee": "Загальна комісія",
                 "totalRefund": "Загальний повернення",
@@ -1577,7 +1574,7 @@
                     "subscribe": "Підписка",
                     "unSubscribe": "Відписка"
                 },
-                "warning_caption": "Tonkeeper не може повністю перевірити результат цієї транзакції. Переконайтеся, що ви довіряєте одержувачу.",
+                "warning_caption": "Keeper не може повністю перевірити результат цієї транзакції. Переконайтеся, що ви довіряєте одержувачу.",
                 "warning_title": "Попередження",
                 "wrongTime": {
                     "button": "Відкрити налаштування",
@@ -1598,15 +1595,15 @@
             "title": "Неперевірений токен"
         },
         "update": {
-            "description": "Доступна нова версія Tonkeeper. Ви можете завантажити її прямо зараз.",
+            "description": "Доступна нова версія Keeper. Ви можете завантажити її прямо зараз.",
             "download": "Завантажити",
-            "downloading": "Завантаження… '{{'progress'}}'%",
-            "mb": "'{{'size'}}' МБ",
+            "downloading": "Завантаження… {{progress}}%",
+            "mb": "{{size}} МБ",
             "remindLater": "Нагадати пізніше",
             "retry": "Ошибка завантаження. Торкніться, щоб спробувати ще раз.",
             "tap": "Натисніть, щоб оновити",
-            "title": "Оновлення Tonkeeper",
-            "version": "Версія '{{'version'}}'"
+            "title": "Оновлення Keeper",
+            "version": "Версія {{version}}"
         },
         "upgrade_to_w5": {
             "about_button": "Про W5 Гаманець",
@@ -1657,7 +1654,7 @@
             "stake_btn": "Заcтейкати",
             "swap_btn": "Обміняти",
             "tonkens_tab_lable": "Токени",
-            "updated_at": "Оновлено {value}"
+            "updated_at": "Оновлено %{value}"
         },
         "wallet_chat": "Чат",
         "wallet_community": "Спільнота",
@@ -1680,21 +1677,22 @@
     "wallet_swap": "Обмін",
     "wallet_title": "Гаманець",
     "yesterday": "Вчора",
-    "staking_pool_liquid_desc": "Коли ви стейкаєте %{coinSymbolWithEx} у пулі Tonstakers, ви отримуєте токен tsTON, який представляє вашу частку в пулі. У міру накопичення прибутку пулу ваш tsTON відповідає більшій кількості %{coinSymbolWithEx}.",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} буде виведено {date}",
-    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} буде виведено після закінчення циклу",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} буде виведено за {value}",
+    "staking_pool_liquid_desc": "Коли ви стейкаєте %{coinSymbol} у пулі Tonstakers, ви отримуєте токен tsTON, який представляє вашу частку в пулі. У міру накопичення прибутку пулу ваш tsTON відповідає більшій кількості %{coinSymbol}.",
+    "staking_pool_withdraw_date": "%{amount} %{coinSymbol} буде виведено %{date}",
+    "staking_portfolio_pending_withdraw": "%{amount} %{coinSymbol} буде виведено після закінчення циклу",
+    "staking_portfolio_pending_withdraw_countdown": "%{amount} %{coinSymbol} буде виведено за %{value}",
     "staking_confirm_modal_provider": "Провайдер",
     "staking_confirm_modal_amount": "Сума",
     "staking_confirm_modal_apy": "APY",
     "staking_confirm_modal_wallet": "Гаманець",
-    "staking_unstake_cycle_info": "Запит буде оброблено після завершення циклу валідації через {value}",
-    "staking_tonstakers_notice": "Стейкінг базується на смарт-контрактах третіх сторін. Tonkeeper не несе відповідальності за стабільність і результат.",
+    "staking_unstake_cycle_info": "Запит буде оброблено після завершення циклу валідації через %{value}",
+    "staking_tonstakers_notice": "Стейкінг базується на смарт-контрактах третіх сторін. Keeper не несе відповідальності за стабільність і результат.",
     "staking_claim": "Отримати",
     "staking_details_pool_address_label": "Адреса пулу",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} очікують на стейкінг",
-    "staking_pools_min_deposit": "Мін. депозит {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "%{amount} %{coinSymbol} очікують на стейкінг",
+    "staking_pools_min_deposit": "Мін. депозит %{minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "Доступний лише повний вивід",
+    "trc20_transfer_unavailable": "Надсилання TRC20 тимчасово недоступне",
     "twa_closed_title": "Міні-застосунок закрито",
     "twa_closed_subtitle": "Продовжуйте з того місця, де зупинилися — на iOS, Android або у вебі.",
     "twa_closed_subtitle_wallets": "Ваші гаманці в безпеці. Будь ласка, збережіть свої секретні фрази та продовжуйте з того місця, де зупинилися — на iOS, Android або у вебі.",

@@ -20,6 +20,7 @@ import { useNotifyErrorHandle, useToast } from '../hooks/useNotification';
 import { useTranslation } from '../hooks/translation';
 import { getMultisigSignerInfo } from './multisig';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from './tonendpoint';
+import { removeLastSlash } from '@tonkeeper/core/dist/utils/url';
 
 export type TwoFATgBotBoundingWalletConfig = {
     status: 'tg-bot-bounding';
@@ -70,29 +71,37 @@ export const useTwoFAApi = () => {
     const config = useTwoFAServiceConfig();
     return useMemo(() => {
         return new Configuration({
-            basePath: config.baseUrl
+            basePath: removeLastSlash(config.baseUrl)
         });
     }, [config.baseUrl]);
 };
 
+/**
+ * Read by hooks mounted on every screen (senders, the 2FA confirm modal), so a
+ * boot config without the 2FA keys must not throw during render. Only the
+ * plugin install needs the key; it fails there via `requireTwoFAServicePubKey`.
+ */
 export const useTwoFAServiceConfig = () => {
     const config = useActiveConfig();
 
     return useMemo(() => {
-        if (!config['2fa_public_key'] || !config['2fa_api_url'] || !config['2fa_bot_url']) {
-            throw new Error('2fa_public_key not found');
-        }
-
-        const servicePubKey = BigInt('0x' + config['2fa_public_key']);
+        const publicKey = config['2fa_public_key'];
 
         return {
-            baseUrl: config['2fa_api_url'],
-            servicePubKey,
+            baseUrl: config['2fa_api_url'] ?? '',
+            servicePubKey: publicKey ? BigInt('0x' + publicKey) : undefined,
             confirmMessageTGTtlSeconds: config['2fa_tg_confirm_send_message_ttl_seconds'],
             confirmConnectionTGTtlSeconds: config['2fa_tg_linked_ttl_seconds'],
-            botUrl: config['2fa_bot_url']
+            botUrl: config['2fa_bot_url'] ?? ''
         };
     }, [config]);
+};
+
+export const requireTwoFAServicePubKey = (servicePubKey: bigint | undefined): bigint => {
+    if (servicePubKey === undefined) {
+        throw new Error('2fa_public_key not found');
+    }
+    return servicePubKey;
 };
 
 export const useTwoFAWalletConfigMayBeOfMultisigHost = () => {

@@ -4,6 +4,11 @@ import { Estimation } from '@tonkeeper/core/dist/entries/send';
 
 import { useAnalyticsTrack } from '../../analytics';
 import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../analytics/events-hooks';
+import {
     useActiveApi,
     useActiveWallet,
     useInvalidateActiveWalletQueries
@@ -11,7 +16,11 @@ import {
 import { useNotifyErrorHandle } from '../../useNotification';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
-import { useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
+import {
+    requireTwoFAServicePubKey,
+    useTwoFAServiceConfig,
+    useTwoFAWalletConfig
+} from '../../../state/two-fa';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { QueryKey } from '../../../libs/queryKey';
@@ -29,6 +38,8 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const { servicePubKey } = useTwoFAServiceConfig();
     const api = useActiveApi();
     const queryClient = useQueryClient();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -47,7 +58,7 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
             const encoder = new TwoFAEncoder(api, wallet.rawAddress);
             const tx = await encoder.encodeInstall({
                 seedPubKey: BigInt('0x' + wallet.publicKey),
-                servicePubKey
+                servicePubKey: requireTwoFAServicePubKey(servicePubKey)
             });
 
             await rawTransactionService.send(
@@ -57,6 +68,14 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
             );
 
             queryClient.setQueryData([QueryKey.twoFAActivationProcess, wallet.id], true);
+
+            trackTransactionSent({
+                category: 'call',
+                category_detail: 'deploy',
+                asset: assetId.tonCoin(),
+                amount: 0,
+                fee_asset: toAnalyticsFeeAsset(EXTERNAL_SENDER_CHOICE.type)
+            });
 
             track('deploy_2fa', {
                 wallet: wallet.rawAddress

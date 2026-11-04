@@ -1,4 +1,6 @@
+import './wallet-core-wasm-path';
 import ReactDOM from 'react-dom/client';
+import '@tonkeeper/uikit/dist/styles/tailwind.css';
 import { App } from './App';
 import browser from 'webextension-polyfill';
 
@@ -7,6 +9,11 @@ import browser from 'webextension-polyfill';
     const source = params.get('source');
 
     let isInCustomPopup = true;
+
+    // Chrome side panel: full-height persistent surface, sized by the browser.
+    if (source === 'side_panel') {
+        document.body.dataset.appView = 'side-panel';
+    }
 
     // opened by click on extension icon
     if (source === 'default_popup') {

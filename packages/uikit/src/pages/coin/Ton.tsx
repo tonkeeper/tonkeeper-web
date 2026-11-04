@@ -27,7 +27,7 @@ const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     return (
         <CoinInfo
             amount={total}
-            symbol={BRAND_CONFIG.coinSymbolWithEx}
+            symbol={BRAND_CONFIG.coinSymbol}
             price={fiatAmount}
             description={t('Ton_page_description')}
             image={BRAND_CONFIG.coinIcon}
@@ -36,7 +36,6 @@ const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
 };
 
 export const TonPage = () => {
-    const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
     const { data: info } = useWalletAccountInfo();
@@ -47,7 +46,7 @@ export const TonPage = () => {
 
     return (
         <>
-            <SubHeader title={t('Toncoin')} />
+            <SubHeader title={BRAND_CONFIG.coinName} />
             <InnerBody ref={ref}>
                 <TonHeader info={info} />
                 <HomeActions chain={BLOCKCHAIN_NAME.TON} />

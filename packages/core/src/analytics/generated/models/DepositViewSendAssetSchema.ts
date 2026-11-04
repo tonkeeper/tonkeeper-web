@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddFundsOptionSchema } from './AddFundsOptionSchema';
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
  * User sees the deposit instructions screen with address, min/max amounts, network, and estimated arrival time. Shared across buy_ton_with_crypto and buy_with_stablecoins flows.
  *
@@ -11,16 +13,9 @@ import type { RampSourceSchema } from './RampSourceSchema';
 export type DepositViewSendAssetSchema = {
     eventName: string;
     from: RampSourceSchema;
+    wallet_mode: WalletModeSchema;
     add_funds_option: AddFundsOptionSchema;
-    /**
-     * Asset the user is sending, in chain/network/type format: ton/mainnet/jetton/{addr}, eth/mainnet/token/{addr}, ton/mainnet/coin, btc/mainnet/coin
-     *
-     */
-    sell_asset: string;
-    /**
-     * Asset the user will receive, in chain/network/type format: ton/mainnet/jetton/{addr}, eth/mainnet/token/{addr}, ton/mainnet/coin, btc/mainnet/coin
-     *
-     */
-    buy_asset: string;
+    sell_asset: AssetSchema;
+    buy_asset: AssetSchema;
 };
 

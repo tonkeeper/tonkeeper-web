@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface EnterpriseEstimateRequest {
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseEstimateRequest
      */
     boc: string;
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseEstimateRequest
      */
     walletPublicKey: string;
 }
@@ -38,7 +34,7 @@ export interface EnterpriseEstimateRequest {
  */
 export function instanceOfEnterpriseEstimateRequest(value: object): value is EnterpriseEstimateRequest {
     if (!('boc' in value) || value['boc'] === undefined) return false;
-    if (!('walletPublicKey' in value) || value['walletPublicKey'] === undefined) return false;
+    if ((!('walletPublicKey' in (value as Record<string, any>)) && !('wallet_public_key' in (value as Record<string, any>))) || ((value as Record<string, any>)['walletPublicKey'] === undefined && (value as Record<string, any>)['wallet_public_key'] === undefined)) return false;
     return true;
 }
 
@@ -57,11 +53,11 @@ export function EnterpriseEstimateRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-  export function EnterpriseEstimateRequestToJSON(json: any): EnterpriseEstimateRequest {
-      return EnterpriseEstimateRequestToJSONTyped(json, false);
-  }
+export function EnterpriseEstimateRequestToJSON(json: any): EnterpriseEstimateRequest {
+    return EnterpriseEstimateRequestToJSONTyped(json, false);
+}
 
-  export function EnterpriseEstimateRequestToJSONTyped(value?: EnterpriseEstimateRequest | null, ignoreDiscriminator: boolean = false): any {
+export function EnterpriseEstimateRequestToJSONTyped(value?: EnterpriseEstimateRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

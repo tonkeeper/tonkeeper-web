@@ -15,7 +15,7 @@ on:
     workflow_dispatch:
 
 env:
-    node-version: 20.11.1
+    node-version: 22.22.2
 
 jobs:
     desktop-build:
@@ -116,6 +116,8 @@ jobs:
 
             - name: Run build intel distributive
               uses: borales/actions-yarn@v5
+              env:
+                  WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
               with:
                   cmd: ${{ matrix.command }}
                   dir: 'apps/desktop'

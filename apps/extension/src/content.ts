@@ -45,6 +45,18 @@ async function setupStream() {
 
     connectBackground();
 
+    const pageMeta = () => ({
+        title: document.title || undefined,
+        // `data:,` is the empty-favicon idiom sites use to suppress the
+        // implicit /favicon.ico request — not a usable icon.
+        icon: [
+            ...document.querySelectorAll<HTMLLinkElement>('link[rel="apple-touch-icon"]'),
+            ...document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]')
+        ]
+            .map(link => link.href)
+            .find(href => href && href !== 'data:,')
+    });
+
     const onPageMessage = (e: MessageEvent<PageMessagePayload>) => {
         // Accept only messages dispatched within the same window context
         if (e.source !== window) return;
@@ -54,7 +66,10 @@ async function setupStream() {
         if (e.data.type !== 'TonkeeperProvider') return;
         if (e.data.message?.origin !== window.location.origin) return;
 
-        sendMessageToActivePort(e.data);
+        sendMessageToActivePort({
+            ...e.data,
+            message: { ...e.data.message, pageMeta: pageMeta() }
+        });
     };
 
     const sendMessageToActivePort = (payload: PageMessagePayload, isRepeat = false) => {

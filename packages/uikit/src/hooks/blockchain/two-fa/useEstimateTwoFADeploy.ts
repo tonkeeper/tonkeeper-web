@@ -6,7 +6,11 @@ import { useNotifyErrorHandle } from '../../useNotification';
 import { DefaultRefetchInterval } from '../../../state/tonendpoint';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { useActiveAccount, useActiveApi } from '../../../state/wallet';
-import { useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
+import {
+    requireTwoFAServicePubKey,
+    useTwoFAServiceConfig,
+    useTwoFAWalletConfig
+} from '../../../state/two-fa';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 export function useEstimateTwoFADeploy() {
@@ -21,7 +25,7 @@ export function useEstimateTwoFADeploy() {
 
     return useQuery<TonEstimation, Error>(
         ['estimate-deploy-2fa-plugin', wallet],
-        async () => {
+        async (): Promise<TonEstimation> => {
             try {
                 if (!isStandardTonWallet(wallet)) {
                     throw new Error('Cant deploy two fa plugin using this wallet');
@@ -29,7 +33,7 @@ export function useEstimateTwoFADeploy() {
 
                 const tx = await new TwoFAEncoder(api, wallet.rawAddress).encodeInstall({
                     seedPubKey: BigInt('0x' + wallet.publicKey),
-                    servicePubKey
+                    servicePubKey: requireTwoFAServicePubKey(servicePubKey)
                 });
                 return await rawTransactionService.estimate(await getSender!(), tx);
             } catch (e) {

@@ -16,6 +16,7 @@ import { useCallback, useMemo } from 'react';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { useMenuController } from '../hooks/ionic';
+import { DappOpenContext, useTrackDappAppLoaded } from '../hooks/analytics/dapp-browser';
 
 export type BrowserTab =
     | (BrowserTabStored & { isLive: false })
@@ -58,6 +59,15 @@ export const useIsBrowserOpened = () => {
     return useAtomValue(openedTab$) !== undefined;
 };
 
+/**
+ * Where a tab open came from, carried only so the resulting
+ * `dapp_app_loaded` reports the same dApp identity its `dapp_app_click` did.
+ */
+export type OpenBrowserTabParams =
+    | ({ id: string } & { dapp?: DappOpenContext })
+    | ({ url: string; title?: string; iconUrl?: string } & { dapp?: DappOpenContext })
+    | 'blanc';
+
 let openBrowserTabCallId = 0;
 export const useOpenBrowserTab = () => {
     const sdk = useAppSdk();
@@ -65,12 +75,9 @@ export const useOpenBrowserTab = () => {
     const client = useQueryClient();
     const { close: closeAsideMenu } = useMenuController('aside-nav');
     const { close: closeWalletMenu } = useMenuController('wallet-nav');
+    const trackDappAppLoaded = useTrackDappAppLoaded();
 
-    return useMutation<
-        void,
-        Error,
-        { id: string } | { url: string; title?: string; iconUrl?: string } | 'blanc'
-    >(async tab => {
+    return useMutation<void, Error, OpenBrowserTabParams>(async tab => {
         closeAsideMenu();
         closeWalletMenu();
         const callId = Date.now();
@@ -83,10 +90,23 @@ export const useOpenBrowserTab = () => {
             return;
         }
 
+        // `open` resolves once the webview reports `document.readyState`
+        // complete, so reaching this point is the dApp having loaded. A dApp
+        // that never finishes loading never resolves, which is exactly the
+        // `dapp_app_click` with no `dapp_app_loaded` the funnel looks for.
+        // The click is tracked right before the tab opens, so the load is
+        // timed from here.
+        const openInBrowser = async (t: BrowserTabIdentifier) => {
+            const openedAt = Date.now();
+            const shownTab = await sdk.dappBrowser!.open(t.url, { id: t.id });
+            if (tab.dapp) {
+                trackDappAppLoaded(tab.dapp, Date.now() - openedAt);
+            }
+            return shownTab;
+        };
+
         const loadTab = async (t: BrowserTabIdentifier) => {
-            const shownTab = await sdk.dappBrowser!.open(t.url, {
-                id: t.id
-            });
+            const shownTab = await openInBrowser(t);
 
             if (mutationHasBeenReset()) {
                 return;
@@ -112,9 +132,7 @@ export const useOpenBrowserTab = () => {
             if (existingTab.isLive) {
                 openedTab$.next({ type: 'existing', id: tab.id });
 
-                const shownTab = await sdk.dappBrowser!.open(existingTab.url, {
-                    id: existingTab.id
-                });
+                const shownTab = await openInBrowser(existingTab);
                 if (mutationHasBeenReset()) {
                     return;
                 }

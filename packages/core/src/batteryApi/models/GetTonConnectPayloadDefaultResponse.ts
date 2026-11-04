@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface GetTonConnectPayloadDefaultResponse {
     /**
      * 
-     * @type {string}
-     * @memberof GetTonConnectPayloadDefaultResponse
      */
     error: string;
     /**
      * 
-     * @type {string}
-     * @memberof GetTonConnectPayloadDefaultResponse
      */
     errorKey?: string;
     /**
      * 
-     * @type {string}
-     * @memberof GetTonConnectPayloadDefaultResponse
      */
     errorDetails?: string;
 }
@@ -63,11 +57,11 @@ export function GetTonConnectPayloadDefaultResponseFromJSONTyped(json: any, igno
     };
 }
 
-  export function GetTonConnectPayloadDefaultResponseToJSON(json: any): GetTonConnectPayloadDefaultResponse {
-      return GetTonConnectPayloadDefaultResponseToJSONTyped(json, false);
-  }
+export function GetTonConnectPayloadDefaultResponseToJSON(json: any): GetTonConnectPayloadDefaultResponse {
+    return GetTonConnectPayloadDefaultResponseToJSONTyped(json, false);
+}
 
-  export function GetTonConnectPayloadDefaultResponseToJSONTyped(value?: GetTonConnectPayloadDefaultResponse | null, ignoreDiscriminator: boolean = false): any {
+export function GetTonConnectPayloadDefaultResponseToJSONTyped(value?: GetTonConnectPayloadDefaultResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

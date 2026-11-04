@@ -65,7 +65,7 @@ export const AmountInput: FC<{
     fieldState: ControllerFieldState;
 }> = ({ asset, fieldState, field }) => {
     const { fiat } = useAppContext();
-    const fiatDisplay = fiat === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : fiat;
+    const fiatDisplay = fiat === FiatCurrencies.GRAM ? BRAND_CONFIG.coinSymbol : fiat;
     const [focus, setFocus] = useState(false);
     const [currencyAmount, setCurrencyAmount] = useState({
         inFiat: false,

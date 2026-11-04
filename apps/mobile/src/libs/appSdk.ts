@@ -10,7 +10,6 @@ import {
     KeyboardService,
     AppCountryInfo
 } from '@tonkeeper/core/dist/AppSdk';
-import packageJson from '../../package.json';
 import { Clipboard } from '@capacitor/clipboard';
 import { Biometric } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
@@ -30,6 +29,7 @@ import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { IosSubscriptionStrategy } from './plugins/subscription-plugin';
 import { CountryInfo } from './plugins/country-info-plugin';
+import { Screenshot } from './plugins/screenshot-plugin';
 import { getCapacitorStorage } from './storage';
 import { SubscriptionService } from '@tonkeeper/core/dist/SubscriptionService';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
@@ -99,8 +99,11 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
         initialStrategyMap: new Map([[SubscriptionSource.IOS, new IosSubscriptionStrategy()]])
     });
 
+    screenshotTaken = new Subject<void>();
+
     constructor() {
         super(capacitorStorage);
+        Screenshot.addListener('screenshotTaken', () => this.screenshotTaken.next());
     }
 
     pasteFromClipboard = async () => {
@@ -171,7 +174,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     // Temporary: strip semver pre-release suffix (e.g. "4.7.0-rc.1" -> "4.7.0") so
     // backend `build` parameter is purely numeric. Revert when backends accept it.
-    version = (packageJson.version ?? 'Unknown').replace(/[-+].*$/, '');
+    version = __APP_VERSION__.replace(/[-+].*$/, '');
 
     targetEnv = CAPACITOR_APPLICATION_ID;
 

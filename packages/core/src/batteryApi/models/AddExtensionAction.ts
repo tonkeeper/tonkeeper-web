@@ -29,14 +29,10 @@ import {
 export interface AddExtensionAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof AddExtensionAction
      */
     wallet: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof AddExtensionAction
      */
     extension: string;
 }
@@ -65,11 +61,11 @@ export function AddExtensionActionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function AddExtensionActionToJSON(json: any): AddExtensionAction {
-      return AddExtensionActionToJSONTyped(json, false);
-  }
+export function AddExtensionActionToJSON(json: any): AddExtensionAction {
+    return AddExtensionActionToJSONTyped(json, false);
+}
 
-  export function AddExtensionActionToJSONTyped(value?: AddExtensionAction | null, ignoreDiscriminator: boolean = false): any {
+export function AddExtensionActionToJSONTyped(value?: AddExtensionAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

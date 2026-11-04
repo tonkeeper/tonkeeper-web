@@ -31,5 +31,11 @@ export const rules: Required<ModuleOptions>['rules'] = [
     {
         test: /\.(png|jpe?g|gif|svg|webp|ico)$/i,
         type: 'asset'
+    },
+    {
+        // `asset/resource`, not `asset`: a face inlined as a data URI would be
+        // re-encoded into the render-blocking stylesheet on every build.
+        test: /\.(woff2?|ttf|otf|eot)$/i,
+        type: 'asset/resource'
     }
 ];

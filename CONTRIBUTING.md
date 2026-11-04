@@ -11,10 +11,11 @@ hotfix/<description>      — urgent production fixes
 ```
 
 **Examples:**
-- `feature/wallet-connect-v2`
-- `fix/transaction-signing`
-- `fix/PRO-123-popup-issue`
-- `hotfix/critical-security-patch`
+
+-   `feature/wallet-connect-v2`
+-   `fix/transaction-signing`
+-   `fix/PRO-123-popup-issue`
+-   `hotfix/critical-security-patch`
 
 ## Commit Messages
 
@@ -25,16 +26,17 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) format:
 ```
 
 **Types:**
-- `feat` — new feature
-- `fix` — bug fix
-- `chore` — maintenance (dependencies, release, etc.)
-- `refactor` — code refactoring
-- `docs` — documentation changes
 
-**Scopes (optional):**
-`desktop`, `extension`, `web`, `core`, `uikit`, `locales`, `mobile`, `twa`
+-   `feat` — new feature
+-   `fix` — bug fix
+-   `chore` — maintenance (dependencies, release, etc.)
+-   `refactor` — code refactoring
+-   `docs` — documentation changes
+
+**Scopes (optional):** `desktop`, `extension`, `web`, `core`, `uikit`, `locales`, `mobile`, `twa`
 
 **Examples:**
+
 ```
 feat(extension): add Firefox manifest v3 support
 fix(desktop): resolve crash on large NFT collections
@@ -71,17 +73,20 @@ Or create PR via GitHub UI.
 
 ### 4. CI Checks
 
-When you open a PR, the **web preview deployment** runs automatically — every PR gets a Cloudflare Pages link in a comment.
+When you open a PR, the **web preview deployment** runs automatically — every PR gets a Cloudflare
+Pages link in a comment.
 
-The heavier builds are **opt-in via PR labels** to save CI compute. Add a label on the PR and that build will run; remove and re-add it to re-trigger.
+The heavier builds are **opt-in via PR labels** to save CI compute. Add a label on the PR and that
+build will run; remove and re-add it to re-trigger.
 
-| Label | Build |
-|---|---|
-| `build:desktop` | Desktop matrix (Linux, Windows, macOS x64/arm/universal) |
-| `build:extension` | Extension (Chrome, Firefox) |
-| `build:ipad` | iPad (uploads to TestFlight) |
+| Label             | Build                                                    |
+| ----------------- | -------------------------------------------------------- |
+| `build:desktop`   | Desktop matrix (Linux, Windows, macOS x64/arm/universal) |
+| `build:extension` | Extension (Chrome, Firefox)                              |
+| `build:ipad`      | iPad (uploads to TestFlight)                             |
 
-You can also run any build off-PR from the **Actions** tab → pick the workflow → *Run workflow* (uses `workflow_dispatch`). Useful for branch builds, re-runs, or builds without an open PR.
+You can also run any build off-PR from the **Actions** tab → pick the workflow → _Run workflow_
+(uses `workflow_dispatch`). Useful for branch builds, re-runs, or builds without an open PR.
 
 ### 5. Code Review and Merge
 
@@ -91,10 +96,10 @@ After approval, the PR is merged into `main` using merge commit.
 
 The git tag is the single source of truth for versioning — no manual `package.json` bumps needed.
 
-| Workflow | Trigger | What it does |
-|---|---|---|
-| **Pre-release** | `v*-*` tag (e.g. `v4.6.0-rc.1`) | Builds all packages, deploys demo to `rc`, publishes GitHub pre-release |
-| **Release** | `v*` tag (e.g. `v4.6.0`) | Builds all packages, deploys to production, publishes GitHub release as latest |
+| Workflow        | Trigger                         | What it does                                                                   |
+| --------------- | ------------------------------- | ------------------------------------------------------------------------------ |
+| **Pre-release** | `v*-*` tag (e.g. `v4.6.0-rc.1`) | Builds all packages, deploys demo to `rc`, publishes GitHub pre-release        |
+| **Release**     | `v*` tag (e.g. `v4.6.0`)        | Builds all packages, deploys to production, publishes GitHub release as latest |
 
 ### Tag convention
 
@@ -103,7 +108,8 @@ vMAJOR.MINOR.PATCH          # stable release
 vMAJOR.MINOR.PATCH-rc.N     # release candidate
 ```
 
-Tags must be valid SemVer for desktop auto-update. Do not use leading zeroes in numeric version parts: use `v26.6.0`, not `v26.06.0`.
+Tags must be valid SemVer for desktop auto-update. Do not use leading zeroes in numeric version
+parts: use `v26.6.0`, not `v26.06.0`.
 
 ### Step-by-step
 
@@ -121,16 +127,18 @@ git tag v4.6.0
 git push origin v4.6.0
 ```
 
-Deploys web to production and publishes the GitHub release as latest. Desktop auto-update is available immediately.
+Deploys web to production and publishes the GitHub release as latest. Desktop auto-update is
+available immediately.
 
 **3. Manual store submissions**
 
-| Package | Channel |
-|---|---|
+| Package   | Channel                                                                |
+| --------- | ---------------------------------------------------------------------- |
 | Extension | Upload zip from GitHub release to Chrome Web Store and Firefox Add-ons |
-| iPad | Submit TestFlight build to App Store via App Store Connect |
+| iPad      | Submit TestFlight build to App Store via App Store Connect             |
 
-Both extension stores and the App Store require review (1–7 days for extensions, 1–3 days for App Store).
+Both extension stores and the App Store require review (1–7 days for extensions, 1–3 days for App
+Store).
 
 ### Manual trigger
 
@@ -145,11 +153,16 @@ gh workflow run release.yaml --ref main --field tag=v4.6.0
 
 We use [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`
 
-- **PATCH** — bug fixes (4.3.4 → 4.3.5)
-- **MINOR** — new features, backward compatible (4.3.4 → 4.4.0)
-- **MAJOR** — breaking changes (4.3.4 → 5.0.0)
+-   **PATCH** — bug fixes (4.3.4 → 4.3.5)
+-   **MINOR** — new features, backward compatible (4.3.4 → 4.4.0)
+-   **MAJOR** — breaking changes (4.3.4 → 5.0.0)
 
 All apps (web, desktop, extension) share the same version number.
+
+Builds without a release tag (PR previews, staging, local) keep the committed `0.0.0` in
+`package.json` and report `9<yy>.<m>.0` for the build month instead (e.g. `926.10.0`), like native
+dev builds do, so backend feature gates treat them as newer than every release. The build configs
+read the version through `scripts/app-version.js`; app code uses the `__APP_VERSION__` define.
 
 ## Project Structure
 
@@ -168,6 +181,37 @@ tonkeeper-web/
 └── .github/
     └── workflows/    — CI/CD pipelines
 ```
+
+## Styling: Tailwind + styled-components
+
+The codebase mid-migration. New multichain UI (`packages/uikit/src/multichain/**`) and any component
+touched during the Phase 2 redesign are Tailwind-only; everything else stays styled-components for
+now. ESLint rejects `styled-components` imports under `multichain/**`.
+
+### Design-token bridge
+
+`packages/uikit/tailwind.config.ts` resolves every color and corner-radius utility to a CSS custom
+property (e.g. `bg-textPrimary` → `var(--tk-text-primary)`). The active styled-components theme
+writes those properties on `:root` from `UserThemeProvider`, so a Tailwind `bg-textPrimary` div and
+an adjacent ` styled.div``background: ${theme.textPrimary}``  ` render the same color under any
+active theme.
+
+Adding a token: append to `tailwindBridge.ts`, declare a `:root` fallback in
+`packages/uikit/src/styles/tailwind.css`, and add the Tailwind config entry.
+
+### Theme variants
+
+Both available themes (`dark`, `pro`) are dark — there is no light theme. `UserThemeProvider`
+rewrites the CSS variables when the theme changes, which is what makes the swap visible. The
+`data-theme="<name>"` attribute on `<html>` is a debug aid only; Tailwind's `dark:` variant is
+unused.
+
+### Style-precedence pitfall
+
+Tailwind CSS loads at bundle time; styled-components injects at runtime. When a styled-components
+rule and a Tailwind utility target the same property, **runtime wins**. If a Tailwind class isn't
+applying on a partially-migrated screen, check parents for a styled-components override and either
+widen the Tailwind utility's specificity (`!`) or finish porting the parent.
 
 ## Useful Commands
 

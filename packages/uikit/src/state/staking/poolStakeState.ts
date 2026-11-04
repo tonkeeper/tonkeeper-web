@@ -51,13 +51,24 @@ export const hasActiveStakeForPool = ({
     );
 };
 
+/**
+ * Pool-token wei to burn for a TON-denominated unstake. Rounded down and
+ * clamped to the actual jetton balance — the rate is a market quote, so
+ * an unclamped conversion can exceed what the wallet holds and the burn
+ * would bounce. A missing or zero rate throws instead of dividing: the
+ * caller must not silently burn a garbage amount.
+ */
 export const convertTonToPoolTokenNano = (
     tonAmount: BigNumber,
     liquidTokenBalance: StakingPoolLiquidTokenBalance,
     tonPrice: BigNumber
 ): bigint => {
-    const tsTonAmount = tonAmount.multipliedBy(tonPrice).div(liquidTokenBalance.price!);
-    return BigInt(tsTonAmount.shiftedBy(9).toFixed(0, BigNumber.ROUND_DOWN));
+    if (!liquidTokenBalance.price || liquidTokenBalance.price.lte(0) || tonPrice.lte(0)) {
+        throw new Error('Liquid jetton rate not found');
+    }
+    const tokenAmount = tonAmount.multipliedBy(tonPrice).div(liquidTokenBalance.price);
+    const converted = new BigNumber(tokenAmount.shiftedBy(9).toFixed(0, BigNumber.ROUND_DOWN));
+    return BigInt(BigNumber.min(converted, liquidTokenBalance.weiAmount).toFixed(0));
 };
 
 export const getStakingPoolTonAmount = ({

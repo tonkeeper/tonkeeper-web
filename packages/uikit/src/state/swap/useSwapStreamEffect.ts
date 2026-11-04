@@ -11,6 +11,10 @@ import { useAtom } from '../../libs/useAtom';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useIsSwapFormNotCompleted } from './useSwapForm';
 import { useSlippageBps } from './useSwapOptions';
+import { useAnalyticsTrack } from '../../hooks/analytics';
+import { useAnalyticsAssetId } from '../../hooks/analytics/events-hooks';
+import { toRedError } from '../../hooks/analytics/red-operation';
+import { startSwapRedOperation } from '../../hooks/analytics/swap';
 
 export const swapConfirmation$ = atom<SwapConfirmation | null>(null);
 const swapIsFetching$ = atom(false);
@@ -42,6 +46,12 @@ export function useSwapStreamEffect() {
     const [, setConfirmation] = useAtom(swapConfirmation$);
     const [, setIsFetching] = useAtom(swapIsFetching$);
     const [, setError] = useAtom(swapError$);
+    // Read through a ref: a tracker that resolves while the screen is up must
+    // not restart the quote stream.
+    const track = useAnalyticsTrack();
+    const trackRef = useRef(track);
+    trackRef.current = track;
+    const analyticsAssetId = useAnalyticsAssetId();
 
     const subscribe = useCallback(() => {
         if (closeRef.current) {
@@ -73,6 +83,14 @@ export function useSwapStreamEffect() {
 
         const abortController = new AbortController();
 
+        // One quote operation per subscription, settled by its first answer
+        // like the native swap screens; the stream keeps re-quoting after that.
+        const quoteSession = startSwapRedOperation(trackRef.current, 'quote', {
+            from_asset: analyticsAssetId.fromAsset(fromAsset),
+            to_asset: analyticsAssetId.fromAsset(toAsset),
+            from_amount: fromAmountRelative.toNumber()
+        });
+
         const { close } = subscribeToOmnistonStream({
             baseUrl,
             fromAsset: toTradeAssetId(fromAsset.address),
@@ -82,10 +100,15 @@ export function useSwapStreamEffect() {
             slippageBps,
             query: queryParams,
             onQuote: confirmation => {
+                quoteSession.finish('success', { stage: 'quote' });
                 setConfirmation(confirmation);
                 setIsFetching(false);
             },
             onError: error => {
+                quoteSession.finish('fail', {
+                    stage: 'quote',
+                    error: toRedError(error, 'native_swap')
+                });
                 setError(error);
                 setIsFetching(false);
             },
@@ -93,6 +116,7 @@ export function useSwapStreamEffect() {
         });
 
         closeRef.current = () => {
+            quoteSession.finish('cancel', { stage: 'quote' });
             abortController.abort();
             close();
         };
@@ -105,6 +129,7 @@ export function useSwapStreamEffect() {
         isNotCompleted,
         slippageBps,
         wallet.rawAddress,
+        analyticsAssetId,
         setConfirmation,
         setIsFetching,
         setError

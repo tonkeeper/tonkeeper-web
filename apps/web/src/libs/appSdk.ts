@@ -3,7 +3,7 @@ import { BaseApp } from '@tonkeeper/core/dist/AppSdk';
 import { safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 
 import { BrowserStorage } from './storage';
-import packageJson from '../../package.json';
+import { NEW_ORIGIN } from '../migration/config';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
 
 function iOS() {
@@ -38,11 +38,11 @@ export class BrowserAppSdk extends BaseApp {
     isIOs = iOS;
     isStandalone = () => iOS() && ((window.navigator as any).standalone as boolean);
 
-    version = packageJson.version ?? 'Unknown';
+    version = __APP_VERSION__;
 
     targetEnv = 'web' as const;
 
-    signerReturnUrl = 'https://wallet.tonkeeper.com/';
+    signerReturnUrl = `${NEW_ORIGIN}/`;
 
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:', 'tonsign:'];
 }

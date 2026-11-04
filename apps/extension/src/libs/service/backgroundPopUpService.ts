@@ -18,9 +18,11 @@ export const handlePopUpConnection = (port: browser.Runtime.Port) => {
     popUpPort = port;
 
     port.onMessage.addListener(message => {
-        if (message.type === 'PopupConnected') {
+        if (message.type === 'ping') {
+            // popup keepalive — port traffic resets the MV3 idle timer
+        } else if (message.type === 'PopupConnected') {
             popUpPort = port;
-            portMessagesQueue.forEach(msg => popUpPort.postMessage(msg));
+            portMessagesQueue.splice(0).forEach(msg => popUpPort.postMessage(msg));
         } else {
             popUpEventEmitter.emit(message.method as PopUpEventName, message as PopUpEventMessage);
         }
@@ -54,6 +56,10 @@ popUpEventEmitter.on('rejectRequest', message => {
 
 popUpEventEmitter.on('tonConnectDisconnect', message => {
     backgroundEventsEmitter.emit('tonConnectDisconnect', message);
+});
+
+popUpEventEmitter.on('evmDisconnect', message => {
+    backgroundEventsEmitter.emit('evmDisconnect', message);
 });
 
 popUpEventEmitter.on('proxyChanged', message => {

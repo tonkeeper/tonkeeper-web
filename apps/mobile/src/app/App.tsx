@@ -1,12 +1,14 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
+import { initChainKit } from '@tonkeeper/core/dist/service/chainkit/initChainKit';
+import { WEB_PUSH_APP_ID } from '@tonkeeper/core/dist/service/chainkit/deviceAuthService';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { DocumentLanguageSync } from '@tonkeeper/uikit/dist/components/DocumentLanguageSync';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
-import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
@@ -22,10 +24,11 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
+import { RootErrorBoundary } from '@tonkeeper/uikit/dist/components/shared/RootErrorBoundary';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useAccountsStateQuery,
@@ -42,6 +45,7 @@ import { useAnalytics, useAppHeight } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { CapacitorNotifications } from '../libs/capacitorNotifications';
+import { listenForPushClicks } from '../libs/push-click';
 import { NarrowContent } from './app-content/NarrowContent';
 import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -51,6 +55,7 @@ import { queryClient } from '../libs/query-client';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
 import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
+import { MULTICHAIN_ENABLED } from '@tonkeeper/core/dist/multichain';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -63,7 +68,6 @@ const GlobalStyle = createGlobalStyle`
 
     body {
         background: ${p => p.theme.backgroundPage};
-        font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, sans-serif;
     }
     
     html, body, #root {
@@ -102,6 +106,12 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const sdk = new CapacitorAppSdk();
+listenForPushClicks();
+initChainKit(sdk.storage, {
+    platform: 'ios_pro',
+    appId: WEB_PUSH_APP_ID,
+    clientVersion: sdk.version
+});
 
 export const Providers = () => {
     const { t: tSimple, i18n } = useTranslation();
@@ -133,6 +143,7 @@ export const Providers = () => {
             <Suspense fallback={<div></div>}>
                 <AppSdkContext.Provider value={sdk}>
                     <TranslationContext.Provider value={translation}>
+                        <DocumentLanguageSync />
                         <StorageContext.Provider value={sdk.storage}>
                             <ThemeAndContent />
                         </StorageContext.Provider>
@@ -152,7 +163,6 @@ export const App = () => (
 );
 
 const ThemeAndContent = () => {
-    const { data } = useProBackupState();
     return (
         <UserThemeProvider
             displayType="full-width"
@@ -160,15 +170,15 @@ const ThemeAndContent = () => {
             isProSupported
             proDisplayType={CAPACITOR_APPLICATION_ID === 'mobile' ? 'mobile' : 'desktop'}
         >
-            <DarkThemeContext.Provider value={!data?.valid}>
-                <GlobalStyle />
-                <HeaderGlobalStyle />
-                <FooterGlobalStyle />
-                <SybHeaderGlobalStyle />
-                <GlobalListStyle />
+            <GlobalStyle />
+            <HeaderGlobalStyle />
+            <FooterGlobalStyle />
+            <SybHeaderGlobalStyle />
+            <GlobalListStyle />
+            <RootErrorBoundary>
                 <Loader />
-                <UnlockNotification sdk={sdk} />
-            </DarkThemeContext.Provider>
+            </RootErrorBoundary>
+            <UnlockNotification sdk={sdk} />
         </UserThemeProvider>
     );
 };
@@ -252,6 +262,7 @@ export const Loader: FC = () => {
         experimental: true,
         ios: false,
         defaultWalletVersion: WalletVersion.V5R1,
+        multichainEnabled: MULTICHAIN_ENABLED,
         tracker: tracker?.track
     };
 

@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { passwordStorage, validatePassword } from '@tonkeeper/core/dist/service/passwordService';
+import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -11,7 +12,8 @@ import { Button, ButtonRow } from '../../components/fields/Button';
 import { Input } from '../../components/fields/Input';
 import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
-import { useIsPasswordSet } from '../../state/wallet';
+import { useActiveAccountQuery, useIsPasswordSet } from '../../state/wallet';
+import { EnterPasswordModal } from '../../components/modals/EnterPasswordModal';
 import { useKeyboardHeight } from '../../hooks/keyboard/useKeyboardHeight';
 
 const Block = styled.form<{ padding: number }>`
@@ -63,8 +65,8 @@ export const PasswordUnlock: FC<{
     const { t } = useTranslation();
     const ref = useRef<HTMLInputElement | null>(null);
     const [password, setPassword] = useState('');
-    const [active, setActive] = useState(false);
     const location = useLocation();
+    const mountLocation = useRef(location);
 
     useEffect(() => {
         sdk.uiEvents.on('navigate', onClose);
@@ -84,13 +86,15 @@ export const PasswordUnlock: FC<{
         };
     }, []);
 
+    // Dismiss the prompt when the user navigates away while it is open.
+    // Compare against the mount-time location: the effect also re-runs on
+    // `onClose` identity changes, and closing on those would dismiss the
+    // prompt immediately after mount.
     useEffect(() => {
-        if (!active) {
-            setActive(true);
-        } else {
+        if (location !== mountLocation.current) {
             onClose();
         }
-    }, [location, active, onClose]);
+    }, [location, onClose]);
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
@@ -180,7 +184,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: requestId,
-                params: new Error('Cancel auth request')
+                params: new UserCancelledError('Cancel auth request')
             });
         }
         close();
@@ -199,6 +203,28 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
             sdk.uiEvents.off('getPassword', handler);
         };
     }, [sdk, setRequest]);
+
+    const { data: activeAccount } = useActiveAccountQuery();
+    const isMultichainPrompt = activeAccount?.type === 'multichain' && isPasswordSet;
+
+    // The redesigned modal has no navigation awareness of its own, so a route
+    // change while it is open cancels the pending request the same way the
+    // legacy sheet does. Location is captured when the request arrives.
+    const location = useLocation();
+    const requestLocation = useRef<typeof location>();
+    useEffect(() => {
+        if (!isMultichainPrompt || requestId == null) {
+            requestLocation.current = undefined;
+            return;
+        }
+        if (!requestLocation.current) {
+            requestLocation.current = location;
+            return;
+        }
+        if (location !== requestLocation.current) {
+            onCancel();
+        }
+    }, [isMultichainPrompt, requestId, location, onCancel]);
 
     const Content = useCallback(() => {
         if (!requestId) return undefined;
@@ -234,12 +260,23 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
         usePadding
     ]);
 
+    if (isMultichainPrompt) {
+        return (
+            <EnterPasswordModal
+                isOpen={requestId != null}
+                onCancel={onCancel}
+                onSubmit={onSubmit}
+            />
+        );
+    }
+
     return (
         <Notification
             isOpen={requestId != null}
             hideButton
             handleClose={onCancel}
             title={isPasswordSet ? t('enter_password') : undefined}
+            topMost
         >
             {Content}
         </Notification>

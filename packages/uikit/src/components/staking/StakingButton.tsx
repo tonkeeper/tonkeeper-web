@@ -55,8 +55,7 @@ export const StakingButton: FC<StakingButtonProps> = ({
     if (minStakeTON && amountBN.lt(minStakeTON)) {
         return (
             <Button size="large" fullWidth secondary disabled>
-                {t('staking_min_deposit_label')}: {minStakeTON.toFixed(0)}{' '}
-                {BRAND_CONFIG.coinSymbolWithEx}
+                {t('staking_min_deposit_label')}: {minStakeTON.toFixed(0)} {BRAND_CONFIG.coinSymbol}
             </Button>
         );
     }

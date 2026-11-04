@@ -2,18 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { LocationSchema } from './LocationSchema';
+import type { UrlSchema } from './UrlSchema';
 /**
  * Triggered when user makes a search request in the browser
  */
 export type DappBrowserSearchOpenSchema = {
     eventName: string;
-    /**
-     * URL domain only, without private information
-     */
-    url: string;
-    /**
-     * 2-letter string in ISO-3166 format, passed from backend
-     */
-    location: string;
+    url: UrlSchema;
+    location: LocationSchema;
 };
 

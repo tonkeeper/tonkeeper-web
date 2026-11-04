@@ -36,45 +36,31 @@ import {
 export interface SubscriptionAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof SubscriptionAction
      */
     subscriber: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof SubscriptionAction
      */
     subscription: string;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof SubscriptionAction
      */
     beneficiary: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof SubscriptionAction
      */
     admin: AccountAddress;
     /**
      * 
-     * @type {number}
-     * @memberof SubscriptionAction
      * @deprecated
      */
     amount?: number;
     /**
      * 
-     * @type {Price}
-     * @memberof SubscriptionAction
      */
     price: Price;
     /**
      * 
-     * @type {boolean}
-     * @memberof SubscriptionAction
      */
     initial: boolean;
 }
@@ -112,11 +98,11 @@ export function SubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function SubscriptionActionToJSON(json: any): SubscriptionAction {
-      return SubscriptionActionToJSONTyped(json, false);
-  }
+export function SubscriptionActionToJSON(json: any): SubscriptionAction {
+    return SubscriptionActionToJSONTyped(json, false);
+}
 
-  export function SubscriptionActionToJSONTyped(value?: SubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
+export function SubscriptionActionToJSONTyped(value?: SubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

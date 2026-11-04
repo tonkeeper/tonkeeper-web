@@ -11,7 +11,7 @@ import { ListBlock, ListItem } from '../List';
 import { Body2, Body3, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ConfirmDisconnectNotification } from './ConfirmDisconnectNotification';
-import { SpinnerRing } from '../Icon';
+import { Loader } from '../Loader';
 import { formatDappUrl } from './utils';
 
 const DesktopListContainer = styled.ul`
@@ -87,11 +87,6 @@ const DisconnectButton = styled(Button)`
     height: 32px;
 `;
 
-const SpinnerRingStyled = styled(SpinnerRing)`
-    transform: scale(1.5);
-    margin: 0 auto;
-`;
-
 export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { data: apps, refetch } = useActiveWalletConnectedApps();
@@ -114,7 +109,9 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
     if (!apps) {
         return (
             <FullHeightContainer className={className}>
-                <SpinnerRingStyled />
+                <div className="flex justify-center">
+                    <Loader size="medium" className="text-iconSecondary" />
+                </div>
             </FullHeightContainer>
         );
     }

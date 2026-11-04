@@ -29,63 +29,43 @@ import {
 export interface PurchasesPurchasesInner {
     /**
      * 
-     * @type {string}
-     * @memberof PurchasesPurchasesInner
      */
     promo?: string;
     /**
      * 
-     * @type {string}
-     * @memberof PurchasesPurchasesInner
      */
     forAccountId?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PurchasesPurchasesInner
      * @deprecated
      */
     userPurchaseId: number;
     /**
      * 
-     * @type {number}
-     * @memberof PurchasesPurchasesInner
      */
     purchaseId: number;
     /**
      * 
-     * @type {string}
-     * @memberof PurchasesPurchasesInner
      */
     type: PurchasesPurchasesInnerTypeEnum;
     /**
      * Amount describes the amount paid by the user for this purchase when we know it. For crypto purchases it is always set.
-     * @type {string}
-     * @memberof PurchasesPurchasesInner
      */
     amount?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PurchasesPurchasesInner
      */
     charges: number;
     /**
      * Currency is set when we know it. For crypto purchases it is always set.
-     * @type {string}
-     * @memberof PurchasesPurchasesInner
      */
     currency?: string;
     /**
      * 
-     * @type {string}
-     * @memberof PurchasesPurchasesInner
      */
     datetime: string;
     /**
      * 
-     * @type {PurchasesPurchasesInnerRefundInformation}
-     * @memberof PurchasesPurchasesInner
      */
     refundInformation?: PurchasesPurchasesInnerRefundInformation;
 }
@@ -100,7 +80,7 @@ export const PurchasesPurchasesInnerTypeEnum = {
     PromoCode: 'promo-code',
     Crypto: 'crypto',
     Gift: 'gift',
-    OnTheWayGift: 'on-the-way-gift'
+    OnTheWayGift: 'on-the-way-gift',
 } as const;
 export type PurchasesPurchasesInnerTypeEnum = typeof PurchasesPurchasesInnerTypeEnum[keyof typeof PurchasesPurchasesInnerTypeEnum];
 
@@ -109,8 +89,8 @@ export type PurchasesPurchasesInnerTypeEnum = typeof PurchasesPurchasesInnerType
  * Check if a given object implements the PurchasesPurchasesInner interface.
  */
 export function instanceOfPurchasesPurchasesInner(value: object): value is PurchasesPurchasesInner {
-    if (!('userPurchaseId' in value) || value['userPurchaseId'] === undefined) return false;
-    if (!('purchaseId' in value) || value['purchaseId'] === undefined) return false;
+    if ((!('userPurchaseId' in (value as Record<string, any>)) && !('user_purchase_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['userPurchaseId'] === undefined && (value as Record<string, any>)['user_purchase_id'] === undefined)) return false;
+    if ((!('purchaseId' in (value as Record<string, any>)) && !('purchase_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['purchaseId'] === undefined && (value as Record<string, any>)['purchase_id'] === undefined)) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
     if (!('charges' in value) || value['charges'] === undefined) return false;
     if (!('datetime' in value) || value['datetime'] === undefined) return false;
@@ -140,11 +120,11 @@ export function PurchasesPurchasesInnerFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-  export function PurchasesPurchasesInnerToJSON(json: any): PurchasesPurchasesInner {
-      return PurchasesPurchasesInnerToJSONTyped(json, false);
-  }
+export function PurchasesPurchasesInnerToJSON(json: any): PurchasesPurchasesInner {
+    return PurchasesPurchasesInnerToJSONTyped(json, false);
+}
 
-  export function PurchasesPurchasesInnerToJSONTyped(value?: PurchasesPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
+export function PurchasesPurchasesInnerToJSONTyped(value?: PurchasesPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

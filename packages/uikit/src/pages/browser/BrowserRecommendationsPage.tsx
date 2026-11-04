@@ -7,7 +7,7 @@ import { RecommendationsPageBodySkeleton } from '../../components/skeletons/Brow
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { CategoryBlock } from './CategoryBlock';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { useTrackDappBrowserOpened } from '../../hooks/analytics/events-hooks';
+import { useTrackDappBrowserOpen } from '../../hooks/analytics/dapp-browser';
 
 const InnerBodyStyled = styled(InnerBody)`
     padding: 0;
@@ -27,7 +27,7 @@ const SkeletonContainer = styled.div`
 
 export const BrowserRecommendationsPage: FC = () => {
     const { data } = useRecommendations();
-    useTrackDappBrowserOpened();
+    useTrackDappBrowserOpen();
 
     return (
         <HideOnReview>

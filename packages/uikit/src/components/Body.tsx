@@ -53,7 +53,7 @@ export const useWindowsScroll = (addHidden = true) => {
     useLayoutEffect(() => {
         if (standalone) {
             if (addHidden) {
-                document.documentElement.classList.add('hidden');
+                document.documentElement.classList.add('scroll-hidden');
             }
             return;
         }

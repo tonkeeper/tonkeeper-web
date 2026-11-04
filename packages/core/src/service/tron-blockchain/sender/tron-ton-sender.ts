@@ -116,6 +116,7 @@ export class TronTonSender extends BaseTronSender implements ITronSender {
 
             throw e;
         }
+        return signedTronTx.txID;
     }
 
     async estimate(

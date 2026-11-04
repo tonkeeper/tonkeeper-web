@@ -20,6 +20,19 @@ const getContext = () => {
     return canvas.getContext('2d') as CanvasRenderingContext2D;
 };
 
+/*
+ * The family list callers should measure with. Reads `--tk-font-sans` off the
+ * root element because the Vietnamese locale swaps the whole UI to Inter —
+ * a hardcoded 'TT Firs Neue' would run the auto-shrink maths against a face
+ * nobody sees.
+ */
+export const getUiFontFamily = () => {
+    const stack = window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue('--tk-font-sans');
+    return stack.trim() || "'TT Firs Neue', sans-serif";
+};
+
 export const getTextWidth = (currentText: string | string[], font: string) => {
     const context = getContext();
     context.font = font;

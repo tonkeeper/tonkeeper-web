@@ -31,6 +31,7 @@ import {
     AccountKeystone,
     AccountLedger,
     AccountMAM,
+    AccountMultichain,
     AccountTonMnemonic,
     AccountTonMultisig,
     AccountTonOnly,
@@ -38,7 +39,7 @@ import {
     AccountTonTestnet,
     AccountTonWatchOnly
 } from '@tonkeeper/core/dist/entries/account';
-import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
+import { useAddWalletFlow } from '../../components/modals/AddWalletFlow';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent,
@@ -202,7 +203,7 @@ const FolderItemOverlay: FC<{ acc: Account; tabLevel: number }> = ({ acc, tabLev
 
 export const DesktopManageAccountsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
-    const { onOpen: addWallet } = useAddWalletNotification();
+    const { onOpen: addWallet } = useAddWalletFlow();
     const { onOpen: manageFolders } = useManageFolderNotification();
     const { t } = useTranslation();
 
@@ -654,6 +655,48 @@ const AccountWatchOnlyRow: FC<{
     );
 };
 
+/**
+ * Multichain accounts expose one flat row: their per-chain wallets aren't
+ * separately selectable and their recovery phrase is reached from the
+ * multichain settings, so rename / delete is the whole menu.
+ */
+const AccountMultichainRow: FC<{
+    account: AccountMultichain;
+    dragHandleProps?: DragHandleProps;
+    tabLevel: number;
+}> = ({ account, dragHandleProps, tabLevel }) => {
+    const { t } = useTranslation();
+    const { onRename, onDelete } = useAccountOptions();
+    return (
+        <Row $tabLevel={tabLevel}>
+            {dragHandleProps ? (
+                <Icon {...dragHandleProps}>
+                    <ReorderIcon />
+                </Icon>
+            ) : (
+                <DragHandleMock />
+            )}
+            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+            <Label2Styled>{account.name}</Label2Styled>
+            <AccountBadgeStyled accountType={account.type} size="s" />
+            <AccountMenu
+                options={[
+                    {
+                        name: t('Rename'),
+                        onClick: () => onRename({ accountId: account.id }),
+                        icon: <PencilIcon />
+                    },
+                    {
+                        name: t('settings_delete_account'),
+                        onClick: () => onDelete({ accountId: account.id }),
+                        icon: <TrashBinIcon />
+                    }
+                ]}
+            />
+        </Row>
+    );
+};
+
 const AccountMAMRow: FC<{
     account: AccountMAM;
     dragHandleProps?: DragHandleProps;
@@ -769,6 +812,8 @@ const AccountRow: FC<{
             return <AccountMAMRow account={account} {...rest} />;
         case 'ton-multisig':
             return <AccountMultisigRow />;
+        case 'multichain':
+            return <AccountMultichainRow account={account} {...rest} />;
         default:
             assertUnreachable(account);
     }

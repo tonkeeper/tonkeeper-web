@@ -6,9 +6,11 @@ import {
     sortWalletsByVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, useCallback } from 'react';
+import { FC, PropsWithChildren, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
+import { cn } from '../libs/css';
+import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../libs/routes';
 import { useUserCountry } from '../state/country';
@@ -27,7 +29,7 @@ import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1, Label2 } from './Text';
 import { AccountAndWalletBadgesGroup, NetworkBadge } from './account/AccountBadge';
 import { ScanButton } from './connect/ScanButton';
-import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
+import { useAddWalletFlow } from './modals/AddWalletFlow';
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
@@ -42,42 +44,29 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useNativeBackButton } from './BackButton';
 import { RoundedButton } from './fields/RoundedButton';
 
-const Block = styled.div<{
-    center?: boolean;
-    second?: boolean;
-}>`
-    flex-shrink: 0;
-    user-select: none;
-    overflow: visible !important;
-    top: 0;
-    z-index: 4;
-    ${p =>
-        p.theme.displayType === 'full-width'
-            ? css`
-                  position: absolute;
-                  width: 100%;
-              `
-            : css`
-                  position: fixed;
-                  width: var(--app-width);
-                  max-width: 548px;
-              `}
-    ${props =>
-        css`
-            padding: ${props.second ? '12px 1rem 0.75rem' : '16px 1rem 1rem'};
-        `}
-    display: flex;
-    box-sizing: border-box;
-    ${props =>
-        props.center &&
-        css`
-            justify-content: center;
-        `}
-    background-color: ${props => props.theme.backgroundPage};
-`;
+const Block: FC<PropsWithChildren<{ center?: boolean; second?: boolean }>> = ({
+    children,
+    center,
+    second
+}) => {
+    const isFullWidth = useIsFullWidthMode();
+    return (
+        <div
+            className={cn(
+                'header-block z-[4] top-0 box-border flex shrink-0 select-none bg-backgroundPage',
+                '![overflow:visible]',
+                isFullWidth ? 'absolute w-full' : 'fixed w-[var(--app-width)] max-w-[548px]',
+                second ? 'px-4 pt-3 pb-3' : 'px-4 py-4',
+                center && 'justify-center'
+            )}
+        >
+            {children}
+        </div>
+    );
+};
 
 export const HeaderGlobalStyle = createGlobalStyle`
-  body:not(.top) ${Block} {
+  body:not(.top) .header-block {
     &::after {
       content: '';
       display: block;
@@ -342,7 +331,7 @@ const TwoFARecoveryStarted = styled(Link)`
 
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const account = useActiveAccount();
-    const { onOpen: addWallet } = useAddWalletNotification();
+    const { onOpen: addWallet } = useAddWalletFlow();
     const { t } = useTranslation();
     const { data: twoFAConfig } = useTwoFAWalletConfig();
 

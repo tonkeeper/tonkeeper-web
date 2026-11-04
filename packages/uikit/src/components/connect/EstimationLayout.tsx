@@ -32,7 +32,7 @@ const ExtraDetails: FC<{
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatAmount } = useFormatFiat(data, formatDecimals(feeAmount));
 
-    let value = `≈ ${amount} ${BRAND_CONFIG.coinSymbolWithEx}`;
+    let value = `≈ ${amount} ${BRAND_CONFIG.coinSymbol}`;
 
     if (fiatAmount) {
         value += ` · ${fiatAmount}`;

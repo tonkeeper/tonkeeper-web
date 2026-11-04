@@ -8,6 +8,7 @@ import { BatterySettingsNotification } from './BatterySettingsNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useActiveTonWalletConfig } from '../../../state/wallet';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
+import { getBatteryLevel } from '@tonkeeper/core/dist/utils/battery';
 import {
     BatteryChargingIcon,
     BatteryFullIcon,
@@ -15,22 +16,25 @@ import {
     BatteryQuarterIcon
 } from './BatteryIcons';
 
-const mediumBatteryValue = 250;
-const smallBatteryValue = 150;
-
 export const BatteryBalanceIcon: FC<{ balance: BatteryBalance } & SVGAttributes<SVGElement>> = ({
     balance,
     ...props
 }) => {
-    if (balance.tonUnitsBalance.weiAmount.isZero()) {
+    const level = getBatteryLevel(balance.tonUnitsBalance.relativeAmount);
+
+    if (level === 'empty') {
         return <BatteryChargingIcon {...props} />;
     }
 
-    if (balance.batteryUnitsBalance.lte(smallBatteryValue)) {
+    if (level === 'negative' || level === 10) {
         return <BatteryQuarterIcon color="accentOrange" {...props} />;
     }
 
-    if (balance.batteryUnitsBalance.lte(mediumBatteryValue)) {
+    if (level === 25) {
+        return <BatteryQuarterIcon {...props} />;
+    }
+
+    if (level <= 50) {
         return <BatteryHalfIcon {...props} />;
     }
 

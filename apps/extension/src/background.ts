@@ -3,6 +3,7 @@
  * The service is responsible to manage input and output events or requests from DApps and PopUp
  */
 
+import './wallet-core-wasm-path';
 import browser from 'webextension-polyfill';
 import {
     handleDAppConnection,
@@ -31,6 +32,27 @@ async function getShouldOpenSystemPopup() {
     } catch {
         return false;
     }
+}
+
+/**
+ * Chrome (114+) renders the app as a full-height side panel opened by the
+ * toolbar icon. `action.default_popup` is unset in the Chrome manifest, so the
+ * click is handled natively by the panel behavior. Browsers without the API
+ * (Firefox keeps `default_popup`; older Chromium falls through to `onClicked`)
+ * use the legacy separate-window flow.
+ */
+const sidePanel = (
+    globalThis as {
+        chrome?: {
+            sidePanel?: { setPanelBehavior(o: { openPanelOnActionClick: boolean }): Promise<void> };
+        };
+    }
+).chrome?.sidePanel;
+
+if (sidePanel) {
+    sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
+} else {
+    browser.action.onClicked.addListener(() => customPopupManager.openPopup('icon-click'));
 }
 
 browser.runtime.onMessage.addListener(async msg => {

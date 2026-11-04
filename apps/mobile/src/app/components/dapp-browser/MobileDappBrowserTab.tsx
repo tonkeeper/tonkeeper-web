@@ -59,7 +59,6 @@ import { AccountAndWalletInfo } from '@tonkeeper/uikit/dist/components/account/A
 import { AccountConnectionInjected } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCountryContextTracker } from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
-import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/analytics';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -228,7 +227,6 @@ const TabHeader: FC<{
     const { mutate: changeTab } = useChangeBrowserTab();
     const { mutate: openNewTab } = useOpenBrowserTab();
     const countryContextTrack = useCountryContextTracker();
-    const track = useAnalyticsTrack();
 
     return (
         <TabHeaderWrapper>
@@ -311,11 +309,13 @@ const TabHeader: FC<{
                                                     ? {
                                                           eventName: 'dapp_unpin',
                                                           url: tab.url,
+                                                          asset_chain: 'ton',
                                                           location: country
                                                       }
                                                     : {
                                                           eventName: 'dapp_pin',
                                                           url: tab.url,
+                                                          asset_chain: 'ton',
                                                           location: country
                                                       }
                                             );
@@ -342,11 +342,13 @@ const TabHeader: FC<{
                             <DropDownItemStyled
                                 onClick={() => {
                                     closeDropDown();
-                                    track({
+                                    countryContextTrack(country => ({
                                         eventName: 'dapp_sharing_copy',
                                         url: tab.url,
-                                        from: 'Share'
-                                    });
+                                        asset_chain: 'ton',
+                                        from: 'share',
+                                        location: country
+                                    }));
                                     sdk.hapticNotification('success');
                                     Share.share({
                                         url: tab.url
@@ -363,11 +365,13 @@ const TabHeader: FC<{
                                 onClick={() => {
                                     closeDropDown();
                                     sdk.copyToClipboard(tab.url);
-                                    track({
+                                    countryContextTrack(country => ({
                                         eventName: 'dapp_sharing_copy',
                                         url: tab.url,
-                                        from: 'Copy link'
-                                    });
+                                        asset_chain: 'ton',
+                                        from: 'copy_link',
+                                        location: country
+                                    }));
                                 }}
                             >
                                 <Label2>{t('browser_actions_copy_link')}</Label2>

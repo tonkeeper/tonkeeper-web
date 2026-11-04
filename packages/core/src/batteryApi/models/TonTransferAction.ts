@@ -43,38 +43,26 @@ import {
 export interface TonTransferAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof TonTransferAction
      */
     sender: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof TonTransferAction
      */
     recipient: AccountAddress;
     /**
-     * amount in nanotons
-     * @type {number}
-     * @memberof TonTransferAction
+     * amount in nanograms
      */
     amount: number;
     /**
      * 
-     * @type {string}
-     * @memberof TonTransferAction
      */
     comment?: string;
     /**
      * 
-     * @type {EncryptedComment}
-     * @memberof TonTransferAction
      */
     encryptedComment?: EncryptedComment;
     /**
      * 
-     * @type {Refund}
-     * @memberof TonTransferAction
      */
     refund?: Refund;
 }
@@ -108,11 +96,11 @@ export function TonTransferActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function TonTransferActionToJSON(json: any): TonTransferAction {
-      return TonTransferActionToJSONTyped(json, false);
-  }
+export function TonTransferActionToJSON(json: any): TonTransferAction {
+    return TonTransferActionToJSONTyped(json, false);
+}
 
-  export function TonTransferActionToJSONTyped(value?: TonTransferAction | null, ignoreDiscriminator: boolean = false): any {
+export function TonTransferActionToJSONTyped(value?: TonTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

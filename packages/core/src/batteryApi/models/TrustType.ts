@@ -21,7 +21,7 @@ export const TrustType = {
     Whitelist: 'whitelist',
     Graylist: 'graylist',
     Blacklist: 'blacklist',
-    None: 'none'
+    None: 'none',
 } as const;
 export type TrustType = typeof TrustType[keyof typeof TrustType];
 

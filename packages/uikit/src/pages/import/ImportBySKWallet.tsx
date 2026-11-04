@@ -1,19 +1,20 @@
 import { Account, AccountTonSK } from '@tonkeeper/core/dist/entries/account';
 import React, { FC, useContext, useMemo, useState } from 'react';
-import { UpdateWalletName } from '../../components/create/WalletName';
+import { CustomizeWallet } from '../../components/create/CustomizeWallet';
 import {
     useAccountsState,
     useCreateAccountTonSK,
     useMutateRenameAccount
 } from '../../state/wallet';
+import { useMutateWalletColor, useWalletColorResolver } from '../../state/walletColor';
 import { FinalView } from './Password';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import {
     OnCloseInterceptor,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../../components/Notification';
+    useSetModalOnBack,
+    useSetModalOnCloseInterceptor
+} from '../../primitives/Modal';
 import { AccountIsAlreadyAdded } from '../../components/create/AccountIsAlreadyAdded';
 import { WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { SKInput } from '../../components/create/SKInput';
@@ -24,6 +25,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useMutation } from '@tanstack/react-query';
 import { SKSigningAlgorithm } from '@tonkeeper/core/dist/service/sign';
+import { useImportFlowAnalytics } from '../../hooks/analytics/wallet-flow';
 
 export const ImportBySKWallet: FC<{
     afterCompleted: () => void;
@@ -32,11 +34,15 @@ export const ImportBySKWallet: FC<{
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
         useCreateAccountTonSK();
     const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
+    const resolveWalletColor = useWalletColorResolver();
+    const { setWalletColor } = useMutateWalletColor();
 
     const [accountCandidate, setAccountCandidate] = useState<
         { account: AccountTonSK; sk: string } | undefined
     >(undefined);
     const [createdAccount, setCreatedAccount] = useState<AccountTonSK | undefined>(undefined);
+
+    const importAnalytics = useImportFlowAnalytics('privatekey');
 
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
 
@@ -64,7 +70,7 @@ export const ImportBySKWallet: FC<{
         }
         return undefined;
     }, [navigateHome, createdAccount, isDirty, openConfirmDiscard, accountCandidate]);
-    useSetNotificationOnBack(onBack);
+    useSetModalOnBack(onBack);
 
     const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
         if (!isDirty) {
@@ -87,7 +93,7 @@ export const ImportBySKWallet: FC<{
             });
         };
     }, [createdAccount, openConfirmDiscard, isDirty]);
-    useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+    useSetModalOnCloseInterceptor(onCloseInterceptor);
 
     const [existingAccountAndWallet, setExistingAccountAndWallet] = useState<
         | {
@@ -131,6 +137,7 @@ export const ImportBySKWallet: FC<{
                 }
                 setAccountCandidate({ account: possibleAccount, sk: secretKey });
             } catch (e) {
+                importAnalytics.error(e);
                 sdk.topMessage('Failed to process secret key');
             }
         }
@@ -163,7 +170,10 @@ export const ImportBySKWallet: FC<{
                         secret: { key: accountCandidate.sk, algorithm: signingAlgorithm },
                         versions,
                         selectAccount: true
-                    }).then(setCreatedAccount);
+                    }).then(account => {
+                        setCreatedAccount(account);
+                        importAnalytics.success();
+                    }, importAnalytics.error);
                 }}
                 isLoading={isCreateWalletLoading}
             />
@@ -172,18 +182,16 @@ export const ImportBySKWallet: FC<{
 
     if (!editNamePagePassed) {
         return (
-            <UpdateWalletName
+            <CustomizeWallet
                 name={createdAccount.name}
-                submitHandler={val => {
-                    renameWallet({
-                        id: createdAccount.id,
-                        ...val
-                    }).then(newAcc => {
-                        setEditNamePagePassed(true);
-                        setCreatedAccount(newAcc as AccountTonSK);
-                    });
+                submitHandler={async ({ name, emoji, colorId }) => {
+                    await setWalletColor(createdAccount.id, colorId);
+                    const newAcc = await renameWallet({ id: createdAccount.id, name, emoji });
+                    setEditNamePagePassed(true);
+                    setCreatedAccount(newAcc as AccountTonSK);
                 }}
                 walletEmoji={createdAccount.emoji}
+                walletColorId={resolveWalletColor(createdAccount.id).id}
                 isLoading={renameLoading}
             />
         );

@@ -1,8 +1,8 @@
 import { EstimateResourcesRequest } from '../../../tronApi';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TronAsset } from '../../../entries/crypto/asset/tron-asset';
-import { TronAddressUtils } from '@ton-keychain/trx';
 import { TRON_USDT_ASSET } from '../../../entries/crypto/asset/constants';
+import { assertTronTransactionMatches, evmHexFromTronAddress } from '../tron-transaction';
 
 export class TronTrc20Encoder {
     public static transferDefaultResources = {
@@ -11,6 +11,11 @@ export class TronTrc20Encoder {
     };
 
     private static transferSelector = 'transfer(address,uint256)';
+
+    private static transferSelectorHex = 'a9059cbb';
+
+    /** Sun; tronweb's own default, passed explicitly so the built transaction can be checked against it. */
+    private static transferFeeLimit = 150_000_000;
 
     private readonly walletAddress: string;
 
@@ -27,6 +32,16 @@ export class TronTrc20Encoder {
         this.tronGridBaseUrl = tronGridBaseUrl;
     }
 
+    private async encodeTransferParameter(to: string, assetAmount: AssetAmount<TronAsset>) {
+        const { AbiCoder } = await import('ethers');
+        return new AbiCoder()
+            .encode(
+                ['address', 'uint256'],
+                [evmHexFromTronAddress(to), assetAmount.weiAmount.toFixed(0)]
+            )
+            .replace(/^(0x)/, '');
+    }
+
     async encodeTransferEstimateRequest(
         to: string,
         assetAmount: AssetAmount<TronAsset>
@@ -35,18 +50,11 @@ export class TronTrc20Encoder {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
 
-        const { AbiCoder } = await import('ethers');
-
         return {
             from: this.walletAddress,
             contractAddress: assetAmount.asset.address,
             selector: TronTrc20Encoder.transferSelector,
-            data: new AbiCoder()
-                .encode(
-                    ['address', 'uint256'],
-                    [TronAddressUtils.base58ToHex(to), assetAmount.weiAmount.toString()]
-                )
-                .replace(/^(0x)/, '')
+            data: await this.encodeTransferParameter(to, assetAmount)
         };
     }
 
@@ -61,15 +69,14 @@ export class TronTrc20Encoder {
             privateKey: undefined
         });
 
-        const functionSelector = 'transfer(address,uint256)';
         const parameter = [
             { type: 'address', value: to },
             { type: 'uint256', value: assetAmount.weiAmount.toFixed(0) }
         ];
         const { transaction } = await tronWeb.transactionBuilder.triggerSmartContract(
             assetAmount.asset.address,
-            functionSelector,
-            {},
+            TronTrc20Encoder.transferSelector,
+            { feeLimit: TronTrc20Encoder.transferFeeLimit },
             parameter,
             this.walletAddress
         );
@@ -77,6 +84,21 @@ export class TronTrc20Encoder {
         /**
          * set tx lifetime to 10 minutes
          */
-        return tronWeb.transactionBuilder.extendExpiration(transaction, 60 * 10);
+        const extended = await tronWeb.transactionBuilder.extendExpiration(transaction, 60 * 10);
+
+        assertTronTransactionMatches(extended, {
+            contract: {
+                type: 'triggerSmartContract',
+                owner: this.walletAddress,
+                contract: assetAmount.asset.address,
+                callValue: 0n,
+                data:
+                    TronTrc20Encoder.transferSelectorHex +
+                    (await this.encodeTransferParameter(to, assetAmount))
+            },
+            feeLimit: BigInt(TronTrc20Encoder.transferFeeLimit)
+        });
+
+        return extended;
     }
 }

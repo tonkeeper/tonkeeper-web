@@ -17,7 +17,7 @@ export function useEstimateMultiTransfer(form: MultiSendFormTokenized, asset: To
 
     return useQuery<TonEstimation, Error>(
         ['multi-transfer-estimate'],
-        async () => {
+        async (): Promise<TonEstimation> => {
             try {
                 if (!isAccountTonWalletStandard(account)) {
                     throw new Error("Can't send a transfer using this account");

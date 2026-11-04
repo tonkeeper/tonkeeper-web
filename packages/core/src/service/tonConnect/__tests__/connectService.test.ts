@@ -1,11 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Address } from '@ton/core';
 import { TonConnectError } from '../../../entries/exception';
-import {
-    ConnectRequest,
-    SEND_TRANSACTION_ERROR_CODES,
-    TonConnectNetwork
-} from '../../../entries/tonConnect';
+import { SEND_TRANSACTION_ERROR_CODES, TonConnectNetwork } from '../../../entries/tonConnect';
 import { Network } from '../../../entries/network';
 import type { TonContract } from '../../../entries/wallet';
 import type { IStorage } from '../../../Storage';
@@ -31,19 +28,20 @@ vi.mock('../../../entries/account', async () => {
     };
 });
 
-const {
-    sendBadRequestResponse,
-    checkTonConnectFromAndNetwork,
-    checkDappOriginMatchesManifest,
-    getManifest
-} = await import('../connectService');
+const { sendBadRequestResponse, checkTonConnectFromAndNetwork, checkDappOriginMatchesManifest } =
+    await import('../connectService');
 
 const fakeStorage = {} as IStorage;
+
+const walletRawAddress = `0:${'ab'.repeat(32)}`;
+const otherRawAddress = `0:${'cd'.repeat(32)}`;
+const friendly = (raw: string, options: { bounceable: boolean; testOnly: boolean }) =>
+    Address.parse(raw).toString({ urlSafe: true, ...options });
 
 const makeWallet = (overrides: Partial<TonContract> = {}): TonContract =>
     ({
         id: 'wallet-1',
-        rawAddress: '0:abc',
+        rawAddress: walletRawAddress,
         ...overrides
     } as TonContract);
 
@@ -100,18 +98,51 @@ describe('checkTonConnectFromAndNetwork', () => {
     });
 
     it('passes when "from" matches the wallet raw address (case-insensitive)', async () => {
-        const wallet = makeWallet({ rawAddress: '0:AbCdEf' });
-
         await expect(
-            checkTonConnectFromAndNetwork(fakeStorage, wallet, { from: '0:abcdef' })
+            checkTonConnectFromAndNetwork(fakeStorage, makeWallet(), {
+                from: walletRawAddress.toUpperCase()
+            })
         ).resolves.toBeUndefined();
     });
 
+    it.each([
+        { bounceable: true, testOnly: false },
+        { bounceable: false, testOnly: false },
+        { bounceable: true, testOnly: true },
+        { bounceable: false, testOnly: true }
+    ])('passes when "from" is the wallet address in friendly format %o', async options => {
+        await expect(
+            checkTonConnectFromAndNetwork(fakeStorage, makeWallet(), {
+                from: friendly(walletRawAddress, options)
+            })
+        ).resolves.toBeUndefined();
+    });
+
+    it('rejects a friendly "from" that belongs to another wallet', async () => {
+        await expect(
+            checkTonConnectFromAndNetwork(fakeStorage, makeWallet(), {
+                from: friendly(otherRawAddress, { bounceable: true, testOnly: false })
+            })
+        ).rejects.toMatchObject({
+            message: 'Invalid account provided',
+            code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR
+        });
+    });
+
+    it('rejects a "from" that is not a TON address', async () => {
+        await expect(
+            checkTonConnectFromAndNetwork(fakeStorage, makeWallet(), { from: 'not-an-address' })
+        ).rejects.toMatchObject({
+            message: 'Invalid account provided',
+            code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR
+        });
+    });
+
     it('throws TonConnectError(BAD_REQUEST) when "from" does not match the wallet', async () => {
-        const wallet = makeWallet({ rawAddress: '0:aaaa' });
+        const wallet = makeWallet();
 
         await expect(
-            checkTonConnectFromAndNetwork(fakeStorage, wallet, { from: '0:bbbb' })
+            checkTonConnectFromAndNetwork(fakeStorage, wallet, { from: otherRawAddress })
         ).rejects.toMatchObject({
             name: 'Error',
             message: 'Invalid account provided',
@@ -119,7 +150,7 @@ describe('checkTonConnectFromAndNetwork', () => {
         });
 
         await expect(
-            checkTonConnectFromAndNetwork(fakeStorage, wallet, { from: '0:bbbb' })
+            checkTonConnectFromAndNetwork(fakeStorage, wallet, { from: otherRawAddress })
         ).rejects.toBeInstanceOf(TonConnectError);
     });
 
@@ -225,56 +256,5 @@ describe('checkDappOriginMatchesManifest', () => {
                 manifestUrl: 'not-a-url'
             })
         ).toBe(false);
-    });
-});
-
-describe('getManifest', () => {
-    let fetchSpy: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-        fetchSpy = vi.fn();
-        vi.stubGlobal('fetch', fetchSpy);
-    });
-
-    afterEach(() => {
-        vi.unstubAllGlobals();
-    });
-
-    it('rejects a manifest whose declared url origin does not match the hosting origin', async () => {
-        const maliciousManifest = {
-            url: 'https://getgems.io',
-            name: 'Getgems',
-            iconUrl: 'https://getgems.io/icon.png'
-        };
-
-        fetchSpy.mockResolvedValue({
-            status: 200,
-            json: async () => maliciousManifest
-        } as Response);
-
-        await expect(
-            getManifest({
-                manifestUrl: 'https://evil.com/tonconnect-manifest.json'
-            } as ConnectRequest)
-        ).rejects.toThrow('Manifest origin mismatch');
-    });
-
-    it('returns the manifest when origin of manifestUrl matches manifest.url', async () => {
-        const legitManifest = {
-            url: 'https://getgems.io',
-            name: 'Getgems',
-            iconUrl: 'https://getgems.io/icon.png'
-        };
-
-        fetchSpy.mockResolvedValue({
-            status: 200,
-            json: async () => legitManifest
-        } as Response);
-
-        const result = await getManifest({
-            manifestUrl: 'https://getgems.io/tonconnect-manifest.json'
-        } as ConnectRequest);
-
-        expect(result).toEqual(legitManifest);
     });
 });

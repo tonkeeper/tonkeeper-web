@@ -208,6 +208,6 @@ export const useAsset = (assetId: string) => {
             i => packAssetId(BLOCKCHAIN_NAME.TON, i.jetton.address) === assetId
         );
 
-        return jettonToTonAssetAmount(jetton!).asset;
+        return jetton ? jettonToTonAssetAmount(jetton).asset : undefined;
     }, [assetId, assets]);
 };

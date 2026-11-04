@@ -10,6 +10,7 @@ import {
     BootParams
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { setAppVersionHeaders } from '@tonkeeper/core/dist/utils/appVersion';
+import { applyMultichainEndpoints } from '@tonkeeper/core/dist/service/multichainEndpoints';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
@@ -59,24 +60,41 @@ export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
     return useQuery<ServerConfig, Error>(
         [QueryKey.tonkeeperApi, TonkeeperApiKey.config, tonendpointKey],
         async () => {
+            const mainnetConfig = await getServerConfig(tonendpoint, Network.MAINNET);
+            // The multichain backends serve mainnet only, so the mainnet block
+            // decides their hosts regardless of the active TON network.
+            applyMultichainEndpoints(mainnetConfig);
             return {
-                mainnetConfig: await getServerConfig(tonendpoint, Network.MAINNET),
+                mainnetConfig,
                 testnetConfig: await getServerConfig(tonendpoint, Network.TESTNET)
             };
+        },
+        {
+            // The shells cannot render without a config, so a boot that never
+            // got one surfaces the root error screen instead of an endless
+            // spinner. A failed background refetch keeps the config it has.
+            useErrorBoundary: (_e, query) => query.state.data === undefined
         }
     );
 };
 
 export const DefaultRefetchInterval = 60000; // 60 sec
 
-export const useTonendpointBuyMethods = () => {
+/**
+ * Legacy `/fiat/methods` buy list. `enabled` defaults to `false` so the
+ * globally-mounted `BuyNotificationControlled` doesn't fire it on every
+ * page load — callers pass `true` only when the modal/buy view is actually
+ * open. Without this gate the multichain home, which has its own onramp
+ * flow via swap.tonkeeper.com, still triggered a stale legacy fetch.
+ */
+export const useTonendpointBuyMethods = (enabled = false) => {
     const { tonendpoint } = useAppContext();
     const { data: countryCode } = useUserCountry();
 
     return useQuery<TonendpoinFiatCategory, Error>(
-        [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint.params.lang],
+        [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint?.params.lang],
         async () => {
-            const methods = await tonendpoint.fiatMethods();
+            const methods = await tonendpoint!.fiatMethods();
             const buy = methods.categories[0];
 
             const layout = methods.layoutByCountry.find(item => item.countryCode === countryCode);
@@ -97,7 +115,7 @@ export const useTonendpointBuyMethods = () => {
             };
         },
         {
-            enabled: !!countryCode
+            enabled: enabled && !!countryCode && !!tonendpoint
         }
     );
 };

@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { SignDataRequestPayload, SignDataResponse } from '@tonkeeper/core/dist/entries/tonConnect';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -14,54 +13,23 @@ import {
 import { Body2, H2, H3, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
-import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
+import { useActiveAccountQuery } from '../../state/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
-import {
-    signDataResult,
-    signDataUint8Array
-} from '@tonkeeper/core/dist/service/tonConnect/signService';
 import { TxConfirmationCustomError } from '@tonkeeper/core/dist/errors/TxConfirmationCustomError';
 import { useAppSdk } from '../../hooks/appSdk';
-import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { signDataOver } from '../../state/mnemonic';
 import { handleSubmit } from '../../libs/form';
 import { ErrorIcon } from '../Icon';
 import { Cell } from '@ton/core';
 import { useAnalyticsTrack } from '../../hooks/analytics';
-
-const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
-    const activeAccount = useActiveAccount();
-    const api = useActiveApi();
-    const sdk = useAppSdk();
-    const { t } = useTranslation();
-
-    return useMutation<SignDataResponse, Error>(async () => {
-        const domain = new URL(origin).host;
-        if (!domain.includes('.')) {
-            throw new TxConfirmationCustomError('Invalid domain', 'error_invalid_domain');
-        }
-
-        const timestamp = await getServerTime(api);
-
-        const payloadToSign = signDataUint8Array({
-            payload,
-            domain,
-            address: activeAccount.activeTonWallet.rawAddress,
-            timestamp
-        });
-        const singer = signDataOver({ sdk, accountId: activeAccount.id, t });
-
-        const signature = await singer(payloadToSign);
-
-        return signDataResult({
-            payload,
-            domain,
-            address: activeAccount.activeTonWallet.rawAddress,
-            timestamp,
-            signature
-        });
-    });
-};
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    isSignDataPayloadValid,
+    SigningWallet,
+    useSignDataMutation,
+    useSigningWallet
+} from '../../state/tonConnectSignData';
+import { TonConnectSignDataSheet } from '../../pages/home/multichain/connect/TonConnectSignDataSheet';
+import { useTonConnectConfirmOperation } from '../../hooks/analytics/ton-connect';
 
 const Payload = styled.div`
     background: ${props => props.theme.backgroundContent};
@@ -112,20 +80,6 @@ const WarningBody = styled(Body2)`
     display: block;
     color: ${props => props.theme.textPrimaryAlternate};
 `;
-
-const stringNotEmpty = (value: string | undefined): value is string => {
-    return value !== '' && value != null;
-};
-
-const seeIfValidCell = (value: string | undefined): boolean => {
-    if (!stringNotEmpty(value)) return false;
-    try {
-        Cell.fromBase64(value);
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
 
 const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
     const { t } = useTranslation();
@@ -198,43 +152,34 @@ const Header = styled(H2)`
 const SignContent: FC<{
     origin: string;
     params: SignDataRequestPayload;
+    signer: SigningWallet | undefined;
     handleClose: (result?: SignDataResponse) => void;
-}> = ({ origin, params, handleClose }) => {
+}> = ({ origin, params, signer, handleClose }) => {
     const { t } = useTranslation();
 
     const [done, setDone] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const { mutateAsync, isLoading } = useSignMutation(origin, params);
+    const { mutateAsync, isLoading } = useSignDataMutation(origin, params, signer);
+    const confirmOperation = useTonConnectConfirmOperation('signData');
     const onSubmit = async () => {
+        confirmOperation.start();
         try {
             const result = await mutateAsync();
+            confirmOperation.succeed();
 
             setDone(true);
             setTimeout(() => handleClose(result), 300);
         } catch (err) {
+            confirmOperation.fail(err);
             setDone(true);
             setError(err as Error);
         }
     };
 
-    const isValid = useMemo(() => {
-        switch (params.type) {
-            case 'text': {
-                return stringNotEmpty(params.text);
-            }
-            case 'binary': {
-                return stringNotEmpty(params.bytes);
-            }
-            case 'cell': {
-                return stringNotEmpty(params.schema) && seeIfValidCell(params.cell);
-            }
-            default:
-                return false;
-        }
-    }, [params]);
+    const isValid = useMemo(() => isSignDataPayloadValid(params), [params]);
 
-    if (!isValid) {
+    if (!isValid || !signer) {
         return (
             <NotificationBlock onSubmit={handleSubmit(() => handleClose())}>
                 <ErrorStyled>
@@ -307,11 +252,11 @@ const Row = styled.div`
     gap: 8px;
 `;
 
-const NotificationTitleWithWalletName: FC<{ origin: string; onClose: () => void }> = ({
-    origin,
-    onClose
-}) => {
-    const wallets = useAccountsState();
+const NotificationTitleWithWalletName: FC<{
+    origin: string;
+    signer: SigningWallet | undefined;
+    onClose: () => void;
+}> = ({ origin, signer, onClose }) => {
     const { t } = useTranslation();
     const title = useMemo(() => {
         try {
@@ -328,7 +273,12 @@ const NotificationTitleWithWalletName: FC<{ origin: string; onClose: () => void 
                     <RowTitle>{title}</RowTitle>
                     <Row>
                         <NameText>{t('signData')}</NameText>
-                        {wallets.length > 1 ? <AccountAndWalletInfo /> : undefined}
+                        {signer && (
+                            <AccountAndWalletInfo
+                                account={signer.account}
+                                walletId={signer.wallet.id}
+                            />
+                        )}
                     </Row>
                 </NotificationTitleRowStyled>
             </NotificationHeader>
@@ -336,12 +286,33 @@ const NotificationTitleWithWalletName: FC<{ origin: string; onClose: () => void 
     );
 };
 
-export const SignDataNotification: FC<{
+export interface SignDataNotificationProps {
     origin: string | undefined;
     params: SignDataRequestPayload | null;
+    walletId: WalletId | undefined;
     handleClose: (result?: SignDataResponse) => void;
-}> = ({ origin, params, handleClose }) => {
+}
+
+/**
+ * Signs with the wallet the request's connection belongs to (`walletId`),
+ * whichever wallet is active.
+ */
+export const SignDataNotification: FC<SignDataNotificationProps> = props => {
+    const { data: activeAccount } = useActiveAccountQuery();
+    if (activeAccount?.type === 'multichain') {
+        return <TonConnectSignDataSheet {...props} />;
+    }
+    return <LegacySignDataNotification {...props} />;
+};
+
+const LegacySignDataNotification: FC<SignDataNotificationProps> = ({
+    origin,
+    params,
+    walletId,
+    handleClose
+}) => {
     const track = useAnalyticsTrack();
+    const signer = useSigningWallet(walletId);
 
     const onClose = useCallback(
         (result?: SignDataResponse) => {
@@ -359,15 +330,20 @@ export const SignDataNotification: FC<{
         if (!params || !origin) return undefined;
         return (
             <>
-                <NotificationTitleWithWalletName origin={origin} onClose={() => onClose()} />
+                <NotificationTitleWithWalletName
+                    origin={origin}
+                    signer={signer}
+                    onClose={() => onClose()}
+                />
                 <SignContent
                     origin={origin}
                     params={params}
+                    signer={signer}
                     handleClose={result => (params != null ? onClose(result) : undefined)}
                 />
             </>
         );
-    }, [origin, params, onClose]);
+    }, [origin, params, signer, onClose]);
 
     return (
         <>

@@ -11,3 +11,17 @@ export function parseJettonScaledUIMultiplier(
 
     return scaledUi;
 }
+
+export function toScaledUIWeiAmount(
+    weiAmount: string,
+    scaledUi: { numerator: string; denominator: string } | undefined
+): string {
+    if (!scaledUi) {
+        return weiAmount;
+    }
+
+    return (
+        (BigInt(weiAmount) * BigInt(scaledUi.numerator)) /
+        BigInt(scaledUi.denominator)
+    ).toString();
+}

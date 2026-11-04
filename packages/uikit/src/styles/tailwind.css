@@ -1,0 +1,275 @@
+/*
+ * Tailwind entry consumed by every app's CSS root.
+ *
+ * The `:root` block declares one CSS custom property per styled-components
+ * theme token, seeded from `defaultTheme.ts` so the very first paint matches
+ * the legacy default. `UserThemeProvider` rewrites these properties whenever
+ * the active theme changes (dark / pro / mobile-pro / light), which lets a
+ * Tailwind `bg-textPrimary` class render in lockstep with the existing
+ * styled-components `theme.textPrimary` accessor.
+ *
+ * Global body / scrollbar / font-smoothing rules still live in
+ * `globalStyle.ts` (injected at runtime by styled-components). We do NOT
+ * duplicate them here — keeping a single base-style source avoids drift
+ * during the partial migration. Drop styled-components base styles here in a
+ * follow-up once `globalStyle.ts` is retired.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /*
+     * TT Firs Neue ships as three static faces, self-hosted because the
+     * family is licensed rather than served from a public CDN. `font-weight`
+     * here is each face's own `usWeightClass`, so the type scale can name
+     * 450 / 500 / 600 and get the drawn weight instead of a synthesised one.
+     *
+     * The faces carry Latin, Cyrillic and roughly half of Vietnamese (the
+     * combining horn and hook-above marks are absent, so letters like ư ơ ả
+     * cannot be drawn) — no Greek, Arabic, Indic or CJK. Uncovered letters
+     * fall through the `--tk-font-sans` stack per glyph; the Vietnamese
+     * locale switches the whole UI to Inter instead (see `:root:lang(vi)`).
+     */
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('./fonts/TT-Firs-Neue-Normal.woff2') format('woff2');
+        font-weight: 450;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('./fonts/TT-Firs-Neue-Medium.woff2') format('woff2');
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('./fonts/TT-Firs-Neue-DemiBold.woff2') format('woff2');
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    /*
+     * Inter (OFL) subset to Latin + Vietnamese, variable weight axis kept so
+     * the 450/500/600 steps of the type scale resolve to drawn instances.
+     * Only ever downloaded when the `vi` stack below is active — browsers
+     * fetch a face on first use, not on declaration.
+     */
+    @font-face {
+        font-family: Inter;
+        src: url('./fonts/InterVariable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    :root {
+        /*
+         * The family's stylistic alternates: ss07 lowercase, ss09 capital G,
+         * ss17 at-sign, ss18 ampersand. One set for every weight and size —
+         * per the design team, the display/text split some mockups export is a
+         * Figma artefact, not intent. Inherited from `:root` so it reaches
+         * text rendered outside `body` (portals, canvas-measured strings).
+         */
+        --tk-font-features: 'ss07' 1, 'ss09' 1, 'ss17' 1, 'ss18' 1;
+
+        /*
+         * The UI font stack, consumed by Tailwind's `fontFamily.sans`, the
+         * styled-components base styles, and the form controls that must
+         * restate `font-family` (inputs don't inherit it by default). Named
+         * platform fallbacks rather than the bare `sans-serif` generic, which
+         * resolved differently per OS.
+         */
+        --tk-font-sans: 'TT Firs Neue', -apple-system, blinkmacsystemfont, 'Segoe UI', roboto,
+            'Helvetica Neue', 'Noto Sans', arial, sans-serif;
+
+        font-feature-settings: var(--tk-font-features);
+
+        /* Text */
+        --tk-text-primary: #fff;
+        --tk-text-secondary: #8994a3;
+        --tk-text-tertiary: #556170;
+        --tk-text-accent: #3c95fa;
+        --tk-text-primary-alternate: #000;
+
+        /* Background */
+        --tk-background-page: #10161f;
+        --tk-background-transparent: rgb(16 22 31 / 96%);
+        --tk-background-content: #1d2633;
+        --tk-background-content-tint: #2e3847;
+        --tk-background-content-attention: #384457;
+        --tk-background-overlay-strong: rgb(0 0 0 / 72%);
+        --tk-background-overlay-light: rgb(0 0 0 / 48%);
+        --tk-background-overlay-extra-light: rgb(0 0 0 / 24%);
+        --tk-background-highlighted: rgb(194 218 255 / 4%);
+        --tk-background-content-placeholder: rgb(255 255 255 / 8%);
+
+        /* Icon */
+        --tk-icon-primary: #fff;
+        --tk-icon-secondary: #8994a3;
+        --tk-icon-tertiary: #556170;
+        --tk-icon-primary-alternate: #000;
+
+        /* Button */
+        --tk-button-primary-background: #3c95fa;
+        --tk-button-primary-foreground: #fff;
+        --tk-button-secondary-background: #1d2633;
+        --tk-button-secondary-foreground: #fff;
+        --tk-button-tertiary-background: #2e3847;
+        --tk-button-tertiary-foreground: #fff;
+        --tk-button-warn-background: #f5a73b;
+        --tk-button-warn-foreground: #fff;
+        --tk-button-primary-background-disabled: #387bc7;
+        --tk-button-secondary-background-disabled: #171f29;
+        --tk-button-tertiary-background-disabled: #28303d;
+        --tk-button-warn-background-disabled: #c2842f;
+        --tk-button-primary-foreground-disabled: rgb(256 256 256 / 48%);
+        --tk-button-secondary-foreground-disabled: rgb(256 256 256 / 48%);
+        --tk-button-tertiary-foreground-disabled: rgb(256 256 256 / 48%);
+        --tk-button-warn-foreground-disabled: rgb(256 256 256 / 48%);
+        --tk-button-primary-background-highlighted: #55a2fa;
+        --tk-button-secondary-background-highlighted: rgb(34 44 59 / 100%);
+        --tk-button-tertiary-background-highlighted: rgb(54 64 82 / 100%);
+        --tk-button-warn-background-highlighted: #f5af4e;
+
+        /* Primary button — green & red variants (single blue theme; not bridged) */
+        --tk-button-primary-background-green: #39cc83;
+        --tk-button-primary-background-green-highlighted: #49cc8b;
+        --tk-button-primary-background-green-disabled: #2b9962;
+        --tk-button-primary-background-red: #ff4766;
+        --tk-button-primary-background-red-highlighted: #ff5e79;
+        --tk-button-primary-background-red-disabled: #c2364e;
+
+        /* Field */
+        --tk-field-background: #1d2633;
+        --tk-field-active-border: #3c95fa;
+        --tk-field-error-border: #ff4766;
+        --tk-field-error-background: rgb(255 71 102 / 8%);
+
+        /* Accent */
+        --tk-accent-blue: #3c95fa;
+        --tk-accent-blue-constant: #3c95fa;
+        --tk-accent-green: #39cc83;
+        --tk-accent-red: #ff4766;
+        --tk-accent-orange: #f5a73b;
+        --tk-accent-purple: #7665e5;
+
+        /* Tab bar */
+        --tk-tabbar-active-icon: #3c95fa;
+        --tk-tabbar-inactive-icon: #8994a3;
+
+        /* Separator */
+        --tk-separator-common: rgb(194 218 255 / 8%);
+        --tk-separator-alternate: rgb(255 255 255 / 8%);
+
+        /* Constants — same value across themes by design, listed once. */
+        --tk-constant-black: #000;
+        --tk-constant-white: #fff;
+        --tk-blue: #07f;
+        --tk-red: #ff3b30;
+
+        /* Legacy corner scale — styled-components mirror, kept for the bridge
+           and the isInsideTonkeeper shrink. Static across themes. */
+        --tk-corner-3xsmall: 4px;
+        --tk-corner-2xsmall: 8px;
+        --tk-corner-extra-small: 12px;
+        --tk-corner-small: 16px;
+        --tk-corner-medium: 20px;
+        --tk-corner-large: 24px;
+        --tk-corner-full: 100%;
+
+        /* Canonical "Corners" rounding scale — backs the Tailwind
+           borderRadius tokens. Static (single theme), not bridged. */
+        --tk-rounding-extra-extra-small: 4px;
+        --tk-rounding-extra-small: 8px;
+        --tk-rounding-small: 12px;
+        --tk-rounding-medium: 16px;
+        --tk-rounding-large: 20px;
+
+        /* Loading-state mask bars. `fill` is overridden per surface: bars drawn
+           on a content card use the tint so they stay visible against it. */
+        --tk-skeleton-fill: var(--tk-background-content);
+
+        /* `9999px`, NOT `100%`. `border-radius: 100%` resolves per-axis and
+           draws an ellipse on rectangles (rounded-full on a fullWidth button
+           rendered as an oval — see commit history). The conventional CSS
+           pill idiom is "any large length", which the browser clamps to
+           `min(width, height) / 2`: semicircle caps on rectangles, full
+           circle on squares. Matches Tailwind's stock default. */
+        --tk-rounding-full: 9999px;
+    }
+
+    /*
+     * Vietnamese: TT Firs Neue cannot draw 44 of the 98 Vietnamese letters
+     * (no horn or hook-above marks), and per-glyph fallback puts two fonts
+     * inside one word. So the `vi` locale drops TT Firs Neue entirely and
+     * renders the whole UI in Inter. `DocumentLanguageSync` keeps the `lang`
+     * attribute this selector matches on in step with the app language. The
+     * stylistic-set overrides are TT-Firs-specific and mean different things
+     * in Inter, so they are reset.
+     */
+    :root:lang(vi) {
+        --tk-font-sans: 'Inter', -apple-system, blinkmacsystemfont, 'Segoe UI', roboto,
+            'Helvetica Neue', 'Noto Sans', arial, sans-serif;
+        --tk-font-features: normal;
+    }
+}
+
+@layer components {
+    /*
+     * Emitted by `useSkeletonMask` only while a `SkeletonScope` above the
+     * element is loading, so a bare attribute selector cannot leak into a
+     * loaded screen.
+     *
+     * The bar is a pseudo-element rather than a restyled box: the element keeps
+     * its own line box, so real typography goes on driving row heights and the
+     * mask never shifts the layout it is standing in for. `!important` is here
+     * to beat the Tailwind text-color utility on the same element.
+     */
+    [data-skeleton] {
+        position: relative;
+        color: transparent !important;
+    }
+
+    /* Children would otherwise show through the bar — chips, icons, badges. */
+    [data-skeleton] > * {
+        visibility: hidden;
+    }
+
+    [data-skeleton]::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        width: var(--tk-skeleton-w, 100%);
+        height: var(--tk-skeleton-h, 12px);
+        border-radius: var(--tk-skeleton-r, 8px);
+        background: var(--tk-skeleton-fill);
+        animation: tk-skeleton-pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes tk-skeleton-pulse {
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [data-skeleton]::after {
+            animation: none;
+        }
+    }
+}

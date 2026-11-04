@@ -1,6 +1,11 @@
 import styled from 'styled-components';
 
-export const IconButton = styled.button<{ transparent?: boolean }>`
+/**
+ * @deprecated Legacy generic round icon button (styled-components). Distinct
+ * from the design-system `components/IconButton` (the labelled action button).
+ * Kept for its existing consumers; migrate/remove in a follow-up.
+ */
+export const LegacyIconButton = styled.button<{ transparent?: boolean }>`
     cursor: pointer;
     width: fit-content;
     height: fit-content;
@@ -22,7 +27,7 @@ export const IconButton = styled.button<{ transparent?: boolean }>`
     border: none;
 `;
 
-export const IconButtonTransparentBackground = styled(IconButton)`
+export const IconButtonTransparentBackground = styled(LegacyIconButton)`
     padding: 10px;
     border: none;
 

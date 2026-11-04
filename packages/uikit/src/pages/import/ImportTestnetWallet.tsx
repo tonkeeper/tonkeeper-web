@@ -1,6 +1,7 @@
 import React, { FC, useContext, useMemo, useState } from 'react';
-import { UpdateWalletName } from '../../components/create/WalletName';
-import { ImportMnemonicType, ImportWords } from '../../components/create/Words';
+import { CustomizeWallet, CustomizeWalletForm } from '../../components/create/CustomizeWallet';
+import { MnemonicInputForm } from '../../components/create/MnemonicInputForm';
+import { ImportMnemonicType } from '../../components/create/SelectMnemonicType';
 import { useAppSdk } from '../../hooks/appSdk';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
@@ -9,6 +10,7 @@ import {
     useCreateAccountTestnet,
     useMutateRenameAccount
 } from '../../state/wallet';
+import { useMutateWalletColor, useWalletColorResolver } from '../../state/walletColor';
 import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
 import { AccountTonTestnet, getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
 import {
@@ -23,14 +25,15 @@ import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDi
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import {
     OnCloseInterceptor,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../../components/Notification';
+    useSetModalOnBack,
+    useSetModalOnCloseInterceptor
+} from '../../primitives/Modal';
 import { useMutation } from '@tanstack/react-query';
 import { useUserFiat } from '../../state/fiat';
 import { mnemonicValidate } from '@ton/crypto';
 import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useImportFlowAnalytics } from '../../hooks/analytics/wallet-flow';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
@@ -133,18 +136,29 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
 
     const [selectedMnemonicType, setSelectedMnemonicType] = useState<ImportMnemonicType>();
 
+    const importAnalytics = useImportFlowAnalytics('mnemonic');
+
     const onMnemonic = async (m: string[]) => {
-        const result = await processMnemonic(m);
-        if (result.tonMnemonic) {
-            setSelectedMnemonicType('tonMnemonic');
+        try {
+            const result = await processMnemonic(m);
+            if (result.tonMnemonic) {
+                setSelectedMnemonicType('tonMnemonic');
+            }
+            setMnemonic(m);
+        } catch (e) {
+            importAnalytics.error(e);
+            throw e;
         }
-        setMnemonic(m);
     };
 
-    const onRename = async (form: { name: string; emoji: string }) => {
+    const resolveWalletColor = useWalletColorResolver();
+    const { setWalletColor } = useMutateWalletColor();
+    const onRename = async ({ name, emoji, colorId }: CustomizeWalletForm) => {
+        await setWalletColor(createdAccount!.id, colorId);
         const newAcc: AccountTonTestnet = await renameAccount({
             id: createdAccount!.id,
-            ...form
+            name,
+            emoji
         });
         setEditNamePagePassed(true);
         setCreatedAccount(newAcc);
@@ -191,7 +205,7 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
         selectedMnemonicType
     ]);
 
-    useSetNotificationOnBack(onBack);
+    useSetModalOnBack(onBack);
 
     const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
         if (!isMnemonicFormDirty) {
@@ -214,11 +228,11 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
             });
         };
     }, [isMnemonicFormDirty, openConfirmDiscard, createdAccount, existingAccountAndWallet]);
-    useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+    useSetModalOnCloseInterceptor(onCloseInterceptor);
 
     if (!mnemonic) {
         return (
-            <ImportWords
+            <MnemonicInputForm
                 onMnemonic={onMnemonic}
                 isLoading={isProcessMnemonic || processedMnemonicResult !== undefined}
                 onIsDirtyChange={setIsMnemonicFormDirty}
@@ -245,7 +259,10 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
                         versions,
                         selectAccount: true,
                         mnemonicType: 'ton'
-                    }).then(setCreatedAccount);
+                    }).then(account => {
+                        setCreatedAccount(account);
+                        importAnalytics.success();
+                    }, importAnalytics.error);
                 }}
                 isLoading={isCreatingWallets}
             />
@@ -254,10 +271,11 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
 
     if (!editNamePagePassed) {
         return (
-            <UpdateWalletName
+            <CustomizeWallet
                 name={createdAccount.name}
                 submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
+                walletColorId={resolveWalletColor(createdAccount.id).id}
                 isLoading={renameAccountLoading}
             />
         );

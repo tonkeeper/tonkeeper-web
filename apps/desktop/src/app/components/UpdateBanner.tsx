@@ -51,7 +51,7 @@ export const UpdateBanner: FC = () => {
         <Banner>
             <TextColumn>
                 <Label2>New version available</Label2>
-                <Body3>Tonkeeper {info.version} is ready to download.</Body3>
+                <Body3>Keeper {info.version} is ready to download.</Body3>
             </TextColumn>
             <Actions>
                 <Button

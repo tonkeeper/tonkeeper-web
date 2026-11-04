@@ -4,61 +4,25 @@ import {
     WalletVersions,
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import { FC, Fragment, ReactNode, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useAccountState, useStandardTonWalletVersions } from '../../state/wallet';
-import { SkeletonListDesktopAdaptive } from '../Skeleton';
-import { Checkbox } from '../fields/Checkbox';
-import { ButtonResponsiveSize } from '../fields/Button';
-import { Body1, Body2, Body2Class, H2Label2Responsive, Label1 } from '../Text';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { Checkbox } from '../../primitives/Checkbox';
+import { Button } from '../../primitives/Button';
+import { SkeletonScope, useSkeletonMask } from '../../primitives/Skeleton';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { mayBeCreateAccountId } from '@tonkeeper/core/dist/service/walletService';
 import { handleSubmit } from '../../libs/form';
-import { NotificationFooter, NotificationFooterPortal } from '../Notification';
-
-const Wrapper = styled.form`
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-`;
-
-const Body = styled(Body1)`
-    user-select: none;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: ${props => props.theme.textSecondary};
-
-    ${p => p.theme.displayType === 'full-width' && Body2Class}
-`;
-
-const SkeletonListStyled = styled(SkeletonListDesktopAdaptive)`
-    width: 100%;
-`;
-
-const ListBlockStyled = styled(ListBlock)`
-    width: 100%;
-`;
-
-const TextContainer = styled.span`
-    flex-direction: column;
-    display: flex;
-    align-items: flex-start;
-`;
-
-const Body2Secondary = styled(Body2)`
-    color: ${props => props.theme.textSecondary};
-`;
+import { ModalFooter, ModalFooterPortal } from '../../primitives/Modal';
 
 export const ChoseWalletVersionsByMnemonic: FC<{
     mnemonic: string[];
@@ -82,6 +46,37 @@ export const ChoseWalletVersionsByMnemonic: FC<{
             onSubmit={onSubmit}
             isLoading={isLoading}
         />
+    );
+};
+
+const WalletVersionRow: FC<{
+    title: ReactNode;
+    description: ReactNode;
+    checked: boolean;
+    onToggle: () => void;
+}> = ({ title, description, checked, onToggle }) => {
+    const mask = useSkeletonMask();
+
+    return (
+        <button
+            type="button"
+            role="checkbox"
+            aria-checked={checked}
+            onClick={onToggle}
+            className="flex w-full items-center gap-4 p-4 text-left transition-colors duration-100 hover:bg-backgroundContentTint"
+        >
+            <div className="min-w-0 flex-1">
+                <div {...mask({ w: 48, h: 16 })} className="truncate text-label1 text-textPrimary">
+                    {title}
+                </div>
+                <div {...mask({ w: 180 })} className="truncate text-body2 text-textSecondary">
+                    {description}
+                </div>
+            </div>
+            <span {...mask({ w: 22, h: 22, r: 6 })} className="flex shrink-0">
+                <Checkbox checked={checked} borderColor="textTertiary" />
+            </span>
+        </button>
     );
 };
 
@@ -136,9 +131,9 @@ export const ChoseWalletVersions: FC<{
         }
     }, [filteredWallets, accountState, defaultWalletVersion]);
 
-    const toggleVersion = (version: WalletVersion, isChecked: boolean) => {
+    const toggleVersion = (version: WalletVersion) => {
         setCheckedVersions(state =>
-            isChecked ? state.concat(version) : state.filter(i => i !== version)
+            state.includes(version) ? state.filter(i => i !== version) : state.concat(version)
         );
     };
 
@@ -149,54 +144,80 @@ export const ChoseWalletVersions: FC<{
         onSubmit(checkedVersions);
     };
 
+    const loading = !filteredWallets;
+
     return (
-        <Wrapper onSubmit={handleSubmit(onSelect)}>
-            <H2Label2Responsive>{t('choose_wallets_title')}</H2Label2Responsive>
-            <Body>{t('choose_wallets_subtitle')}</Body>
-            {!filteredWallets ? (
-                <SkeletonListStyled size={WalletVersions.length} />
-            ) : (
-                <>
-                    <ListBlockStyled>
-                        {filteredWallets.map(wallet => (
-                            <ListItem hover={false} key={wallet.address.toRawString()}>
-                                <ListItemPayload>
-                                    <TextContainer>
-                                        <Label1>{walletVersionText(wallet.version)}</Label1>
-                                        <Body2Secondary>
-                                            {toShortValue(formatAddress(wallet.address, network))}
-                                            &nbsp;·&nbsp;
-                                            {toFormattedTonBalance(wallet.tonBalance)}&nbsp;TON
-                                            {wallet.hasJettons && t('wallet_version_and_tokens')}
-                                        </Body2Secondary>
-                                    </TextContainer>
-                                    <Checkbox
-                                        checked={checkedVersions.includes(wallet.version)}
-                                        onChange={isChecked =>
-                                            toggleVersion(wallet.version, isChecked)
-                                        }
-                                    />
-                                </ListItemPayload>
-                            </ListItem>
-                        ))}
-                    </ListBlockStyled>
-                    <NotificationFooterPortal>
-                        <NotificationFooter>
-                            <ButtonResponsiveSize
-                                fullWidth
-                                primary
-                                disabled={!checkedVersions.length}
-                                onClick={onSelect}
-                                loading={isLoading}
-                                type="submit"
-                                autoFocus
-                            >
-                                {t('continue')}
-                            </ButtonResponsiveSize>
-                        </NotificationFooter>
-                    </NotificationFooterPortal>
-                </>
-            )}
-        </Wrapper>
+        <form
+            onSubmit={handleSubmit(onSelect)}
+            className="mx-auto flex w-full max-w-[524px] flex-col items-center"
+        >
+            <div className="flex flex-col items-center gap-1 px-8 pb-6 text-center">
+                <h2 className="text-h2 text-textPrimary">{t('choose_wallets_title')}</h2>
+                <p className="text-balance text-body1 text-textSecondary">
+                    {t('choose_wallets_subtitle')}
+                </p>
+            </div>
+
+            <SkeletonScope loading={loading}>
+                <div
+                    role="group"
+                    aria-busy={loading}
+                    className="mb-4 w-full overflow-hidden rounded-medium bg-backgroundContent"
+                >
+                    {loading
+                        ? WalletVersions.map((version, index) => (
+                              <Fragment key={version}>
+                                  {index > 0 && (
+                                      <div className="ml-4 h-[0.5px] bg-separatorCommon" />
+                                  )}
+                                  <WalletVersionRow
+                                      title={walletVersionText(version)}
+                                      description="—"
+                                      checked={false}
+                                      onToggle={() => {}}
+                                  />
+                              </Fragment>
+                          ))
+                        : filteredWallets.map((wallet, index) => (
+                              <Fragment key={wallet.address.toRawString()}>
+                                  {index > 0 && (
+                                      <div className="ml-4 h-[0.5px] bg-separatorCommon" />
+                                  )}
+                                  <WalletVersionRow
+                                      title={walletVersionText(wallet.version)}
+                                      description={
+                                          <>
+                                              {toShortValue(formatAddress(wallet.address, network))}
+                                              &nbsp;·&nbsp;
+                                              {toFormattedTonBalance(wallet.tonBalance)}&nbsp;
+                                              {BRAND_CONFIG.coinSymbol}
+                                              {wallet.hasJettons && t('wallet_version_and_tokens')}
+                                          </>
+                                      }
+                                      checked={checkedVersions.includes(wallet.version)}
+                                      onToggle={() => toggleVersion(wallet.version)}
+                                  />
+                              </Fragment>
+                          ))}
+                </div>
+            </SkeletonScope>
+
+            <ModalFooterPortal>
+                <ModalFooter>
+                    <Button
+                        size="large"
+                        variant="primaryBlue"
+                        fullWidth
+                        type="submit"
+                        disabled={loading || !checkedVersions.length}
+                        loading={isLoading}
+                        onClick={onSelect}
+                        autoFocus
+                    >
+                        {t('continue')}
+                    </Button>
+                </ModalFooter>
+            </ModalFooterPortal>
+        </form>
     );
 };

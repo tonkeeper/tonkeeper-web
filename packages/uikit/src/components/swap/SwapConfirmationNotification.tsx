@@ -29,6 +29,19 @@ import {
     useGetSender,
     useTonConnectAvailableSendersChoices
 } from '../../hooks/blockchain/useSender';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../hooks/analytics/events-hooks';
+import { useAnalyticsTrack } from '../../hooks/analytics';
+import {
+    finishSwapSendWithError,
+    startSwapRedOperation,
+    SwapAnalyticsRoute,
+    useSwapAnalytics
+} from '../../hooks/analytics/swap';
+import { isUserCancellation } from '@tonkeeper/core/dist/errors/UserCancelledError';
 import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
 import { useActiveAccount, useTonBalance } from '../../state/wallet';
 import { useBatteryUnitTonRate } from '../../state/battery';
@@ -156,6 +169,7 @@ function useAssetFiat(assetAddress: TonAssetAddress, amount: BigNumber): string 
 export type SwapConfirmData = {
     confirmation: SwapConfirmation;
     payload: TonConnectTransactionPayload;
+    isMax?: boolean;
 };
 
 // --- Main Component ---
@@ -202,6 +216,10 @@ const SwapConfirmContent: FC<{
     const client = useQueryClient();
     const getSender = useGetSender();
     const tonConnectService = useTonConnectTransactionService();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
+    const track = useAnalyticsTrack();
+    const swapAnalytics = useSwapAnalytics();
 
     // --- Sender selection ---
     const { data: availableSendersChoices } = useTonConnectAvailableSendersChoices(payload);
@@ -211,15 +229,14 @@ const SwapConfirmContent: FC<{
 
     const availableSendersChoicesKey = JSON.stringify(availableSendersChoices);
 
+    // Keyed on the choices only: re-running on selectedSenderType would undo every user pick.
     useEffect(() => {
-        if (
-            availableSendersChoices?.[0] &&
-            availableSendersChoices[0].type !== selectedSenderType
-        ) {
-            setSelectedSenderType(availableSendersChoices[0].type);
+        const defaultChoice = availableSendersChoices?.[0];
+        if (defaultChoice) {
+            setSelectedSenderType(defaultChoice.type);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [availableSendersChoicesKey, selectedSenderType, setSelectedSenderType]);
+    }, [availableSendersChoicesKey]);
 
     const senderChoice: SenderChoice = useMemo(() => {
         if (selectedSenderType === BATTERY_SENDER_CHOICE.type) return BATTERY_SENDER_CHOICE;
@@ -308,16 +325,63 @@ const SwapConfirmContent: FC<{
 
     const onSubmit = useCallback(async () => {
         if (isAlmostExpired || isSending) return;
+        const analyticsRoute: SwapAnalyticsRoute = {
+            asset_from: assetId.fromAsset(fromAsset),
+            asset_to: assetId.fromAsset(toAsset),
+            is_max: confirmData.isMax,
+            fee_asset: toAnalyticsFeeAsset(senderChoice.type),
+            provider_name: confirmation.resolverName
+        };
+        swapAnalytics.confirm(analyticsRoute);
+        const sendSession = startSwapRedOperation(track, 'send', {
+            from_asset: analyticsRoute.asset_from,
+            to_asset: analyticsRoute.asset_to,
+            from_amount: bidFormatted.toNumber(),
+            to_amount: askFormatted.toNumber(),
+            fee_paid_in: analyticsRoute.fee_asset,
+            provider: analyticsRoute.provider_name
+        });
         try {
             const boc = await mutateAsync();
+            sendSession.finish('success', { stage: 'send' });
+            swapAnalytics.success(analyticsRoute);
+            trackTransactionSent({
+                category: 'swap',
+                // This flow only quotes TON-to-TON routes; cross-chain swaps go
+                // through the multichain swap flow.
+                category_detail: 'onchain',
+                asset: assetId.fromAsset(fromAsset),
+                to_asset: assetId.fromAsset(toAsset),
+                amount: bidFormatted.toNumber(),
+                fee_asset: toAnalyticsFeeAsset(senderChoice.type)
+            });
             sdk.hapticNotification('success');
             setTimeout(() => handleClose({ boc }), 300);
         } catch (e) {
+            finishSwapSendWithError(sendSession, e);
+            if (!isUserCancellation(e)) swapAnalytics.failed(analyticsRoute, e);
             sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
             console.error(e);
         }
-    }, [isAlmostExpired, isSending, mutateAsync, sdk, handleClose]);
+    }, [
+        isAlmostExpired,
+        isSending,
+        mutateAsync,
+        sdk,
+        handleClose,
+        trackTransactionSent,
+        assetId,
+        fromAsset,
+        toAsset,
+        bidFormatted,
+        askFormatted,
+        senderChoice,
+        confirmation.resolverName,
+        confirmData.isMax,
+        swapAnalytics,
+        track
+    ]);
 
     const done = sendResult !== undefined;
 

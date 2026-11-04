@@ -45,15 +45,17 @@ export const RenameWalletContent: FC<{
     const [emoji, setEmoji] = useState(derivation ? derivation.emoji : account.emoji);
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
+        const nextName = name.trim();
+        if (!nextName) return;
         if (derivation) {
             await renameDerivation({
                 id: account.id,
                 derivationIndex: derivation.index,
-                name,
+                name: nextName,
                 emoji
             });
         } else {
-            await renameAccount({ id: account.id, name, emoji });
+            await renameAccount({ id: account.id, name: nextName, emoji });
         }
         onClose();
     };
@@ -80,7 +82,7 @@ export const RenameWalletContent: FC<{
                         fullWidth
                         primary
                         loading={isLoading}
-                        disabled={isLoading}
+                        disabled={isLoading || !name.trim()}
                         type="submit"
                     >
                         {t('add_edit_favorite_save')}

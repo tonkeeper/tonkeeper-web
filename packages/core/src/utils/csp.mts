@@ -1,3 +1,8 @@
+// Default (namespace) import: `csp.mts` compiles to native ESM (`.mjs`), and
+// chain-kit is CommonJS — Node's ESM interop can't statically see its named
+// exports, but the default binding is the whole `module.exports`.
+import chainkit from '@tonkeeper/chainkit';
+
 export type CspConfig = Record<string, string[] | boolean>;
 
 export const baseCspConfig = {
@@ -9,8 +14,9 @@ export const baseCspConfig = {
     'worker-src': ["'none'"],
     'media-src': ["'none'"],
 
-    /* Allow loading self scripts */
-    'script-src': ["'self'"],
+    /* Allow loading self scripts; 'wasm-unsafe-eval' is required by @tonkeeper/chainkit / Trust Wallet Core
+     * to compile its WebAssembly module. Does NOT enable eval()/Function(). */
+    'script-src': ["'self'", "'wasm-unsafe-eval'"],
 
     /* Allow using inline styles for Styled Components; allow loading Montserrat font from Google Fonts */
     'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com/'],
@@ -30,9 +36,26 @@ export const baseCspConfig = {
         'https://*.tonapi.io',
         'https://tonconsole.com',
         'https://*.tonconsole.com',
-        'https://api.trongrid.io/',
         'https://duckduckgo.com',
-        'https://oauth.telegram.org'
+        'https://oauth.telegram.org',
+
+        /* WalletConnect: the Reown relay websocket carrying dApp sessions, the
+         * Verify API attestations behind the connect-sheet risk states, and the
+         * SDK usage-event beacon. The beacon fires on Core init regardless of
+         * the `telemetryEnabled` flag in this SDK version, and both native apps
+         * keep telemetry on against the shared Reown project, so web matches
+         * them rather than being the one shell that drops its sessions. */
+        'wss://relay.walletconnect.org',
+        'wss://relay.walletconnect.com',
+        'https://verify.walletconnect.org',
+        'https://pulse.walletconnect.org',
+
+        /* Third-party node providers @tonkeeper/chainkit reaches for
+         * multichain estimate/broadcast (TON / EVM / BTC / TRON). Sourced from
+         * chain-kit's own origin list so the allowlist tracks the SDK instead
+         * of a hand-maintained copy that silently drifts. CSP matches by host
+         * and ignores the path. */
+        ...chainkit.rpcOrigins()
     ],
 
     /* Allow loading pwa manifest */

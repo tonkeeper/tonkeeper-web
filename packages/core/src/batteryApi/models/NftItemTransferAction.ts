@@ -43,44 +43,30 @@ import {
 export interface NftItemTransferAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof NftItemTransferAction
      */
     sender?: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof NftItemTransferAction
      */
     recipient?: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof NftItemTransferAction
      */
     nft: string;
     /**
      * 
-     * @type {string}
-     * @memberof NftItemTransferAction
      */
     comment?: string;
     /**
      * 
-     * @type {EncryptedComment}
-     * @memberof NftItemTransferAction
      */
     encryptedComment?: EncryptedComment;
     /**
      * raw hex encoded payload
-     * @type {string}
-     * @memberof NftItemTransferAction
      */
     payload?: string;
     /**
      * 
-     * @type {Refund}
-     * @memberof NftItemTransferAction
      */
     refund?: Refund;
 }
@@ -113,11 +99,11 @@ export function NftItemTransferActionFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function NftItemTransferActionToJSON(json: any): NftItemTransferAction {
-      return NftItemTransferActionToJSONTyped(json, false);
-  }
+export function NftItemTransferActionToJSON(json: any): NftItemTransferAction {
+    return NftItemTransferActionToJSONTyped(json, false);
+}
 
-  export function NftItemTransferActionToJSONTyped(value?: NftItemTransferAction | null, ignoreDiscriminator: boolean = false): any {
+export function NftItemTransferActionToJSONTyped(value?: NftItemTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

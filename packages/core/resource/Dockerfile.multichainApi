@@ -1,0 +1,6 @@
+FROM openapitools/openapi-generator-cli
+
+COPY resource/generate_multichain_openapi_client.sh /generate_multichain_openapi_client.sh
+RUN chmod +x /generate_multichain_openapi_client.sh
+
+ENTRYPOINT ["/generate_multichain_openapi_client.sh"]

@@ -1,10 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import { getActiveWalletConfig } from '@tonkeeper/core/dist/service/wallet/configService';
 import {
     AccountsApi,
-    BlockchainApi,
     DNSApi,
     DnsRecord,
     NFTApi,
@@ -12,7 +10,9 @@ import {
     NftItem
 } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
+import { joinUrl } from '@tonkeeper/core/dist/utils/url';
 import { useMemo } from 'react';
+import { isSpamNft, isUnverifiedNft } from './nft-classification';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
@@ -42,12 +42,8 @@ export const useMarkNftAsSpam = () => {
         const address = nft.collection?.address || nft.address;
 
         if (!config.spamNfts.includes(address) && mainnetConfig?.scam_api_url) {
-            let baseUrl = mainnetConfig?.scam_api_url;
-            if (baseUrl.endsWith('/')) {
-                baseUrl = baseUrl.slice(0, baseUrl.length - 1);
-            }
             try {
-                await fetch(`${baseUrl}/report/${address}`, {
+                await fetch(joinUrl(mainnetConfig.scam_api_url, `/report/${address}`), {
                     method: 'POST'
                 });
             } catch (e) {
@@ -150,35 +146,8 @@ export function useIsUnverifiedNft(
     return isUnverifiedNft(nft, config);
 }
 
-export const isSpamNft = (
-    nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined,
-    config: TonWalletConfig | undefined
-) => {
-    if (!nft) {
-        return true;
-    }
-    const address = nft.collection?.address || nft.address;
-    if (config?.spamNfts.includes(address)) {
-        return true;
-    }
+export { isSpamNft, isUnverifiedNft } from './nft-classification';
 
-    if (config?.trustedNfts.includes(address)) {
-        return false;
-    }
-
-    return ['blacklist', 'graylist'].includes(nft.trust);
-};
-
-export const isUnverifiedNft = (
-    nft: (NftWithCollectionId & { trust: NFT['trust'] }) | undefined,
-    config: TonWalletConfig | undefined
-) => {
-    return Boolean(
-        nft &&
-            nft.trust !== 'whitelist' &&
-            !config?.trustedNfts.includes(nft.collection?.address || nft.address)
-    );
-};
 export const useWalletNftList = () => {
     const wallet = useActiveWallet();
     const { tonApiV2 } = useActiveApi();
@@ -216,12 +185,31 @@ export const useWalletFilteredNftList = () => {
         ...rest
     };
 };
+/**
+ * Filtered NFT list for wallet-facing galleries: spam and user-hidden items
+ * removed (via `useWalletFilteredNftList`), plus items whose metadata asks
+ * not to be rendered (`render_type: 'hidden'`).
+ */
+export const useWalletVisibleNftList = () => {
+    const { data: nfts, ...rest } = useWalletFilteredNftList();
+
+    const visible = useMemo(
+        () => nfts?.filter(nft => nft.metadata?.render_type !== 'hidden'),
+        [nfts]
+    );
+
+    return {
+        data: visible,
+        ...rest
+    };
+};
+
 export const useNftDNSLinkData = (nft: NFT) => {
     const api = useActiveApi();
 
     return useQuery<DnsRecord | null, Error>(
         ['dns_link', nft?.address],
-        async () => {
+        async (): Promise<DnsRecord | null> => {
             const { dns: domainName } = nft;
             if (!domainName) return null;
 
@@ -234,7 +222,10 @@ export const useNftDNSLinkData = (nft: NFT) => {
         { enabled: nft.dns != null }
     );
 };
-const MINUTES_IN_YEAR = 60 * 60 * 24 * 366;
+/**
+ * When a `.ton` domain expires, per tonapi's `expiring_at` — the same source
+ * the native apps read, so all clients show one date.
+ */
 export const useNftDNSExpirationDate = (nft: NFT) => {
     const { tonApiV2 } = useActiveApi();
 
@@ -244,17 +235,8 @@ export const useNftDNSExpirationDate = (nft: NFT) => {
         }
 
         try {
-            const result = await new BlockchainApi(tonApiV2).execGetMethodForBlockchainAccount({
-                accountId: nft.address,
-                methodName: 'get_last_fill_up_time'
-            });
-
-            const lastRefill = result?.decoded?.last_fill_up_time;
-            if (lastRefill && typeof lastRefill === 'number' && isFinite(lastRefill)) {
-                return new Date((lastRefill + MINUTES_IN_YEAR) * 1000);
-            }
-
-            return null;
+            const info = await new DNSApi(tonApiV2).getDnsInfo({ domainName: nft.dns });
+            return info.expiringAt ? new Date(info.expiringAt * 1000) : null;
         } catch (e) {
             return null;
         }

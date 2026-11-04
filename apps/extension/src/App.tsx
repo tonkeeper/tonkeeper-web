@@ -1,7 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MultichainPromo } from '@tonkeeper/uikit/dist/components/modals/MultichainPromoModal';
+import { MULTICHAIN_ENABLED } from '@tonkeeper/core/dist/multichain';
+import { initChainKit } from '@tonkeeper/core/dist/service/chainkit/initChainKit';
+import { WEB_PUSH_APP_ID } from '@tonkeeper/core/dist/service/chainkit/deviceAuthService';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { DocumentLanguageSync } from '@tonkeeper/uikit/dist/components/DocumentLanguageSync';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { Footer, FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -22,6 +27,8 @@ import {
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { useTrackLaunchApp } from '@tonkeeper/uikit/dist/hooks/analytics/launch-app';
+import { useTrackWalletOpen } from '@tonkeeper/uikit/dist/hooks/analytics/wallet-open';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
@@ -31,20 +38,30 @@ import {
     TranslationContext,
     useTWithReplaces
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, MultichainRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
+import StartScreen from '@tonkeeper/uikit/dist/pages/import/StartScreen';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveAccountQuery, useAccountsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
+import { AppLayout } from '@tonkeeper/uikit/dist/components/layout/AppLayout';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from 'react';
-import { MemoryRouter, Route, Switch, useLocation } from 'react-router-dom';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import React, {
+    FC,
+    PropsWithChildren,
+    Suspense,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef
+} from 'react';
+import { MemoryRouter, Route, Switch, useLocation, useParams } from 'react-router-dom';
+import styled, { createGlobalStyle } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { EvmInjectedSubscription } from './components/EvmInjectedSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
@@ -61,6 +78,20 @@ import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/setting
 import { Notifications } from './components/Notifications';
 import { useProApiUrl } from '@tonkeeper/uikit/dist/state/pro';
 import { CustomConfirmNotificationControlled } from '@tonkeeper/uikit/dist/components/modals/CustomConfirmControlled';
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
+import { HomeMultichain } from '@tonkeeper/uikit/dist/pages/home/multichain/HomeMultichain';
+import { MultichainBackgroundElements } from '@tonkeeper/uikit/dist/pages/home/multichain/MultichainBackgroundElements';
+import { MultichainAssetPage } from '@tonkeeper/uikit/dist/pages/home/multichain/asset/MultichainAssetPage';
+import { MultichainHistory } from '@tonkeeper/uikit/dist/pages/home/multichain/history/MultichainHistory';
+import { MultichainCollectiblesPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesPage';
+import { MultichainCollectiblesSettingsPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesSettingsPage';
+import { MultichainTradePage } from '@tonkeeper/uikit/dist/pages/home/multichain/trade/MultichainTradePage';
+import { MultichainBrowserPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/MultichainBrowserPage';
+import { MultichainSettingsRouting } from '@tonkeeper/uikit/dist/pages/home/multichain/settings/MultichainSettingsRouting';
+import { BrowserCategoryPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/BrowserCategoryPage';
+import { MultichainStakingPositionPage } from '@tonkeeper/uikit/dist/pages/home/multichain/staking/MultichainStakingPositionPage';
+import { AppErrorBoundary } from './components/AppErrorBoundary';
+import { RootErrorBoundary } from '@tonkeeper/uikit/dist/components/shared/RootErrorBoundary';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -104,6 +135,11 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new ExtensionAppSdk();
+initChainKit(sdk.storage, {
+    platform: 'extension',
+    appId: WEB_PUSH_APP_ID,
+    clientVersion: sdk.version
+});
 connectToBackground();
 
 const ExtensionGlobalStyle = createGlobalStyle`
@@ -136,39 +172,57 @@ export const App: FC<{ isInCustomPopup: boolean }> = ({ isInCustomPopup }) => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <MemoryRouter>
-                <InitialRedirect>
-                    <AppSdkContext.Provider value={sdk}>
-                        <StorageContext.Provider value={sdk.storage}>
-                            <TranslationContext.Provider value={translation}>
-                                <UserThemeProvider>
-                                    <ExtensionGlobalStyle />
-                                    <HeaderGlobalStyle />
-                                    <FooterGlobalStyle />
-                                    <SybHeaderGlobalStyle />
-                                    <GlobalListStyle />
-                                    <Suspense
-                                        fallback={
-                                            <FullSizeWrapper standalone={false}>
-                                                <Loading />
-                                            </FullSizeWrapper>
-                                        }
-                                    >
-                                        <Loader />
-                                    </Suspense>
-                                    <UnlockNotification sdk={sdk} />
-                                </UserThemeProvider>
-                            </TranslationContext.Provider>
-                        </StorageContext.Provider>
-                    </AppSdkContext.Provider>
-                </InitialRedirect>
-            </MemoryRouter>
+            <AppErrorBoundary>
+                <MemoryRouter>
+                    <InitialRedirect>
+                        <AppSdkContext.Provider value={sdk}>
+                            <StorageContext.Provider value={sdk.storage}>
+                                <TranslationContext.Provider value={translation}>
+                                    <DocumentLanguageSync />
+                                    <UserThemeProvider>
+                                        <ExtensionGlobalStyle />
+                                        <HeaderGlobalStyle />
+                                        <FooterGlobalStyle />
+                                        <SybHeaderGlobalStyle />
+                                        <GlobalListStyle />
+                                        <Suspense
+                                            fallback={
+                                                <ExtensionPopupRoot>
+                                                    <Loading />
+                                                </ExtensionPopupRoot>
+                                            }
+                                        >
+                                            <RootErrorBoundary FallbackRoot={ExtensionPopupRoot}>
+                                                <Loader />
+                                            </RootErrorBoundary>
+                                        </Suspense>
+                                        <UnlockNotification sdk={sdk} />
+                                    </UserThemeProvider>
+                                </TranslationContext.Provider>
+                            </StorageContext.Provider>
+                        </AppSdkContext.Provider>
+                    </InitialRedirect>
+                </MemoryRouter>
+            </AppErrorBoundary>
         </QueryClientProvider>
     );
 };
 
-const PageWrapper = styled(Container)`
+/**
+ * Extension popup geometry — Container plus the 385px-min / 600px-tall
+ * shape every entry path used to set via `FullSizeWrapper` / `Wrapper`.
+ * Routes use `AppLayout` for chrome; this wrapper only constrains the
+ * popup box itself. In the Chrome side panel the browser owns the viewport,
+ * so the box follows it full-height instead of the fixed popup shape.
+ */
+const ExtensionPopupRoot = styled(Container)`
     min-width: 385px;
+    height: 600px;
+    width: var(--app-width);
+
+    body[data-app-view='side-panel'] & {
+        height: 100vh;
+    }
 
     > * {
         overflow: auto;
@@ -176,32 +230,6 @@ const PageWrapper = styled(Container)`
         max-width: 548px;
         box-sizing: border-box;
     }
-`;
-
-const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
-    min-width: 385px;
-    height: 600px;
-    width: var(--app-width);
-
-    > * {
-        ${props =>
-            props.standalone &&
-            css`
-                overflow: auto;
-                width: var(--app-width);
-                max-width: 548px;
-                box-sizing: border-box;
-            `}
-    }
-`;
-
-const Wrapper = styled(FullSizeWrapper)<{
-    standalone: boolean;
-    recovery: boolean;
-}>`
-    box-sizing: border-box;
-    padding-top: ${props => (props.recovery ? 0 : 64)}px;
-    padding-bottom: 80px;
 `;
 
 export const Loader: FC = React.memo(() => {
@@ -244,9 +272,9 @@ export const Loader: FC = React.memo(() => {
         globalSetupLoading
     ) {
         return (
-            <FullSizeWrapper standalone={false}>
+            <ExtensionPopupRoot>
                 <Loading />
-            </FullSizeWrapper>
+            </ExtensionPopupRoot>
         );
     }
 
@@ -266,22 +294,24 @@ export const Loader: FC = React.memo(() => {
         proFeatures: false,
         hideQrScanner: true,
         hideSigner: true,
-        hideMam: true,
         hideMultisig: true,
         hideFireblocks: true,
         defaultWalletVersion: WalletVersion.V5R1,
+        multichainEnabled: MULTICHAIN_ENABLED,
         tracker: tracker?.track
     };
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} />
-            <CopyNotification />
-            <Suspense fallback={<></>}>
-                <QrScanner />
-            </Suspense>
-            <ModalsRoot />
-            <CustomConfirmNotificationControlled />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification />
+                <Suspense fallback={<></>}>
+                    <QrScanner />
+                </Suspense>
+                <ModalsRoot />
+                <CustomConfirmNotificationControlled />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 });
@@ -289,8 +319,13 @@ export const Loader: FC = React.memo(() => {
 const InitialRedirect: FC<PropsWithChildren> = ({ children }) => {
     const navigate = useNavigate();
 
+    // Must fire exactly once: the MemoryRouter never clears the page URL's
+    // hash, and `navigate` changes identity on every navigation, so keying
+    // this effect on `navigate` alone re-navigates in an infinite render loop.
+    const redirected = useRef(false);
     useEffect(() => {
-        if (window.location.hash) {
+        if (!redirected.current && window.location.hash) {
+            redirected.current = true;
             navigate(window.location.hash.substring(1));
         }
     }, [navigate]);
@@ -309,16 +344,20 @@ export const Content: FC<{
     useWindowsScroll(!pageView);
     useAppWidth();
     useTrackLocation();
+    useTrackLaunchApp();
+    useTrackWalletOpen();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
 
     if (location.pathname === AppRoute.connectLedger) {
         return (
-            <PageWrapper>
-                <Suspense fallback={<Loading />}>
-                    <ConnectLedgerPage />
-                </Suspense>
-            </PageWrapper>
+            <ExtensionPopupRoot>
+                <AppLayout bare>
+                    <Suspense fallback={<Loading />}>
+                        <ConnectLedgerPage />
+                    </Suspense>
+                </AppLayout>
+            </ExtensionPopupRoot>
         );
     }
 
@@ -328,70 +367,133 @@ export const Content: FC<{
 
     if (pageView) {
         return (
-            <PageWrapper>
-                <Suspense fallback={<Loading />}>
-                    <InitializeContainer>
-                        <Initialize />
-                    </InitializeContainer>
-                </Suspense>
-            </PageWrapper>
+            <ExtensionPopupRoot>
+                <AppLayout bare>
+                    <Suspense fallback={<Loading />}>
+                        <StartScreen />
+                    </Suspense>
+                </AppLayout>
+            </ExtensionPopupRoot>
+        );
+    }
+
+    if (activeAccount?.type === 'multichain') {
+        return (
+            <ExtensionPopupRoot>
+                <AppLayout standalone compactChromeOffsets={false}>
+                    <Switch>
+                        <Route path={`${MultichainRoute.asset}/:assetId`}>
+                            <MultichainAssetRoute />
+                        </Route>
+                        <Route path={MultichainRoute.history}>
+                            <MultichainHistory />
+                        </Route>
+                        <Route path={MultichainRoute.collectiblesSettings}>
+                            <MultichainCollectiblesSettingsPage />
+                        </Route>
+                        <Route path={MultichainRoute.collectibles}>
+                            <MultichainCollectiblesPage />
+                        </Route>
+                        <Route path={MultichainRoute.trade}>
+                            <MultichainTradePage />
+                        </Route>
+                        <Route path={`${MultichainRoute.staking}/:poolAddress`}>
+                            <MultichainStakingPositionRoute />
+                        </Route>
+                        <Route path={`${MultichainRoute.browserCategory}/:id`}>
+                            <BrowserCategoryPage />
+                        </Route>
+                        <Route path={MultichainRoute.browser}>
+                            <MultichainBrowserPage />
+                        </Route>
+                        <Route path={MultichainRoute.settings}>
+                            <MultichainSettingsRouting />
+                        </Route>
+                        <Route path="*">
+                            <HomeMultichain />
+                        </Route>
+                    </Switch>
+                    <MemoryScroll />
+                    <Notifications />
+                    <TonConnectSubscription />
+                    <EvmInjectedSubscription />
+                    <MultichainBackgroundElements />
+                    <Suspense>
+                        <ReceiveNotification />
+                        <NftNotification />
+                        <SendNftNotification />
+                        <AddFavoriteNotification />
+                        <EditFavoriteNotification />
+                        <ConnectLedgerNotification />
+                        <SwapMobileNotification />
+                        <PairKeystoneNotification />
+                    </Suspense>
+                </AppLayout>
+            </ExtensionPopupRoot>
         );
     }
 
     return (
-        <Wrapper standalone recovery={location.pathname.includes(SettingsRoute.recovery)}>
-            <Switch>
-                <Route path={AppRoute.activity}>
-                    <Suspense fallback={<ActivitySkeletonPage />}>
-                        <Activity />
-                    </Suspense>
-                </Route>
-                <Route path={AppRoute.browser}>
-                    <Suspense fallback={<BrowserSkeletonPage />}>
-                        <Browser />
-                    </Suspense>
-                </Route>
-                <Route path={AppRoute.settings}>
-                    <Suspense fallback={<SettingsSkeletonPage />}>
-                        <Settings />
-                    </Suspense>
-                </Route>
-                <Route path={AppRoute.walletSettings}>
-                    <RedirectFromDesktopSettings />
-                </Route>
-                <Route path={`${AppRoute.coins}/:name`}>
-                    <Suspense fallback={<CoinSkeletonPage />}>
-                        <Coin />
-                    </Suspense>
-                </Route>
-                <Route path={AppRoute.swap}>
-                    <Suspense fallback={null}>
-                        <SwapPage />
-                    </Suspense>
-                </Route>
-                <Route path={AppRoute.staking}>
-                    <Suspense fallback={null}>
-                        <StakingPage />
-                    </Suspense>
-                </Route>
-                <Route path="*" component={IndexPage} />
-            </Switch>
-            <Footer />
-            <MemoryScroll />
-            <Notifications />
-            <TonConnectSubscription />
-            <Suspense>
-                <SendActionNotification />
-                <ReceiveNotification />
-                <NftNotification />
-                <SendNftNotification />
-                <AddFavoriteNotification />
-                <EditFavoriteNotification />
-                <ConnectLedgerNotification />
-                <SwapMobileNotification />
-                <PairKeystoneNotification />
-            </Suspense>
-        </Wrapper>
+        <ExtensionPopupRoot>
+            <AppLayout
+                standalone
+                recovery={location.pathname.includes(SettingsRoute.recovery)}
+                bottomBar={<Footer />}
+            >
+                <Switch>
+                    <Route path={AppRoute.activity}>
+                        <Suspense fallback={<ActivitySkeletonPage />}>
+                            <Activity />
+                        </Suspense>
+                    </Route>
+                    <Route path={AppRoute.browser}>
+                        <Suspense fallback={<BrowserSkeletonPage />}>
+                            <Browser />
+                        </Suspense>
+                    </Route>
+                    <Route path={AppRoute.settings}>
+                        <Suspense fallback={<SettingsSkeletonPage />}>
+                            <Settings />
+                        </Suspense>
+                    </Route>
+                    <Route path={AppRoute.walletSettings}>
+                        <RedirectFromDesktopSettings />
+                    </Route>
+                    <Route path={`${AppRoute.coins}/:name`}>
+                        <Suspense fallback={<CoinSkeletonPage />}>
+                            <Coin />
+                        </Suspense>
+                    </Route>
+                    <Route path={AppRoute.swap}>
+                        <Suspense fallback={null}>
+                            <SwapPage />
+                        </Suspense>
+                    </Route>
+                    <Route path={AppRoute.staking}>
+                        <Suspense fallback={null}>
+                            <StakingPage />
+                        </Suspense>
+                    </Route>
+                    <Route path="*" component={IndexPage} />
+                </Switch>
+                <MemoryScroll />
+                <Notifications />
+                <TonConnectSubscription />
+                <EvmInjectedSubscription />
+                <MultichainPromo />
+                <Suspense>
+                    <SendActionNotification />
+                    <ReceiveNotification />
+                    <NftNotification />
+                    <SendNftNotification />
+                    <AddFavoriteNotification />
+                    <EditFavoriteNotification />
+                    <ConnectLedgerNotification />
+                    <SwapMobileNotification />
+                    <PairKeystoneNotification />
+                </Suspense>
+            </AppLayout>
+        </ExtensionPopupRoot>
     );
 };
 
@@ -406,4 +508,14 @@ const IndexPage = () => {
             </InnerBody>
         </>
     );
+};
+
+const MultichainAssetRoute: FC = () => {
+    const { assetId } = useParams<{ assetId: string }>();
+    return <MultichainAssetPage assetId={decodeURIComponent(assetId)} />;
+};
+
+const MultichainStakingPositionRoute: FC = () => {
+    const { poolAddress } = useParams<{ poolAddress: string }>();
+    return <MultichainStakingPositionPage poolAddress={decodeURIComponent(poolAddress)} />;
 };

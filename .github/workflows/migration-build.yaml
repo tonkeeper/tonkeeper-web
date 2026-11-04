@@ -1,0 +1,115 @@
+name: Migration App Build
+on:
+    workflow_call:
+        inputs:
+            environment:
+                required: true
+                type: string
+            migration_new_origin:
+                description:
+                    'Origin the wallet has moved to. Falls back to vars.MIGRATION_NEW_ORIGIN, then
+                    the build-time default.'
+                required: false
+                type: string
+                default: ''
+            pages_project:
+                description:
+                    'Cloudflare Pages project to publish into. Its own project, not the wallet one:
+                    pages.dev is a public suffix, so <project>.pages.dev is the registrable domain
+                    and two projects are genuinely cross-site the way the real domains are. Two
+                    branches of one project would only be cross-origin, hiding anything that depends
+                    on the site boundary.'
+                required: false
+                type: string
+                default: 'tonkeeper-web-migration'
+        secrets:
+            CLOUDFLARE_API_TOKEN:
+                required: true
+            CLOUDFLARE_ACCOUNT_ID:
+                required: true
+        outputs:
+            deployment-url:
+                description: 'The app deployment url'
+                value: ${{ jobs.migration-build.outputs.deployment-url }}
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: 'Cloudflare Pages branch name to deploy to'
+                required: true
+                type: string
+            migration_new_origin:
+                description: 'Origin the wallet has moved to'
+                required: false
+                type: string
+                default: ''
+            pages_project:
+                description: 'Cloudflare Pages project to publish into'
+                required: false
+                type: string
+                default: 'tonkeeper-web-migration'
+env:
+    node-version: 22.22.2
+    NODE_AUTH_TOKEN: ${{ github.token }}
+
+permissions:
+    contents: read
+    packages: read
+
+jobs:
+    migration-build:
+        name: migration-build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              run: yarn install --immutable
+
+            - name: Run build
+              run: yarn build:migration
+              env:
+                  MIGRATION_NEW_ORIGIN:
+                      ${{ inputs.migration_new_origin || vars.MIGRATION_NEW_ORIGIN }}
+
+            - name: Publish to Cloudflare Pages
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command:
+                      pages deploy apps/migration/dist --project-name=${{ inputs.pages_project ||
+                      'tonkeeper-web-migration' }} --branch=${{ inputs.environment }}
+
+            - name: Check served security headers
+              run: node scripts/check-deployed-headers.mjs "$DEPLOYMENT_URL" migration
+              env:
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+
+            - name: Summary
+              run: |
+                  echo '### Successful MIGRATION deployment 🚚' >> $GITHUB_STEP_SUMMARY
+                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY

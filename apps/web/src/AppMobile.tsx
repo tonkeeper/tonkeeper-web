@@ -1,7 +1,20 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
+import { MultichainPromo } from '@tonkeeper/uikit/dist/components/modals/MultichainPromoModal';
+import { HomeMultichain } from '@tonkeeper/uikit/dist/pages/home/multichain/HomeMultichain';
+import { MultichainBackgroundElements } from '@tonkeeper/uikit/dist/pages/home/multichain/MultichainBackgroundElements';
+import { MultichainAssetPage } from '@tonkeeper/uikit/dist/pages/home/multichain/asset/MultichainAssetPage';
+import { MultichainHistory } from '@tonkeeper/uikit/dist/pages/home/multichain/history/MultichainHistory';
+import { MultichainCollectiblesPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesPage';
+import { MultichainCollectiblesSettingsPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesSettingsPage';
+import { MultichainTradePage } from '@tonkeeper/uikit/dist/pages/home/multichain/trade/MultichainTradePage';
+import { MultichainStakingPositionPage } from '@tonkeeper/uikit/dist/pages/home/multichain/staking/MultichainStakingPositionPage';
+import { MultichainBrowserPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/MultichainBrowserPage';
+import { MultichainSettingsRouting } from '@tonkeeper/uikit/dist/pages/home/multichain/settings/MultichainSettingsRouting';
+import { BrowserCategoryPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/BrowserCategoryPage';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { Footer } from '@tonkeeper/uikit/dist/components/Footer';
 import { Header } from '@tonkeeper/uikit/dist/components/Header';
+import { AppLayout } from '@tonkeeper/uikit/dist/components/layout/AppLayout';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import {
@@ -16,14 +29,21 @@ import {
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { useTrackLaunchApp } from '@tonkeeper/uikit/dist/hooks/analytics/launch-app';
+import { useTrackWalletOpen } from '@tonkeeper/uikit/dist/hooks/analytics/wallet-open';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppRoute, SignerRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import {
+    AppRoute,
+    MultichainRoute,
+    scrollPagePathname,
+    SignerRoute,
+    SettingsRoute
+} from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense, useMemo } from 'react';
-import { Route, Switch, useLocation } from 'react-router-dom';
-import styled, { ThemeProvider, css, useTheme } from 'styled-components';
+import StartScreen from '@tonkeeper/uikit/dist/pages/import/StartScreen';
+import React, { FC, ReactNode, Suspense, useLayoutEffect, useMemo, useRef } from 'react';
+import { Route, Switch, useLocation, useParams } from 'react-router-dom';
+import { ThemeProvider, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 import { UrlTonConnectSubscription } from './components/UrlTonConnectSubscription';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
@@ -38,6 +58,10 @@ const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
 const StakingPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/staking'));
 const WebTonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
+);
+const MultichainConnectSubscription = React.lazy(
+    () =>
+        import('@tonkeeper/uikit/dist/pages/home/multichain/connect/MultichainConnectSubscription')
 );
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
@@ -70,40 +94,6 @@ const SwapMobileNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
 );
 
-const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
-    ${props =>
-        props.standalone
-            ? css`
-                  position: fixed;
-                  top: 0;
-                  height: calc(var(--app-height) - 2px);
-                  -webkit-overflow-scrolling: touch;
-              `
-            : css`
-                  @media (width >= 600px) {
-                      border-left: 1px solid ${props.theme.separatorCommon};
-                      border-right: 1px solid ${props.theme.separatorCommon};
-                  }
-              `};
-
-    > * {
-        ${props =>
-            props.standalone &&
-            css`
-                overflow: auto;
-                width: var(--app-width);
-                max-width: 548px;
-                box-sizing: border-box;
-            `}
-    }
-`;
-
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean; recovery: boolean }>`
-    box-sizing: border-box;
-    padding-top: ${props => (props.recovery ? 0 : 64)}px;
-    padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
-`;
-
 export const MobileView: FC<{
     activeAccount?: Account | null;
     lock: boolean;
@@ -113,6 +103,8 @@ export const MobileView: FC<{
     useWindowsScroll();
     useAppWidth(standalone);
     useTrackLocation();
+    useTrackLaunchApp();
+    useTrackWalletOpen();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
 
@@ -125,6 +117,47 @@ export const MobileView: FC<{
         <ThemeProvider theme={updated}>
             <MobileContent activeAccount={activeAccount} lock={lock} standalone={standalone} />
         </ThemeProvider>
+    );
+};
+
+/**
+ * Scroll surface for the multichain routes.
+ *
+ * They own their chrome instead of going through `AppLayout`, so in a browser
+ * tab they simply scroll the window — `MemoryScroll` then restores the offset
+ * per path. An iOS PWA has no window scroller to use: `useWindowsScroll` locks
+ * `html` / `body` / `#root` there, and `AppLayout` compensates by turning
+ * itself into a fixed box whose children scroll. These routes need the same
+ * treatment, plus the top safe-area inset the legacy `Header` used to carry.
+ */
+const MultichainScrollRoot: FC<{ standalone: boolean; children: ReactNode }> = ({
+    standalone,
+    children
+}) => {
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const { pathname } = useLocation();
+    const scrollPage = scrollPagePathname(pathname);
+
+    useLayoutEffect(() => {
+        scrollRef.current?.scrollTo({ top: 0 });
+    }, [scrollPage]);
+
+    if (!standalone) {
+        return (
+            <>
+                {children}
+                <MemoryScroll />
+            </>
+        );
+    }
+
+    return (
+        <div
+            ref={scrollRef}
+            className="fixed inset-0 overflow-y-auto overflow-x-hidden pt-[env(safe-area-inset-top)]"
+        >
+            {children}
+        </div>
     );
 };
 
@@ -141,7 +174,7 @@ export const MobileContent: FC<{
 
     if (location.pathname.startsWith(AppRoute.signer)) {
         return (
-            <Wrapper standalone={standalone}>
+            <AppLayout standalone={standalone}>
                 <Switch>
                     <Route path={AppRoute.signer}>
                         <Route path={SignerRoute.link}>
@@ -151,26 +184,75 @@ export const MobileContent: FC<{
                         </Route>
                     </Route>
                 </Switch>
-            </Wrapper>
+            </AppLayout>
         );
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
         return (
-            <FullSizeWrapper standalone={false}>
+            <AppLayout bare>
                 <Suspense fallback={<Loading />}>
-                    <InitializeContainer fullHeight={false}>
-                        <Initialize />
-                    </InitializeContainer>
+                    <StartScreen />
                 </Suspense>
-            </FullSizeWrapper>
+            </AppLayout>
+        );
+    }
+
+    // Multichain portfolio renders its own content directly. No legacy
+    // Home selector, no AppLayout, no Suspense — fully independent
+    // until the new chrome lands.
+    if (activeAccount.type === 'multichain') {
+        return (
+            <>
+                <MultichainScrollRoot standalone={standalone}>
+                    <Switch>
+                        <Route path={`${MultichainRoute.asset}/:assetId`}>
+                            <MultichainAssetRoute />
+                        </Route>
+                        <Route path={MultichainRoute.history}>
+                            <MultichainHistory />
+                        </Route>
+                        <Route path={MultichainRoute.collectiblesSettings}>
+                            <MultichainCollectiblesSettingsPage />
+                        </Route>
+                        <Route path={MultichainRoute.collectibles}>
+                            <MultichainCollectiblesPage />
+                        </Route>
+                        <Route path={MultichainRoute.trade}>
+                            <MultichainTradePage />
+                        </Route>
+                        <Route path={`${MultichainRoute.staking}/:poolAddress`}>
+                            <MultichainStakingPositionRoute />
+                        </Route>
+                        <Route path={`${MultichainRoute.browserCategory}/:id`}>
+                            <BrowserCategoryPage />
+                        </Route>
+                        <Route path={MultichainRoute.browser}>
+                            <MultichainBrowserPage />
+                        </Route>
+                        <Route path={MultichainRoute.settings}>
+                            <MultichainSettingsRouting />
+                        </Route>
+                        <Route path="*">
+                            <HomeMultichain />
+                        </Route>
+                    </Switch>
+                </MultichainScrollRoot>
+                <MultichainBackgroundElements />
+                <Suspense>
+                    <WebTonConnectSubscription />
+                    <UrlTonConnectSubscription />
+                    <MultichainConnectSubscription />
+                </Suspense>
+            </>
         );
     }
 
     return (
-        <Wrapper
+        <AppLayout
             standalone={standalone}
             recovery={location.pathname.includes(SettingsRoute.recovery)}
+            bottomBar={<Footer standalone={standalone} />}
         >
             <Switch>
                 <Route path={AppRoute.activity}>
@@ -217,12 +299,21 @@ export const MobileContent: FC<{
                     </>
                 </Route>
             </Switch>
-            <Footer standalone={standalone} />
             <MemoryScroll />
             <Notifications />
             <UrlTonConnectSubscription />
-        </Wrapper>
+        </AppLayout>
     );
+};
+
+const MultichainAssetRoute: FC = () => {
+    const { assetId } = useParams<{ assetId: string }>();
+    return <MultichainAssetPage assetId={decodeURIComponent(assetId)} />;
+};
+
+const MultichainStakingPositionRoute: FC = () => {
+    const { poolAddress } = useParams<{ poolAddress: string }>();
+    return <MultichainStakingPositionPage poolAddress={decodeURIComponent(poolAddress)} />;
 };
 
 const Notifications = () => {
@@ -231,6 +322,7 @@ const Notifications = () => {
             <SendActionNotification />
             <ReceiveNotification />
             <WebTonConnectSubscription />
+            <MultichainConnectSubscription />
             <NftNotification />
             <SendNftNotification />
             <AddFavoriteNotification />
@@ -240,6 +332,7 @@ const Notifications = () => {
             <ConnectLedgerNotification />
             <SwapMobileNotification />
             <PairKeystoneNotification />
+            <MultichainPromo />
         </Suspense>
     );
 };

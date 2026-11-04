@@ -8,7 +8,7 @@ import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../List'
 import { Checkbox } from '../../fields/Checkbox';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import { Button } from '../../fields/Button';
-import { useBatteryServiceConfig } from '../../../state/battery';
+import { requireBatteryServiceConfig, useBatteryServiceConfig } from '../../../state/battery';
 
 const NotificationStyled = styled(Notification)<{ $hideSelection?: boolean }>`
     max-width: 400px;
@@ -142,7 +142,7 @@ const BatterySettingsNotificationContent: FC<{
     onClose: () => void;
 }> = ({ batterySettings, onClose, hideSelection }) => {
     const { t } = useTranslation();
-    const batteryConfig = useBatteryServiceConfig();
+    const batteryConfig = requireBatteryServiceConfig(useBatteryServiceConfig());
 
     const [batterySettingsOptimistic, setBatterySettingsOptimistic] = useState(batterySettings);
     const { mutateAsync } = useMutateActiveTonWalletConfig();

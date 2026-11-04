@@ -2,11 +2,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
+import { initChainKit } from '@tonkeeper/core/dist/service/chainkit/initChainKit';
+import { WEB_PUSH_APP_ID } from '@tonkeeper/core/dist/service/chainkit/deviceAuthService';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { DocumentLanguageSync } from '@tonkeeper/uikit/dist/components/DocumentLanguageSync';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
-import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
-import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
+// Header/Footer disabled while multichain home stabilises.
+// import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
+// import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
@@ -22,6 +25,7 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
+import { RootErrorBoundary } from '@tonkeeper/uikit/dist/components/shared/RootErrorBoundary';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
@@ -40,11 +44,18 @@ import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { UiShowcase } from '@tonkeeper/uikit/dist/pages/showcase/UiShowcase';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 import { BrowserRouter } from 'react-router-dom';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
+import { isMultichainEnabled } from '@tonkeeper/core/dist/multichain';
+import { StartScreenExtraActionContext } from '@tonkeeper/uikit/dist/hooks/startScreenExtraAction';
+import { MIGRATE_ROUTE } from './migration/config';
+import { MigrateRoute } from './migration/MigrateRoute';
+import { OldOriginCheck } from './migration/OldOriginCheck';
+import { OldOriginEntry } from './migration/OldOriginEntry';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -59,6 +70,11 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new BrowserAppSdk();
+initChainKit(sdk.storage, {
+    platform: 'web',
+    appId: WEB_PUSH_APP_ID,
+    clientVersion: sdk.version
+});
 
 export const App: FC = () => {
     return (
@@ -92,6 +108,7 @@ const Providers: FC<PropsWithChildren> = () => {
             <Suspense>
                 <AppSdkContext.Provider value={sdk}>
                     <TranslationContext.Provider value={translation}>
+                        <DocumentLanguageSync />
                         <StorageContext.Provider value={sdk.storage}>
                             <ThemeAndContent />
                         </StorageContext.Provider>
@@ -102,27 +119,51 @@ const Providers: FC<PropsWithChildren> = () => {
     );
 };
 
+/**
+ * The way back to the origin the wallet moved from, offered under the start
+ * screen's own two buttons. One stable element, so the start screen and the
+ * boot screen that hands over to it reserve exactly the same room for it.
+ */
+const startScreenExtraAction = <OldOriginEntry />;
+
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
     const isMobile = useLayout();
 
+    // Temporary DEV-only route for eyeballing every primitive in one place. Renders
+    // before the wallet/lock gate so it's reachable without an unlocked account.
+    const isShowcase = import.meta.env.DEV && window.location.pathname.startsWith('/ui-showcase');
+
+    // Landing for a handoff from the previous origin. Also above the wallet gate:
+    // it has to answer before any account exists, and it must never fall through
+    // to a wallet route while a payload is still in the URL.
+    const isMigrate = window.location.pathname.startsWith(MIGRATE_ROUTE);
+
     return (
-        <UserThemeProvider
-            isPro={Boolean(data?.valid)}
-            isProSupported
-            proDisplayType="desktop"
-            displayType={isMobile ? 'compact' : 'full-width'}
-        >
-            <DarkThemeContext.Provider value={!data?.valid}>
+        <StartScreenExtraActionContext.Provider value={startScreenExtraAction}>
+            <UserThemeProvider
+                isPro={Boolean(data?.valid)}
+                isProSupported
+                proDisplayType="desktop"
+                displayType={isMobile ? 'compact' : 'full-width'}
+            >
                 <GlobalStyle />
-                <HeaderGlobalStyle />
-                <FooterGlobalStyle />
                 <SybHeaderGlobalStyle />
                 <GlobalListStyle />
-                <Loader />
-                <UnlockNotification sdk={sdk} />
-            </DarkThemeContext.Provider>
-        </UserThemeProvider>
+                {isShowcase ? (
+                    <UiShowcase />
+                ) : isMigrate ? (
+                    <MigrateRoute />
+                ) : (
+                    <OldOriginCheck>
+                        <RootErrorBoundary>
+                            <Loader />
+                        </RootErrorBoundary>
+                        <UnlockNotification sdk={sdk} />
+                    </OldOriginCheck>
+                )}
+            </UserThemeProvider>
+        </StartScreenExtraActionContext.Provider>
     );
 };
 
@@ -198,9 +239,11 @@ const Loader: FC = () => {
         extension: false,
         proFeatures: true,
         ios,
+        hideQrScanner: true,
         defaultWalletVersion: WalletVersion.V5R1,
         hideMultisig: isMobile,
         hideFireblocks: true,
+        multichainEnabled: isMultichainEnabled(),
         tracker: tracker?.track
     };
 

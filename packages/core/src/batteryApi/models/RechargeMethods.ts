@@ -29,8 +29,6 @@ import {
 export interface RechargeMethods {
     /**
      * 
-     * @type {Array<RechargeMethodsMethodsInner>}
-     * @memberof RechargeMethods
      */
     methods: Array<RechargeMethodsMethodsInner>;
 }
@@ -57,11 +55,11 @@ export function RechargeMethodsFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function RechargeMethodsToJSON(json: any): RechargeMethods {
-      return RechargeMethodsToJSONTyped(json, false);
-  }
+export function RechargeMethodsToJSON(json: any): RechargeMethods {
+    return RechargeMethodsToJSONTyped(json, false);
+}
 
-  export function RechargeMethodsToJSONTyped(value?: RechargeMethods | null, ignoreDiscriminator: boolean = false): any {
+export function RechargeMethodsToJSONTyped(value?: RechargeMethods | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

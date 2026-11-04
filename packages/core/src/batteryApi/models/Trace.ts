@@ -29,26 +29,18 @@ import {
 export interface Trace {
     /**
      * 
-     * @type {Transaction}
-     * @memberof Trace
      */
     transaction: Transaction;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof Trace
      */
     interfaces: Array<string>;
     /**
      * 
-     * @type {Array<Trace>}
-     * @memberof Trace
      */
     children?: Array<Trace>;
     /**
      * 
-     * @type {boolean}
-     * @memberof Trace
      */
     emulated?: boolean;
 }
@@ -79,11 +71,11 @@ export function TraceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tra
     };
 }
 
-  export function TraceToJSON(json: any): Trace {
-      return TraceToJSONTyped(json, false);
-  }
+export function TraceToJSON(json: any): Trace {
+    return TraceToJSONTyped(json, false);
+}
 
-  export function TraceToJSONTyped(value?: Trace | null, ignoreDiscriminator: boolean = false): any {
+export function TraceToJSONTyped(value?: Trace | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

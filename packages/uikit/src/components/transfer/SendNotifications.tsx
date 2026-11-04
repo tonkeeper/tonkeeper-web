@@ -52,6 +52,8 @@ import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
 import { useAnalyticsTrack } from '../../hooks/analytics';
+import { TransferInitiatedBy, useAnalyticsAssetId } from '../../hooks/analytics/events-hooks';
+import { SendFrom, transferSendFrom } from '../../hooks/analytics/send';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
@@ -67,13 +69,16 @@ const SendContent: FC<{
     chain?: BLOCKCHAIN_NAME;
     initRecipient?: RecipientData;
     initAmountState?: Partial<AmountState>;
-}> = ({ onClose, chain, initRecipient, initAmountState }) => {
+    initiatedBy?: TransferInitiatedBy;
+    from: SendFrom;
+}> = ({ onClose, chain, initRecipient, initAmountState, initiatedBy, from }) => {
     const sdk = useAppSdk();
     const { standalone, ios, extension } = useAppContext();
     const { t } = useTranslation();
     const { data: filter } = useJettonList();
     const isActiveAccountMultisig = useIsActiveAccountMultisig();
     const track = useAnalyticsTrack();
+    const assetId = useAnalyticsAssetId();
 
     const [view, _setView] = useState<'multisig-settings' | 'recipient' | 'amount' | 'confirm'>(
         isActiveAccountMultisig ? 'multisig-settings' : 'recipient'
@@ -97,15 +102,6 @@ const SendContent: FC<{
     const [amountViewState, setAmountViewState] = useState<Partial<AmountState> | undefined>(
         initAmountState
     );
-
-    useEffect(() => {
-        if (initRecipient) {
-            track('send_click', {
-                from: 'send_amount',
-                token: amountViewState?.assetAmount?.asset?.symbol ?? 'ton'
-            });
-        }
-    }, [initRecipient, amountViewState?.assetAmount?.asset?.symbol, track]);
 
     const availableTrc20Transfers = useTrc20TransfersNumberAvailable();
     const { onOpen: openTopUpNotification } = useTopUpTronFeeBalanceNotification();
@@ -141,19 +137,17 @@ const SendContent: FC<{
         setRight(true);
         setRecipient(data);
         setView('amount');
-        track('send_click', {
-            from: 'send_recipient',
-            token: amountViewState?.assetAmount?.asset?.symbol ?? 'ton'
-        });
     };
 
     const onConfirmAmount = (data: AmountState) => {
         setRight(true);
         setAmountViewState(data);
         setView('confirm');
-        track('send_confirm', {
-            from: 'send_amount',
-            token: amountViewState?.assetAmount?.asset?.symbol ?? 'ton'
+        track({
+            eventName: 'send_click',
+            from,
+            asset: assetId.fromAsset(data.assetAmount.asset),
+            amount: data.assetAmount.relativeAmount.toNumber()
         });
     };
 
@@ -406,6 +400,8 @@ const SendContent: FC<{
                                             amountViewState!.assetAmount as AssetAmount<TonAsset>
                                         }
                                         isMax={amountViewState!.isMax!}
+                                        initiatedBy={initiatedBy}
+                                        sendFrom={from}
                                     >
                                         <ConfirmViewTitleSlot>
                                             {status !== 'exiting' && (
@@ -449,6 +445,8 @@ const SendActionNotification = () => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
     const [transferParams, setTransferParams] = useState<InitTransferData | undefined>(undefined);
+    const [initiatedBy, setInitiatedBy] = useState<TransferInitiatedBy | undefined>(undefined);
+    const [from, setFrom] = useState<SendFrom>('wallet_screen');
     const { key: jettonsQueryKey } = useJettonList();
     const client = useQueryClient();
     const wallet = useActiveWallet();
@@ -467,11 +465,14 @@ const SendActionNotification = () => {
 
             const transfer = options.params;
             setChain(options.params.chain);
+            setInitiatedBy(transfer.origin ?? 'user');
+            const sendFrom = transferSendFrom(transfer);
+            setFrom(sendFrom);
 
             if (transfer.chain === BLOCKCHAIN_NAME.TRON) {
                 setTransferParams(makeTronTransferInitData(transfer));
                 setOpen(true);
-                track('send_open', { from: transfer.from });
+                track({ eventName: 'send_open', from: sendFrom });
                 return;
             }
 
@@ -491,7 +492,7 @@ const SendActionNotification = () => {
                 setOpen(true);
             }
 
-            track('send_open', { from: transfer.from });
+            track({ eventName: 'send_open', from: sendFrom });
         };
 
         sdk.uiEvents.on('transfer', handler);
@@ -511,10 +512,12 @@ const SendActionNotification = () => {
                 onClose={onClose}
                 chain={chain}
                 initAmountState={transferParams?.initAmountState}
+                initiatedBy={initiatedBy}
+                from={from}
                 initRecipient={transferParams?.initRecipient}
             />
         );
-    }, [transferParams, chain, onClose]);
+    }, [transferParams, chain, onClose, initiatedBy, from]);
 
     return (
         <NotificationStyled

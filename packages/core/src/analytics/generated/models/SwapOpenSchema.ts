@@ -2,8 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
- * User on WALLET screen clicked SWAP action button
+ * User opened the native swap flow
  */
 export type SwapOpenSchema = {
     eventName: string;
@@ -11,5 +12,6 @@ export type SwapOpenSchema = {
      * Type of swap implementation
      */
     type: 'native';
+    wallet_mode: WalletModeSchema;
 };
 

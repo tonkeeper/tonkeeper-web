@@ -4,7 +4,11 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonEstimation, TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 import BigNumber from 'bignumber.js';
-import { useTrackTransactionSent } from '../analytics/events-hooks';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../analytics/events-hooks';
 import { useActiveAccount } from '../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -41,6 +45,7 @@ export function useSendMultiTransfer() {
     const account = useActiveAccount();
     const client = useQueryClient();
     const trackTransactionSent = useTrackTransactionSent();
+    const assetId = useAnalyticsAssetId();
 
     const notifyError = useNotifyErrorHandle();
     const getSender = useGetSender();
@@ -72,7 +77,20 @@ export function useSendMultiTransfer() {
                 multiSendFormToTransferMessages(asset, form)
             );
 
-            trackTransactionSent(asset.id === TON_ASSET.id ? 'TonTransfer' : 'JettonTransfer');
+            // One `transaction_sent` per multi-send, carrying the total moved
+            // across all rows — the rows leave the wallet as a single batch.
+            const totalWei = form.rows.reduce(
+                (sum, row) => sum.plus(row.weiAmount),
+                new BigNumber(0)
+            );
+
+            trackTransactionSent({
+                category: 'transfer',
+                category_detail: asset.id === TON_ASSET.id ? 'coin' : 'token',
+                asset: assetId.fromAsset(asset),
+                amount: new AssetAmount({ asset, weiAmount: totalWei }).relativeAmount.toNumber(),
+                fee_asset: toAnalyticsFeeAsset(senderChoice.type)
+            });
         } catch (e) {
             await notifyError(e);
         }

@@ -1,10 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
 import { CheckmarkCircleIcon, ErrorIcon, ExclamationMarkCircleIcon } from '../Icon';
 import {
     Notification,
@@ -20,28 +18,29 @@ import { H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { MainButton, ResultButton, TransferViewHeaderBlock } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useAccountsState, useActiveAccountQuery } from '../../state/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { MultisigOrderFormView } from '../transfer/MultisigOrderFormView';
-import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
 import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderChoice,
     TonSenderChoiceUserAvailable,
-    useGetEstimationSender,
-    useGetSender,
     useTonConnectAvailableSendersChoices
 } from '../../hooks/blockchain/useSender';
-import { useToQueryKeyPart } from '../../hooks/useToQueryKeyPart';
-import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/dist/entries/send';
+import {
+    useTonConnectTransactionEstimation,
+    useTonConnectTransactionSendMutation
+} from '../../state/tonConnectTransaction';
+import { TonConnectTransactionSheet } from '../../pages/home/multichain/connect/TonConnectTransactionSheet';
 import { ActionFeeDetailsUniversal, SelectSenderDropdown } from '../activity/NotificationCommon';
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useTonConnectConfirmOperation } from '../../hooks/analytics/ton-connect';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -63,55 +62,6 @@ const ButtonRowStyled = styled.div`
         flex: 1;
     }
 `;
-
-export const useTonConnectTransactionSendMutation = (
-    params: TonConnectTransactionPayload,
-    estimate: TonEstimationDetailed | undefined,
-    options: {
-        senderChoice: SenderChoice;
-        multisigTTL?: MultisigOrderLifetimeMinutes;
-        waitInvalidation?: boolean;
-    }
-) => {
-    const account = useActiveAccount();
-    const client = useQueryClient();
-    const getSender = useGetSender();
-    const tonConnectService = useTonConnectTransactionService();
-
-    return useMutation<string, Error>(async () => {
-        if (!estimate) {
-            throw new Error('Transaction estimate is not ready');
-        }
-
-        if (account.type === 'watch-only') {
-            throw new Error('Cant use this account');
-        }
-
-        let sender: Sender;
-        if (account.type === 'ton-multisig') {
-            if (!options.multisigTTL) {
-                throw new Error('TTL must be specified for multisig sending');
-            }
-
-            sender = await getSender({
-                type: 'multisig',
-                ttlSeconds: 60 * Number(options.multisigTTL)
-            });
-        } else {
-            sender = await getSender(options.senderChoice);
-        }
-
-        const boc = await tonConnectService.send(sender, estimate, params);
-
-        const invalidationPromise = client.invalidateQueries(
-            anyOfKeysParts(account.id, account.activeTonWallet.id)
-        );
-        if (options.waitInvalidation) {
-            await invalidationPromise;
-        }
-        return boc;
-    });
-};
 
 const NotificationSkeleton: FC<{
     handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
@@ -175,7 +125,8 @@ const TonTransactionContent: FC<{
     handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
     waitInvalidation?: boolean;
     multisigTTL?: MultisigOrderLifetimeMinutes;
-}> = ({ params, handleClose, waitInvalidation, multisigTTL }) => {
+    walletId?: WalletId;
+}> = ({ params, handleClose, waitInvalidation, multisigTTL, walletId }) => {
     const sdk = useAppSdk();
 
     const { t } = useTranslation();
@@ -233,15 +184,20 @@ const TonTransactionContent: FC<{
     } = useTonConnectTransactionSendMutation(params, estimate, {
         multisigTTL,
         waitInvalidation,
-        senderChoice
+        senderChoice,
+        walletId
     });
+    const confirmOperation = useTonConnectConfirmOperation('sendTransaction');
 
     const onSubmit = async () => {
+        confirmOperation.start();
         try {
             const result = await mutateAsync();
+            confirmOperation.succeed();
             sdk.hapticNotification('success');
             setTimeout(() => handleClose({ boc: result, senderChoice }), 300);
         } catch (e) {
+            confirmOperation.fail(e);
             sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
             console.error(e);
@@ -323,50 +279,6 @@ const TonTransactionContent: FC<{
     );
 };
 
-export const useTonConnectTransactionEstimation = (
-    params: TonConnectTransactionPayload,
-    senderChoice: SenderChoice,
-    options: { multisigTTL?: MultisigOrderLifetimeMinutes; paramsLoading?: boolean }
-) => {
-    const account = useActiveAccount();
-    const accounts = useAccountsState();
-
-    const senderChoiceComputed = useMemo(() => {
-        if (account.type === 'ton-multisig') {
-            return {
-                type: 'multisig' as const,
-                ttlSeconds: 60 * Number(options?.multisigTTL ?? '60')
-            };
-        }
-
-        return senderChoice;
-    }, [senderChoice, options?.multisigTTL, account.type]);
-
-    const getSender = useGetEstimationSender(senderChoiceComputed);
-    const getSenderKey = useToQueryKeyPart(getSender);
-    const tonConenctService = useTonConnectTransactionService();
-
-    return useQuery<TonEstimationDetailed, Error>(
-        [QueryKey.estimate, params, account, accounts, getSenderKey],
-        async () => {
-            if (account.type === 'watch-only') {
-                throw new Error('Cant use this account');
-            }
-
-            const sender = await getSender!();
-
-            const result = await tonConenctService.estimate(sender, params);
-
-            if (!isTonEstimationDetailed(result)) {
-                throw new Error("Can't get estimation details");
-            }
-
-            return result;
-        },
-        { enabled: !!getSender && options?.paramsLoading !== true }
-    );
-};
-
 const NotificationTitleRowStyled = styled(NotificationTitleRow)`
     align-items: flex-start;
 `;
@@ -388,11 +300,29 @@ const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose 
     );
 };
 
-export const TonTransactionNotification: FC<{
+export interface TonTransactionNotificationProps {
     params: TonConnectTransactionPayload | null;
     handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
     waitInvalidation?: boolean;
-}> = ({ params, handleClose, waitInvalidation }) => {
+    walletId?: WalletId;
+    /** Page or manifest URL of the requesting dApp. */
+    dappUrl?: string;
+}
+
+export const TonTransactionNotification: FC<TonTransactionNotificationProps> = props => {
+    const { data: activeAccount } = useActiveAccountQuery();
+    if (activeAccount?.type === 'multichain') {
+        return <TonConnectTransactionSheet {...props} />;
+    }
+    return <LegacyTonTransactionNotification {...props} />;
+};
+
+const LegacyTonTransactionNotification: FC<TonTransactionNotificationProps> = ({
+    params,
+    handleClose,
+    waitInvalidation,
+    walletId
+}) => {
     const { t } = useTranslation();
     // This modal is mounted eagerly by ModalsRoot, so it can render before the
     // accounts query resolves; `useAccountsState()` returns undefined until then.
@@ -437,6 +367,7 @@ export const TonTransactionNotification: FC<{
                     handleClose={boc => (params != null ? onClose(boc) : undefined)}
                     waitInvalidation={waitInvalidation}
                     multisigTTL={multisigTTL}
+                    walletId={walletId}
                 />
             </>
         );
@@ -448,7 +379,8 @@ export const TonTransactionNotification: FC<{
         multisigTTL,
         setMultisigTTL,
         t,
-        waitInvalidation
+        waitInvalidation,
+        walletId
     ]);
 
     return (

@@ -4,6 +4,11 @@ import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
 import { useActiveApi, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../analytics/events-hooks';
 
 import { useNotifyErrorHandle } from '../../useNotification';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
@@ -19,6 +24,8 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
     const getSender = useGetSender();
     const notifyError = useNotifyErrorHandle();
     const api = useActiveApi();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -37,6 +44,14 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
                 zeroFeeEstimation,
                 message
             );
+
+            trackTransactionSent({
+                category: 'call',
+                category_detail: 'multisig',
+                asset: assetId.tonCoin(),
+                amount: 0,
+                fee_asset: toAnalyticsFeeAsset(EXTERNAL_SENDER_CHOICE.type)
+            });
 
             await invalidateAccountQueries();
             return true;

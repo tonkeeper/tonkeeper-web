@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface ApplyPromoRequest {
     /**
      * 
-     * @type {string}
-     * @memberof ApplyPromoRequest
      */
     publicKey: string;
     /**
      * 
-     * @type {string}
-     * @memberof ApplyPromoRequest
      */
     promoCode: string;
 }
@@ -37,8 +33,8 @@ export interface ApplyPromoRequest {
  * Check if a given object implements the ApplyPromoRequest interface.
  */
 export function instanceOfApplyPromoRequest(value: object): value is ApplyPromoRequest {
-    if (!('publicKey' in value) || value['publicKey'] === undefined) return false;
-    if (!('promoCode' in value) || value['promoCode'] === undefined) return false;
+    if ((!('publicKey' in (value as Record<string, any>)) && !('public_key' in (value as Record<string, any>))) || ((value as Record<string, any>)['publicKey'] === undefined && (value as Record<string, any>)['public_key'] === undefined)) return false;
+    if ((!('promoCode' in (value as Record<string, any>)) && !('promo_code' in (value as Record<string, any>))) || ((value as Record<string, any>)['promoCode'] === undefined && (value as Record<string, any>)['promo_code'] === undefined)) return false;
     return true;
 }
 
@@ -57,11 +53,11 @@ export function ApplyPromoRequestFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function ApplyPromoRequestToJSON(json: any): ApplyPromoRequest {
-      return ApplyPromoRequestToJSONTyped(json, false);
-  }
+export function ApplyPromoRequestToJSON(json: any): ApplyPromoRequest {
+    return ApplyPromoRequestToJSONTyped(json, false);
+}
 
-  export function ApplyPromoRequestToJSONTyped(value?: ApplyPromoRequest | null, ignoreDiscriminator: boolean = false): any {
+export function ApplyPromoRequestToJSONTyped(value?: ApplyPromoRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

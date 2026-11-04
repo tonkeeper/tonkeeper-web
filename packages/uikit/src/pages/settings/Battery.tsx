@@ -17,13 +17,17 @@ import {
     useCanSeeBattery,
     useProvideBatteryAuth
 } from '../../state/battery';
-import { GearIconEmpty, SpinnerRing } from '../../components/Icon';
+import { GearIconEmpty } from '../../components/Icon';
+import { Loader } from '../../components/Loader';
 import { BuyBatteryMethods } from '../../components/settings/battery/BuyBatteryMethods';
 import { BatterySettingsNotification } from '../../components/settings/battery/BatterySettingsNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useTranslation } from '../../hooks/translation';
 import { fallbackRenderOver } from '../../components/Error';
-import { IconButton, IconButtonTransparentBackground } from '../../components/fields/IconButton';
+import {
+    LegacyIconButton,
+    IconButtonTransparentBackground
+} from '../../components/fields/IconButton';
 import { useAppSdk } from '../../hooks/appSdk';
 import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -71,7 +75,7 @@ const SettingsButton = styled(IconButtonTransparentBackground)`
     padding-right: 1rem;
 `;
 
-const SettingsButtonMobile = styled(IconButton)`
+const SettingsButtonMobile = styled(LegacyIconButton)`
     position: absolute;
     right: 16px;
     width: 32px;
@@ -170,7 +174,7 @@ export const BatteryPageContent: FC = () => {
     if (!data) {
         return (
             <SpinnerWrapper>
-                <SpinnerRing />
+                <Loader size="small" className="text-iconSecondary" />
             </SpinnerWrapper>
         );
     }

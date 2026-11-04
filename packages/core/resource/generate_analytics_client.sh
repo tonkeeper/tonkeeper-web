@@ -1,6 +1,11 @@
 #!/bin/sh
 # Regenerates the analytics event types from tonkeeper/analytics-schemas.
 #
+# Set ANALYTICS_SCHEMAS_BRANCH to generate against a schema branch that hasn't
+# been merged yet, e.g. to try a proposed event out in the client before review:
+#
+#   ANALYTICS_SCHEMAS_BRANCH=my-branch yarn generate:analytics
+#
 # Pipeline:
 #   1. clone the private analytics-schemas repo to a temp dir using $GITHUB_TOKEN
 #   2. patch broken local $refs (see preprocess-analytics-schemas.js)
@@ -31,12 +36,14 @@ fi
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-git clone --depth 1 \
+git clone --depth 1 --branch "${ANALYTICS_SCHEMAS_BRANCH:-main}" \
     "https://x-oauth-basic:${GITHUB_TOKEN}@github.com/tonkeeper/analytics-schemas.git" \
     "$TMP/schemas" >/dev/null 2>&1
 
+SCHEMAS_DIR="$TMP/schemas/openapi-client"
+
 node "$SCRIPT_DIR/preprocess-analytics-schemas.js" \
-    "$TMP/schemas/openapi-client" \
+    "$SCHEMAS_DIR" \
     "$TMP/preprocessed"
 
 npx @redocly/cli bundle \
@@ -53,7 +60,7 @@ npx openapi-typescript-codegen \
 node "$SCRIPT_DIR/prune-redundant-aliases.js" "$GENERATED_DIR"
 
 node "$SCRIPT_DIR/generate-analytics-wrapper.js" \
-    "$TMP/schemas/openapi-client" \
+    "$SCHEMAS_DIR" \
     "$WRAPPER_OUT"
 
 echo "analytics types regenerated: $GENERATED_DIR + $WRAPPER_OUT"

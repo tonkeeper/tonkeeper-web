@@ -11,7 +11,7 @@ import {
 } from '../../entries/tonConnect';
 import { SessionCrypto } from './protocol';
 import { AccountConnectionHttp } from './connectionService';
-import { removeLastSlash } from '../../utils/url';
+import { joinUrl } from '../../utils/url';
 
 const defaultTtl = 300;
 
@@ -29,7 +29,7 @@ export const sendEventToBridge = async <T extends RpcMethod>({
     bridgeEndpoint: string;
 }) => {
     const sessionCrypto = new SessionCrypto(sessionKeyPair);
-    const url = `${removeLastSlash(bridgeEndpoint)}/bridge/message?client_id=${
+    const url = `${joinUrl(bridgeEndpoint, '/bridge/message')}?client_id=${
         sessionCrypto.sessionId
     }&to=${clientSessionId}&ttl=${ttl}`;
 
@@ -79,7 +79,7 @@ export const subscribeTonConnect = ({
         .map(item => new SessionCrypto(item.sessionKeyPair).sessionId)
         .join(',');
 
-    let url = `${removeLastSlash(bridgeEndpoint)}/bridge/events?client_id=${walletSessionIds}`;
+    let url = `${joinUrl(bridgeEndpoint, '/bridge/events')}?client_id=${walletSessionIds}`;
 
     if (lastEventId) {
         url += `&last_event_id=${lastEventId}`;

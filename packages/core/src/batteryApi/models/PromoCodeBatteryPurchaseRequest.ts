@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface PromoCodeBatteryPurchaseRequest {
     /**
      * 
-     * @type {string}
-     * @memberof PromoCodeBatteryPurchaseRequest
      */
     promoCode: string;
 }
@@ -31,7 +29,7 @@ export interface PromoCodeBatteryPurchaseRequest {
  * Check if a given object implements the PromoCodeBatteryPurchaseRequest interface.
  */
 export function instanceOfPromoCodeBatteryPurchaseRequest(value: object): value is PromoCodeBatteryPurchaseRequest {
-    if (!('promoCode' in value) || value['promoCode'] === undefined) return false;
+    if ((!('promoCode' in (value as Record<string, any>)) && !('promo_code' in (value as Record<string, any>))) || ((value as Record<string, any>)['promoCode'] === undefined && (value as Record<string, any>)['promo_code'] === undefined)) return false;
     return true;
 }
 
@@ -49,11 +47,11 @@ export function PromoCodeBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDi
     };
 }
 
-  export function PromoCodeBatteryPurchaseRequestToJSON(json: any): PromoCodeBatteryPurchaseRequest {
-      return PromoCodeBatteryPurchaseRequestToJSONTyped(json, false);
-  }
+export function PromoCodeBatteryPurchaseRequestToJSON(json: any): PromoCodeBatteryPurchaseRequest {
+    return PromoCodeBatteryPurchaseRequestToJSONTyped(json, false);
+}
 
-  export function PromoCodeBatteryPurchaseRequestToJSONTyped(value?: PromoCodeBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
+export function PromoCodeBatteryPurchaseRequestToJSONTyped(value?: PromoCodeBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

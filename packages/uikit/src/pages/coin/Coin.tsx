@@ -4,6 +4,7 @@ import { JettonContent } from './Jetton';
 import { TonPage } from './Ton';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronUsdtContent } from './TronUsdt';
+import { useTrackCoinRouteAssetView } from '../../hooks/analytics/asset-view';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -15,6 +16,8 @@ const CoinPage = () => {
     const navigate = useNavigate();
     const { name } = useParams();
     const canUseTron = useCanReceiveTron();
+
+    useTrackCoinRouteAssetView(name);
 
     useEffect(() => {
         if (!name) {

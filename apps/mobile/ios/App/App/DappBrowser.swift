@@ -435,9 +435,10 @@ class TabRateLimiter {
 extension DappBrowserPlugin: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard message.name == "browserMessages",
+              let webView = message.webView,
+              let origin = trustedFrameOrigin(of: message, in: webView),
               let body = message.body as? [String: Any],
-              let type = body["type"] as? String,
-              let webView = message.webView else {
+              let type = body["type"] as? String else {
             return
         }
 
@@ -454,16 +455,30 @@ extension DappBrowserPlugin: WKScriptMessageHandler {
             return
         }
 
-        webView.evaluateJavaScript("window.location.origin") { result, error in
-            let origin = (result as? String) ?? "unknown"
+        self.notifyListeners("browserMessageReceived", data: [
+            "webViewId": webViewId,
+            "queryId": queryId,
+            "payload": payload,
+            "webViewOrigin": origin
+        ])
+    }
 
-            self.notifyListeners("browserMessageReceived", data: [
-                "webViewId": webViewId,
-                "queryId": queryId,
-                "payload": payload,
-                "webViewOrigin": origin
-            ])
+    private func trustedFrameOrigin(of message: WKScriptMessage, in webView: WKWebView) -> String? {
+        let frame = message.frameInfo
+        guard frame.isMainFrame,
+              let frameHost = frame.request.url?.host,
+              frameHost == webView.url?.host else {
+            return nil
         }
+
+        let securityOrigin = frame.securityOrigin
+        guard !securityOrigin.protocol.isEmpty,
+              !securityOrigin.host.isEmpty else {
+            return nil
+        }
+
+        let port = securityOrigin.port == 0 ? "" : ":\(securityOrigin.port)"
+        return "\(securityOrigin.protocol)://\(securityOrigin.host)\(port)"
     }
 }
 

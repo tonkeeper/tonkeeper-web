@@ -8,7 +8,6 @@ import { App } from '@capacitor/app';
 import { isSignerLink } from '@tonkeeper/uikit/dist/state/signer';
 import { atom, replaySubject } from '@tonkeeper/core/dist/entries/atom';
 import { capacitorStorage } from '../appSdk';
-import packageJson from '../../../package.json';
 
 const tonConnectDisconnect$ = replaySubject<AccountConnection>('all');
 const tonConnectRequest$ = replaySubject<TonConnectAppRequestPayload>('all');
@@ -25,7 +24,7 @@ export const tonConnectSSE = new TonConnectSSE({
     bridgeEndpointFetcher: createBridgeEndpointFetcher({
         platform: 'pro_mobile_ios',
         // Temporary: match appSdk — strip semver pre-release suffix from `build`.
-        build: packageJson.version.replace(/[-+].*$/, ''),
+        build: __APP_VERSION__.replace(/[-+].*$/, ''),
         onError: e => console.error(e)
     })
 });
@@ -45,17 +44,25 @@ export const subscribeToSignerResponse = (listener: (value: { signatureHex: stri
     return signerResponse$.subscribe(listener);
 };
 
-const tonLink$ = atom<string | undefined>(undefined);
+const tonLink$ = atom<{ url: string; isColdStart: boolean } | undefined>(undefined);
 const signerLink$ = atom<string | undefined>(undefined);
 const filterNotEmpty = (callback: (value: string) => void) => (val: string | undefined) =>
     val !== undefined && callback(val);
 
-export const subscribeToTonOrTonConnectUrlOpened = (listener: (url: string) => void) => {
-    if (tonLink$.value !== undefined) {
-        listener(tonLink$.value);
-    }
-    return tonLink$.subscribe(filterNotEmpty(listener));
+export const subscribeToTonOrTonConnectUrlOpened = (
+    listener: (url: string, isColdStart: boolean) => void
+) => {
+    const notify = (link: typeof tonLink$.value) =>
+        link !== undefined && listener(link.url, link.isColdStart);
+    notify(tonLink$.value);
+    return tonLink$.subscribe(notify);
 };
+
+/**
+ * Opening a link from another app moves this one to the background first, so a
+ * link that arrives before the app has ever been backgrounded launched it.
+ */
+let hasBeenBackgrounded = false;
 
 export const subscribeToSignerUrlOpened = (listener: (url: string) => void) => {
     if (signerLink$.value !== undefined) {
@@ -81,7 +88,7 @@ App.addListener('appUrlOpen', ({ url }) => {
         } else if (signerSignResponse) {
             signerResponse$.next({ signatureHex: signerSignResponse });
         } else {
-            tonLink$.next(url);
+            tonLink$.next({ url, isColdStart: !hasBeenBackgrounded });
         }
     }
 });
@@ -90,6 +97,7 @@ App.addListener('appStateChange', async ({ isActive }) => {
     if (isActive) {
         tonConnectSSE.reconnect();
     } else {
+        hasBeenBackgrounded = true;
         tonConnectSSE.destroy();
     }
 });

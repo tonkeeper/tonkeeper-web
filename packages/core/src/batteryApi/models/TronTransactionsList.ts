@@ -29,8 +29,6 @@ import {
 export interface TronTransactionsList {
     /**
      * 
-     * @type {Array<TronTransactionsListTransactionsInner>}
-     * @memberof TronTransactionsList
      */
     transactions: Array<TronTransactionsListTransactionsInner>;
 }
@@ -57,11 +55,11 @@ export function TronTransactionsListFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function TronTransactionsListToJSON(json: any): TronTransactionsList {
-      return TronTransactionsListToJSONTyped(json, false);
-  }
+export function TronTransactionsListToJSON(json: any): TronTransactionsList {
+    return TronTransactionsListToJSONTyped(json, false);
+}
 
-  export function TronTransactionsListToJSONTyped(value?: TronTransactionsList | null, ignoreDiscriminator: boolean = false): any {
+export function TronTransactionsListToJSONTyped(value?: TronTransactionsList | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

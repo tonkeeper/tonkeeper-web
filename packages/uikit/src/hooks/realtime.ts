@@ -25,6 +25,13 @@ export const useRealtimeUpdatesInvalidation = () => {
         if (!apiKey || !activeTonWalletAddress) {
             return;
         }
+        // Skip the TON-side SSE stream for multichain accounts. The
+        // multichain home reads through `useMultichainWalletAssets`,
+        // not the TON-only `QueryKey.wallet`/`QueryKey.account` caches
+        // this invalidator targets, so the connection is wasted work.
+        if (activeAccount?.type === 'multichain') {
+            return;
+        }
 
         const url = new URL(apiPath);
         url.searchParams.append('accounts', activeTonWalletAddress);
@@ -56,5 +63,5 @@ export const useRealtimeUpdatesInvalidation = () => {
         return () => {
             sse.close();
         };
-    }, [activeTonWalletAddress, apiPath, apiKey, client]);
+    }, [activeAccount?.type, activeTonWalletAddress, apiPath, apiKey, client]);
 };

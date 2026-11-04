@@ -1,7 +1,8 @@
 import BigNumber from 'bignumber.js';
 import { BRAND_CONFIG } from '../config/brand';
 import { JettonsBalances } from '../tonApiV2';
-import { getBrowserLocale, getDecimalSeparator, getGroupSeparator } from './formatting';
+import { getDecimalSeparator, getGroupSeparator } from './formatting';
+import { getNumberLocale } from './numberFormat';
 
 export const DefaultDecimals = 9;
 
@@ -39,7 +40,7 @@ export function getDecimalLength(str: string) {
 
 function formatEntryAndTail(entry: string, tail: string | undefined) {
     const path = [] as string[];
-    path.push(new Intl.NumberFormat(getBrowserLocale()).format(parseInt(entry)));
+    path.push(new Intl.NumberFormat(getNumberLocale()).format(parseInt(entry)));
     if (tail !== undefined) {
         path.push(tail);
     }
@@ -57,7 +58,7 @@ export function formatSendValue(str: string) {
 
 export const getJettonSymbol = (address: string, jettons: JettonsBalances): string => {
     if (address === 'TON') {
-        return BRAND_CONFIG.coinSymbolWithEx;
+        return BRAND_CONFIG.coinSymbol;
     }
     const jetton = jettons.balances.find(item => item.jetton.address === address);
     return jetton?.jetton.symbol ?? address;

@@ -21,15 +21,11 @@ import { mapValues } from '../runtime';
 export interface RequestRefundRequest {
     /**
      * 
-     * @type {number}
-     * @memberof RequestRefundRequest
      * @deprecated
      */
     userPurchaseId?: number;
     /**
      * 
-     * @type {number}
-     * @memberof RequestRefundRequest
      */
     purchaseId?: number;
 }
@@ -56,11 +52,11 @@ export function RequestRefundRequestFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function RequestRefundRequestToJSON(json: any): RequestRefundRequest {
-      return RequestRefundRequestToJSONTyped(json, false);
-  }
+export function RequestRefundRequestToJSON(json: any): RequestRefundRequest {
+    return RequestRefundRequestToJSONTyped(json, false);
+}
 
-  export function RequestRefundRequestToJSONTyped(value?: RequestRefundRequest | null, ignoreDiscriminator: boolean = false): any {
+export function RequestRefundRequestToJSONTyped(value?: RequestRefundRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface ConfigGasProxyInner {
     /**
      * 
-     * @type {string}
-     * @memberof ConfigGasProxyInner
      */
     address: string;
 }
@@ -49,11 +47,11 @@ export function ConfigGasProxyInnerFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function ConfigGasProxyInnerToJSON(json: any): ConfigGasProxyInner {
-      return ConfigGasProxyInnerToJSONTyped(json, false);
-  }
+export function ConfigGasProxyInnerToJSON(json: any): ConfigGasProxyInner {
+    return ConfigGasProxyInnerToJSONTyped(json, false);
+}
 
-  export function ConfigGasProxyInnerToJSONTyped(value?: ConfigGasProxyInner | null, ignoreDiscriminator: boolean = false): any {
+export function ConfigGasProxyInnerToJSONTyped(value?: ConfigGasProxyInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

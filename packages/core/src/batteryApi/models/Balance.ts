@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface Balance {
     /**
      * 
-     * @type {string}
-     * @memberof Balance
      */
     balance: string;
     /**
      * reserved amount in units (TON/USD)
-     * @type {string}
-     * @memberof Balance
      */
     reserved: string;
     /**
      * 
-     * @type {string}
-     * @memberof Balance
      */
     units: BalanceUnitsEnum;
 }
@@ -45,7 +39,7 @@ export interface Balance {
  */
 export const BalanceUnitsEnum = {
     Usd: 'usd',
-    Ton: 'ton'
+    Ton: 'ton',
 } as const;
 export type BalanceUnitsEnum = typeof BalanceUnitsEnum[keyof typeof BalanceUnitsEnum];
 
@@ -76,11 +70,11 @@ export function BalanceFromJSONTyped(json: any, ignoreDiscriminator: boolean): B
     };
 }
 
-  export function BalanceToJSON(json: any): Balance {
-      return BalanceToJSONTyped(json, false);
-  }
+export function BalanceToJSON(json: any): Balance {
+    return BalanceToJSONTyped(json, false);
+}
 
-  export function BalanceToJSONTyped(value?: Balance | null, ignoreDiscriminator: boolean = false): any {
+export function BalanceToJSONTyped(value?: Balance | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

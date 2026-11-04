@@ -68,7 +68,7 @@ export const useAnalytics = (
 
             tracker.init({
                 application: 'Desktop',
-                walletType: toWalletType(activeAccount.activeTonWallet),
+                walletType: toWalletType(activeAccount?.activeTonWallet),
                 activeAccount,
                 accounts,
                 network,

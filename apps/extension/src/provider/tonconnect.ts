@@ -20,7 +20,6 @@ import {
     tonConnectTonkeeperAppName,
     tonConnectTonkeeperWalletInfo
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import packageJson from '../../package.json';
 import { tonConnectProtocolVersion } from '../constants';
 
 const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
@@ -43,7 +42,7 @@ export class ExtensionTonConnectInjectedBridge implements ITonConnectInjectedBri
 
     deviceInfo = getDeviceInfo(
         getTonConnectPlatform('extension'),
-        packageJson.version,
+        __APP_VERSION__,
         255,
         tonConnectTonkeeperAppName
     );

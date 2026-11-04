@@ -99,10 +99,13 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
         return transport;
     });
 
+    // Keyed on `mutation.reset`, not `mutation`: the result object is new every
+    // render, and callers run `reset` from mount effects that would re-fire forever.
+    const { reset: resetMutation } = mutation;
     const reset = useCallback(() => {
         setIsDeviceConnected(false);
-        mutation.reset();
-    }, [mutation]);
+        resetMutation();
+    }, [resetMutation]);
 
     return {
         ...mutation,

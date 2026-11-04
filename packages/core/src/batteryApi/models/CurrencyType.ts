@@ -21,7 +21,7 @@ export const CurrencyType = {
     Native: 'native',
     ExtraCurrency: 'extra_currency',
     Jetton: 'jetton',
-    Fiat: 'fiat'
+    Fiat: 'fiat',
 } as const;
 export type CurrencyType = typeof CurrencyType[keyof typeof CurrencyType];
 

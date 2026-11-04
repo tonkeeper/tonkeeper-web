@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface EstimatedTronTxInstantFeeAcceptedAssetsInner {
     /**
      * 
-     * @type {string}
-     * @memberof EstimatedTronTxInstantFeeAcceptedAssetsInner
      */
     type: EstimatedTronTxInstantFeeAcceptedAssetsInnerTypeEnum;
     /**
      * 
-     * @type {string}
-     * @memberof EstimatedTronTxInstantFeeAcceptedAssetsInner
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof EstimatedTronTxInstantFeeAcceptedAssetsInner
      */
     jettonMasterId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof EstimatedTronTxInstantFeeAcceptedAssetsInner
      */
     amountNano: string;
     /**
      * 
-     * @type {number}
-     * @memberof EstimatedTronTxInstantFeeAcceptedAssetsInner
      */
     decimals: number;
 }
@@ -57,7 +47,7 @@ export interface EstimatedTronTxInstantFeeAcceptedAssetsInner {
  */
 export const EstimatedTronTxInstantFeeAcceptedAssetsInnerTypeEnum = {
     Jetton: 'jetton',
-    Ton: 'ton'
+    Ton: 'ton',
 } as const;
 export type EstimatedTronTxInstantFeeAcceptedAssetsInnerTypeEnum = typeof EstimatedTronTxInstantFeeAcceptedAssetsInnerTypeEnum[keyof typeof EstimatedTronTxInstantFeeAcceptedAssetsInnerTypeEnum];
 
@@ -68,7 +58,7 @@ export type EstimatedTronTxInstantFeeAcceptedAssetsInnerTypeEnum = typeof Estima
 export function instanceOfEstimatedTronTxInstantFeeAcceptedAssetsInner(value: object): value is EstimatedTronTxInstantFeeAcceptedAssetsInner {
     if (!('type' in value) || value['type'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
-    if (!('amountNano' in value) || value['amountNano'] === undefined) return false;
+    if ((!('amountNano' in (value as Record<string, any>)) && !('amount_nano' in (value as Record<string, any>))) || ((value as Record<string, any>)['amountNano'] === undefined && (value as Record<string, any>)['amount_nano'] === undefined)) return false;
     if (!('decimals' in value) || value['decimals'] === undefined) return false;
     return true;
 }
@@ -91,11 +81,11 @@ export function EstimatedTronTxInstantFeeAcceptedAssetsInnerFromJSONTyped(json: 
     };
 }
 
-  export function EstimatedTronTxInstantFeeAcceptedAssetsInnerToJSON(json: any): EstimatedTronTxInstantFeeAcceptedAssetsInner {
-      return EstimatedTronTxInstantFeeAcceptedAssetsInnerToJSONTyped(json, false);
-  }
+export function EstimatedTronTxInstantFeeAcceptedAssetsInnerToJSON(json: any): EstimatedTronTxInstantFeeAcceptedAssetsInner {
+    return EstimatedTronTxInstantFeeAcceptedAssetsInnerToJSONTyped(json, false);
+}
 
-  export function EstimatedTronTxInstantFeeAcceptedAssetsInnerToJSONTyped(value?: EstimatedTronTxInstantFeeAcceptedAssetsInner | null, ignoreDiscriminator: boolean = false): any {
+export function EstimatedTronTxInstantFeeAcceptedAssetsInnerToJSONTyped(value?: EstimatedTronTxInstantFeeAcceptedAssetsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

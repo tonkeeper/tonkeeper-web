@@ -19,6 +19,7 @@ import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 import { useApplySwapDeeplinkParams } from '../../hooks/deeplinks/useSwapDeeplink';
+import { useTrackSwapOpen } from '../../hooks/analytics/swap';
 
 const HeaderButtons = styled.div`
     margin-left: auto;
@@ -54,6 +55,7 @@ const DesktopSwapPageContent = () => {
 
     useSwapStreamEffect();
     useApplySwapDeeplinkParams();
+    useTrackSwapOpen(isSwapsEnabled);
 
     if (!isSwapsEnabled) {
         sdk.openPage(swapLink);

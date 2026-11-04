@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface EstimateGaslessCostRequest {
     /**
      * 
-     * @type {boolean}
-     * @memberof EstimateGaslessCostRequest
      */
     battery?: boolean;
     /**
      * 
-     * @type {string}
-     * @memberof EstimateGaslessCostRequest
      */
     payload: string;
 }
@@ -56,11 +52,11 @@ export function EstimateGaslessCostRequestFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-  export function EstimateGaslessCostRequestToJSON(json: any): EstimateGaslessCostRequest {
-      return EstimateGaslessCostRequestToJSONTyped(json, false);
-  }
+export function EstimateGaslessCostRequestToJSON(json: any): EstimateGaslessCostRequest {
+    return EstimateGaslessCostRequestToJSONTyped(json, false);
+}
 
-  export function EstimateGaslessCostRequestToJSONTyped(value?: EstimateGaslessCostRequest | null, ignoreDiscriminator: boolean = false): any {
+export function EstimateGaslessCostRequestToJSONTyped(value?: EstimateGaslessCostRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

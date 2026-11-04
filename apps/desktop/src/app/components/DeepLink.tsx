@@ -9,6 +9,7 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
+import { useTrackDeeplinkOpen } from '@tonkeeper/uikit/dist/hooks/analytics/deeplink-open';
 
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
@@ -16,6 +17,7 @@ export const DeepLinkSubscription = () => {
     const { mutateAsync, reset } = useDeeplinkHandlers({ withBattery: true });
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useCompleteHttpConnection();
+    const trackDeeplinkOpen = useTrackDeeplinkOpen();
 
     const handlerClose = async (
         result:
@@ -39,11 +41,12 @@ export const DeepLinkSubscription = () => {
     };
 
     useEffect(() => {
-        window.backgroundApi.onTonConnect(async (url: string) => {
+        window.backgroundApi.onTonConnect(async (url: string, isColdStart: boolean) => {
+            trackDeeplinkOpen(url, isColdStart);
             reset();
             setParams(await mutateAsync(url));
         });
-    }, [mutateAsync, reset]);
+    }, [mutateAsync, reset, trackDeeplinkOpen]);
 
     return (
         <TonConnectNotification

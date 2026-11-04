@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface BatteryCharged {
     /**
      * 
-     * @type {boolean}
-     * @memberof BatteryCharged
      */
     batteryCharged: boolean;
 }
@@ -31,7 +29,7 @@ export interface BatteryCharged {
  * Check if a given object implements the BatteryCharged interface.
  */
 export function instanceOfBatteryCharged(value: object): value is BatteryCharged {
-    if (!('batteryCharged' in value) || value['batteryCharged'] === undefined) return false;
+    if ((!('batteryCharged' in (value as Record<string, any>)) && !('battery_charged' in (value as Record<string, any>))) || ((value as Record<string, any>)['batteryCharged'] === undefined && (value as Record<string, any>)['battery_charged'] === undefined)) return false;
     return true;
 }
 
@@ -49,11 +47,11 @@ export function BatteryChargedFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function BatteryChargedToJSON(json: any): BatteryCharged {
-      return BatteryChargedToJSONTyped(json, false);
-  }
+export function BatteryChargedToJSON(json: any): BatteryCharged {
+    return BatteryChargedToJSONTyped(json, false);
+}
 
-  export function BatteryChargedToJSONTyped(value?: BatteryCharged | null, ignoreDiscriminator: boolean = false): any {
+export function BatteryChargedToJSONTyped(value?: BatteryCharged | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

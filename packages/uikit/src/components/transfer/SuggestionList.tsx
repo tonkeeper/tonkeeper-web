@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { intlLocale } from '@tonkeeper/core/dist/entries/language';
+import { intlDateLocale } from '@tonkeeper/core/dist/entries/language';
 import {
     FavoriteSuggestion,
     LatestSuggestion,
@@ -62,7 +62,7 @@ const IconBlue = styled.span`
 `;
 
 const getLatestDate = (language: string, timestamp: number) => {
-    return new Intl.DateTimeFormat(intlLocale(language), {
+    return new Intl.DateTimeFormat(intlDateLocale(language), {
         day: 'numeric',
         month: 'long'
     }).format(new Date(timestamp));
@@ -181,7 +181,7 @@ const LatestItem: FC<{
             <ListItemPayload>
                 <ColumnText
                     text={toShortValue(address)}
-                    secondary={getLatestDate(intlLocale(i18n.language), item.timestamp)}
+                    secondary={getLatestDate(i18n.language, item.timestamp)}
                 />
                 <DropDown
                     payload={onClose => (

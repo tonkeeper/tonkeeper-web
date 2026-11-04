@@ -17,6 +17,7 @@ import React, { FC, useMemo } from 'react';
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { PencilIcon, PinIconOutline, PlusIconSmall, UnpinIconOutline } from '../../components/Icon';
 import { Button } from '../../components/fields/Button';
@@ -31,10 +32,9 @@ import { styled } from 'styled-components';
 import { Dot } from '../../components/Dot';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
+import { useAddWalletFlow } from '../../components/modals/AddWalletFlow';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
-import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
-import { Address } from '@ton/core';
+import { DEFAULT_WALLET_EMOJI } from '@tonkeeper/core/dist/utils/emojis';
 import { AppRoute } from '../../libs/routes';
 import {
     AccountTonMultisig,
@@ -58,7 +58,7 @@ export const DesktopManageMultisigsPage = () => {
     const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const isActiveAccountMultisigManagable = isAccountCanManageMultisigs(activeAccount);
-    const { onOpen: addWallet } = useAddWalletNotification();
+    const { onOpen: addWallet } = useAddWalletFlow();
 
     if (!isActiveAccountMultisigManagable) {
         return <Navigate to={AppRoute.home} />;
@@ -159,9 +159,7 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                 | undefined;
             const name =
                 existingAccount?.name || 'Multisig ' + toShortValue(formatAddress(m.address));
-            const emoji =
-                existingAccount?.emoji ||
-                getFallbackAccountEmoji(Address.parse(m.address).hash.toString('hex'));
+            const emoji = existingAccount?.emoji || DEFAULT_WALLET_EMOJI;
 
             return {
                 address: m.address,
@@ -233,7 +231,7 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                             <Body3>
                                 {toShortValue(formatAddress(item.address))}
                                 <Dot />
-                                {toFormattedTonBalance(item.balance)}&nbsp;TON
+                                {toFormattedTonBalance(item.balance)}&nbsp;{BRAND_CONFIG.coinSymbol}
                             </Body3>
                         </TextContainer>
 
@@ -292,7 +290,7 @@ const EmptyMultisigsPage = () => {
     const { t } = useTranslation();
     const config = useActiveConfig();
     const sdk = useAppSdk();
-    const { onOpen: addWallet } = useAddWalletNotification();
+    const { onOpen: addWallet } = useAddWalletFlow();
 
     const multisig_about_url = config.multisig_about_url;
 

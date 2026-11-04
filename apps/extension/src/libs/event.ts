@@ -6,8 +6,9 @@ import {
     TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { ProxyConfiguration } from '../entries/proxy';
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 export type PopUpEventEmitter = IEventEmitter<PupUpEvents>;
 export type BackgroundEventsEmitter = IEventEmitter<BackgroundEvents>;
@@ -25,19 +26,44 @@ export type NotificationFields<Kind extends string, Value> = {
     logo?: string;
     origin: string;
     data: Value;
-} & (Kind extends 'tonConnectRequest' | 'tonLinkIntercept' ? unknown : { manifest: DAppManifest });
+} & (Kind extends 'tonConnectRequest' | 'tonLinkIntercept' | 'evmConnectRequest' | 'evmSignRequest'
+    ? unknown
+    : {
+          manifest: DAppManifest;
+          /** The wallet the dApp connection belongs to; it signs the request. */
+          walletId: WalletId;
+      });
+
+/** Injected-EVM (window.ethereum) connect approval: the chain we present. */
+export interface EvmConnectRequestData {
+    chainId: string;
+}
+
+/** Injected-EVM signing/tx approval: the raw JSON-RPC request the popup decodes and signs. */
+export interface EvmSignRequestData {
+    method: string;
+    params: unknown[];
+    chainId: string;
+    address: string;
+    /** The account that approved the connection; it signs the request. */
+    accountId: AccountId;
+}
 
 export type NotificationData =
     | NotificationFields<'tonConnectRequest', ConnectRequest>
     | NotificationFields<'tonConnectSend', TonConnectTransactionPayload>
     | NotificationFields<'tonConnectSign', SignDataRequestPayload>
-    | NotificationFields<'tonLinkIntercept', { url: string }>;
+    | NotificationFields<'tonLinkIntercept', { url: string }>
+    | NotificationFields<'evmConnectRequest', EvmConnectRequestData>
+    | NotificationFields<'evmSignRequest', EvmSignRequestData>;
 
 export interface PupUpEvents {
     approveRequest: PayloadRequest;
     rejectRequest: number;
 
     tonConnectDisconnect: string[];
+    /** dApp origin whose injected-EVM connection the user removed in the popup. */
+    evmDisconnect: string;
 
     proxyChanged: ProxyConfiguration;
 
@@ -75,8 +101,13 @@ export interface BackgroundEvents {
     closedPopUp: number;
 
     tonConnectDisconnect: string[];
+    /** dApp origin whose injected-EVM connection the user removed in the popup. */
+    evmDisconnect: string;
 
     proxyChanged: ProxyConfiguration;
+
+    /** An injected-EVM (window.ethereum) event to push to the listed dApp origins. */
+    evmEvent: { origins: string[]; name: string; data: unknown };
 }
 
 export const RESPONSE = 'Response';

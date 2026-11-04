@@ -57,6 +57,7 @@ export class TronFreeProSender extends BaseTronSender implements ITronSender {
         } catch (e) {
             throw await this.formatBatteryError(e);
         }
+        return signedTx.txID;
     }
 
     async estimate(

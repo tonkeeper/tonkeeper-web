@@ -10,7 +10,7 @@ import {
     useSwapTokensFilter,
     useWalletFilteredSwapAssets
 } from '../../../state/swap/useSwapAssets';
-import { SpinnerIcon } from '../../Icon';
+import { Loader } from '../../Loader';
 import { useTranslation } from '../../../hooks/translation';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 
@@ -123,7 +123,7 @@ const SwapTokensListContent: FC<{ onSelect: (token: TonAsset | undefined) => voi
                 />
             ) : (
                 <SpinnerContainer>
-                    <SpinnerIcon />
+                    <Loader size="small" />
                 </SpinnerContainer>
             )}
         </SwapTokensListContentWrapper>

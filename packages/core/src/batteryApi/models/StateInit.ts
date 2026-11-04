@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface StateInit {
     /**
      * 
-     * @type {string}
-     * @memberof StateInit
      */
     boc: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof StateInit
      */
     interfaces: Array<string>;
 }
@@ -57,11 +53,11 @@ export function StateInitFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function StateInitToJSON(json: any): StateInit {
-      return StateInitToJSONTyped(json, false);
-  }
+export function StateInitToJSON(json: any): StateInit {
+    return StateInitToJSONTyped(json, false);
+}
 
-  export function StateInitToJSONTyped(value?: StateInit | null, ignoreDiscriminator: boolean = false): any {
+export function StateInitToJSONTyped(value?: StateInit | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

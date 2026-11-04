@@ -36,6 +36,7 @@ import {
 } from './Risk';
 
 /**
+ * Result of emulating a wallet message on the current blockchain state: describes the expected on-chain consequences (trace, high-level AccountEvent, risk) for the signing wallet. For UI display only.
  * 
  * @export
  * @interface MessageConsequences
@@ -43,20 +44,14 @@ import {
 export interface MessageConsequences {
     /**
      * 
-     * @type {Trace}
-     * @memberof MessageConsequences
      */
     trace: Trace;
     /**
      * 
-     * @type {Risk}
-     * @memberof MessageConsequences
      */
     risk: Risk;
     /**
      * 
-     * @type {AccountEvent}
-     * @memberof MessageConsequences
      */
     event: AccountEvent;
 }
@@ -87,11 +82,11 @@ export function MessageConsequencesFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function MessageConsequencesToJSON(json: any): MessageConsequences {
-      return MessageConsequencesToJSONTyped(json, false);
-  }
+export function MessageConsequencesToJSON(json: any): MessageConsequences {
+    return MessageConsequencesToJSONTyped(json, false);
+}
 
-  export function MessageConsequencesToJSONTyped(value?: MessageConsequences | null, ignoreDiscriminator: boolean = false): any {
+export function MessageConsequencesToJSONTyped(value?: MessageConsequences | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

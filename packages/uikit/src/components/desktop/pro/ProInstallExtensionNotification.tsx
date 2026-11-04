@@ -27,7 +27,7 @@ import { ConfirmMainButtonProps } from '../../transfer/common';
 import { SubscriptionExtension } from '@tonkeeper/core/dist/pro';
 import { useFormatFiat, useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { SpinnerIcon } from '../../Icon';
+import { Loader } from '../../Loader';
 import { secondsToUnitCount } from '@tonkeeper/core/dist/utils/pro';
 import { useAtomValue } from '../../../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
@@ -169,7 +169,7 @@ const ProInstallExtensionNotificationContent: FC<
                             <Body2Styled>{t('swap_blockchain_fee')}</Body2Styled>
                             <FiatEquivalentWrapper>
                                 <Label2>
-                                    {isEstimating && <SpinnerIcon />}
+                                    {isEstimating && <Loader size="small" />}
                                     {!!estimationError && <>—</>}
                                     {estimation?.fee?.extra &&
                                         estimateFeeMutation.data.fee.extra.toStringAssetRelativeAmount()}

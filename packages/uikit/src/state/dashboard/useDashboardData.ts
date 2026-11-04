@@ -81,7 +81,13 @@ async function applyStakingToDashboardTotalBalance(
     });
 }
 
-export function useDashboardData() {
+/**
+ * Rows for every mainnet TON wallet, one cell per column. Without options the
+ * columns come from the stored user selection (the legacy dashboard table);
+ * pass `options.columnIds` to fetch an explicit column set instead — the query
+ * stays disabled while it's undefined.
+ */
+export function useDashboardData(options?: { columnIds: string[] | undefined }) {
     const sdk = useAppSdk();
     const { data: columns } = useDashboardColumnsAsForm();
     const selectedColumns = columns?.filter(c => c.isEnabled);
@@ -93,7 +99,7 @@ export function useDashboardData() {
         i18n: { language },
         t
     } = useTranslation();
-    const selectedColIds = selectedColumns?.map(c => c.id);
+    const selectedColIds = options ? options.columnIds : selectedColumns?.map(c => c.id);
     const client = useQueryClient();
 
     const accountsState = useAccountsOrdered();

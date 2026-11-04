@@ -12,30 +12,54 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  EmulateMessageToWalletRequest,
-  GetTonConnectPayloadDefaultResponse,
-  MessageConsequences,
-} from '../models/index';
 import {
+    type EmulateMessageToWalletRequest,
     EmulateMessageToWalletRequestFromJSON,
     EmulateMessageToWalletRequestToJSON,
+} from '../models/EmulateMessageToWalletRequest';
+import {
+    type GetTonConnectPayloadDefaultResponse,
     GetTonConnectPayloadDefaultResponseFromJSON,
     GetTonConnectPayloadDefaultResponseToJSON,
+} from '../models/GetTonConnectPayloadDefaultResponse';
+import {
+    type MessageConsequences,
     MessageConsequencesFromJSON,
     MessageConsequencesToJSON,
-} from '../models/index';
+} from '../models/MessageConsequences';
 
 export interface EmulateMessageToWalletOperationRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
     emulateMessageToWalletRequest: EmulateMessageToWalletRequest;
+    /**
+     * 
+     */
     acceptLanguage?: string;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * 
+     */
     enableValidation?: boolean;
 }
 
 export interface GetJettonMetadataRequest {
+    /**
+     * 
+     */
     name: string;
 }
 
@@ -47,10 +71,25 @@ export interface GetJettonMetadataRequest {
  */
 export interface EmulationApiInterface {
     /**
-     * Emulate sending message to blockchain
-     * @param {string} xTonConnectAuth 
+     * Creates request options for emulateMessageToWallet without sending the request
      * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64
      * @param {string} [acceptLanguage] 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {boolean} [enableValidation] 
+     * @throws {RequiredError}
+     * @memberof EmulationApiInterface
+     */
+    emulateMessageToWalletRequestOpts(requestParameters: EmulateMessageToWalletOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * Emulate sending message to blockchain
+     * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64
+     * @param {string} [acceptLanguage] 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {boolean} [enableValidation] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -62,6 +101,14 @@ export interface EmulationApiInterface {
      * Emulate sending message to blockchain
      */
     emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageConsequences>;
+
+    /**
+     * Creates request options for getJettonMetadata without sending the request
+     * @param {string} name 
+     * @throws {RequiredError}
+     * @memberof EmulationApiInterface
+     */
+    getJettonMetadataRequestOpts(requestParameters: GetJettonMetadataRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -84,16 +131,9 @@ export interface EmulationApiInterface {
 export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterface {
 
     /**
-     * Emulate sending message to blockchain
+     * Creates request options for emulateMessageToWallet without sending the request
      */
-    async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling emulateMessageToWallet().'
-            );
-        }
-
+    async emulateMessageToWalletRequestOpts(requestParameters: EmulateMessageToWalletOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['emulateMessageToWalletRequest'] == null) {
             throw new runtime.RequiredError(
                 'emulateMessageToWalletRequest',
@@ -119,13 +159,32 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/wallet/emulate`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/wallet/emulate`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: EmulateMessageToWalletRequestToJSON(requestParameters['emulateMessageToWalletRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Emulate sending message to blockchain
+     */
+    async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>> {
+        const requestOptions = await this.emulateMessageToWalletRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageConsequencesFromJSON(jsonValue));
     }
@@ -139,8 +198,9 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
+     * Creates request options for getJettonMetadata without sending the request
      */
-    async getJettonMetadataRaw(requestParameters: GetJettonMetadataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async getJettonMetadataRequestOpts(requestParameters: GetJettonMetadataRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['name'] == null) {
             throw new runtime.RequiredError(
                 'name',
@@ -152,12 +212,23 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/jetton-metadata/{name}.json`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name']))),
+
+        let urlPath = `/jetton-metadata/{name}.json`;
+        urlPath = urlPath.replace('{name}', encodeURIComponent(String(requestParameters['name'])));
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async getJettonMetadataRaw(requestParameters: GetJettonMetadataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.getJettonMetadataRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }

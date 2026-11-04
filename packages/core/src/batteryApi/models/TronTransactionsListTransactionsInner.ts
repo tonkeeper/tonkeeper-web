@@ -21,74 +21,50 @@ import { mapValues } from '../runtime';
 export interface TronTransactionsListTransactionsInner {
     /**
      * 
-     * @type {string}
-     * @memberof TronTransactionsListTransactionsInner
      */
     txid: string;
     /**
      * 
-     * @type {string}
-     * @memberof TronTransactionsListTransactionsInner
      */
     fromAccount: string;
     /**
      * 
-     * @type {string}
-     * @memberof TronTransactionsListTransactionsInner
      */
     toAccount: string;
     /**
      * 
-     * @type {string}
-     * @memberof TronTransactionsListTransactionsInner
      */
     amount: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof TronTransactionsListTransactionsInner
      */
     isPending: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof TronTransactionsListTransactionsInner
      */
     isFailed: boolean;
     /**
      * 
-     * @type {number}
-     * @memberof TronTransactionsListTransactionsInner
      */
     batteryCharges: number;
     /**
      * 
-     * @type {number}
-     * @memberof TronTransactionsListTransactionsInner
      */
     timestamp: number;
     /**
      * 
-     * @type {number}
-     * @memberof TronTransactionsListTransactionsInner
      */
     trongridResult?: number;
     /**
      * Type of fee used for this transaction (battery, ton, etc.)
-     * @type {string}
-     * @memberof TronTransactionsListTransactionsInner
      */
     feeType?: string;
     /**
      * Fee amount in TON nano units
-     * @type {number}
-     * @memberof TronTransactionsListTransactionsInner
      */
     feeTonNano?: number;
     /**
      * Whether this transaction was made using free pro transfers
-     * @type {boolean}
-     * @memberof TronTransactionsListTransactionsInner
      */
     isFreePro?: boolean;
 }
@@ -98,12 +74,12 @@ export interface TronTransactionsListTransactionsInner {
  */
 export function instanceOfTronTransactionsListTransactionsInner(value: object): value is TronTransactionsListTransactionsInner {
     if (!('txid' in value) || value['txid'] === undefined) return false;
-    if (!('fromAccount' in value) || value['fromAccount'] === undefined) return false;
-    if (!('toAccount' in value) || value['toAccount'] === undefined) return false;
+    if ((!('fromAccount' in (value as Record<string, any>)) && !('from_account' in (value as Record<string, any>))) || ((value as Record<string, any>)['fromAccount'] === undefined && (value as Record<string, any>)['from_account'] === undefined)) return false;
+    if ((!('toAccount' in (value as Record<string, any>)) && !('to_account' in (value as Record<string, any>))) || ((value as Record<string, any>)['toAccount'] === undefined && (value as Record<string, any>)['to_account'] === undefined)) return false;
     if (!('amount' in value) || value['amount'] === undefined) return false;
-    if (!('isPending' in value) || value['isPending'] === undefined) return false;
-    if (!('isFailed' in value) || value['isFailed'] === undefined) return false;
-    if (!('batteryCharges' in value) || value['batteryCharges'] === undefined) return false;
+    if ((!('isPending' in (value as Record<string, any>)) && !('is_pending' in (value as Record<string, any>))) || ((value as Record<string, any>)['isPending'] === undefined && (value as Record<string, any>)['is_pending'] === undefined)) return false;
+    if ((!('isFailed' in (value as Record<string, any>)) && !('is_failed' in (value as Record<string, any>))) || ((value as Record<string, any>)['isFailed'] === undefined && (value as Record<string, any>)['is_failed'] === undefined)) return false;
+    if ((!('batteryCharges' in (value as Record<string, any>)) && !('battery_charges' in (value as Record<string, any>))) || ((value as Record<string, any>)['batteryCharges'] === undefined && (value as Record<string, any>)['battery_charges'] === undefined)) return false;
     if (!('timestamp' in value) || value['timestamp'] === undefined) return false;
     return true;
 }
@@ -133,11 +109,11 @@ export function TronTransactionsListTransactionsInnerFromJSONTyped(json: any, ig
     };
 }
 
-  export function TronTransactionsListTransactionsInnerToJSON(json: any): TronTransactionsListTransactionsInner {
-      return TronTransactionsListTransactionsInnerToJSONTyped(json, false);
-  }
+export function TronTransactionsListTransactionsInnerToJSON(json: any): TronTransactionsListTransactionsInner {
+    return TronTransactionsListTransactionsInnerToJSONTyped(json, false);
+}
 
-  export function TronTransactionsListTransactionsInnerToJSONTyped(value?: TronTransactionsListTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
+export function TronTransactionsListTransactionsInnerToJSONTyped(value?: TronTransactionsListTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

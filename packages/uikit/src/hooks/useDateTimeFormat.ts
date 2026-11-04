@@ -1,4 +1,4 @@
-import { intlLocale } from '@tonkeeper/core/dist/entries/language';
+import { intlDateLocale } from '@tonkeeper/core/dist/entries/language';
 import { useTranslation } from './translation';
 import { useMemo } from 'react';
 import { timeFromNow } from '../libs/dateTime';
@@ -13,7 +13,7 @@ export function useDateTimeFormat() {
             date = new Date(Number(date) * 1000);
         }
 
-        return Intl.DateTimeFormat(intlLocale(i18n.language), options).format(new Date(date));
+        return Intl.DateTimeFormat(intlDateLocale(i18n.language), options).format(new Date(date));
     };
 }
 

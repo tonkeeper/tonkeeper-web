@@ -148,3 +148,28 @@ const localeMap: Record<string, string> = {
 export const intlLocale = (locale: string) => {
     return localeMap[locale] ?? locale;
 };
+
+// An engine without CLDR data for a locale formats it with the root locale, whose month names are
+// the placeholders M01…M12 ("M10 13"); such locales fall back to English.
+const hasMonthNames = (locale: string) => {
+    try {
+        const month = new Intl.DateTimeFormat(locale, { month: 'short' }).format(
+            new Date(2000, 9, 15)
+        );
+        return !/M\d{2}/.test(month);
+    } catch {
+        return false;
+    }
+};
+
+const dateLocales = new Map<string, string>();
+
+export const intlDateLocale = (locale: string) => {
+    const resolved = intlLocale(locale);
+    let dateLocale = dateLocales.get(resolved);
+    if (dateLocale === undefined) {
+        dateLocale = hasMonthNames(resolved) ? resolved : 'en';
+        dateLocales.set(resolved, dateLocale);
+    }
+    return dateLocale;
+};

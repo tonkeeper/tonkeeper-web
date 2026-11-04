@@ -6,7 +6,7 @@ import { SkeletonListWithImages } from '../../../components/Skeleton';
 import { Body2, H3, Label1 } from '../../../components/Text';
 import { useTranslation } from '../../../hooks/translation';
 import { useActiveTonWalletConfig } from '../../../state/wallet';
-import { IconButton } from '../../../components/fields/IconButton';
+import { LegacyIconButton } from '../../../components/fields/IconButton';
 import { BorderSmallResponsive } from '../../../components/shared/Styles';
 import {
     isSpamNft,
@@ -39,7 +39,7 @@ const NftImageStyled = styled(Image)`
     ${BorderSmallResponsive}
 `;
 
-const NftButton = styled(IconButton)`
+const NftButton = styled(LegacyIconButton)`
     padding: 8px;
     background-color: ${props => props.theme.backgroundContentTint};
 

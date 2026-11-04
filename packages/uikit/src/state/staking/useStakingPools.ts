@@ -1,32 +1,54 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { PoolInfo, StakingApi } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    GetStakingPools200Response,
+    PoolImplementation,
+    PoolImplementationType,
+    PoolInfo,
+    StakingApi
+} from '@tonkeeper/core/dist/tonApiV2';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveApi, useActiveWallet, useActiveTonNetwork } from '../wallet';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
 
-export const useStakingPools = () => {
+const useStakingPoolsResponse = <T>(select: (response: GetStakingPools200Response) => T) => {
     const wallet = useActiveWallet();
     const api = useActiveApi();
     const network = useActiveTonNetwork();
     const isEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.STAKING);
 
-    return useQuery<PoolInfo[], Error>(
+    return useQuery<GetStakingPools200Response, Error, T>(
         [wallet.rawAddress, QueryKey.staking, 'pools', network],
         async () => {
-            const response = await new StakingApi(api.tonApiV2).getStakingPools({
+            return new StakingApi(api.tonApiV2).getStakingPools({
                 availableFor: wallet.rawAddress,
                 includeUnverified: false
             });
-
-            return response.pools;
         },
         {
             staleTime: 60_000,
-            enabled: isEnabled
+            enabled: isEnabled,
+            select
         }
     );
+};
+
+const selectPools = (response: GetStakingPools200Response) => response.pools;
+
+export const useStakingPools = () => {
+    return useStakingPoolsResponse(selectPools);
+};
+
+const selectImplementations = (response: GetStakingPools200Response) =>
+    response.implementations as Partial<Record<PoolImplementationType, PoolImplementation>>;
+
+/**
+ * Per-implementation metadata (site url + socials) shipped alongside the
+ * pool list, keyed by `PoolImplementationType`.
+ */
+export const useStakingPoolImplementations = () => {
+    return useStakingPoolsResponse(selectImplementations);
 };
 
 export const useStakingPoolByJetton = (

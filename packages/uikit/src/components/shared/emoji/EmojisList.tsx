@@ -1,85 +1,52 @@
 import { emojis } from '@tonkeeper/core/dist/utils/emojis';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, memo, useEffect, useState } from 'react';
+
 import { emojiIcons } from './emojiIcons';
-import styled from 'styled-components';
 
-const EmojisListScroll = styled.div`
-    max-height: 240px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    overflow: auto;
-    position: relative;
-
-    &::-webkit-scrollbar {
-        display: none;
-        width: 0;
-        background: transparent;
-        height: 0;
-    }
-
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-
-    /* optimise large emojis list rendering avoiding styled components */
-    > .emoji-button {
-        height: 32px;
-        width: 32px;
-        line-height: 24px;
-        font-size: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-`;
-
-const Shadow = styled.div`
-    position: sticky;
-    width: 100%;
-    height: 16px;
-`;
-
-const ShadowBottom = styled(Shadow)`
-    bottom: -1px;
-    background: ${props => props.theme.gradientBackgroundBottom};
-`;
-
-const ShadowTop = styled(Shadow)`
-    top: 0;
-    background: ${props => props.theme.gradientBackgroundTop};
-`;
-
+/**
+ * Scrollable emoji grid used by the wallet-customize step. The icon
+ * cells (`.emoji-button`) are deliberately *not* styled-components: an
+ * inline class kept rendering of the ~1700-item list cheap on legacy
+ * styled-components. With Tailwind that's no longer a concern — each
+ * cell is a plain `<div className="…">` and the grid still benefits
+ * from `React.memo` on the parent.
+ *
+ * The top and bottom shadow strips fade the list edges into
+ * `backgroundPage`, matching the modal sheet color so the list reads
+ * as scroll-bounded without a hard line.
+ */
 const shortEmojisList = emojis.slice(0, 150);
 
-export const EmojisList: FC<{ onClick: (emoji: string) => void; keepShortListForMS?: number }> =
-    React.memo(({ onClick, keepShortListForMS }) => {
-        const [emojisList, setEmojisList] = useState(keepShortListForMS ? shortEmojisList : emojis);
+const cellClass = 'flex h-8 w-8 cursor-pointer items-center justify-center text-2xl leading-6';
 
-        useEffect(() => {
-            if (keepShortListForMS) {
-                setTimeout(() => setEmojisList(emojis), keepShortListForMS);
-            }
-        }, [keepShortListForMS]);
+export const EmojisList: FC<{
+    onClick: (emoji: string) => void;
+    keepShortListForMS?: number;
+}> = memo(({ onClick, keepShortListForMS }) => {
+    const [emojisList, setEmojisList] = useState(keepShortListForMS ? shortEmojisList : emojis);
 
-        return (
-            <EmojisListScroll>
-                <ShadowTop />
-                {emojiIcons.map(item => (
-                    <div
-                        className="emoji-button"
-                        key={item.name}
-                        onClick={() => onClick(item.name)}
-                    >
-                        <item.icon />
-                    </div>
-                ))}
-                {emojisList.map(emoji => (
-                    <div className="emoji-button" key={emoji} onClick={() => onClick(emoji)}>
-                        {emoji}
-                    </div>
-                ))}
-                <ShadowBottom />
-            </EmojisListScroll>
-        );
-    });
+    useEffect(() => {
+        if (keepShortListForMS) {
+            const timer = setTimeout(() => setEmojisList(emojis), keepShortListForMS);
+            return () => clearTimeout(timer);
+        }
+    }, [keepShortListForMS]);
+
+    return (
+        <div className="relative flex max-h-[240px] flex-wrap items-center overflow-auto outline-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="sticky top-0 h-4 w-full bg-gradient-to-b from-backgroundPage to-transparent" />
+            {emojiIcons.map(item => (
+                <div className={cellClass} key={item.name} onClick={() => onClick(item.name)}>
+                    <item.icon />
+                </div>
+            ))}
+            {emojisList.map(emoji => (
+                <div className={cellClass} key={emoji} onClick={() => onClick(emoji)}>
+                    {emoji}
+                </div>
+            ))}
+            <div className="sticky -bottom-px h-4 w-full bg-gradient-to-t from-backgroundPage to-transparent" />
+        </div>
+    );
+});
+EmojisList.displayName = 'EmojisList';

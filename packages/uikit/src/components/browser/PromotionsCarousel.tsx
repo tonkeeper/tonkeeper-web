@@ -53,7 +53,7 @@ const CarouselItem: FC<{ item: CarouselApp; onClickApp?: (app: CarouselApp) => v
     item,
     onClickApp
 }) => {
-    const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'featured');
+    const openAppCallback = useOpenPromotedAppInExternalBrowser(item, 'featured');
     const callback = useCallback(() => {
         if (onClickApp) {
             onClickApp(item);

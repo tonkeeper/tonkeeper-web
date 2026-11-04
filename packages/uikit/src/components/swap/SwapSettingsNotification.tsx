@@ -169,8 +169,8 @@ const SwapSettingsContent: FC<{ afterClose: (action?: () => void) => void }> = (
         <>
             <SettingSection>
                 <SettingTextBlock>
-                    <Label2>{t('swap_price_impact')}</Label2>
-                    <DescriptionText>{t('swap_price_impact_description')}</DescriptionText>
+                    <Label2>{t('multichain_swap_value_difference')}</Label2>
+                    <DescriptionText>{t('swap_value_difference_description')}</DescriptionText>
                 </SettingTextBlock>
                 <OptionsRow>
                     {PRICE_IMPACT_OPTIONS.map(opt => (

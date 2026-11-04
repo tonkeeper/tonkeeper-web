@@ -21,7 +21,7 @@ export const JettonVerificationType = {
     Whitelist: 'whitelist',
     Graylist: 'graylist',
     Blacklist: 'blacklist',
-    None: 'none'
+    None: 'none',
 } as const;
 export type JettonVerificationType = typeof JettonVerificationType[keyof typeof JettonVerificationType];
 

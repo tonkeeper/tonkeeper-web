@@ -8,14 +8,16 @@ import { useTranslation } from '../../../hooks/translation';
 import { useAsyncValidator } from '../../../hooks/useAsyncValidator';
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
 import { MultiSendForm, getPastedTable } from '../../../state/multiSend';
-import { SpinnerRing, XMarkCircleIcon } from '../../Icon';
+import { XMarkCircleIcon } from '../../Icon';
+import { Loader } from '../../Loader';
 import { Body2 } from '../../Text';
-import { IconButton } from '../../fields/IconButton';
+import { LegacyIconButton } from '../../fields/IconButton';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
 import { useTonRecipientValidator } from '../../fields/TonRecipientInput';
 
-const SpinnerRingStyled = styled(SpinnerRing)`
+const SpinnerRingStyled = styled(Loader)`
     transform: scale(1.2);
+    color: ${p => p.theme.iconSecondary};
 `;
 
 const Body2Secondary = styled(Body2)`
@@ -112,7 +114,7 @@ export const ReceiverInput: FC<{
                 placeholder={t('transactionDetails_recipient')}
                 onPaste={onPaste}
             />
-            {isValidating && <SpinnerRingStyled />}
+            {isValidating && <SpinnerRingStyled size="small" />}
             {!isValidating &&
                 validationProduct &&
                 'dns' in validationProduct &&
@@ -124,7 +126,7 @@ export const ReceiverInput: FC<{
                     </AddressText>
                 ))}
             {!isValidating && inputValue && (
-                <IconButton
+                <LegacyIconButton
                     type="button"
                     onClick={() => {
                         inputTouched.current = true;
@@ -132,7 +134,7 @@ export const ReceiverInput: FC<{
                     }}
                 >
                     <XMarkCircleIcon />
-                </IconButton>
+                </LegacyIconButton>
             )}
         </InputBlockStyled>
     );

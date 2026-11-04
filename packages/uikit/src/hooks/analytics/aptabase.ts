@@ -3,6 +3,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
 import { getOsName } from '@tonkeeper/core/dist/analytics/os';
+import { joinUrl } from '@tonkeeper/core/dist/utils/url';
 import {
     Analytics,
     TrackableEvent,
@@ -22,7 +23,7 @@ export class Aptabase implements Analytics {
         userIdentity: UserIdentity;
     }) {
         init(options.key, {
-            apiUrl: `${options.host}/api/v0/event`,
+            apiUrl: joinUrl(options.host, '/api/v0/event'),
             appVersion: options.appVersion
         });
         this.userIdentity = options.userIdentity;

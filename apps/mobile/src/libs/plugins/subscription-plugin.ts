@@ -67,7 +67,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                             products: [
                                 {
                                     id: ProductIds.MONTHLY,
-                                    displayName: 'Tonkeeper Pro Monthly',
+                                    displayName: 'Keeper Pro Monthly',
                                     description: 'Access to premium features for one month',
                                     displayPrice: '$1.23',
                                     subscriptionGroup: 'emHJGjKGJKGGJim',

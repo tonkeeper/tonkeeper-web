@@ -2,8 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetSchema } from './AssetSchema';
+import type { FeeAssetSchema } from './FeeAssetSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
- * After confirming the swap info, user on CONFIRM ACTION screen have to SLIDE TO CONFIRM
+ * Swap completed successfully (the swap transaction was submitted)
  */
 export type SwapSuccessSchema = {
     eventName: string;
@@ -11,21 +14,18 @@ export type SwapSuccessSchema = {
      * Type of swap implementation
      */
     type: 'native';
+    wallet_mode: WalletModeSchema;
+    asset_from: AssetSchema;
+    asset_to: AssetSchema;
+    fee_asset: FeeAssetSchema;
     /**
-     * Currency used to pay network fees
-     */
-    fee_paid_in: 'ton' | 'battery';
-    /**
-     * Symbol of the jetton being swapped from
-     */
-    jetton_symbol_from: string;
-    /**
-     * Symbol of the jetton being swapped to
-     */
-    jetton_symbol_to: string;
-    /**
-     * Name of the swap provider
+     * Name of the swap provider (e.g. stonfi, dedust, swap.coffee)
      */
     provider_name: string;
+    /**
+     * Optional. True when the user chose to swap the entire balance of asset_from.
+     *
+     */
+    is_max?: boolean;
 };
 

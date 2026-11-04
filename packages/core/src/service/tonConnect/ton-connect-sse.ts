@@ -3,7 +3,7 @@ import {
     disconnectHttpAccountConnection,
     getTonWalletConnections
 } from './connectionService';
-import { isStandardTonWallet, WalletId } from '../../entries/wallet';
+import { isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
 import { getLastEventId, subscribeTonConnect } from './httpBridge';
 import { accountsStorage } from '../accountsStorage';
 import { IStorage } from '../../Storage';
@@ -11,6 +11,7 @@ import { TonConnectAppRequest, TonConnectAppRequestPayload } from '../../entries
 import { TonConnectError } from '../../entries/exception';
 import { getWalletById } from '../../entries/account';
 import { checkTonConnectFromAndNetwork } from './connectService';
+import { walletIdOfClientSession } from './sessionOwner';
 import { replyHttpBadRequestResponse, replyHttpDisconnectResponse } from './actionService';
 import { delay } from '../../utils/common';
 import {
@@ -29,6 +30,11 @@ type System = {
     refresh?: () => void;
     bringToFront?: () => Promise<void>;
     log?: Logger;
+};
+
+type WalletConnections = {
+    wallet: TonContract;
+    connections: AccountConnectionHttp[];
 };
 
 type Listeners = {
@@ -67,7 +73,9 @@ export class TonConnectSSE {
 
     private connections: AccountConnectionHttp[] = [];
 
-    private dist: Record<string, WalletId> = {};
+    private walletsConnections: WalletConnections[] = [];
+
+    private dist: Record<string, WalletId | undefined> = {};
 
     private closeConnection: (() => void) | null = null;
 
@@ -114,18 +122,22 @@ export class TonConnectSSE {
             a => a.allTonWallets
         );
 
-        this.connections = [];
-        this.dist = {};
-
+        const walletsConnections: WalletConnections[] = [];
         for (const wallet of walletsState) {
-            const walletConnections = (await getTonWalletConnections(this.storage, wallet)).filter(
+            const connections = (await getTonWalletConnections(this.storage, wallet)).filter(
                 i => i.type === 'http'
             ) as AccountConnectionHttp[];
+            walletsConnections.push({ wallet, connections });
+        }
 
-            this.connections = this.connections.concat(walletConnections);
-            walletConnections.forEach(item => {
-                this.dist[item.clientSessionId] = wallet.id;
-            });
+        this.walletsConnections = walletsConnections;
+        this.connections = walletsConnections.flatMap(i => i.connections);
+        this.dist = {};
+        for (const { clientSessionId } of this.connections) {
+            this.dist[clientSessionId] = walletIdOfClientSession(
+                walletsConnections,
+                clientSessionId
+            );
         }
     }
 
@@ -145,8 +157,13 @@ export class TonConnectSSE {
     };
 
     private getStandardWalletByClientSessionId = async (clientSessionId: string) => {
+        const walletId = this.dist[clientSessionId];
+        if (walletId === undefined) {
+            return null;
+        }
+
         const accounts = await accountsStorage(this.storage).getAccounts();
-        const wallet = getWalletById(accounts, this.dist[clientSessionId]);
+        const wallet = getWalletById(accounts, walletId);
 
         if (!wallet || !isStandardTonWallet(wallet)) {
             return null;
@@ -156,16 +173,22 @@ export class TonConnectSSE {
     };
 
     private onDisconnect = async ({ connection, request }: TonConnectAppRequest<'http'>) => {
-        const wallet = await this.getStandardWalletByClientSessionId(connection.clientSessionId);
-        if (!wallet) {
+        const owners = this.walletsConnections
+            .filter(item =>
+                item.connections.some(c => c.clientSessionId === connection.clientSessionId)
+            )
+            .map(item => item.wallet);
+        if (owners.length === 0) {
             return;
         }
 
-        await disconnectHttpAccountConnection({
-            storage: this.storage,
-            wallet,
-            clientSessionId: connection.clientSessionId
-        });
+        for (const wallet of owners) {
+            await disconnectHttpAccountConnection({
+                storage: this.storage,
+                wallet,
+                clientSessionId: connection.clientSessionId
+            });
+        }
         await replyHttpDisconnectResponse({
             connection,
             request,
@@ -175,9 +198,7 @@ export class TonConnectSSE {
         this.listeners.onDisconnect(connection);
     };
 
-    private selectWallet = async (clientSessionId: string) => {
-        const walletId = this.dist[clientSessionId];
-
+    private selectWallet = async (walletId: WalletId) => {
         const activeAccount = await accountsStorage(this.storage).getActiveAccount();
         if (!activeAccount) {
             throw new Error('Account not found');
@@ -201,21 +222,21 @@ export class TonConnectSSE {
 
         const validatePayload = async (
             payload: TonConnectAppRequestPayload['payload']
-        ): Promise<boolean> => {
+        ): Promise<WalletId | undefined> => {
             const wallet = await this.getStandardWalletByClientSessionId(
                 params.connection.clientSessionId
             );
             if (!wallet) {
                 await replyBadRequest('Unknown session');
-                return false;
+                return undefined;
             }
 
             try {
                 await checkTonConnectFromAndNetwork(this.storage, wallet, payload);
-                return true;
+                return wallet.id;
             } catch (e) {
                 await replyBadRequest(e instanceof TonConnectError ? e.message : 'Bad request');
-                return false;
+                return undefined;
             }
         };
 
@@ -224,17 +245,20 @@ export class TonConnectSSE {
                 return this.onDisconnect(params);
             }
             case 'sendTransaction': {
+                const payload = JSON.parse(params.request.params[0]);
+                const walletId = await validatePayload(payload);
+                if (walletId === undefined) {
+                    return;
+                }
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
+                    walletId,
                     kind: 'sendTransaction',
-                    payload: JSON.parse(params.request.params[0])
+                    payload
                 };
-                if (!(await validatePayload(value.payload))) {
-                    return;
-                }
                 try {
-                    await this.selectWallet(params.connection.clientSessionId);
+                    await this.selectWallet(walletId);
                 } catch (e) {
                     await replyBadRequest(e instanceof Error ? e.message : 'Bad request');
                     return;
@@ -242,17 +266,20 @@ export class TonConnectSSE {
                 return this.listeners.onRequest(value);
             }
             case 'signData': {
+                const payload = JSON.parse(params.request.params[0]);
+                const walletId = await validatePayload(payload);
+                if (walletId === undefined) {
+                    return;
+                }
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
+                    walletId,
                     kind: 'signData',
-                    payload: JSON.parse(params.request.params[0])
+                    payload
                 };
-                if (!(await validatePayload(value.payload))) {
-                    return;
-                }
                 try {
-                    await this.selectWallet(params.connection.clientSessionId);
+                    await this.selectWallet(walletId);
                 } catch (e) {
                     await replyBadRequest(e instanceof Error ? e.message : 'Bad request');
                     return;

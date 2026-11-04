@@ -33,9 +33,14 @@ export const useAppWidth = (standalone: boolean) => {
                 doc.style.setProperty('--app-width', `${window.innerWidth}px`);
             } else {
                 const doc = document.documentElement;
-                const app = (document.getElementById('root') as HTMLDivElement).childNodes.item(
-                    0
-                ) as HTMLDivElement;
+                // Root's first child can be missing for a tick while a
+                // Suspense fallback is `null` (multichain portfolio path
+                // does this). Skip the measurement and let the next
+                // resize event pick it up.
+                const app = document
+                    .getElementById('root')
+                    ?.childNodes.item(0) as HTMLDivElement | null;
+                if (!app) return;
 
                 doc.style.setProperty('--app-width', `${app.clientWidth}px`);
             }
@@ -59,11 +64,13 @@ export const useAnalytics = (
     const network = useActiveTonNetwork();
     const sdk = useAppSdk();
 
-    return useQuery<Analytics | undefined>(
+    return useQuery<Analytics | null>(
         [QueryKey.analytics, network, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
             if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
-                return;
+                // react-query rejects `undefined` as query data with
+                // "Query data cannot be undefined". `null` is allowed.
+                return null;
             }
 
             const tracker = new Aptabase({
@@ -90,7 +97,11 @@ export const useAnalytics = (
 export const useLayout = () => {
     const navigate = useNavigate();
 
-    const [isMobile, setMobile] = useState(localStorage.getItem('layout') === 'true');
+    // Taken from the window rather than remembered from the last visit: a
+    // remembered layout that no longer fits — or none at all, on a fresh
+    // profile — read as a switch on the first pass below and sent the visit
+    // home, dropping the deeplink it arrived on.
+    const [isMobile, setMobile] = useState(() => window.innerWidth < 1024);
 
     useEffect(() => {
         const appWidth = throttle(() => {
@@ -98,7 +109,6 @@ export const useLayout = () => {
                 setMobile(old => {
                     if (old !== false) {
                         navigate(AppRoute.home);
-                        localStorage.setItem('layout', 'false');
                     }
                     return false;
                 });
@@ -106,7 +116,6 @@ export const useLayout = () => {
                 setMobile(old => {
                     if (old !== true) {
                         navigate(AppRoute.home);
-                        localStorage.setItem('layout', 'true');
                     }
                     return true;
                 });

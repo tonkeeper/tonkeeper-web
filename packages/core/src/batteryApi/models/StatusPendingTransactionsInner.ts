@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface StatusPendingTransactionsInner {
     /**
      * 
-     * @type {string}
-     * @memberof StatusPendingTransactionsInner
      */
     id: string;
 }
@@ -49,11 +47,11 @@ export function StatusPendingTransactionsInnerFromJSONTyped(json: any, ignoreDis
     };
 }
 
-  export function StatusPendingTransactionsInnerToJSON(json: any): StatusPendingTransactionsInner {
-      return StatusPendingTransactionsInnerToJSONTyped(json, false);
-  }
+export function StatusPendingTransactionsInnerToJSON(json: any): StatusPendingTransactionsInner {
+    return StatusPendingTransactionsInnerToJSONTyped(json, false);
+}
 
-  export function StatusPendingTransactionsInnerToJSONTyped(value?: StatusPendingTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
+export function StatusPendingTransactionsInnerToJSONTyped(value?: StatusPendingTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

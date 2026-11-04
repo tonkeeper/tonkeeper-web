@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 import { FC, useMemo } from 'react';
-import { DoneIcon, DotIcon, ResponsiveSpinner } from '../Icon';
+import { DoneIcon, DotIcon } from '../Icon';
+import { Loader } from '../Loader';
 import { Body2, Body2Class } from '../Text';
 import { LedgerIcon } from './LedgerIcons';
 import { Dot } from '../Dot';
@@ -252,7 +253,11 @@ const StepIcon: FC<{ state: 'future' | 'active' | 'completed'; isErrored?: boole
     if (state === 'active') {
         return (
             <IconContainer>
-                {isErrored ? <DotIcon color="accentRed" /> : <ResponsiveSpinner />}
+                {isErrored ? (
+                    <DotIcon color="accentRed" />
+                ) : (
+                    <Loader size="small" className="text-iconSecondary" />
+                )}
             </IconContainer>
         );
     }

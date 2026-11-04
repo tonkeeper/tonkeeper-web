@@ -44,7 +44,7 @@ const EmptyActivity = () => {
 
     const [openBuy, setOpenBuy] = useState(false);
 
-    const { data: buy } = useTonendpointBuyMethods();
+    const { data: buy } = useTonendpointBuyMethods(openBuy);
 
     return (
         <EmptyBody>

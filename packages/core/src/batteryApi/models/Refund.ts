@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface Refund {
     /**
      * 
-     * @type {string}
-     * @memberof Refund
      */
     type: RefundTypeEnum;
     /**
      * 
-     * @type {string}
-     * @memberof Refund
      */
     origin: string;
 }
@@ -40,7 +36,7 @@ export interface Refund {
 export const RefundTypeEnum = {
     DnsTon: 'DNS.ton',
     DnsTg: 'DNS.tg',
-    GetGems: 'GetGems'
+    GetGems: 'GetGems',
 } as const;
 export type RefundTypeEnum = typeof RefundTypeEnum[keyof typeof RefundTypeEnum];
 
@@ -69,11 +65,11 @@ export function RefundFromJSONTyped(json: any, ignoreDiscriminator: boolean): Re
     };
 }
 
-  export function RefundToJSON(json: any): Refund {
-      return RefundToJSONTyped(json, false);
-  }
+export function RefundToJSON(json: any): Refund {
+    return RefundToJSONTyped(json, false);
+}
 
-  export function RefundToJSONTyped(value?: Refund | null, ignoreDiscriminator: boolean = false): any {
+export function RefundToJSONTyped(value?: Refund | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

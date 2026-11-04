@@ -29,20 +29,14 @@ import {
 export interface IOSBatteryPurchaseStatusTransactionsInner {
     /**
      * 
-     * @type {string}
-     * @memberof IOSBatteryPurchaseStatusTransactionsInner
      */
     transactionId: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof IOSBatteryPurchaseStatusTransactionsInner
      */
     success: boolean;
     /**
      * 
-     * @type {IOSBatteryPurchaseStatusTransactionsInnerError}
-     * @memberof IOSBatteryPurchaseStatusTransactionsInner
      */
     error?: IOSBatteryPurchaseStatusTransactionsInnerError;
 }
@@ -51,7 +45,7 @@ export interface IOSBatteryPurchaseStatusTransactionsInner {
  * Check if a given object implements the IOSBatteryPurchaseStatusTransactionsInner interface.
  */
 export function instanceOfIOSBatteryPurchaseStatusTransactionsInner(value: object): value is IOSBatteryPurchaseStatusTransactionsInner {
-    if (!('transactionId' in value) || value['transactionId'] === undefined) return false;
+    if ((!('transactionId' in (value as Record<string, any>)) && !('transaction_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['transactionId'] === undefined && (value as Record<string, any>)['transaction_id'] === undefined)) return false;
     if (!('success' in value) || value['success'] === undefined) return false;
     return true;
 }
@@ -72,11 +66,11 @@ export function IOSBatteryPurchaseStatusTransactionsInnerFromJSONTyped(json: any
     };
 }
 
-  export function IOSBatteryPurchaseStatusTransactionsInnerToJSON(json: any): IOSBatteryPurchaseStatusTransactionsInner {
-      return IOSBatteryPurchaseStatusTransactionsInnerToJSONTyped(json, false);
-  }
+export function IOSBatteryPurchaseStatusTransactionsInnerToJSON(json: any): IOSBatteryPurchaseStatusTransactionsInner {
+    return IOSBatteryPurchaseStatusTransactionsInnerToJSONTyped(json, false);
+}
 
-  export function IOSBatteryPurchaseStatusTransactionsInnerToJSONTyped(value?: IOSBatteryPurchaseStatusTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
+export function IOSBatteryPurchaseStatusTransactionsInnerToJSONTyped(value?: IOSBatteryPurchaseStatusTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -29,32 +29,22 @@ import {
 export interface TonConnectProofRequestProof {
     /**
      * 
-     * @type {number}
-     * @memberof TonConnectProofRequestProof
      */
     timestamp: number;
     /**
      * 
-     * @type {TonConnectProofRequestProofDomain}
-     * @memberof TonConnectProofRequestProof
      */
     domain: TonConnectProofRequestProofDomain;
     /**
      * 
-     * @type {string}
-     * @memberof TonConnectProofRequestProof
      */
     signature: string;
     /**
      * 
-     * @type {string}
-     * @memberof TonConnectProofRequestProof
      */
     payload: string;
     /**
      * 
-     * @type {string}
-     * @memberof TonConnectProofRequestProof
      */
     stateInit?: string;
 }
@@ -88,11 +78,11 @@ export function TonConnectProofRequestProofFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function TonConnectProofRequestProofToJSON(json: any): TonConnectProofRequestProof {
-      return TonConnectProofRequestProofToJSONTyped(json, false);
-  }
+export function TonConnectProofRequestProofToJSON(json: any): TonConnectProofRequestProof {
+    return TonConnectProofRequestProofToJSONTyped(json, false);
+}
 
-  export function TonConnectProofRequestProofToJSONTyped(value?: TonConnectProofRequestProof | null, ignoreDiscriminator: boolean = false): any {
+export function TonConnectProofRequestProofToJSONTyped(value?: TonConnectProofRequestProof | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

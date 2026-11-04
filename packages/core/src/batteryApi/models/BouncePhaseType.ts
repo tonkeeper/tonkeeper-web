@@ -20,7 +20,7 @@
 export const BouncePhaseType = {
     TrPhaseBounceNegfunds: 'TrPhaseBounceNegfunds',
     TrPhaseBounceNofunds: 'TrPhaseBounceNofunds',
-    TrPhaseBounceOk: 'TrPhaseBounceOk'
+    TrPhaseBounceOk: 'TrPhaseBounceOk',
 } as const;
 export type BouncePhaseType = typeof BouncePhaseType[keyof typeof BouncePhaseType];
 

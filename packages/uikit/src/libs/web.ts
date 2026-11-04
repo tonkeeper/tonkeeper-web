@@ -43,6 +43,20 @@ export function scrollToContainersBottom(element: HTMLElement) {
     scrollableParent.scrollTop = scrollableParent.scrollHeight;
 }
 
+/**
+ * Jump the element's scroll container back to the top. Ionic pages scroll
+ * inside `ion-content`'s shadow DOM, which the parent walk cannot reach, so
+ * that host is asked directly.
+ */
+export function scrollToContainersTop(element: HTMLElement) {
+    const ionContent = element.closest('ion-content') as HTMLIonContentElement | null;
+    if (ionContent) {
+        void ionContent.scrollToTop();
+        return;
+    }
+    getClosestScrollableParent(element).scrollTop = 0;
+}
+
 export function sendBroadcastMessage(channel: string, request: string) {
     try {
         if (typeof BroadcastChannel === 'undefined') {

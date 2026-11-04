@@ -34,9 +34,14 @@
     "approval": {
         "accepted": "Hiển thị",
         "declined": "Đã từ chối",
+        "details_collection": "Chi tiết bộ sưu tập",
         "details_token": "Chi tiết token",
         "id_collection": "ID bộ sưu tập",
         "id_token": "ID token",
+        "move_to_accepted_collection": "Hiển thị bộ sưu tập trong ví",
+        "move_to_accepted_token": "Hiển thị token trong ví",
+        "move_to_declined_collection": "Ẩn bộ sưu tập khỏi ví",
+        "move_to_declined_token": "Ẩn token khỏi ví",
         "name": "Tên",
         "not_spam": "Không phải thư rác",
         "spam": "Thư rác",
@@ -46,7 +51,7 @@
     "battery": {
         "other_ways": {
             "by_crypto": {
-                "title": "Nạp tiền bằng {symbol}"
+                "title": "Nạp tiền bằng %{symbol}"
             },
             "gift": {
                 "subtitle": "Chia sẻ với bạn bè",
@@ -54,22 +59,30 @@
             }
         },
         "packages": {
-            "disclaimer": "Một lần nạp đủ để trả phí giao dịch trung bình. Một số giao dịch có thể tốn nhiều hơn."
+            "disclaimer": "Một lần nạp đủ để trả phí giao dịch trung bình. Một số giao dịch có thể tốn nhiều hơn.",
+            "title": {
+                "large": "Lớn",
+                "medium": "Trung bình",
+                "small": "Nhỏ"
+            }
         },
         "please_wait": "Pin sẽ được sạc trong vài phút nữa",
         "promocode": {
-            "title": "Mã khuyến mãi"
+            "title": "Mã khuyến mãi",
+            "apply": "Áp dụng",
+            "success": "Pin của bạn đã được sạc"
         },
         "recharge_by_crypto": {
             "other": {
                 "subtitle": "Nhập số tiền thủ công",
                 "title": "Khác"
             },
-            "title": "Nạp lại"
+            "title": "Nạp lại",
+            "title_gift": "Quà tặng"
         },
-        "title": "Pin Tonkeeper",
+        "title": "Pin Keeper",
         "transactions": {
-            "description": "Các giao dịch được chọn sẽ được thanh toán bằng pin Tonkeeper.",
+            "description": "Các giao dịch được chọn sẽ được thanh toán bằng pin Keeper.",
             "settings": "Cài đặt pin",
             "title": "Giao dịch",
             "types": {
@@ -131,14 +144,14 @@
     "dns_current_address": "Địa chỉ hiện tại của bạn",
     "dns_expiration_date": "Ngày hết hạn",
     "dns_renew_toast_success": "Tên miền đã được gia hạn",
-    "dns_renew_until_btn": "Gia hạn đến {untilDate}",
+    "dns_renew_until_btn": "Gia hạn đến %{untilDate}",
     "exchange_method_dont_show_again": "Không hiển thị lại",
-    "exchange_method_open_warning": "Bạn đang mở một ứng dụng bên ngoài không do Tonkeeper vận hành.",
+    "exchange_method_open_warning": "Bạn đang mở một ứng dụng bên ngoài không do Keeper vận hành.",
     "exchange_modal": {
         "other_ways_to_buy": "Các cách mua khác"
     },
-    "exchange_other_ways": "Các cách khác để mua hoặc bán %{coinSymbolWithEx}",
-    "exchange_title": "Mua %{coinSymbolWithEx}",
+    "exchange_other_ways": "Các cách khác để mua hoặc bán %{coinSymbol}",
+    "exchange_title": "Mua %{coinSymbol}",
     "import_add_wallet": "Thêm ví",
     "import_add_wallet_description": "Tạo ví mới hoặc thêm ví hiện có.",
     "import_existing_wallet": "Ví hiện có",
@@ -154,18 +167,16 @@
     "intro_continue_btn": "Bắt đầu",
     "intro_item1_caption": "Nhờ kiến trúc độc đáo của The Open Network, các giao dịch %{chainName} được xử lý chỉ trong vài giây.",
     "intro_item1_title": "Tốc độ đẳng cấp thế giới",
-    "intro_item2_caption": "Tonkeeper lưu trữ các khóa mã hóa của bạn trên thiết bị của bạn. Tất cả các giao dịch đều được thực hiện thông qua các giao thức phi tập trung nên tiền điện tử của bạn không bao giờ rơi vào tay các sàn giao dịch tập trung.",
+    "intro_item2_caption": "Keeper lưu trữ các khóa mã hóa của bạn trên thiết bị của bạn. Tất cả các giao dịch đều được thực hiện thông qua các giao thức phi tập trung nên tiền điện tử của bạn không bao giờ rơi vào tay các sàn giao dịch tập trung.",
     "intro_item2_title": "Bảo mật đầu-cuối",
     "intro_title": "Chào mừng\nđến với ",
-    "jetton_id": "ID mã thông báo: {jettonAddress}",
+    "jetton_id": "ID mã thông báo: %{jettonAddress}",
     "jettons_list_title": "Token",
     "later": "Sau này",
     "ledger": {
         "operation_not_supported": "Thao tác này không khả dụng cho ví Ledger. Vui lòng chọn ví khác và thử lại."
     },
-    "legal_font_license": "Phông chữ Montserrat",
     "legal_header_title": "Pháp lý",
-    "legal_licenses_title": "Giấy phép",
     "legal_privacy": "Chính sách bảo mật",
     "legal_terms": "Điều khoản dịch vụ",
     "loading": "Đang tải",
@@ -197,7 +208,7 @@
         "title": "Chuyển nhượng NFT"
     },
     "nft_transfer_title": "Chuyển NFT",
-    "nft_unlink_domain_button": "Được liên kết với '{{'address'}}'",
+    "nft_unlink_domain_button": "Được liên kết với {{address}}",
     "nft_view_in_explorer": "Xem trong trình khám phá",
     "notifications": {
         "alert": {
@@ -217,7 +228,7 @@
     "recovery_phrase": {
         "copy_button": "Sao chép"
     },
-    "reminder_notifications_caption": "Nhận thông báo khi bạn nhận được %{coinSymbolWithEx}, token và NFT.",
+    "reminder_notifications_caption": "Nhận thông báo khi bạn nhận được %{coinSymbol}, token và NFT.",
     "reminder_notifications_enable_button": "Bật thông báo",
     "reminder_notifications_later_button": "Sau này",
     "reminder_notifications_title": "Nhận thông báo tức thì",
@@ -230,7 +241,7 @@
     "send_publish_tx_error": "Gửi giao dịch thất bại",
     "send_screen_steps": {
         "address": {
-            "delete_alert_text": "Bạn có chắc chắn muốn xóa «{name}» khỏi danh sách yêu thích của mình không?",
+            "delete_alert_text": "Bạn có chắc chắn muốn xóa «%{name}» khỏi danh sách yêu thích của mình không?",
             "suggest_actions": {
                 "add": "Thêm vào mục yêu thích",
                 "delete": "Xóa",
@@ -241,7 +252,7 @@
         "amount": {
             "insufficient_balance": "Số dư không đủ",
             "max": "TỐI ĐA",
-            "remaining": "Có sẵn: {amount}"
+            "remaining": "Có sẵn: %{amount}"
         },
         "comfirm": {
             "comment_required_text": "Khi gửi, hãy đảm bảo bao gồm ghi chú hoặc mã tag từ sàn giao dịch. Nếu không có, tiền của bạn sẽ không được nạp và có thể bị mất.",
@@ -250,7 +261,7 @@
         },
         "done": {
             "done_label": "Hoàn tất",
-            "to": "Tới: {name}"
+            "to": "Tới: %{name}"
         }
     },
     "send_sending_wrong_time_description": "Bật tự động cập nhật ngày và giờ trong cài đặt thiết bị của bạn. Sau đó thử chuyển lại.",
@@ -260,10 +271,10 @@
     "settings_jettons_list": "Token",
     "settings_legal_documents": "Tài liệu pháp lý",
     "settings_network_alert_title": "Chọn mạng",
-    "settings_news": "Tin tức Tonkeeper",
+    "settings_news": "Tin tức Keeper",
     "settings_notifications": "Thông báo",
     "settings_primary_currency": "Tiền tệ",
-    "settings_rate": "Đánh giá Tonkeeper",
+    "settings_rate": "Đánh giá Keeper",
     "settings_recovery_phrase": "Cụm từ khôi phục",
     "settings_reset": "Đăng xuất",
     "settings_reset_alert_title": "🚧 🚨 Đăng xuất? 🚨 🚧",
@@ -293,17 +304,17 @@
     "staking_earnings_section_title": "Thu nhập dự kiến hàng năm",
     "staking_enter_amount": "Nhập số tiền",
     "staking_insufficient_balance": "Số dư không đủ",
-    "staking_insufficient_recommended_fee_reserve": "Không đủ tiền: số dư ví phải có 1 %{coinSymbolWithEx} dự trữ và 0.05 %{coinSymbolWithEx} phí.",
+    "staking_insufficient_recommended_fee_reserve": "Không đủ tiền: số dư ví phải có 1 %{coinSymbol} dự trữ và 0.05 %{coinSymbol} phí.",
     "staking_max": "TỐI ĐA",
     "staking_min_deposit_label": "Số tiền gửi tối thiểu",
     "staking_next_cycle_desc_liquid": "Có thể rút stake ngay lập tức",
-    "staking_next_cycle_message": "Chu kỳ tiếp theo trong {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · Gửi tối thiểu {minDeposit} %{coinSymbolWithEx}",
-    "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} sẵn sàng rút",
+    "staking_next_cycle_message": "Chu kỳ tiếp theo trong %{value}",
+    "staking_pool_detail": "APY ≈ %{apy}% · Gửi tối thiểu %{minDeposit} %{coinSymbol}",
+    "staking_pools_apy": "APY ≈ %{apy}%",
+    "staking_ready_withdraw": "%{amount} %{coinSymbol} sẵn sàng rút",
     "staking_rewards_after_stake": "Sau khi gửi tiền",
     "staking_rewards_current": "Hiện tại",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ %{value} %{coinSymbol}",
     "staking_staked": "Đã gửi",
     "staking_title": "Đặt cọc",
     "staking_top_up": "Gửi tiền",
@@ -346,10 +357,9 @@
         "subtitle": "NFT có thể không an toàn để sử dụng vì một trong những lý do sau.",
         "title": "NFT chưa được xác minh"
     },
-    "swap_confirm_not_enough_ton_for_fee": "Không đủ %{coinSymbolWithEx} để trả phí mạng ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "Không đủ %{coinSymbol} để trả phí mạng (%{required})",
     "swap_exchange_in": "Hoán đổi trong",
     "swap_expired_refresh": "Giao dịch đã hết hạn. Làm mới báo giá",
-    "swap_price_impact_description": "Chênh lệch giữa giá thị trường và giá ước tính do quy mô giao dịch.",
     "swap_price_impact_ignore_variant": "Bỏ qua",
     "swap_slippage_tolerance": "Dung sai trượt giá",
     "swap_slippage_tolerance_description": "Mức giá có thể thay đổi bất lợi trước khi giao dịch bị hoàn tác.",
@@ -359,9 +369,9 @@
     "tokenDetails": {
         "tonviewer_button": "Xem trên Tonviewer"
     },
-    "tonkeeper_pro": "Tonkeeper Pro",
-    "tonkeeper_pro_description": "Gói đăng ký Tonkeeper Pro đi kèm với tính năng ví mở rộng, cung cấp bộ công cụ quản lý tiền điện tử.",
-    "ton_login_caption": "{name} đang yêu cầu quyền truy cập vào địa chỉ ví của bạn",
+    "tonkeeper_pro": "Keeper Pro",
+    "tonkeeper_pro_description": "Gói đăng ký Keeper Pro đi kèm với tính năng ví mở rộng, cung cấp bộ công cụ quản lý tiền điện tử.",
+    "ton_login_caption": "%{name} đang yêu cầu quyền truy cập vào địa chỉ ví của bạn",
     "ton_login_connect_button": "Kết nối ví",
     "ton_login_notice": "Hãy chắc chắn kiểm tra địa chỉ dịch vụ trước khi kết nối ví.",
     "ton_login_success": "Hoàn thành",
@@ -375,7 +385,7 @@
     "transaction_fee": "Phí",
     "transaction_hash": "Giao dịch",
     "transaction_merchant": "Thương nhân",
-    "transaction_receive_date": "Đã nhận vào ngày {date}",
+    "transaction_receive_date": "Đã nhận vào ngày %{date}",
     "transaction_recipient": "Người nhận",
     "transaction_recipient_address": "Địa chỉ người nhận",
     "transactions": {
@@ -390,7 +400,7 @@
     },
     "transaction_sender": "Người gửi",
     "transaction_sender_address": "Địa chỉ người gửi",
-    "transaction_sent_date": "Đã gửi vào ngày {date}",
+    "transaction_sent_date": "Đã gửi vào ngày %{date}",
     "transaction_type_bid": "Đấu giá",
     "transaction_type_contract_deploy": "Triển khai hợp đồng",
     "transaction_type_pending": "Đang chờ xử lý",
@@ -410,7 +420,7 @@
             "types": {
                 "jettonTransfer": "Chuyển token",
                 "nftItemTransfer": "Chuyển NFT",
-                "tonTransfer": "Chuyển khoản %{coinSymbolWithEx}",
+                "tonTransfer": "Chuyển khoản %{coinSymbol}",
                 "unknownTransaction": "Giao dịch không xác định"
             }
         }
@@ -427,21 +437,22 @@
     "wallet_swap": "Hoán đổi",
     "wallet_title": "Ví",
     "yesterday": "Hôm qua",
-    "staking_pool_liquid_desc": "Khi bạn stake %{coinSymbolWithEx} trong pool Tonstakers, bạn nhận token tsTON thể hiện phần của bạn trong pool. Khi pool tích lũy lợi nhuận, tsTON của bạn tương ứng với nhiều %{coinSymbolWithEx} hơn.",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} sẽ được rút vào {date}",
-    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} sẽ được rút sau khi kết thúc chu kỳ",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} sẽ được rút trong {value}",
+    "staking_pool_liquid_desc": "Khi bạn stake %{coinSymbol} trong pool Tonstakers, bạn nhận token tsTON thể hiện phần của bạn trong pool. Khi pool tích lũy lợi nhuận, tsTON của bạn tương ứng với nhiều %{coinSymbol} hơn.",
+    "staking_pool_withdraw_date": "%{amount} %{coinSymbol} sẽ được rút vào %{date}",
+    "staking_portfolio_pending_withdraw": "%{amount} %{coinSymbol} sẽ được rút sau khi kết thúc chu kỳ",
+    "staking_portfolio_pending_withdraw_countdown": "%{amount} %{coinSymbol} sẽ được rút trong %{value}",
     "staking_confirm_modal_provider": "Nhà cung cấp",
     "staking_confirm_modal_amount": "Số tiền",
     "staking_confirm_modal_apy": "APY",
     "staking_confirm_modal_wallet": "Ví",
-    "staking_unstake_cycle_info": "Yêu cầu sẽ được xử lý sau khi kết thúc chu kỳ xác thực trong {value}",
-    "staking_tonstakers_notice": "Staking dựa trên hợp đồng thông minh của bên thứ ba. Tonkeeper không chịu trách nhiệm về trải nghiệm staking.",
+    "staking_unstake_cycle_info": "Yêu cầu sẽ được xử lý sau khi kết thúc chu kỳ xác thực trong %{value}",
+    "staking_tonstakers_notice": "Staking dựa trên hợp đồng thông minh của bên thứ ba. Keeper không chịu trách nhiệm về trải nghiệm staking.",
     "staking_claim": "Nhận",
     "staking_details_pool_address_label": "Địa chỉ pool",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} đang chờ stake",
-    "staking_pools_min_deposit": "Nạp tối thiểu {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "%{amount} %{coinSymbol} đang chờ stake",
+    "staking_pools_min_deposit": "Nạp tối thiểu %{minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "Chỉ có thể rút toàn bộ",
+    "trc20_transfer_unavailable": "Việc gửi TRC20 tạm thời không khả dụng",
     "twa_closed_title": "Mini App đã đóng",
     "twa_closed_subtitle": "Tiếp tục từ nơi bạn đã dừng trên iOS, Android hoặc Web.",
     "twa_closed_subtitle_wallets": "Ví của bạn vẫn an toàn. Vui lòng lưu các cụm từ khôi phục của bạn và tiếp tục từ nơi bạn đã dừng trên iOS, Android hoặc Web.",

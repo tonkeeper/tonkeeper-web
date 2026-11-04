@@ -271,7 +271,7 @@ const parseAmount = (val: string) => {
 };
 
 const parseAsset = (val: string) => {
-    if (val === 'TON') {
+    if (val === 'TON' || val === FiatCurrencies.GRAM) {
         return {
             type: 'token',
             address: TON_ASSET.address

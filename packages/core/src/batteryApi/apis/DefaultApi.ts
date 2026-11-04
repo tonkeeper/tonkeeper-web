@@ -12,295 +12,886 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  AndroidBatteryPurchaseRequest,
-  AndroidBatteryPurchaseStatus,
-  AppStoreNotificationRequest,
-  ApplyPromoRequest,
-  Balance,
-  BatteryCharged,
-  Config,
-  CreateCustomRefundRequest,
-  CreatePromoCampaign200Response,
-  CreatePromoCampaignRequest,
-  EmulateMessageToWalletRequest,
-  EnterpriseEstimate200Response,
-  EnterpriseEstimateRequest,
-  EnterpriseGetMessage200Response,
-  EnterpriseGetStatus200Response,
-  EnterpriseSend200Response,
-  EnterpriseWalletConfig,
-  EstimateGaslessCostRequest,
-  EstimatedTronTx,
-  GaslessEstimation,
-  GetTonConnectPayloadDefaultResponse,
-  GetTronConfig200Response,
-  IOSBatteryPurchaseStatus,
-  IncreaseUserBalanceRequest,
-  IosBatteryPurchaseRequest,
-  PromoCodeBatteryPurchaseRequest,
-  PromoCodeBatteryPurchaseStatus,
-  PromoUsed,
-  Purchases,
-  RechargeMethods,
-  RequestRefundRequest,
-  ResetUserBalanceRequest,
-  SentTronTx,
-  Status,
-  Transactions,
-  TronAvailableTransfers,
-  TronSendRequest,
-  TronTransactionsList,
-  VerifyPurchasePromo200Response,
-} from '../models/index';
 import {
+    type AndroidBatteryPurchaseRequest,
     AndroidBatteryPurchaseRequestFromJSON,
     AndroidBatteryPurchaseRequestToJSON,
+} from '../models/AndroidBatteryPurchaseRequest';
+import {
+    type AndroidBatteryPurchaseStatus,
     AndroidBatteryPurchaseStatusFromJSON,
     AndroidBatteryPurchaseStatusToJSON,
+} from '../models/AndroidBatteryPurchaseStatus';
+import {
+    type AppStoreNotificationRequest,
     AppStoreNotificationRequestFromJSON,
     AppStoreNotificationRequestToJSON,
+} from '../models/AppStoreNotificationRequest';
+import {
+    type ApplyPromoRequest,
     ApplyPromoRequestFromJSON,
     ApplyPromoRequestToJSON,
+} from '../models/ApplyPromoRequest';
+import {
+    type Balance,
     BalanceFromJSON,
     BalanceToJSON,
+} from '../models/Balance';
+import {
+    type BatteryCharged,
     BatteryChargedFromJSON,
     BatteryChargedToJSON,
+} from '../models/BatteryCharged';
+import {
+    type BatteryNftTransferRequest,
+    BatteryNftTransferRequestFromJSON,
+    BatteryNftTransferRequestToJSON,
+} from '../models/BatteryNftTransferRequest';
+import {
+    type BatterySwapTonToUsdtRequest,
+    BatterySwapTonToUsdtRequestFromJSON,
+    BatterySwapTonToUsdtRequestToJSON,
+} from '../models/BatterySwapTonToUsdtRequest';
+import {
+    type BatteryTransferRequest,
+    BatteryTransferRequestFromJSON,
+    BatteryTransferRequestToJSON,
+} from '../models/BatteryTransferRequest';
+import {
+    type Config,
     ConfigFromJSON,
     ConfigToJSON,
+} from '../models/Config';
+import {
+    type CreateCustomRefundRequest,
     CreateCustomRefundRequestFromJSON,
     CreateCustomRefundRequestToJSON,
+} from '../models/CreateCustomRefundRequest';
+import {
+    type CreatePromoCampaign200Response,
     CreatePromoCampaign200ResponseFromJSON,
     CreatePromoCampaign200ResponseToJSON,
+} from '../models/CreatePromoCampaign200Response';
+import {
+    type CreatePromoCampaignByUser200Response,
+    CreatePromoCampaignByUser200ResponseFromJSON,
+    CreatePromoCampaignByUser200ResponseToJSON,
+} from '../models/CreatePromoCampaignByUser200Response';
+import {
+    type CreatePromoCampaignByUserRequest,
+    CreatePromoCampaignByUserRequestFromJSON,
+    CreatePromoCampaignByUserRequestToJSON,
+} from '../models/CreatePromoCampaignByUserRequest';
+import {
+    type CreatePromoCampaignRequest,
     CreatePromoCampaignRequestFromJSON,
     CreatePromoCampaignRequestToJSON,
-    EmulateMessageToWalletRequestFromJSON,
-    EmulateMessageToWalletRequestToJSON,
+} from '../models/CreatePromoCampaignRequest';
+import {
+    type EnterpriseEstimate200Response,
     EnterpriseEstimate200ResponseFromJSON,
     EnterpriseEstimate200ResponseToJSON,
+} from '../models/EnterpriseEstimate200Response';
+import {
+    type EnterpriseEstimateRequest,
     EnterpriseEstimateRequestFromJSON,
     EnterpriseEstimateRequestToJSON,
+} from '../models/EnterpriseEstimateRequest';
+import {
+    type EnterpriseGetMessage200Response,
     EnterpriseGetMessage200ResponseFromJSON,
     EnterpriseGetMessage200ResponseToJSON,
+} from '../models/EnterpriseGetMessage200Response';
+import {
+    type EnterpriseGetStatus200Response,
     EnterpriseGetStatus200ResponseFromJSON,
     EnterpriseGetStatus200ResponseToJSON,
+} from '../models/EnterpriseGetStatus200Response';
+import {
+    type EnterpriseSend200Response,
     EnterpriseSend200ResponseFromJSON,
     EnterpriseSend200ResponseToJSON,
+} from '../models/EnterpriseSend200Response';
+import {
+    type EnterpriseWalletConfig,
     EnterpriseWalletConfigFromJSON,
     EnterpriseWalletConfigToJSON,
+} from '../models/EnterpriseWalletConfig';
+import {
+    type EstimateGaslessCostRequest,
     EstimateGaslessCostRequestFromJSON,
     EstimateGaslessCostRequestToJSON,
+} from '../models/EstimateGaslessCostRequest';
+import {
+    type EstimateGaslessJettonTransferRequest,
+    EstimateGaslessJettonTransferRequestFromJSON,
+    EstimateGaslessJettonTransferRequestToJSON,
+} from '../models/EstimateGaslessJettonTransferRequest';
+import {
+    type EstimatedTronTx,
     EstimatedTronTxFromJSON,
     EstimatedTronTxToJSON,
+} from '../models/EstimatedTronTx';
+import {
+    type GaslessCommissionJettonTransfer,
+    GaslessCommissionJettonTransferFromJSON,
+    GaslessCommissionJettonTransferToJSON,
+} from '../models/GaslessCommissionJettonTransfer';
+import {
+    type GaslessEstimation,
     GaslessEstimationFromJSON,
     GaslessEstimationToJSON,
+} from '../models/GaslessEstimation';
+import {
+    type GetTonConnectPayloadDefaultResponse,
     GetTonConnectPayloadDefaultResponseFromJSON,
     GetTonConnectPayloadDefaultResponseToJSON,
+} from '../models/GetTonConnectPayloadDefaultResponse';
+import {
+    type GetTronConfig200Response,
     GetTronConfig200ResponseFromJSON,
     GetTronConfig200ResponseToJSON,
+} from '../models/GetTronConfig200Response';
+import {
+    type IOSBatteryPurchaseStatus,
     IOSBatteryPurchaseStatusFromJSON,
     IOSBatteryPurchaseStatusToJSON,
+} from '../models/IOSBatteryPurchaseStatus';
+import {
+    type IncreaseUserBalanceRequest,
     IncreaseUserBalanceRequestFromJSON,
     IncreaseUserBalanceRequestToJSON,
+} from '../models/IncreaseUserBalanceRequest';
+import {
+    type IosBatteryPurchaseRequest,
     IosBatteryPurchaseRequestFromJSON,
     IosBatteryPurchaseRequestToJSON,
+} from '../models/IosBatteryPurchaseRequest';
+import {
+    type MigrateOldBatteryRequest,
+    MigrateOldBatteryRequestFromJSON,
+    MigrateOldBatteryRequestToJSON,
+} from '../models/MigrateOldBatteryRequest';
+import {
+    type MigrateRelayerRequest,
+    MigrateRelayerRequestFromJSON,
+    MigrateRelayerRequestToJSON,
+} from '../models/MigrateRelayerRequest';
+import {
+    type PromoCodeBatteryPurchaseRequest,
     PromoCodeBatteryPurchaseRequestFromJSON,
     PromoCodeBatteryPurchaseRequestToJSON,
+} from '../models/PromoCodeBatteryPurchaseRequest';
+import {
+    type PromoCodeBatteryPurchaseStatus,
     PromoCodeBatteryPurchaseStatusFromJSON,
     PromoCodeBatteryPurchaseStatusToJSON,
+} from '../models/PromoCodeBatteryPurchaseStatus';
+import {
+    type PromoUsed,
     PromoUsedFromJSON,
     PromoUsedToJSON,
+} from '../models/PromoUsed';
+import {
+    type Purchases,
     PurchasesFromJSON,
     PurchasesToJSON,
+} from '../models/Purchases';
+import {
+    type RechargeMethods,
     RechargeMethodsFromJSON,
     RechargeMethodsToJSON,
+} from '../models/RechargeMethods';
+import {
+    type RelayerToBatteryRequest,
+    RelayerToBatteryRequestFromJSON,
+    RelayerToBatteryRequestToJSON,
+} from '../models/RelayerToBatteryRequest';
+import {
+    type ReplenishOKXBalanceRequest,
+    ReplenishOKXBalanceRequestFromJSON,
+    ReplenishOKXBalanceRequestToJSON,
+} from '../models/ReplenishOKXBalanceRequest';
+import {
+    type RequestRefundRequest,
     RequestRefundRequestFromJSON,
     RequestRefundRequestToJSON,
+} from '../models/RequestRefundRequest';
+import {
+    type ResetUserBalanceRequest,
     ResetUserBalanceRequestFromJSON,
     ResetUserBalanceRequestToJSON,
+} from '../models/ResetUserBalanceRequest';
+import {
+    type SendMessageRequest,
+    SendMessageRequestFromJSON,
+    SendMessageRequestToJSON,
+} from '../models/SendMessageRequest';
+import {
+    type SentTronTx,
     SentTronTxFromJSON,
     SentTronTxToJSON,
+} from '../models/SentTronTx';
+import {
+    type Status,
     StatusFromJSON,
     StatusToJSON,
+} from '../models/Status';
+import {
+    type Transactions,
     TransactionsFromJSON,
     TransactionsToJSON,
+} from '../models/Transactions';
+import {
+    type TronAvailableTransfers,
     TronAvailableTransfersFromJSON,
     TronAvailableTransfersToJSON,
+} from '../models/TronAvailableTransfers';
+import {
+    type TronSendRequest,
     TronSendRequestFromJSON,
     TronSendRequestToJSON,
+} from '../models/TronSendRequest';
+import {
+    type TronTransactionsList,
     TronTransactionsListFromJSON,
     TronTransactionsListToJSON,
+} from '../models/TronTransactionsList';
+import {
+    type VerifyPurchasePromo200Response,
     VerifyPurchasePromo200ResponseFromJSON,
     VerifyPurchasePromo200ResponseToJSON,
-} from '../models/index';
+} from '../models/VerifyPurchasePromo200Response';
 
 export interface AndroidBatteryPurchaseOperationRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
     androidBatteryPurchaseRequest: AndroidBatteryPurchaseRequest;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
 }
 
 export interface AppStoreNotificationOperationRequest {
+    /**
+     * 
+     */
     appStoreNotificationRequest: AppStoreNotificationRequest;
 }
 
 export interface ApplyPromoOperationRequest {
+    /**
+     * 
+     */
     token: string;
+    /**
+     * 
+     */
     applyPromoRequest: ApplyPromoRequest;
 }
 
-export interface CreateCustomRefundOperationRequest {
+export interface BatteryNftTransferOperationRequest {
+    /**
+     * 
+     */
     token: string;
+    /**
+     * 
+     */
+    batteryNftTransferRequest: BatteryNftTransferRequest;
+}
+
+export interface BatterySwapTonToUsdtOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    batterySwapTonToUsdtRequest: BatterySwapTonToUsdtRequest;
+}
+
+export interface BatteryTransferOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    batteryTransferRequest: BatteryTransferRequest;
+}
+
+export interface CreateCustomRefundOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
     createCustomRefundRequest: CreateCustomRefundRequest;
 }
 
 export interface CreatePromoCampaignOperationRequest {
+    /**
+     * 
+     */
     token: string;
+    /**
+     * 
+     */
     createPromoCampaignRequest: CreatePromoCampaignRequest;
 }
 
+export interface CreatePromoCampaignByUserOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    createPromoCampaignByUserRequest: CreatePromoCampaignByUserRequest;
+}
+
 export interface EnterpriseEstimateOperationRequest {
+    /**
+     * 
+     */
     xEnterpriseAuth: string;
+    /**
+     * 
+     */
     walletId: string;
+    /**
+     * 
+     */
     enterpriseEstimateRequest: EnterpriseEstimateRequest;
+    /**
+     * 
+     */
     acceptLanguage?: string;
+    /**
+     * 
+     */
     emulate?: boolean;
 }
 
 export interface EnterpriseGetMessageRequest {
+    /**
+     * 
+     */
     xEnterpriseAuth: string;
+    /**
+     * 
+     */
     msgId: string;
 }
 
 export interface EnterpriseGetStatusRequest {
+    /**
+     * 
+     */
     xEnterpriseAuth: string;
 }
 
 export interface EnterpriseGetWalletConfigRequest {
+    /**
+     * 
+     */
     xEnterpriseAuth: string;
+    /**
+     * 
+     */
     walletId: string;
 }
 
 export interface EnterpriseSendRequest {
+    /**
+     * 
+     */
     xEnterpriseAuth: string;
+    /**
+     * 
+     */
     walletId: string;
+    /**
+     * 
+     */
     enterpriseEstimateRequest: EnterpriseEstimateRequest;
 }
 
 export interface EstimateGaslessCostOperationRequest {
+    /**
+     * 
+     */
     jettonMaster: string;
+    /**
+     * 
+     */
     estimateGaslessCostRequest: EstimateGaslessCostRequest;
+    /**
+     * 
+     */
     xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * 
+     */
     walletAddress?: string;
+    /**
+     * 
+     */
     walletPublicKey?: string;
+    /**
+     * 
+     */
     enableValidation?: boolean;
 }
 
+export interface EstimateGaslessJettonTransferOperationRequest {
+    /**
+     * 
+     */
+    estimateGaslessJettonTransferRequest: EstimateGaslessJettonTransferRequest;
+}
+
 export interface ExtendRefundPeriodRequest {
+    /**
+     * 
+     */
     token: string;
+    /**
+     * 
+     */
     purchaseId: number;
 }
 
 export interface GetBalanceRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * 
+     */
     units?: GetBalanceUnitsEnum;
+    /**
+     * 
+     */
     region?: string;
 }
 
 export interface GetBatteryChargedRequest {
+    /**
+     * 
+     */
     accountId: string;
 }
 
 export interface GetPromoUsedRequest {
+    /**
+     * 
+     */
     promo: string;
 }
 
 export interface GetPurchasesRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * 
+     */
     limit?: number;
+    /**
+     * 
+     */
     offset?: number;
+    /**
+     * 
+     */
     includeGiftsOnTheWay?: boolean;
 }
 
 export interface GetRechargeMethodsRequest {
+    /**
+     * 
+     */
     includeRechargeOnly?: boolean;
 }
 
 export interface GetStatusRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
 }
 
 export interface GetTransactionsRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * 
+     */
     limit?: number;
+    /**
+     * 
+     */
     offset?: number;
 }
 
 export interface GetTronAvailableTransfersRequest {
+    /**
+     * JWT token from Pro service (Bearer token)
+     */
     xProAuth: string;
 }
 
 export interface GetTronTransactionsRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * 
+     */
     limit?: number;
+    /**
+     * 
+     */
     maxTimestamp?: number;
 }
 
 export interface IncreaseUserBalanceOperationRequest {
+    /**
+     * 
+     */
     token: string;
+    /**
+     * 
+     */
     userId: number;
+    /**
+     * 
+     */
     increaseUserBalanceRequest: IncreaseUserBalanceRequest;
 }
 
 export interface IosBatteryPurchaseOperationRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
     iosBatteryPurchaseRequest: IosBatteryPurchaseRequest;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
 }
 
 export interface ItrxIoCallbackRequest {
+    /**
+     * 
+     */
+    sIGNATURE: string;
+    /**
+     * 
+     */
+    tIMESTAMP: string;
+    /**
+     * 
+     */
     requestBody: { [key: string]: any; };
 }
 
+export interface MigrateOldBatteryOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    migrateOldBatteryRequest: MigrateOldBatteryRequest;
+}
+
+export interface MigrateRelayerOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    migrateRelayerRequest: MigrateRelayerRequest;
+}
+
+export interface OmnistonSwapRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    master0: string;
+    /**
+     * 
+     */
+    master1: string;
+    /**
+     * 
+     */
+    fromAmount: string;
+}
+
 export interface PromoCodeBatteryPurchaseOperationRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
     promoCodeBatteryPurchaseRequest: PromoCodeBatteryPurchaseRequest;
+    /**
+     * 
+     */
     acceptLanguage?: string;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+}
+
+export interface RelayerToBatteryOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    relayerToBatteryRequest: RelayerToBatteryRequest;
+}
+
+export interface ReplenishOKXBalanceOperationRequest {
+    /**
+     * 
+     */
+    token: string;
+    /**
+     * 
+     */
+    replenishOKXBalanceRequest: ReplenishOKXBalanceRequest;
 }
 
 export interface RequestRefundOperationRequest {
-    xTonConnectAuth: string;
+    /**
+     * 
+     */
     requestRefundRequest: RequestRefundRequest;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
 }
 
 export interface ResetUserBalanceOperationRequest {
+    /**
+     * 
+     */
     token: string;
+    /**
+     * 
+     */
     userId: number;
+    /**
+     * 
+     */
     resetUserBalanceRequest: ResetUserBalanceRequest;
 }
 
-export interface SendMessageRequest {
-    xTonConnectAuth: string;
-    emulateMessageToWalletRequest: EmulateMessageToWalletRequest;
+export interface SendMessageOperationRequest {
+    /**
+     * 
+     */
+    sendMessageRequest: SendMessageRequest;
+    /**
+     * 
+     */
+    xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * Promo code the client wants applied. For now it is only accepted, nothing is redeemed by it.
+     */
+    xPromo?: string;
 }
 
 export interface TronEstimateRequest {
+    /**
+     * 
+     */
     wallet: string;
+    /**
+     * 
+     */
     xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * Enterprise access token; use with Tron battery billing for enterprise accounts
+     */
+    xEnterpriseAuth?: string;
+    /**
+     * JWT token from Pro service for free charges verification
+     */
     xProAuth?: string;
+    /**
+     * 
+     */
     energy?: number;
+    /**
+     * 
+     */
     bandwidth?: number;
+    /**
+     * Enable balance validation for battery charges
+     */
     enableValidation?: boolean;
 }
 
 export interface TronSendOperationRequest {
+    /**
+     * 
+     */
     tronSendRequest: TronSendRequest;
+    /**
+     * 
+     */
     xTonConnectAuth?: string;
+    /**
+     * Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     */
+    xWalletID?: string;
+    /**
+     * Bearer token for WalletID-based requests, "Bearer <token>". The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     */
+    authorization?: string;
+    /**
+     * Enterprise access token; use with Tron battery billing for enterprise accounts
+     */
+    xEnterpriseAuth?: string;
+    /**
+     * JWT token from Pro service for free charges verification
+     */
     xProAuth?: string;
+    /**
+     * User public key for commission payments (required when instant_fee_tx is provided)
+     */
     userPublicKey?: string;
 }
 
 export interface VerifyPurchasePromoRequest {
+    /**
+     * 
+     */
     promo?: string;
 }
 
@@ -312,9 +903,22 @@ export interface VerifyPurchasePromoRequest {
  */
 export interface DefaultApiInterface {
     /**
-     * verify an in-app purchase
-     * @param {string} xTonConnectAuth 
+     * Creates request options for androidBatteryPurchase without sending the request
      * @param {AndroidBatteryPurchaseRequest} androidBatteryPurchaseRequest In-App purchase
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    androidBatteryPurchaseRequestOpts(requestParameters: AndroidBatteryPurchaseOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * verify an in-app purchase
+     * @param {AndroidBatteryPurchaseRequest} androidBatteryPurchaseRequest In-App purchase
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -325,6 +929,14 @@ export interface DefaultApiInterface {
      * verify an in-app purchase
      */
     androidBatteryPurchase(requestParameters: AndroidBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AndroidBatteryPurchaseStatus>;
+
+    /**
+     * Creates request options for appStoreNotification without sending the request
+     * @param {AppStoreNotificationRequest} appStoreNotificationRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    appStoreNotificationRequestOpts(requestParameters: AppStoreNotificationOperationRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -338,6 +950,15 @@ export interface DefaultApiInterface {
     /**
      */
     appStoreNotification(requestParameters: AppStoreNotificationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object>;
+
+    /**
+     * Creates request options for applyPromo without sending the request
+     * @param {string} token 
+     * @param {ApplyPromoRequest} applyPromoRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    applyPromoRequestOpts(requestParameters: ApplyPromoOperationRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -354,6 +975,84 @@ export interface DefaultApiInterface {
     applyPromo(requestParameters: ApplyPromoOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromoCodeBatteryPurchaseStatus>;
 
     /**
+     * Creates request options for batteryNftTransfer without sending the request
+     * @param {string} token 
+     * @param {BatteryNftTransferRequest} batteryNftTransferRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batteryNftTransferRequestOpts(requestParameters: BatteryNftTransferOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {BatteryNftTransferRequest} batteryNftTransferRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batteryNftTransferRaw(requestParameters: BatteryNftTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    batteryNftTransfer(requestParameters: BatteryNftTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for batterySwapTonToUsdt without sending the request
+     * @param {string} token 
+     * @param {BatterySwapTonToUsdtRequest} batterySwapTonToUsdtRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batterySwapTonToUsdtRequestOpts(requestParameters: BatterySwapTonToUsdtOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {BatterySwapTonToUsdtRequest} batterySwapTonToUsdtRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batterySwapTonToUsdtRaw(requestParameters: BatterySwapTonToUsdtOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    batterySwapTonToUsdt(requestParameters: BatterySwapTonToUsdtOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for batteryTransfer without sending the request
+     * @param {string} token 
+     * @param {BatteryTransferRequest} batteryTransferRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batteryTransferRequestOpts(requestParameters: BatteryTransferOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {BatteryTransferRequest} batteryTransferRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batteryTransferRaw(requestParameters: BatteryTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    batteryTransfer(requestParameters: BatteryTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for createCustomRefund without sending the request
+     * @param {string} token 
+     * @param {CreateCustomRefundRequest} createCustomRefundRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createCustomRefundRequestOpts(requestParameters: CreateCustomRefundOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {string} token 
      * @param {CreateCustomRefundRequest} createCustomRefundRequest 
@@ -368,6 +1067,15 @@ export interface DefaultApiInterface {
     createCustomRefund(requestParameters: CreateCustomRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
 
     /**
+     * Creates request options for createPromoCampaign without sending the request
+     * @param {string} token 
+     * @param {CreatePromoCampaignRequest} createPromoCampaignRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createPromoCampaignRequestOpts(requestParameters: CreatePromoCampaignOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {string} token 
      * @param {CreatePromoCampaignRequest} createPromoCampaignRequest 
@@ -380,6 +1088,41 @@ export interface DefaultApiInterface {
     /**
      */
     createPromoCampaign(requestParameters: CreatePromoCampaignOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreatePromoCampaign200Response>;
+
+    /**
+     * Creates request options for createPromoCampaignByUser without sending the request
+     * @param {string} token 
+     * @param {CreatePromoCampaignByUserRequest} createPromoCampaignByUserRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createPromoCampaignByUserRequestOpts(requestParameters: CreatePromoCampaignByUserOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {CreatePromoCampaignByUserRequest} createPromoCampaignByUserRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createPromoCampaignByUserRaw(requestParameters: CreatePromoCampaignByUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreatePromoCampaignByUser200Response>>;
+
+    /**
+     */
+    createPromoCampaignByUser(requestParameters: CreatePromoCampaignByUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreatePromoCampaignByUser200Response>;
+
+    /**
+     * Creates request options for enterpriseEstimate without sending the request
+     * @param {string} xEnterpriseAuth 
+     * @param {string} walletId 
+     * @param {EnterpriseEstimateRequest} enterpriseEstimateRequest bag-of-cells serialized to base64
+     * @param {string} [acceptLanguage] 
+     * @param {boolean} [emulate] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseEstimateRequestOpts(requestParameters: EnterpriseEstimateOperationRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -399,6 +1142,15 @@ export interface DefaultApiInterface {
     enterpriseEstimate(requestParameters: EnterpriseEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseEstimate200Response>;
 
     /**
+     * Creates request options for enterpriseGetMessage without sending the request
+     * @param {string} xEnterpriseAuth 
+     * @param {string} msgId 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseGetMessageRequestOpts(requestParameters: EnterpriseGetMessageRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {string} xEnterpriseAuth 
      * @param {string} msgId 
@@ -411,6 +1163,14 @@ export interface DefaultApiInterface {
     /**
      */
     enterpriseGetMessage(requestParameters: EnterpriseGetMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseGetMessage200Response>;
+
+    /**
+     * Creates request options for enterpriseGetStatus without sending the request
+     * @param {string} xEnterpriseAuth 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseGetStatusRequestOpts(requestParameters: EnterpriseGetStatusRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -426,6 +1186,15 @@ export interface DefaultApiInterface {
     enterpriseGetStatus(requestParameters: EnterpriseGetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseGetStatus200Response>;
 
     /**
+     * Creates request options for enterpriseGetWalletConfig without sending the request
+     * @param {string} xEnterpriseAuth 
+     * @param {string} walletId 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseGetWalletConfigRequestOpts(requestParameters: EnterpriseGetWalletConfigRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {string} xEnterpriseAuth 
      * @param {string} walletId 
@@ -438,6 +1207,16 @@ export interface DefaultApiInterface {
     /**
      */
     enterpriseGetWalletConfig(requestParameters: EnterpriseGetWalletConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseWalletConfig>;
+
+    /**
+     * Creates request options for enterpriseSend without sending the request
+     * @param {string} xEnterpriseAuth 
+     * @param {string} walletId 
+     * @param {EnterpriseEstimateRequest} enterpriseEstimateRequest bag-of-cells serialized to base64
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseSendRequestOpts(requestParameters: EnterpriseSendRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -455,10 +1234,27 @@ export interface DefaultApiInterface {
     enterpriseSend(requestParameters: EnterpriseSendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseSend200Response>;
 
     /**
+     * Creates request options for estimateGaslessCost without sending the request
+     * @param {string} jettonMaster 
+     * @param {EstimateGaslessCostRequest} estimateGaslessCostRequest 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {string} [walletAddress] 
+     * @param {string} [walletPublicKey] 
+     * @param {boolean} [enableValidation] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    estimateGaslessCostRequestOpts(requestParameters: EstimateGaslessCostOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {string} jettonMaster 
      * @param {EstimateGaslessCostRequest} estimateGaslessCostRequest 
      * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {string} [walletAddress] 
      * @param {string} [walletPublicKey] 
      * @param {boolean} [enableValidation] 
@@ -471,6 +1267,38 @@ export interface DefaultApiInterface {
     /**
      */
     estimateGaslessCost(requestParameters: EstimateGaslessCostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GaslessEstimation>;
+
+    /**
+     * Creates request options for estimateGaslessJettonTransfer without sending the request
+     * @param {EstimateGaslessJettonTransferRequest} estimateGaslessJettonTransferRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    estimateGaslessJettonTransferRequestOpts(requestParameters: EstimateGaslessJettonTransferOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @summary Estimate gasless commission for a jetton transfer by its parameters
+     * @param {EstimateGaslessJettonTransferRequest} estimateGaslessJettonTransferRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    estimateGaslessJettonTransferRaw(requestParameters: EstimateGaslessJettonTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessCommissionJettonTransfer>>;
+
+    /**
+     * Estimate gasless commission for a jetton transfer by its parameters
+     */
+    estimateGaslessJettonTransfer(requestParameters: EstimateGaslessJettonTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GaslessCommissionJettonTransfer>;
+
+    /**
+     * Creates request options for extendRefundPeriod without sending the request
+     * @param {string} token 
+     * @param {number} purchaseId 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    extendRefundPeriodRequestOpts(requestParameters: ExtendRefundPeriodRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -487,8 +1315,22 @@ export interface DefaultApiInterface {
     extendRefundPeriod(requestParameters: ExtendRefundPeriodRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
 
     /**
+     * Creates request options for getBalance without sending the request
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {'usd' | 'ton'} [units] 
+     * @param {string} [region] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getBalanceRequestOpts(requestParameters: GetBalanceRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * This method returns information about a user\'s balance.
-     * @param {string} xTonConnectAuth 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {'usd' | 'ton'} [units] 
      * @param {string} [region] 
      * @param {*} [options] Override http request option.
@@ -501,6 +1343,14 @@ export interface DefaultApiInterface {
      * This method returns information about a user\'s balance.
      */
     getBalance(requestParameters: GetBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Balance>;
+
+    /**
+     * Creates request options for getBatteryCharged without sending the request
+     * @param {string} accountId 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getBatteryChargedRequestOpts(requestParameters: GetBatteryChargedRequest): Promise<runtime.RequestOpts>;
 
     /**
      * This method returns information about a user\'s balance.
@@ -517,6 +1367,13 @@ export interface DefaultApiInterface {
     getBatteryCharged(requestParameters: GetBatteryChargedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BatteryCharged>;
 
     /**
+     * Creates request options for getConfig without sending the request
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getConfigRequestOpts(): Promise<runtime.RequestOpts>;
+
+    /**
      * This method returns information about Battery Service.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -528,6 +1385,14 @@ export interface DefaultApiInterface {
      * This method returns information about Battery Service.
      */
     getConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Config>;
+
+    /**
+     * Creates request options for getPromoUsed without sending the request
+     * @param {string} promo 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getPromoUsedRequestOpts(requestParameters: GetPromoUsedRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -543,8 +1408,23 @@ export interface DefaultApiInterface {
     getPromoUsed(requestParameters: GetPromoUsedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromoUsed>;
 
     /**
+     * Creates request options for getPurchases without sending the request
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {number} [limit] 
+     * @param {number} [offset] 
+     * @param {boolean} [includeGiftsOnTheWay] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getPurchasesRequestOpts(requestParameters: GetPurchasesRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * This method returns a list of purchases made by a specific user.
-     * @param {string} xTonConnectAuth 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {number} [limit] 
      * @param {number} [offset] 
      * @param {boolean} [includeGiftsOnTheWay] 
@@ -558,6 +1438,14 @@ export interface DefaultApiInterface {
      * This method returns a list of purchases made by a specific user.
      */
     getPurchases(requestParameters: GetPurchasesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Purchases>;
+
+    /**
+     * Creates request options for getRechargeMethods without sending the request
+     * @param {boolean} [includeRechargeOnly] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getRechargeMethodsRequestOpts(requestParameters: GetRechargeMethodsRequest): Promise<runtime.RequestOpts>;
 
     /**
      * This method returns on-chain recharge methods.
@@ -574,8 +1462,20 @@ export interface DefaultApiInterface {
     getRechargeMethods(requestParameters: GetRechargeMethodsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RechargeMethods>;
 
     /**
+     * Creates request options for getStatus without sending the request
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getStatusRequestOpts(requestParameters: GetStatusRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * This method returns information about the current status of Battery Service.
-     * @param {string} xTonConnectAuth 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -588,8 +1488,22 @@ export interface DefaultApiInterface {
     getStatus(requestParameters: GetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Status>;
 
     /**
+     * Creates request options for getTransactions without sending the request
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {number} [limit] 
+     * @param {number} [offset] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTransactionsRequestOpts(requestParameters: GetTransactionsRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * This method returns a list of transactions made by a specific user.
-     * @param {string} xTonConnectAuth 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {number} [limit] 
      * @param {number} [offset] 
      * @param {*} [options] Override http request option.
@@ -602,6 +1516,14 @@ export interface DefaultApiInterface {
      * This method returns a list of transactions made by a specific user.
      */
     getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions>;
+
+    /**
+     * Creates request options for getTronAvailableTransfers without sending the request
+     * @param {string} xProAuth JWT token from Pro service (Bearer token)
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronAvailableTransfersRequestOpts(requestParameters: GetTronAvailableTransfersRequest): Promise<runtime.RequestOpts>;
 
     /**
      * Get number of available TRON free transfers for Pro users
@@ -618,6 +1540,13 @@ export interface DefaultApiInterface {
     getTronAvailableTransfers(requestParameters: GetTronAvailableTransfersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronAvailableTransfers>;
 
     /**
+     * Creates request options for getTronConfig without sending the request
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronConfigRequestOpts(): Promise<runtime.RequestOpts>;
+
+    /**
      * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -630,8 +1559,22 @@ export interface DefaultApiInterface {
     getTronConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTronConfig200Response>;
 
     /**
+     * Creates request options for getTronTransactions without sending the request
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {number} [limit] 
+     * @param {number} [maxTimestamp] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronTransactionsRequestOpts(requestParameters: GetTronTransactionsRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
-     * @param {string} xTonConnectAuth 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {number} [limit] 
      * @param {number} [maxTimestamp] 
      * @param {*} [options] Override http request option.
@@ -643,6 +1586,16 @@ export interface DefaultApiInterface {
     /**
      */
     getTronTransactions(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList>;
+
+    /**
+     * Creates request options for increaseUserBalance without sending the request
+     * @param {string} token 
+     * @param {number} userId 
+     * @param {IncreaseUserBalanceRequest} increaseUserBalanceRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    increaseUserBalanceRequestOpts(requestParameters: IncreaseUserBalanceOperationRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -660,9 +1613,22 @@ export interface DefaultApiInterface {
     increaseUserBalance(requestParameters: IncreaseUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
 
     /**
-     * verify an in-app purchase
-     * @param {string} xTonConnectAuth 
+     * Creates request options for iosBatteryPurchase without sending the request
      * @param {IosBatteryPurchaseRequest} iosBatteryPurchaseRequest In-App purchase
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    iosBatteryPurchaseRequestOpts(requestParameters: IosBatteryPurchaseOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * verify an in-app purchase
+     * @param {IosBatteryPurchaseRequest} iosBatteryPurchaseRequest In-App purchase
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -675,7 +1641,19 @@ export interface DefaultApiInterface {
     iosBatteryPurchase(requestParameters: IosBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IOSBatteryPurchaseStatus>;
 
     /**
+     * Creates request options for itrxIoCallback without sending the request
+     * @param {string} sIGNATURE 
+     * @param {string} tIMESTAMP 
+     * @param {{ [key: string]: any; }} requestBody 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    itrxIoCallbackRequestOpts(requestParameters: ItrxIoCallbackRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * receive callback from itrx.io
+     * @param {string} sIGNATURE 
+     * @param {string} tIMESTAMP 
      * @param {{ [key: string]: any; }} requestBody 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -689,10 +1667,97 @@ export interface DefaultApiInterface {
     itrxIoCallback(requestParameters: ItrxIoCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
 
     /**
-     * charge battery with promo code
-     * @param {string} xTonConnectAuth 
+     * Creates request options for migrateOldBattery without sending the request
+     * @param {string} token 
+     * @param {MigrateOldBatteryRequest} migrateOldBatteryRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    migrateOldBatteryRequestOpts(requestParameters: MigrateOldBatteryOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {MigrateOldBatteryRequest} migrateOldBatteryRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    migrateOldBatteryRaw(requestParameters: MigrateOldBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    migrateOldBattery(requestParameters: MigrateOldBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for migrateRelayer without sending the request
+     * @param {string} token 
+     * @param {MigrateRelayerRequest} migrateRelayerRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    migrateRelayerRequestOpts(requestParameters: MigrateRelayerOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {MigrateRelayerRequest} migrateRelayerRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    migrateRelayerRaw(requestParameters: MigrateRelayerOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    migrateRelayer(requestParameters: MigrateRelayerOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for omnistonSwap without sending the request
+     * @param {string} token 
+     * @param {string} master0 
+     * @param {string} master1 
+     * @param {string} fromAmount 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    omnistonSwapRequestOpts(requestParameters: OmnistonSwapRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {string} master0 
+     * @param {string} master1 
+     * @param {string} fromAmount 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    omnistonSwapRaw(requestParameters: OmnistonSwapRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    omnistonSwap(requestParameters: OmnistonSwapRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for promoCodeBatteryPurchase without sending the request
      * @param {PromoCodeBatteryPurchaseRequest} promoCodeBatteryPurchaseRequest charge battery with promo code
      * @param {string} [acceptLanguage] 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    promoCodeBatteryPurchaseRequestOpts(requestParameters: PromoCodeBatteryPurchaseOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * charge battery with promo code
+     * @param {PromoCodeBatteryPurchaseRequest} promoCodeBatteryPurchaseRequest charge battery with promo code
+     * @param {string} [acceptLanguage] 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -705,9 +1770,68 @@ export interface DefaultApiInterface {
     promoCodeBatteryPurchase(requestParameters: PromoCodeBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromoCodeBatteryPurchaseStatus>;
 
     /**
+     * Creates request options for relayerToBattery without sending the request
+     * @param {string} token 
+     * @param {RelayerToBatteryRequest} relayerToBatteryRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    relayerToBatteryRequestOpts(requestParameters: RelayerToBatteryOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * 
-     * @param {string} xTonConnectAuth 
+     * @param {string} token 
+     * @param {RelayerToBatteryRequest} relayerToBatteryRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    relayerToBatteryRaw(requestParameters: RelayerToBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    relayerToBattery(requestParameters: RelayerToBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for replenishOKXBalance without sending the request
+     * @param {string} token 
+     * @param {ReplenishOKXBalanceRequest} replenishOKXBalanceRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    replenishOKXBalanceRequestOpts(requestParameters: ReplenishOKXBalanceOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {string} token 
+     * @param {ReplenishOKXBalanceRequest} replenishOKXBalanceRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    replenishOKXBalanceRaw(requestParameters: ReplenishOKXBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    replenishOKXBalance(requestParameters: ReplenishOKXBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
+     * Creates request options for requestRefund without sending the request
      * @param {RequestRefundRequest} requestRefundRequest 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    requestRefundRequestOpts(requestParameters: RequestRefundOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
+     * 
+     * @param {RequestRefundRequest} requestRefundRequest 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -717,6 +1841,16 @@ export interface DefaultApiInterface {
     /**
      */
     requestRefund(requestParameters: RequestRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * Creates request options for resetUserBalance without sending the request
+     * @param {string} token 
+     * @param {number} userId 
+     * @param {ResetUserBalanceRequest} resetUserBalanceRequest 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    resetUserBalanceRequestOpts(requestParameters: ResetUserBalanceOperationRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -734,24 +1868,58 @@ export interface DefaultApiInterface {
     resetUserBalance(requestParameters: ResetUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
 
     /**
+     * Creates request options for sendMessage without sending the request
+     * @param {SendMessageRequest} sendMessageRequest bag-of-cells serialized to base64, with a proof of the wallet\&#39;s consent
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {string} [xPromo] Promo code the client wants applied. For now it is only accepted, nothing is redeemed by it.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    sendMessageRequestOpts(requestParameters: SendMessageOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * Send message to blockchain
-     * @param {string} xTonConnectAuth 
-     * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64
+     * @param {SendMessageRequest} sendMessageRequest bag-of-cells serialized to base64, with a proof of the wallet\&#39;s consent
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {string} [xPromo] Promo code the client wants applied. For now it is only accepted, nothing is redeemed by it.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    sendMessageRaw(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    sendMessageRaw(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      * Send message to blockchain
      */
-    sendMessage(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    sendMessage(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * Creates request options for tronEstimate without sending the request
+     * @param {string} wallet 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {string} [xEnterpriseAuth] Enterprise access token; use with Tron battery billing for enterprise accounts
+     * @param {string} [xProAuth] JWT token from Pro service for free charges verification
+     * @param {number} [energy] 
+     * @param {number} [bandwidth] 
+     * @param {boolean} [enableValidation] Enable balance validation for battery charges
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    tronEstimateRequestOpts(requestParameters: TronEstimateRequest): Promise<runtime.RequestOpts>;
 
     /**
      * Estimate cost of sending a tx in Tron network
      * @param {string} wallet 
      * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {string} [xEnterpriseAuth] Enterprise access token; use with Tron battery billing for enterprise accounts
      * @param {string} [xProAuth] JWT token from Pro service for free charges verification
      * @param {number} [energy] 
      * @param {number} [bandwidth] 
@@ -768,9 +1936,26 @@ export interface DefaultApiInterface {
     tronEstimate(requestParameters: TronEstimateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EstimatedTronTx>;
 
     /**
+     * Creates request options for tronSend without sending the request
+     * @param {TronSendRequest} tronSendRequest 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {string} [xEnterpriseAuth] Enterprise access token; use with Tron battery billing for enterprise accounts
+     * @param {string} [xProAuth] JWT token from Pro service for free charges verification
+     * @param {string} [userPublicKey] User public key for commission payments (required when instant_fee_tx is provided)
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    tronSendRequestOpts(requestParameters: TronSendOperationRequest): Promise<runtime.RequestOpts>;
+
+    /**
      * send TRON tx
      * @param {TronSendRequest} tronSendRequest 
      * @param {string} [xTonConnectAuth] 
+     * @param {string} [xWalletID] Tonkeeper WalletID identifying the wallet. Two formats are accepted: hex64 (legacy v1) or base32 lowercase 32-char (v2). When it comes with a valid X-Wallet-Token, the request is authenticated by the wallet id; otherwise X-TonConnect-Auth is used as before. The wallet id alone identifies the user; the public key is not sent by the client, it is taken from the message the request carries.
+     * @param {string} [authorization] Bearer token for WalletID-based requests, \&quot;Bearer &lt;token&gt;\&quot;. The token is compared against the server-configured one (WALLET_ID_TEST_TOKEN). A request that has X-Wallet-ID with a wrong token is rejected with 401 unless it also carries X-TonConnect-Auth.
+     * @param {string} [xEnterpriseAuth] Enterprise access token; use with Tron battery billing for enterprise accounts
      * @param {string} [xProAuth] JWT token from Pro service for free charges verification
      * @param {string} [userPublicKey] User public key for commission payments (required when instant_fee_tx is provided)
      * @param {*} [options] Override http request option.
@@ -783,6 +1968,14 @@ export interface DefaultApiInterface {
      * send TRON tx
      */
     tronSend(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SentTronTx>;
+
+    /**
+     * Creates request options for verifyPurchasePromo without sending the request
+     * @param {string} [promo] 
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    verifyPurchasePromoRequestOpts(requestParameters: VerifyPurchasePromoRequest): Promise<runtime.RequestOpts>;
 
     /**
      * 
@@ -805,16 +1998,9 @@ export interface DefaultApiInterface {
 export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
     /**
-     * verify an in-app purchase
+     * Creates request options for androidBatteryPurchase without sending the request
      */
-    async androidBatteryPurchaseRaw(requestParameters: AndroidBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AndroidBatteryPurchaseStatus>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling androidBatteryPurchase().'
-            );
-        }
-
+    async androidBatteryPurchaseRequestOpts(requestParameters: AndroidBatteryPurchaseOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['androidBatteryPurchaseRequest'] == null) {
             throw new runtime.RequiredError(
                 'androidBatteryPurchaseRequest',
@@ -832,13 +2018,32 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/purchase-battery/android`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/purchase-battery/android`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: AndroidBatteryPurchaseRequestToJSON(requestParameters['androidBatteryPurchaseRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * verify an in-app purchase
+     */
+    async androidBatteryPurchaseRaw(requestParameters: AndroidBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AndroidBatteryPurchaseStatus>> {
+        const requestOptions = await this.androidBatteryPurchaseRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AndroidBatteryPurchaseStatusFromJSON(jsonValue));
     }
@@ -852,8 +2057,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for appStoreNotification without sending the request
      */
-    async appStoreNotificationRaw(requestParameters: AppStoreNotificationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async appStoreNotificationRequestOpts(requestParameters: AppStoreNotificationOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['appStoreNotificationRequest'] == null) {
             throw new runtime.RequiredError(
                 'appStoreNotificationRequest',
@@ -867,13 +2073,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/purchase-battery/ios/app-store-notification`,
+
+        let urlPath = `/purchase-battery/ios/app-store-notification`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: AppStoreNotificationRequestToJSON(requestParameters['appStoreNotificationRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async appStoreNotificationRaw(requestParameters: AppStoreNotificationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+        const requestOptions = await this.appStoreNotificationRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -886,8 +2102,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for applyPromo without sending the request
      */
-    async applyPromoRaw(requestParameters: ApplyPromoOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoCodeBatteryPurchaseStatus>> {
+    async applyPromoRequestOpts(requestParameters: ApplyPromoOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
                 'token',
@@ -912,13 +2129,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/restricted/apply-promo`,
+
+        let urlPath = `/restricted/apply-promo`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ApplyPromoRequestToJSON(requestParameters['applyPromoRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async applyPromoRaw(requestParameters: ApplyPromoOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoCodeBatteryPurchaseStatus>> {
+        const requestOptions = await this.applyPromoRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PromoCodeBatteryPurchaseStatusFromJSON(jsonValue));
     }
@@ -931,8 +2158,177 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for batteryNftTransfer without sending the request
      */
-    async createCustomRefundRaw(requestParameters: CreateCustomRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async batteryNftTransferRequestOpts(requestParameters: BatteryNftTransferOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling batteryNftTransfer().'
+            );
+        }
+
+        if (requestParameters['batteryNftTransferRequest'] == null) {
+            throw new runtime.RequiredError(
+                'batteryNftTransferRequest',
+                'Required parameter "batteryNftTransferRequest" was null or undefined when calling batteryNftTransfer().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/battery-nft-transfer`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: BatteryNftTransferRequestToJSON(requestParameters['batteryNftTransferRequest']),
+        };
+    }
+
+    /**
+     */
+    async batteryNftTransferRaw(requestParameters: BatteryNftTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.batteryNftTransferRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async batteryNftTransfer(requestParameters: BatteryNftTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.batteryNftTransferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for batterySwapTonToUsdt without sending the request
+     */
+    async batterySwapTonToUsdtRequestOpts(requestParameters: BatterySwapTonToUsdtOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling batterySwapTonToUsdt().'
+            );
+        }
+
+        if (requestParameters['batterySwapTonToUsdtRequest'] == null) {
+            throw new runtime.RequiredError(
+                'batterySwapTonToUsdtRequest',
+                'Required parameter "batterySwapTonToUsdtRequest" was null or undefined when calling batterySwapTonToUsdt().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/battery-swap-ton-to-usdt`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: BatterySwapTonToUsdtRequestToJSON(requestParameters['batterySwapTonToUsdtRequest']),
+        };
+    }
+
+    /**
+     */
+    async batterySwapTonToUsdtRaw(requestParameters: BatterySwapTonToUsdtOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.batterySwapTonToUsdtRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async batterySwapTonToUsdt(requestParameters: BatterySwapTonToUsdtOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.batterySwapTonToUsdtRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for batteryTransfer without sending the request
+     */
+    async batteryTransferRequestOpts(requestParameters: BatteryTransferOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling batteryTransfer().'
+            );
+        }
+
+        if (requestParameters['batteryTransferRequest'] == null) {
+            throw new runtime.RequiredError(
+                'batteryTransferRequest',
+                'Required parameter "batteryTransferRequest" was null or undefined when calling batteryTransfer().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/battery-transfer`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: BatteryTransferRequestToJSON(requestParameters['batteryTransferRequest']),
+        };
+    }
+
+    /**
+     */
+    async batteryTransferRaw(requestParameters: BatteryTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.batteryTransferRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async batteryTransfer(requestParameters: BatteryTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.batteryTransferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for createCustomRefund without sending the request
+     */
+    async createCustomRefundRequestOpts(requestParameters: CreateCustomRefundOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
                 'token',
@@ -957,13 +2353,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/restricted/create-custom-refund`,
+
+        let urlPath = `/restricted/create-custom-refund`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: CreateCustomRefundRequestToJSON(requestParameters['createCustomRefundRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async createCustomRefundRaw(requestParameters: CreateCustomRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.createCustomRefundRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -976,8 +2382,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for createPromoCampaign without sending the request
      */
-    async createPromoCampaignRaw(requestParameters: CreatePromoCampaignOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreatePromoCampaign200Response>> {
+    async createPromoCampaignRequestOpts(requestParameters: CreatePromoCampaignOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
                 'token',
@@ -1002,13 +2409,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/restricted/promo-campaign`,
+
+        let urlPath = `/restricted/promo-campaign`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: CreatePromoCampaignRequestToJSON(requestParameters['createPromoCampaignRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async createPromoCampaignRaw(requestParameters: CreatePromoCampaignOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreatePromoCampaign200Response>> {
+        const requestOptions = await this.createPromoCampaignRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CreatePromoCampaign200ResponseFromJSON(jsonValue));
     }
@@ -1021,8 +2438,65 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for createPromoCampaignByUser without sending the request
      */
-    async enterpriseEstimateRaw(requestParameters: EnterpriseEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseEstimate200Response>> {
+    async createPromoCampaignByUserRequestOpts(requestParameters: CreatePromoCampaignByUserOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling createPromoCampaignByUser().'
+            );
+        }
+
+        if (requestParameters['createPromoCampaignByUserRequest'] == null) {
+            throw new runtime.RequiredError(
+                'createPromoCampaignByUserRequest',
+                'Required parameter "createPromoCampaignByUserRequest" was null or undefined when calling createPromoCampaignByUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/promo-campaign-by-user`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreatePromoCampaignByUserRequestToJSON(requestParameters['createPromoCampaignByUserRequest']),
+        };
+    }
+
+    /**
+     */
+    async createPromoCampaignByUserRaw(requestParameters: CreatePromoCampaignByUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreatePromoCampaignByUser200Response>> {
+        const requestOptions = await this.createPromoCampaignByUserRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreatePromoCampaignByUser200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async createPromoCampaignByUser(requestParameters: CreatePromoCampaignByUserOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreatePromoCampaignByUser200Response> {
+        const response = await this.createPromoCampaignByUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for enterpriseEstimate without sending the request
+     */
+    async enterpriseEstimateRequestOpts(requestParameters: EnterpriseEstimateOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['xEnterpriseAuth'] == null) {
             throw new runtime.RequiredError(
                 'xEnterpriseAuth',
@@ -1062,13 +2536,24 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
-        const response = await this.request({
-            path: `/enterprise/wallets/{wallet_id}/estimate`.replace(`{${"wallet_id"}}`, encodeURIComponent(String(requestParameters['walletId']))),
+
+        let urlPath = `/enterprise/wallets/{wallet_id}/estimate`;
+        urlPath = urlPath.replace('{wallet_id}', encodeURIComponent(String(requestParameters['walletId'])));
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: EnterpriseEstimateRequestToJSON(requestParameters['enterpriseEstimateRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async enterpriseEstimateRaw(requestParameters: EnterpriseEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseEstimate200Response>> {
+        const requestOptions = await this.enterpriseEstimateRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseEstimate200ResponseFromJSON(jsonValue));
     }
@@ -1081,8 +2566,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for enterpriseGetMessage without sending the request
      */
-    async enterpriseGetMessageRaw(requestParameters: EnterpriseGetMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetMessage200Response>> {
+    async enterpriseGetMessageRequestOpts(requestParameters: EnterpriseGetMessageRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['xEnterpriseAuth'] == null) {
             throw new runtime.RequiredError(
                 'xEnterpriseAuth',
@@ -1105,12 +2591,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
         }
 
-        const response = await this.request({
-            path: `/enterprise/messages/{msg_id}`.replace(`{${"msg_id"}}`, encodeURIComponent(String(requestParameters['msgId']))),
+
+        let urlPath = `/enterprise/messages/{msg_id}`;
+        urlPath = urlPath.replace('{msg_id}', encodeURIComponent(String(requestParameters['msgId'])));
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async enterpriseGetMessageRaw(requestParameters: EnterpriseGetMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetMessage200Response>> {
+        const requestOptions = await this.enterpriseGetMessageRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseGetMessage200ResponseFromJSON(jsonValue));
     }
@@ -1123,8 +2620,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for enterpriseGetStatus without sending the request
      */
-    async enterpriseGetStatusRaw(requestParameters: EnterpriseGetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetStatus200Response>> {
+    async enterpriseGetStatusRequestOpts(requestParameters: EnterpriseGetStatusRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['xEnterpriseAuth'] == null) {
             throw new runtime.RequiredError(
                 'xEnterpriseAuth',
@@ -1140,12 +2638,22 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
         }
 
-        const response = await this.request({
-            path: `/enterprise/status`,
+
+        let urlPath = `/enterprise/status`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async enterpriseGetStatusRaw(requestParameters: EnterpriseGetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetStatus200Response>> {
+        const requestOptions = await this.enterpriseGetStatusRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseGetStatus200ResponseFromJSON(jsonValue));
     }
@@ -1158,8 +2666,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for enterpriseGetWalletConfig without sending the request
      */
-    async enterpriseGetWalletConfigRaw(requestParameters: EnterpriseGetWalletConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseWalletConfig>> {
+    async enterpriseGetWalletConfigRequestOpts(requestParameters: EnterpriseGetWalletConfigRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['xEnterpriseAuth'] == null) {
             throw new runtime.RequiredError(
                 'xEnterpriseAuth',
@@ -1182,12 +2691,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
         }
 
-        const response = await this.request({
-            path: `/enterprise/wallets/{wallet_id}/config`.replace(`{${"wallet_id"}}`, encodeURIComponent(String(requestParameters['walletId']))),
+
+        let urlPath = `/enterprise/wallets/{wallet_id}/config`;
+        urlPath = urlPath.replace('{wallet_id}', encodeURIComponent(String(requestParameters['walletId'])));
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async enterpriseGetWalletConfigRaw(requestParameters: EnterpriseGetWalletConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseWalletConfig>> {
+        const requestOptions = await this.enterpriseGetWalletConfigRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseWalletConfigFromJSON(jsonValue));
     }
@@ -1200,8 +2720,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for enterpriseSend without sending the request
      */
-    async enterpriseSendRaw(requestParameters: EnterpriseSendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseSend200Response>> {
+    async enterpriseSendRequestOpts(requestParameters: EnterpriseSendRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['xEnterpriseAuth'] == null) {
             throw new runtime.RequiredError(
                 'xEnterpriseAuth',
@@ -1233,13 +2754,24 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
         }
 
-        const response = await this.request({
-            path: `/enterprise/wallets/{wallet_id}/send`.replace(`{${"wallet_id"}}`, encodeURIComponent(String(requestParameters['walletId']))),
+
+        let urlPath = `/enterprise/wallets/{wallet_id}/send`;
+        urlPath = urlPath.replace('{wallet_id}', encodeURIComponent(String(requestParameters['walletId'])));
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: EnterpriseEstimateRequestToJSON(requestParameters['enterpriseEstimateRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async enterpriseSendRaw(requestParameters: EnterpriseSendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseSend200Response>> {
+        const requestOptions = await this.enterpriseSendRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseSend200ResponseFromJSON(jsonValue));
     }
@@ -1252,8 +2784,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for estimateGaslessCost without sending the request
      */
-    async estimateGaslessCostRaw(requestParameters: EstimateGaslessCostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessEstimation>> {
+    async estimateGaslessCostRequestOpts(requestParameters: EstimateGaslessCostOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['jettonMaster'] == null) {
             throw new runtime.RequiredError(
                 'jettonMaster',
@@ -1290,13 +2823,32 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/gasless/estimate-cost/{jetton_master}`.replace(`{${"jetton_master"}}`, encodeURIComponent(String(requestParameters['jettonMaster']))),
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/gasless/estimate-cost/{jetton_master}`;
+        urlPath = urlPath.replace('{jetton_master}', encodeURIComponent(String(requestParameters['jettonMaster'])));
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: EstimateGaslessCostRequestToJSON(requestParameters['estimateGaslessCostRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async estimateGaslessCostRaw(requestParameters: EstimateGaslessCostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessEstimation>> {
+        const requestOptions = await this.estimateGaslessCostRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GaslessEstimationFromJSON(jsonValue));
     }
@@ -1309,8 +2861,56 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for estimateGaslessJettonTransfer without sending the request
      */
-    async extendRefundPeriodRaw(requestParameters: ExtendRefundPeriodRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async estimateGaslessJettonTransferRequestOpts(requestParameters: EstimateGaslessJettonTransferOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['estimateGaslessJettonTransferRequest'] == null) {
+            throw new runtime.RequiredError(
+                'estimateGaslessJettonTransferRequest',
+                'Required parameter "estimateGaslessJettonTransferRequest" was null or undefined when calling estimateGaslessJettonTransfer().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/gasless/estimate/jetton-transfer`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EstimateGaslessJettonTransferRequestToJSON(requestParameters['estimateGaslessJettonTransferRequest']),
+        };
+    }
+
+    /**
+     * Estimate gasless commission for a jetton transfer by its parameters
+     */
+    async estimateGaslessJettonTransferRaw(requestParameters: EstimateGaslessJettonTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessCommissionJettonTransfer>> {
+        const requestOptions = await this.estimateGaslessJettonTransferRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GaslessCommissionJettonTransferFromJSON(jsonValue));
+    }
+
+    /**
+     * Estimate gasless commission for a jetton transfer by its parameters
+     */
+    async estimateGaslessJettonTransfer(requestParameters: EstimateGaslessJettonTransferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GaslessCommissionJettonTransfer> {
+        const response = await this.estimateGaslessJettonTransferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for extendRefundPeriod without sending the request
+     */
+    async extendRefundPeriodRequestOpts(requestParameters: ExtendRefundPeriodRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
                 'token',
@@ -1333,12 +2933,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/restricted/purchases/{purchase_id}/extend-refund-period`.replace(`{${"purchase_id"}}`, encodeURIComponent(String(requestParameters['purchaseId']))),
+
+        let urlPath = `/restricted/purchases/{purchase_id}/extend-refund-period`;
+        urlPath = urlPath.replace('{purchase_id}', encodeURIComponent(String(requestParameters['purchaseId'])));
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async extendRefundPeriodRaw(requestParameters: ExtendRefundPeriodRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.extendRefundPeriodRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -1351,16 +2962,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * This method returns information about a user\'s balance.
+     * Creates request options for getBalance without sending the request
      */
-    async getBalanceRaw(requestParameters: GetBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Balance>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling getBalance().'
-            );
-        }
-
+    async getBalanceRequestOpts(requestParameters: GetBalanceRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['units'] != null) {
@@ -1377,12 +2981,31 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/balance`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/balance`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * This method returns information about a user\'s balance.
+     */
+    async getBalanceRaw(requestParameters: GetBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Balance>> {
+        const requestOptions = await this.getBalanceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => BalanceFromJSON(jsonValue));
     }
@@ -1390,15 +3013,15 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      * This method returns information about a user\'s balance.
      */
-    async getBalance(requestParameters: GetBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Balance> {
+    async getBalance(requestParameters: GetBalanceRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Balance> {
         const response = await this.getBalanceRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * This method returns information about a user\'s balance.
+     * Creates request options for getBatteryCharged without sending the request
      */
-    async getBatteryChargedRaw(requestParameters: GetBatteryChargedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BatteryCharged>> {
+    async getBatteryChargedRequestOpts(requestParameters: GetBatteryChargedRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['accountId'] == null) {
             throw new runtime.RequiredError(
                 'accountId',
@@ -1414,12 +3037,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/battery-charged`,
+
+        let urlPath = `/battery-charged`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * This method returns information about a user\'s balance.
+     */
+    async getBatteryChargedRaw(requestParameters: GetBatteryChargedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BatteryCharged>> {
+        const requestOptions = await this.getBatteryChargedRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => BatteryChargedFromJSON(jsonValue));
     }
@@ -1433,19 +3067,30 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * This method returns information about Battery Service.
+     * Creates request options for getConfig without sending the request
      */
-    async getConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Config>> {
+    async getConfigRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/config`,
+
+        let urlPath = `/config`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * This method returns information about Battery Service.
+     */
+    async getConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Config>> {
+        const requestOptions = await this.getConfigRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConfigFromJSON(jsonValue));
     }
@@ -1459,8 +3104,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for getPromoUsed without sending the request
      */
-    async getPromoUsedRaw(requestParameters: GetPromoUsedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoUsed>> {
+    async getPromoUsedRequestOpts(requestParameters: GetPromoUsedRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['promo'] == null) {
             throw new runtime.RequiredError(
                 'promo',
@@ -1476,12 +3122,22 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/promo-used`,
+
+        let urlPath = `/promo-used`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async getPromoUsedRaw(requestParameters: GetPromoUsedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoUsed>> {
+        const requestOptions = await this.getPromoUsedRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PromoUsedFromJSON(jsonValue));
     }
@@ -1494,16 +3150,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * This method returns a list of purchases made by a specific user.
+     * Creates request options for getPurchases without sending the request
      */
-    async getPurchasesRaw(requestParameters: GetPurchasesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Purchases>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling getPurchases().'
-            );
-        }
-
+    async getPurchasesRequestOpts(requestParameters: GetPurchasesRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -1524,12 +3173,31 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/purchases`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/purchases`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * This method returns a list of purchases made by a specific user.
+     */
+    async getPurchasesRaw(requestParameters: GetPurchasesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Purchases>> {
+        const requestOptions = await this.getPurchasesRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PurchasesFromJSON(jsonValue));
     }
@@ -1537,15 +3205,15 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      * This method returns a list of purchases made by a specific user.
      */
-    async getPurchases(requestParameters: GetPurchasesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Purchases> {
+    async getPurchases(requestParameters: GetPurchasesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Purchases> {
         const response = await this.getPurchasesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * This method returns on-chain recharge methods.
+     * Creates request options for getRechargeMethods without sending the request
      */
-    async getRechargeMethodsRaw(requestParameters: GetRechargeMethodsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RechargeMethods>> {
+    async getRechargeMethodsRequestOpts(requestParameters: GetRechargeMethodsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['includeRechargeOnly'] != null) {
@@ -1554,12 +3222,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/recharge-methods`,
+
+        let urlPath = `/recharge-methods`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * This method returns on-chain recharge methods.
+     */
+    async getRechargeMethodsRaw(requestParameters: GetRechargeMethodsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RechargeMethods>> {
+        const requestOptions = await this.getRechargeMethodsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RechargeMethodsFromJSON(jsonValue));
     }
@@ -1573,16 +3252,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * This method returns information about the current status of Battery Service.
+     * Creates request options for getStatus without sending the request
      */
-    async getStatusRaw(requestParameters: GetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Status>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling getStatus().'
-            );
-        }
-
+    async getStatusRequestOpts(requestParameters: GetStatusRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -1591,12 +3263,31 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/status`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/status`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * This method returns information about the current status of Battery Service.
+     */
+    async getStatusRaw(requestParameters: GetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Status>> {
+        const requestOptions = await this.getStatusRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => StatusFromJSON(jsonValue));
     }
@@ -1604,22 +3295,15 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      * This method returns information about the current status of Battery Service.
      */
-    async getStatus(requestParameters: GetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Status> {
+    async getStatus(requestParameters: GetStatusRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Status> {
         const response = await this.getStatusRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * This method returns a list of transactions made by a specific user.
+     * Creates request options for getTransactions without sending the request
      */
-    async getTransactionsRaw(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling getTransactions().'
-            );
-        }
-
+    async getTransactionsRequestOpts(requestParameters: GetTransactionsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -1636,12 +3320,31 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/transactions`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/transactions`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * This method returns a list of transactions made by a specific user.
+     */
+    async getTransactionsRaw(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>> {
+        const requestOptions = await this.getTransactionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TransactionsFromJSON(jsonValue));
     }
@@ -1649,15 +3352,15 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      * This method returns a list of transactions made by a specific user.
      */
-    async getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions> {
+    async getTransactions(requestParameters: GetTransactionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions> {
         const response = await this.getTransactionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Get number of available TRON free transfers for Pro users
+     * Creates request options for getTronAvailableTransfers without sending the request
      */
-    async getTronAvailableTransfersRaw(requestParameters: GetTronAvailableTransfersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronAvailableTransfers>> {
+    async getTronAvailableTransfersRequestOpts(requestParameters: GetTronAvailableTransfersRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['xProAuth'] == null) {
             throw new runtime.RequiredError(
                 'xProAuth',
@@ -1673,12 +3376,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-Pro-Auth'] = String(requestParameters['xProAuth']);
         }
 
-        const response = await this.request({
-            path: `/v0/tron/available-transfers`,
+
+        let urlPath = `/v0/tron/available-transfers`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get number of available TRON free transfers for Pro users
+     */
+    async getTronAvailableTransfersRaw(requestParameters: GetTronAvailableTransfersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronAvailableTransfers>> {
+        const requestOptions = await this.getTronAvailableTransfersRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TronAvailableTransfersFromJSON(jsonValue));
     }
@@ -1692,18 +3406,29 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for getTronConfig without sending the request
      */
-    async getTronConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTronConfig200Response>> {
+    async getTronConfigRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/v0/tron/config`,
+
+        let urlPath = `/v0/tron/config`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async getTronConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTronConfig200Response>> {
+        const requestOptions = await this.getTronConfigRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GetTronConfig200ResponseFromJSON(jsonValue));
     }
@@ -1716,15 +3441,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for getTronTransactions without sending the request
      */
-    async getTronTransactionsRaw(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronTransactionsList>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling getTronTransactions().'
-            );
-        }
-
+    async getTronTransactionsRequestOpts(requestParameters: GetTronTransactionsRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -1741,26 +3460,45 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/v0/tron/transactions`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/v0/tron/transactions`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async getTronTransactionsRaw(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronTransactionsList>> {
+        const requestOptions = await this.getTronTransactionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TronTransactionsListFromJSON(jsonValue));
     }
 
     /**
      */
-    async getTronTransactions(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList> {
+    async getTronTransactions(requestParameters: GetTronTransactionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList> {
         const response = await this.getTronTransactionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
+     * Creates request options for increaseUserBalance without sending the request
      */
-    async increaseUserBalanceRaw(requestParameters: IncreaseUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async increaseUserBalanceRequestOpts(requestParameters: IncreaseUserBalanceOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
                 'token',
@@ -1792,13 +3530,24 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/restricted/users/{user_id}/increase-balance`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters['userId']))),
+
+        let urlPath = `/restricted/users/{user_id}/increase-balance`;
+        urlPath = urlPath.replace('{user_id}', encodeURIComponent(String(requestParameters['userId'])));
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: IncreaseUserBalanceRequestToJSON(requestParameters['increaseUserBalanceRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async increaseUserBalanceRaw(requestParameters: IncreaseUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.increaseUserBalanceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -1811,16 +3560,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * verify an in-app purchase
+     * Creates request options for iosBatteryPurchase without sending the request
      */
-    async iosBatteryPurchaseRaw(requestParameters: IosBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IOSBatteryPurchaseStatus>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling iosBatteryPurchase().'
-            );
-        }
-
+    async iosBatteryPurchaseRequestOpts(requestParameters: IosBatteryPurchaseOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['iosBatteryPurchaseRequest'] == null) {
             throw new runtime.RequiredError(
                 'iosBatteryPurchaseRequest',
@@ -1838,13 +3580,32 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/purchase-battery/ios`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/purchase-battery/ios`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: IosBatteryPurchaseRequestToJSON(requestParameters['iosBatteryPurchaseRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * verify an in-app purchase
+     */
+    async iosBatteryPurchaseRaw(requestParameters: IosBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IOSBatteryPurchaseStatus>> {
+        const requestOptions = await this.iosBatteryPurchaseRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IOSBatteryPurchaseStatusFromJSON(jsonValue));
     }
@@ -1858,9 +3619,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * receive callback from itrx.io
+     * Creates request options for itrxIoCallback without sending the request
      */
-    async itrxIoCallbackRaw(requestParameters: ItrxIoCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async itrxIoCallbackRequestOpts(requestParameters: ItrxIoCallbackRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sIGNATURE'] == null) {
+            throw new runtime.RequiredError(
+                'sIGNATURE',
+                'Required parameter "sIGNATURE" was null or undefined when calling itrxIoCallback().'
+            );
+        }
+
+        if (requestParameters['tIMESTAMP'] == null) {
+            throw new runtime.RequiredError(
+                'tIMESTAMP',
+                'Required parameter "tIMESTAMP" was null or undefined when calling itrxIoCallback().'
+            );
+        }
+
         if (requestParameters['requestBody'] == null) {
             throw new runtime.RequiredError(
                 'requestBody',
@@ -1874,13 +3649,32 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/v0/tron/itrx-io-callback`,
+        if (requestParameters['sIGNATURE'] != null) {
+            headerParameters['SIGNATURE'] = String(requestParameters['sIGNATURE']);
+        }
+
+        if (requestParameters['tIMESTAMP'] != null) {
+            headerParameters['TIMESTAMP'] = String(requestParameters['tIMESTAMP']);
+        }
+
+
+        let urlPath = `/v0/tron/itrx-io-callback`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: requestParameters['requestBody'],
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * receive callback from itrx.io
+     */
+    async itrxIoCallbackRaw(requestParameters: ItrxIoCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.itrxIoCallbackRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -1894,16 +3688,200 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * charge battery with promo code
+     * Creates request options for migrateOldBattery without sending the request
      */
-    async promoCodeBatteryPurchaseRaw(requestParameters: PromoCodeBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoCodeBatteryPurchaseStatus>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
+    async migrateOldBatteryRequestOpts(requestParameters: MigrateOldBatteryOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling promoCodeBatteryPurchase().'
+                'token',
+                'Required parameter "token" was null or undefined when calling migrateOldBattery().'
             );
         }
 
+        if (requestParameters['migrateOldBatteryRequest'] == null) {
+            throw new runtime.RequiredError(
+                'migrateOldBatteryRequest',
+                'Required parameter "migrateOldBatteryRequest" was null or undefined when calling migrateOldBattery().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/migrate-old-battery`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: MigrateOldBatteryRequestToJSON(requestParameters['migrateOldBatteryRequest']),
+        };
+    }
+
+    /**
+     */
+    async migrateOldBatteryRaw(requestParameters: MigrateOldBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.migrateOldBatteryRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async migrateOldBattery(requestParameters: MigrateOldBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.migrateOldBatteryRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for migrateRelayer without sending the request
+     */
+    async migrateRelayerRequestOpts(requestParameters: MigrateRelayerOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling migrateRelayer().'
+            );
+        }
+
+        if (requestParameters['migrateRelayerRequest'] == null) {
+            throw new runtime.RequiredError(
+                'migrateRelayerRequest',
+                'Required parameter "migrateRelayerRequest" was null or undefined when calling migrateRelayer().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/migrate-relayer`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: MigrateRelayerRequestToJSON(requestParameters['migrateRelayerRequest']),
+        };
+    }
+
+    /**
+     */
+    async migrateRelayerRaw(requestParameters: MigrateRelayerOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.migrateRelayerRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async migrateRelayer(requestParameters: MigrateRelayerOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.migrateRelayerRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for omnistonSwap without sending the request
+     */
+    async omnistonSwapRequestOpts(requestParameters: OmnistonSwapRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling omnistonSwap().'
+            );
+        }
+
+        if (requestParameters['master0'] == null) {
+            throw new runtime.RequiredError(
+                'master0',
+                'Required parameter "master0" was null or undefined when calling omnistonSwap().'
+            );
+        }
+
+        if (requestParameters['master1'] == null) {
+            throw new runtime.RequiredError(
+                'master1',
+                'Required parameter "master1" was null or undefined when calling omnistonSwap().'
+            );
+        }
+
+        if (requestParameters['fromAmount'] == null) {
+            throw new runtime.RequiredError(
+                'fromAmount',
+                'Required parameter "fromAmount" was null or undefined when calling omnistonSwap().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        if (requestParameters['master0'] != null) {
+            queryParameters['master0'] = requestParameters['master0'];
+        }
+
+        if (requestParameters['master1'] != null) {
+            queryParameters['master1'] = requestParameters['master1'];
+        }
+
+        if (requestParameters['fromAmount'] != null) {
+            queryParameters['from_amount'] = requestParameters['fromAmount'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/restricted/omniston-swap`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async omnistonSwapRaw(requestParameters: OmnistonSwapRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.omnistonSwapRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async omnistonSwap(requestParameters: OmnistonSwapRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.omnistonSwapRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for promoCodeBatteryPurchase without sending the request
+     */
+    async promoCodeBatteryPurchaseRequestOpts(requestParameters: PromoCodeBatteryPurchaseOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['promoCodeBatteryPurchaseRequest'] == null) {
             throw new runtime.RequiredError(
                 'promoCodeBatteryPurchaseRequest',
@@ -1925,13 +3903,32 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/purchase-battery/promo-code`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/purchase-battery/promo-code`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: PromoCodeBatteryPurchaseRequestToJSON(requestParameters['promoCodeBatteryPurchaseRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * charge battery with promo code
+     */
+    async promoCodeBatteryPurchaseRaw(requestParameters: PromoCodeBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoCodeBatteryPurchaseStatus>> {
+        const requestOptions = await this.promoCodeBatteryPurchaseRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PromoCodeBatteryPurchaseStatusFromJSON(jsonValue));
     }
@@ -1945,15 +3942,121 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for relayerToBattery without sending the request
      */
-    async requestRefundRaw(requestParameters: RequestRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
+    async relayerToBatteryRequestOpts(requestParameters: RelayerToBatteryOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling requestRefund().'
+                'token',
+                'Required parameter "token" was null or undefined when calling relayerToBattery().'
             );
         }
 
+        if (requestParameters['relayerToBatteryRequest'] == null) {
+            throw new runtime.RequiredError(
+                'relayerToBatteryRequest',
+                'Required parameter "relayerToBatteryRequest" was null or undefined when calling relayerToBattery().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/relayer-to-battery`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RelayerToBatteryRequestToJSON(requestParameters['relayerToBatteryRequest']),
+        };
+    }
+
+    /**
+     */
+    async relayerToBatteryRaw(requestParameters: RelayerToBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.relayerToBatteryRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async relayerToBattery(requestParameters: RelayerToBatteryOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.relayerToBatteryRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for replenishOKXBalance without sending the request
+     */
+    async replenishOKXBalanceRequestOpts(requestParameters: ReplenishOKXBalanceOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling replenishOKXBalance().'
+            );
+        }
+
+        if (requestParameters['replenishOKXBalanceRequest'] == null) {
+            throw new runtime.RequiredError(
+                'replenishOKXBalanceRequest',
+                'Required parameter "replenishOKXBalanceRequest" was null or undefined when calling replenishOKXBalance().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/restricted/okx-deposit`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ReplenishOKXBalanceRequestToJSON(requestParameters['replenishOKXBalanceRequest']),
+        };
+    }
+
+    /**
+     */
+    async replenishOKXBalanceRaw(requestParameters: ReplenishOKXBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.replenishOKXBalanceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async replenishOKXBalance(requestParameters: ReplenishOKXBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.replenishOKXBalanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for requestRefund without sending the request
+     */
+    async requestRefundRequestOpts(requestParameters: RequestRefundOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['requestRefundRequest'] == null) {
             throw new runtime.RequiredError(
                 'requestRefundRequest',
@@ -1971,13 +4074,31 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/request-refund`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+
+        let urlPath = `/request-refund`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: RequestRefundRequestToJSON(requestParameters['requestRefundRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async requestRefundRaw(requestParameters: RequestRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.requestRefundRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -1989,8 +4110,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for resetUserBalance without sending the request
      */
-    async resetUserBalanceRaw(requestParameters: ResetUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async resetUserBalanceRequestOpts(requestParameters: ResetUserBalanceOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['token'] == null) {
             throw new runtime.RequiredError(
                 'token',
@@ -2022,13 +4144,24 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/restricted/users/{user_id}/reset-balance`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters['userId']))),
+
+        let urlPath = `/restricted/users/{user_id}/reset-balance`;
+        urlPath = urlPath.replace('{user_id}', encodeURIComponent(String(requestParameters['userId'])));
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: ResetUserBalanceRequestToJSON(requestParameters['resetUserBalanceRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async resetUserBalanceRaw(requestParameters: ResetUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        const requestOptions = await this.resetUserBalanceRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -2041,20 +4174,13 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * Send message to blockchain
+     * Creates request options for sendMessage without sending the request
      */
-    async sendMessageRaw(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
+    async sendMessageRequestOpts(requestParameters: SendMessageOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['sendMessageRequest'] == null) {
             throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling sendMessage().'
-            );
-        }
-
-        if (requestParameters['emulateMessageToWalletRequest'] == null) {
-            throw new runtime.RequiredError(
-                'emulateMessageToWalletRequest',
-                'Required parameter "emulateMessageToWalletRequest" was null or undefined when calling sendMessage().'
+                'sendMessageRequest',
+                'Required parameter "sendMessageRequest" was null or undefined when calling sendMessage().'
             );
         }
 
@@ -2068,13 +4194,36 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
-        const response = await this.request({
-            path: `/message`,
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+        if (requestParameters['xPromo'] != null) {
+            headerParameters['X-Promo'] = String(requestParameters['xPromo']);
+        }
+
+
+        let urlPath = `/message`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: EmulateMessageToWalletRequestToJSON(requestParameters['emulateMessageToWalletRequest']),
-        }, initOverrides);
+            body: SendMessageRequestToJSON(requestParameters['sendMessageRequest']),
+        };
+    }
+
+    /**
+     * Send message to blockchain
+     */
+    async sendMessageRaw(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.sendMessageRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.VoidApiResponse(response);
     }
@@ -2082,14 +4231,14 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      * Send message to blockchain
      */
-    async sendMessage(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async sendMessage(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.sendMessageRaw(requestParameters, initOverrides);
     }
 
     /**
-     * Estimate cost of sending a tx in Tron network
+     * Creates request options for tronEstimate without sending the request
      */
-    async tronEstimateRaw(requestParameters: TronEstimateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EstimatedTronTx>> {
+    async tronEstimateRequestOpts(requestParameters: TronEstimateRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['wallet'] == null) {
             throw new runtime.RequiredError(
                 'wallet',
@@ -2121,16 +4270,39 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+        if (requestParameters['xEnterpriseAuth'] != null) {
+            headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
         if (requestParameters['xProAuth'] != null) {
             headerParameters['X-Pro-Auth'] = String(requestParameters['xProAuth']);
         }
 
-        const response = await this.request({
-            path: `/v0/tron/estimate`,
+
+        let urlPath = `/v0/tron/estimate`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Estimate cost of sending a tx in Tron network
+     */
+    async tronEstimateRaw(requestParameters: TronEstimateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EstimatedTronTx>> {
+        const requestOptions = await this.tronEstimateRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EstimatedTronTxFromJSON(jsonValue));
     }
@@ -2144,9 +4316,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * send TRON tx
+     * Creates request options for tronSend without sending the request
      */
-    async tronSendRaw(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SentTronTx>> {
+    async tronSendRequestOpts(requestParameters: TronSendOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['tronSendRequest'] == null) {
             throw new runtime.RequiredError(
                 'tronSendRequest',
@@ -2168,17 +4340,40 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
+        if (requestParameters['xWalletID'] != null) {
+            headerParameters['X-Wallet-ID'] = String(requestParameters['xWalletID']);
+        }
+
+        if (requestParameters['authorization'] != null) {
+            headerParameters['Authorization'] = String(requestParameters['authorization']);
+        }
+
+        if (requestParameters['xEnterpriseAuth'] != null) {
+            headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
         if (requestParameters['xProAuth'] != null) {
             headerParameters['X-Pro-Auth'] = String(requestParameters['xProAuth']);
         }
 
-        const response = await this.request({
-            path: `/v0/tron/send`,
+
+        let urlPath = `/v0/tron/send`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: TronSendRequestToJSON(requestParameters['tronSendRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * send TRON tx
+     */
+    async tronSendRaw(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SentTronTx>> {
+        const requestOptions = await this.tronSendRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => SentTronTxFromJSON(jsonValue));
     }
@@ -2192,8 +4387,9 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * Creates request options for verifyPurchasePromo without sending the request
      */
-    async verifyPurchasePromoRaw(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyPurchasePromo200Response>> {
+    async verifyPurchasePromoRequestOpts(requestParameters: VerifyPurchasePromoRequest): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         if (requestParameters['promo'] != null) {
@@ -2202,12 +4398,22 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/purchase-battery/verify-purchase-promo`,
+
+        let urlPath = `/purchase-battery/verify-purchase-promo`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     */
+    async verifyPurchasePromoRaw(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyPurchasePromo200Response>> {
+        const requestOptions = await this.verifyPurchasePromoRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => VerifyPurchasePromo200ResponseFromJSON(jsonValue));
     }
@@ -2226,6 +4432,6 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
  */
 export const GetBalanceUnitsEnum = {
     Usd: 'usd',
-    Ton: 'ton'
+    Ton: 'ton',
 } as const;
 export type GetBalanceUnitsEnum = typeof GetBalanceUnitsEnum[keyof typeof GetBalanceUnitsEnum];

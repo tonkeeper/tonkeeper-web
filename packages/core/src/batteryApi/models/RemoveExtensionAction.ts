@@ -29,14 +29,10 @@ import {
 export interface RemoveExtensionAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof RemoveExtensionAction
      */
     wallet: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof RemoveExtensionAction
      */
     extension: string;
 }
@@ -65,11 +61,11 @@ export function RemoveExtensionActionFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function RemoveExtensionActionToJSON(json: any): RemoveExtensionAction {
-      return RemoveExtensionActionToJSONTyped(json, false);
-  }
+export function RemoveExtensionActionToJSON(json: any): RemoveExtensionAction {
+    return RemoveExtensionActionToJSONTyped(json, false);
+}
 
-  export function RemoveExtensionActionToJSONTyped(value?: RemoveExtensionAction | null, ignoreDiscriminator: boolean = false): any {
+export function RemoveExtensionActionToJSONTyped(value?: RemoveExtensionAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -1,4 +1,7 @@
+import './reload-on-stale-chunk';
 import ReactDOM from 'react-dom/client';
+import '@tonkeeper/uikit/dist/styles/tailwind.css';
+import './wallet-core-wasm-path';
 import { App } from './App';
 import './i18n';
 
@@ -8,6 +11,15 @@ import {
     getTgAuthResult,
     sendTgAuthResultToOpener
 } from '@tonkeeper/core/dist/service/telegramOauth';
+import { noteCheckAnswerNone } from './migration/analytics';
+import { settleCheckAnswer } from './migration/handoffRequest';
+
+const resumePath = settleCheckAnswer(window.location);
+
+if (resumePath) {
+    history.replaceState(null, '', resumePath);
+    noteCheckAnswerNone();
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 

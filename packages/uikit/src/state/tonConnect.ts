@@ -31,7 +31,11 @@ import {
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { Account, getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
+import {
+    Account,
+    getNetworkByAccount,
+    isAccountSupportTonConnect
+} from '@tonkeeper/core/dist/entries/account';
 import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
 import { TxConfirmationCustomError } from '@tonkeeper/core/dist/errors/TxConfirmationCustomError';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
@@ -49,6 +53,10 @@ export const useAppTonConnectConnections = <T extends AccountConnection['type']>
     const { data } = useAccountsStateQuery();
 
     const wallets = data?.flatMap(a => a.allTonWallets);
+
+    // Skip the query entirely when no account supports TonConnect
+    // (e.g. watch-only-only setups).
+    const hasTonConnectCapableAccount = data?.some(isAccountSupportTonConnect) ?? false;
 
     return useQuery<
         {
@@ -73,15 +81,17 @@ export const useAppTonConnectConnections = <T extends AccountConnection['type']>
                 }[]
             >;
         },
-        { enabled: wallets !== undefined }
+        { enabled: wallets !== undefined && hasTonConnectCapableAccount }
     );
 };
 
 export const useTonConnectLastEventId = () => {
     const sdk = useAppSdk();
 
+    // A wallet with no TonConnect history has no stored event id; react-query
+    // rejects `undefined` as query data, so the absence is stored as `null`.
     return useQuery([QueryKey.tonConnectLastEventId], async () => {
-        return getLastEventId(sdk.storage);
+        return (await getLastEventId(sdk.storage)) ?? null;
     });
 };
 
@@ -241,7 +251,7 @@ export const tonConnectAppManuallyDisconnected$ = subject<
 export const useDisconnectTonConnectConnection = (options?: { skipEmit?: boolean }) => {
     const { mutateAsync } = useDisconnectTonConnectAppFromActiveWallet(options);
     return useCallback(
-        (app: { id: string }) => mutateAsync({ connectionId: app.id }),
+        (connection: AccountConnection) => mutateAsync({ connection }),
         [mutateAsync]
     );
 };
@@ -256,7 +266,7 @@ export const useDisconnectTonConnectAppFromActiveWallet = (options?: { skipEmit?
             dapp:
                 | { origin: string; connectionType?: AccountConnection['type'] }
                 | 'all'
-                | { connectionId: string }
+                | { connection: AccountConnection }
         ) => {
             const connectionsToDisconnect: AccountConnection[] = await disconnectDappFromWallet(
                 sdk.storage,
@@ -330,7 +340,7 @@ const disconnectDappFromWallet = async (
     dapp:
         | { origin: string; connectionType?: AccountConnection['type'] }
         | 'all'
-        | { connectionId: string },
+        | { connection: AccountConnection },
     wallet: {
         id: string;
         publicKey?: string;
@@ -349,19 +359,27 @@ const disconnectDappFromWallet = async (
                       const origin = getConnectionDappOrigin(c);
                       return !origin || eqOrigins(origin, dapp.origin);
                   } else {
-                      return c.id === dapp.connectionId;
+                      return isSameSession(c, dapp.connection);
                   }
               });
 
     connections =
-        dapp === 'all'
-            ? []
-            : connections.filter(item => connectionsToDisconnect.every(c => c.id !== item.id));
+        dapp === 'all' ? [] : connections.filter(item => !connectionsToDisconnect.includes(item));
 
     await setAccountConnection(storage, wallet, connections);
 
     return connectionsToDisconnect;
 };
+
+function isSameSession(a: AccountConnection, b: AccountConnection) {
+    if (a.type === 'http' && b.type === 'http') {
+        return a.clientSessionId === b.clientSessionId;
+    }
+    if (a.type === 'injected' && b.type === 'injected') {
+        return eqOrigins(a.webViewOrigin, b.webViewOrigin);
+    }
+    return false;
+}
 
 function getConnectionDappOrigin(connection: AccountConnection) {
     return connection.type === 'injected'

@@ -29,14 +29,10 @@ import {
 export interface ElectionsDepositStakeAction {
     /**
      * 
-     * @type {number}
-     * @memberof ElectionsDepositStakeAction
      */
     amount: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof ElectionsDepositStakeAction
      */
     staker: AccountAddress;
 }
@@ -65,11 +61,11 @@ export function ElectionsDepositStakeActionFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function ElectionsDepositStakeActionToJSON(json: any): ElectionsDepositStakeAction {
-      return ElectionsDepositStakeActionToJSONTyped(json, false);
-  }
+export function ElectionsDepositStakeActionToJSON(json: any): ElectionsDepositStakeAction {
+    return ElectionsDepositStakeActionToJSONTyped(json, false);
+}
 
-  export function ElectionsDepositStakeActionToJSONTyped(value?: ElectionsDepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
+export function ElectionsDepositStakeActionToJSONTyped(value?: ElectionsDepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

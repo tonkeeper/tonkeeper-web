@@ -13,23 +13,26 @@ import { Body2, H2Label2Responsive } from '../../components/Text';
 import { useAppSdk } from '../../hooks/appSdk';
 import { AppRoute } from '../../libs/routes';
 import { useNativeBackButton } from '../../components/BackButton';
-import { SpinnerIcon } from '../../components/Icon';
+import { Loader } from '../../components/Loader';
 import { ListBlock, ListItem } from '../../components/List';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Checkbox } from '../../components/fields/Checkbox';
-import { UpdateWalletName } from '../../components/create/WalletName';
+import { useMutateWalletColor, useWalletColorResolver } from '../../state/walletColor';
+import { CustomizeWallet } from '../../components/create/CustomizeWallet';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import {
-    NotificationFooter,
-    NotificationFooterPortal,
+    ModalFooter,
+    ModalFooterPortal,
     OnCloseInterceptor,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../../components/Notification';
+    useSetModalOnBack,
+    useSetModalOnCloseInterceptor
+} from '../../primitives/Modal';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { useImportFlowAnalytics } from '../../hooks/analytics/wallet-flow';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -98,8 +101,15 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         }
     }, [tonTransport]);
 
+    const importAnalytics = useImportFlowAnalytics('ledger');
+    useEffect(() => {
+        if (isConnectionError) {
+            importAnalytics.error(new Error('Ledger connection failed'));
+        }
+    }, [isConnectionError, importAnalytics]);
+
     const { navigateHome: navigateBackNotification } = useContext(AddWalletContext);
-    useSetNotificationOnBack(navigateBackNotification);
+    useSetModalOnBack(navigateBackNotification);
 
     if (moveNext) {
         return (
@@ -107,6 +117,7 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
                 onCancel={afterCompleted}
                 tonTransport={tonTransport!}
                 afterCompleted={afterCompleted}
+                importAnalytics={importAnalytics}
             />
         );
     }
@@ -123,8 +134,8 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         <ConnectLedgerWrapper>
             <H2Styled>{t('ledger_connect_header')}</H2Styled>
             <LedgerConnectionSteps currentStep={currentStep} isErrored={isConnectionError} />
-            <NotificationFooterPortal>
-                <NotificationFooter>
+            <ModalFooterPortal>
+                <ModalFooter>
                     <ButtonsBlock>
                         <ButtonResponsiveSize secondary onClick={afterCompleted}>
                             {t('cancel')}
@@ -133,8 +144,8 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
                             {t('try_again')}
                         </ButtonResponsiveSize>
                     </ButtonsBlock>
-                </NotificationFooter>
-            </NotificationFooterPortal>
+                </ModalFooter>
+            </ModalFooterPortal>
         </ConnectLedgerWrapper>
     );
 };
@@ -183,7 +194,8 @@ const ChooseLedgerAccounts: FC<{
     tonTransport: LedgerTonTransport;
     onCancel: () => void;
     afterCompleted: () => void;
-}> = ({ tonTransport, onCancel, afterCompleted }) => {
+    importAnalytics: ReturnType<typeof useImportFlowAnalytics>;
+}> = ({ tonTransport, onCancel, afterCompleted, importAnalytics }) => {
     const { t } = useTranslation();
     const { mutateAsync: getLedgerWallets, data: ledgerAccountData } = useLedgerWallets(
         LEDGER_IMPORT_ACCOUNTS_COUNT
@@ -191,6 +203,8 @@ const ChooseLedgerAccounts: FC<{
     const [selectedIndexes, setSelectedIndexes] = useState<Record<number, boolean>>({});
 
     const { mutateAsync: addAccountsMutation, isLoading: isAdding } = useAddLedgerAccountMutation();
+    const resolveWalletColor = useWalletColorResolver();
+    const { setWalletColor } = useMutateWalletColor();
 
     const [accountsSelected, setAccountsSelected] = useState<boolean>();
 
@@ -217,7 +231,7 @@ const ChooseLedgerAccounts: FC<{
 
         return () => setAccountsSelected(false);
     }, [navigateHome, accountsSelected]);
-    useSetNotificationOnBack(onBack);
+    useSetModalOnBack(onBack);
 
     const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
     const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
@@ -233,23 +247,31 @@ const ChooseLedgerAccounts: FC<{
             });
         };
     }, [openConfirmDiscard]);
-    useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+    useSetModalOnCloseInterceptor(onCloseInterceptor);
 
     if (accountsSelected) {
         return (
-            <UpdateWalletName
+            <CustomizeWallet
                 walletEmoji={ledgerAccountData!.emoji}
                 name={ledgerAccountData!.name}
-                submitHandler={({ name, emoji }) =>
-                    addAccountsMutation({
-                        name,
-                        emoji,
-                        allWallets: ledgerAccountData!.wallets,
-                        walletsIndexesToAdd: Object.entries(selectedIndexes)
-                            .filter(([, v]) => v)
-                            .map(([k]) => Number(k)),
-                        accountId: ledgerAccountData!.accountId
-                    }).then(afterCompleted)
+                walletColorId={resolveWalletColor(ledgerAccountData!.accountId).id}
+                submitHandler={({ name, emoji, colorId }) =>
+                    setWalletColor(ledgerAccountData!.accountId, colorId)
+                        .then(() =>
+                            addAccountsMutation({
+                                name,
+                                emoji,
+                                allWallets: ledgerAccountData!.wallets,
+                                walletsIndexesToAdd: Object.entries(selectedIndexes)
+                                    .filter(([, v]) => v)
+                                    .map(([k]) => Number(k)),
+                                accountId: ledgerAccountData!.accountId
+                            })
+                        )
+                        .then(() => {
+                            importAnalytics.success();
+                            afterCompleted();
+                        }, importAnalytics.error)
                 }
             />
         );
@@ -261,7 +283,7 @@ const ChooseLedgerAccounts: FC<{
             <AccountsListWrapper>
                 {!ledgerAccountData ? (
                     <AccountsLoadingWrapper>
-                        <SpinnerIcon />
+                        <Loader size="small" />
                     </AccountsLoadingWrapper>
                 ) : (
                     <ListBlock margin={false}>
@@ -272,7 +294,8 @@ const ChooseLedgerAccounts: FC<{
                                 <Dot>·</Dot>
                                 &nbsp;
                                 <Body2Secondary>
-                                    {toFormattedTonBalance(account.balance)}&nbsp;TON
+                                    {toFormattedTonBalance(account.balance)}&nbsp;
+                                    {BRAND_CONFIG.coinSymbol}
                                 </Body2Secondary>
                                 <CheckboxStyled
                                     checked={selectedIndexes[account.accountIndex]}
@@ -288,8 +311,8 @@ const ChooseLedgerAccounts: FC<{
                     </ListBlock>
                 )}
             </AccountsListWrapper>
-            <NotificationFooterPortal>
-                <NotificationFooter>
+            <ModalFooterPortal>
+                <ModalFooter>
                     <ButtonsBlock>
                         <ButtonResponsiveSize secondary onClick={onCancel}>
                             {t('cancel')}
@@ -303,8 +326,8 @@ const ChooseLedgerAccounts: FC<{
                             {t('continue')}
                         </ButtonResponsiveSize>
                     </ButtonsBlock>
-                </NotificationFooter>
-            </NotificationFooterPortal>
+                </ModalFooter>
+            </ModalFooterPortal>
         </ConnectLedgerWrapper>
     );
 };

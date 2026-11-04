@@ -6,11 +6,12 @@ import { TronApi, TronResources } from '../../../tronApi';
 import { TronTrc20Encoder } from '../encoder/tron-trc20-encoder';
 
 export interface ITronSender {
+    /** Resolves to the broadcast transaction id. */
     send(
         to: string,
         assetAmount: AssetAmount<TronAsset>,
         estimation: TronEstimation
-    ): Promise<void>;
+    ): Promise<string>;
 
     estimate(to: string, assetAmount: AssetAmount<TronAsset>): Promise<TronEstimation>;
 }

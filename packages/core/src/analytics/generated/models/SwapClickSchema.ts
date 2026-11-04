@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetSchema } from './AssetSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
  * After filling in swap info, user on SWAP screen clicked CONTINUE action button
  */
@@ -11,13 +13,13 @@ export type SwapClickSchema = {
      * Type of swap implementation
      */
     type: 'native';
+    wallet_mode: WalletModeSchema;
+    asset_from: AssetSchema;
+    asset_to: AssetSchema;
     /**
-     * Symbol of the jetton being swapped from
+     * Optional. True when the user chose to swap the entire balance of asset_from.
+     *
      */
-    jetton_symbol_from: string;
-    /**
-     * Symbol of the jetton being swapped to
-     */
-    jetton_symbol_to: string;
+    is_max?: boolean;
 };
 

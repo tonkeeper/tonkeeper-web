@@ -8,7 +8,7 @@ import { TonRecipientInput } from '../fields/TonRecipientInput';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { Address } from '@ton/core';
 import { useMobileModalFullScreenStretcher } from '../../hooks/useElementHeight';
-import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { ModalFooter, ModalFooterPortal } from '../../primitives/Modal';
 
 const Block = styled.div`
     display: flex;
@@ -62,8 +62,8 @@ export const AddressInput: FC<{
                         onIsLoadingChange={setDataIsLoading}
                         placeholder={t('wallet_address')}
                     />
-                    <NotificationFooterPortal>
-                        <NotificationFooter>
+                    <ModalFooterPortal>
+                        <ModalFooter>
                             <ButtonResponsiveSize
                                 fullWidth
                                 primary
@@ -76,8 +76,8 @@ export const AddressInput: FC<{
                             >
                                 {t('continue')}
                             </ButtonResponsiveSize>
-                        </NotificationFooter>
-                    </NotificationFooterPortal>
+                        </ModalFooter>
+                    </ModalFooterPortal>
                 </Block>
             </CenterContainer>
             {stretcher}

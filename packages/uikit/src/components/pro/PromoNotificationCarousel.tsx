@@ -9,6 +9,7 @@ import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon, ChevronRightIcon } from '../Icon';
 import { useUserLanguage } from '../../state/language';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
+import { joinUrl } from '@tonkeeper/core/dist/utils/url';
 import { useAppContext } from '../../hooks/appContext';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
@@ -72,7 +73,11 @@ export const PromoNotificationCarousel = () => {
                             <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
                                 <ImageWrapper isActive={observedSlide === idx}>
                                     <SlideImage
-                                        src={`${baseSlideUrl}${src[langKey]}`}
+                                        src={
+                                            baseSlideUrl
+                                                ? joinUrl(baseSlideUrl, src[langKey])
+                                                : undefined
+                                        }
                                         alt={titleKey}
                                     />
                                 </ImageWrapper>

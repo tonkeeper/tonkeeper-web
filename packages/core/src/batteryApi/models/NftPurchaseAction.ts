@@ -43,32 +43,22 @@ import {
 export interface NftPurchaseAction {
     /**
      * 
-     * @type {string}
-     * @memberof NftPurchaseAction
      */
     auctionType: NftPurchaseActionAuctionTypeEnum;
     /**
      * 
-     * @type {Price}
-     * @memberof NftPurchaseAction
      */
     amount: Price;
     /**
      * 
-     * @type {NftItem}
-     * @memberof NftPurchaseAction
      */
     nft: NftItem;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof NftPurchaseAction
      */
     seller: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof NftPurchaseAction
      */
     buyer: AccountAddress;
 }
@@ -81,7 +71,7 @@ export const NftPurchaseActionAuctionTypeEnum = {
     DnsTon: 'DNS.ton',
     DnsTg: 'DNS.tg',
     NumberTg: 'NUMBER.tg',
-    Getgems: 'getgems'
+    Getgems: 'getgems',
 } as const;
 export type NftPurchaseActionAuctionTypeEnum = typeof NftPurchaseActionAuctionTypeEnum[keyof typeof NftPurchaseActionAuctionTypeEnum];
 
@@ -90,7 +80,7 @@ export type NftPurchaseActionAuctionTypeEnum = typeof NftPurchaseActionAuctionTy
  * Check if a given object implements the NftPurchaseAction interface.
  */
 export function instanceOfNftPurchaseAction(value: object): value is NftPurchaseAction {
-    if (!('auctionType' in value) || value['auctionType'] === undefined) return false;
+    if ((!('auctionType' in (value as Record<string, any>)) && !('auction_type' in (value as Record<string, any>))) || ((value as Record<string, any>)['auctionType'] === undefined && (value as Record<string, any>)['auction_type'] === undefined)) return false;
     if (!('amount' in value) || value['amount'] === undefined) return false;
     if (!('nft' in value) || value['nft'] === undefined) return false;
     if (!('seller' in value) || value['seller'] === undefined) return false;
@@ -116,11 +106,11 @@ export function NftPurchaseActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function NftPurchaseActionToJSON(json: any): NftPurchaseAction {
-      return NftPurchaseActionToJSONTyped(json, false);
-  }
+export function NftPurchaseActionToJSON(json: any): NftPurchaseAction {
+    return NftPurchaseActionToJSONTyped(json, false);
+}
 
-  export function NftPurchaseActionToJSONTyped(value?: NftPurchaseAction | null, ignoreDiscriminator: boolean = false): any {
+export function NftPurchaseActionToJSONTyped(value?: NftPurchaseAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

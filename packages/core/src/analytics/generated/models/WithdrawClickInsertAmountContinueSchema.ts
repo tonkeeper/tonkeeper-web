@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
 import type { WithdrawOptionSchema } from './WithdrawOptionSchema';
 /**
@@ -11,18 +12,12 @@ export type WithdrawClickInsertAmountContinueSchema = {
     eventName: string;
     from: RampSourceSchema;
     withdraw_option: WithdrawOptionSchema;
-    /**
-     * Carried from withdraw_click_asset
-     */
-    sell_asset: string;
+    sell_asset: AssetSchema;
     /**
      * Carried from withdraw_click_stablecoin
      */
     stablecoin_symbol: string;
-    /**
-     * Carried from withdraw_click_network
-     */
-    buy_asset: string;
+    buy_asset: AssetSchema;
     /**
      * Amount the user entered to withdraw
      */

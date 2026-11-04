@@ -1,0 +1,28 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(scripts/agent/gate.sh*)",
+            "Bash(yarn workspace @tonkeeper/playwrite qa*)",
+            "Bash(QA_TICKET=* yarn qa *)",
+            "Bash(node qa/summary.mjs *)",
+            "Bash(node tests/playwright/qa/summary.mjs *)",
+            "Bash(gh pr view *)",
+            "Bash(gh pr diff *)",
+            "Bash(gh pr checks *)"
+        ],
+        "deny": ["Read(tests/playwright/.env)", "Read(tests/playwright/qa/.auth/**)"]
+    },
+    "hooks": {
+        "PreToolUse": [
+            {
+                "matcher": "Bash|Read|Grep|Glob|Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-secrets.mjs"
+                    }
+                ]
+            }
+        ]
+    }
+}

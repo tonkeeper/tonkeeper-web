@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface ResetUserBalanceRequest {
     /**
      * 
-     * @type {string}
-     * @memberof ResetUserBalanceRequest
      */
     reason: string;
 }
@@ -49,11 +47,11 @@ export function ResetUserBalanceRequestFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-  export function ResetUserBalanceRequestToJSON(json: any): ResetUserBalanceRequest {
-      return ResetUserBalanceRequestToJSONTyped(json, false);
-  }
+export function ResetUserBalanceRequestToJSON(json: any): ResetUserBalanceRequest {
+    return ResetUserBalanceRequestToJSONTyped(json, false);
+}
 
-  export function ResetUserBalanceRequestToJSONTyped(value?: ResetUserBalanceRequest | null, ignoreDiscriminator: boolean = false): any {
+export function ResetUserBalanceRequestToJSONTyped(value?: ResetUserBalanceRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

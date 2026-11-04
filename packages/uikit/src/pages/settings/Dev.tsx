@@ -4,7 +4,8 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppSdk, useIsCapacitorApp } from '../../hooks/appSdk';
-import { CloseIcon, PlusIcon, SpinnerIcon } from '../../components/Icon';
+import { CloseIcon, PlusIcon } from '../../components/Icon';
+import { Loader } from '../../components/Loader';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
@@ -38,7 +39,6 @@ import { useDevMenuVisibility } from '../../state/dev';
 import { useMutateProApiUrl, useProApiUrl } from '../../state/pro';
 import { isFirstSemverStringGreater } from '@tonkeeper/core/dist/utils/common';
 import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
-import { Button } from '../../components/fields/Button';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -58,7 +58,7 @@ const CookieSettings = () => {
         return [
             {
                 name: 'Clean All Cookies',
-                icon: isLoading ? <SpinnerIcon /> : <CloseIcon />,
+                icon: isLoading ? <Loader size="small" /> : <CloseIcon />,
                 action: () => mutate()
             }
         ];
@@ -92,7 +92,7 @@ const AddAccountBySK = () => {
     return (
         <>
             <SettingsList items={items} />
-            <AddWalletContext.Provider value={{ navigateHome: onClose }}>
+            <AddWalletContext.Provider value={{ navigateHome: onClose, analyticsFrom: 'main' }}>
                 <Notification isOpen={isOpen} handleClose={onClose} mobileFullScreen>
                     {() => (
                         <ImportBySKWallet
@@ -171,31 +171,6 @@ const EnvironmentToggle = () => {
                             onChange={changeUrl}
                             checked={proApiUrl === mainnetConfig.pro_dev_api_url}
                         />
-                    </ListItemPayload>
-                </ListItem>
-            </ListBlockDesktopAdaptive>
-        </HideOnReview>
-    );
-};
-
-const EncryptionKeysCleaner = () => {
-    const sdk = useAppSdk();
-
-    const handleClear = async () => {
-        await sdk.storage.delete(AppKey.META_ENCRYPTION_MAP);
-
-        console.log('Current encryption map: ', await sdk.storage.get(AppKey.META_ENCRYPTION_MAP));
-    };
-
-    return (
-        <HideOnReview>
-            <ListBlockDesktopAdaptive>
-                <ListItem hover={false}>
-                    <ListItemPayload>
-                        <Label1>Meta encryption keys</Label1>
-                        <Button size="small" onClick={handleClear}>
-                            Clear
-                        </Button>
                     </ListItemPayload>
                 </ListItem>
             </ListBlockDesktopAdaptive>
@@ -329,7 +304,6 @@ export const DevSettings = React.memo(() => {
                 <ReviewerSettings />
                 <LogsSettings />
                 <EnvironmentToggle />
-                <EncryptionKeysCleaner />
             </DesktopWrapper>
         );
     }

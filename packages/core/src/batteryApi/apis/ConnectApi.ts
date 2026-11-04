@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  GetTonConnectPayload200Response,
-  GetTonConnectPayloadDefaultResponse,
-} from '../models/index';
 import {
+    type GetTonConnectPayload200Response,
     GetTonConnectPayload200ResponseFromJSON,
     GetTonConnectPayload200ResponseToJSON,
+} from '../models/GetTonConnectPayload200Response';
+import {
+    type GetTonConnectPayloadDefaultResponse,
     GetTonConnectPayloadDefaultResponseFromJSON,
     GetTonConnectPayloadDefaultResponseToJSON,
-} from '../models/index';
+} from '../models/GetTonConnectPayloadDefaultResponse';
 
 /**
  * ConnectApi - interface
@@ -32,6 +31,13 @@ import {
  * @interface ConnectApiInterface
  */
 export interface ConnectApiInterface {
+    /**
+     * Creates request options for getTonConnectPayload without sending the request
+     * @throws {RequiredError}
+     * @memberof ConnectApiInterface
+     */
+    getTonConnectPayloadRequestOpts(): Promise<runtime.RequestOpts>;
+
     /**
      * Get a payload for further token receipt
      * @param {*} [options] Override http request option.
@@ -53,19 +59,30 @@ export interface ConnectApiInterface {
 export class ConnectApi extends runtime.BaseAPI implements ConnectApiInterface {
 
     /**
-     * Get a payload for further token receipt
+     * Creates request options for getTonConnectPayload without sending the request
      */
-    async getTonConnectPayloadRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTonConnectPayload200Response>> {
+    async getTonConnectPayloadRequestOpts(): Promise<runtime.RequestOpts> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        const response = await this.request({
-            path: `/tonconnect/payload`,
+
+        let urlPath = `/tonconnect/payload`;
+
+        return {
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Get a payload for further token receipt
+     */
+    async getTonConnectPayloadRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTonConnectPayload200Response>> {
+        const requestOptions = await this.getTonConnectPayloadRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GetTonConnectPayload200ResponseFromJSON(jsonValue));
     }

@@ -1,23 +1,24 @@
 import { styled } from 'styled-components';
 import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { Body3 } from '../Text';
-import { IconButton } from '../fields/IconButton';
+import { LegacyIconButton } from '../fields/IconButton';
 import { useState } from 'react';
 import { ChevronDownIcon, InfoCircleIcon } from '../Icon';
 import { Skeleton } from '../shared/Skeleton';
 import {
-    priceImpactStatus,
     useIsSwapFormNotCompleted,
-    useSwapPriceImpact,
-    useSwapToAsset
+    useSwapToAsset,
+    useSwapValueDifferenceBps,
+    ValueDifferenceStatus,
+    valueDifferenceStatus
 } from '../../state/swap/useSwapForm';
 import { useSwapConfirmation } from '../../state/swap/useSwapStreamEffect';
-import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useTranslation } from '../../hooks/translation';
 import { Accordion } from '../shared/Accordion';
 import { TooltipHost, Tooltip } from '../shared/Tooltip';
 import BigNumber from 'bignumber.js';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { formatPercent } from '@tonkeeper/core/dist/utils/numberFormat';
 
 const TxInfoContainer = styled.div``;
 
@@ -34,7 +35,7 @@ const TxInfoHeader = styled.div`
     }
 `;
 
-const AccordionButton = styled(IconButton)<{ isOpened: boolean }>`
+const AccordionButton = styled(LegacyIconButton)<{ isOpened: boolean }>`
     transform: ${p => (p.isOpened ? 'rotate(180deg)' : 'rotate(0deg)')};
     transition: transform 0.2s ease-in-out;
     border: none;
@@ -64,20 +65,20 @@ const InfoSkeleton = () => {
     return <Skeleton width="60px" height="12px" margin="2px 0" />;
 };
 
-const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus> }>`
+const ValueDifference = styled(Body3)<{ status: ValueDifferenceStatus }>`
     color: ${p =>
-        p.status === 'low'
-            ? p.theme.accentGreen
-            : p.status === 'medium' || p.status === 'unknown'
+        p.status === 'danger'
+            ? p.theme.accentRed
+            : p.status === 'warning'
             ? p.theme.accentOrange
-            : p.theme.accentRed};
+            : p.theme.textPrimary};
 `;
 
 export const SwapTransactionInfo = () => {
     const { t } = useTranslation();
     const [isOpened, setIsOpened] = useState(false);
     const { confirmation, isFetching } = useSwapConfirmation();
-    const priceImpact = useSwapPriceImpact();
+    const valueDifferenceBps = useSwapValueDifferenceBps();
     const isNotCompleted = useIsSwapFormNotCompleted();
     const [toAsset] = useSwapToAsset();
 
@@ -113,34 +114,22 @@ export const SwapTransactionInfo = () => {
                 </AccordionButton>
             </TxInfoHeader>
             <Accordion isOpened={isOpened}>
-                <InfoRow>
-                    <InfoRowLabel>{t('swap_price_impact')}</InfoRowLabel>
-                    <TooltipHost>
-                        <InfoCircleIcon />
-                    </TooltipHost>
-                    <Tooltip placement="top">{t('swap_price_impact_tooltip')}</Tooltip>
-                    <InfoRowRight>
-                        {priceImpact === undefined || !confirmation ? (
-                            <InfoSkeleton />
-                        ) : (
-                            <PriceImpact status={priceImpactStatus(priceImpact)}>
-                                {priceImpact ? (
-                                    <>
-                                        ≈&nbsp;
-                                        {`${priceImpact
-                                            .multipliedBy(100)
-                                            .decimalPlaces(2)
-                                            .toString()
-                                            .replace('.', getDecimalSeparator())
-                                            .replace('-', '+')}%`}
-                                    </>
-                                ) : (
-                                    t('swap_unknown_price_impact')
-                                )}
-                            </PriceImpact>
-                        )}
-                    </InfoRowRight>
-                </InfoRow>
+                {valueDifferenceBps !== undefined && (
+                    <InfoRow>
+                        <InfoRowLabel>{t('multichain_swap_value_difference')}</InfoRowLabel>
+                        <TooltipHost>
+                            <InfoCircleIcon />
+                        </TooltipHost>
+                        <Tooltip placement="top">
+                            {t('multichain_swap_value_difference_info')}
+                        </Tooltip>
+                        <InfoRowRight>
+                            <ValueDifference status={valueDifferenceStatus(valueDifferenceBps)}>
+                                {formatPercent(valueDifferenceBps / 100, { signed: true })}
+                            </ValueDifference>
+                        </InfoRowRight>
+                    </InfoRow>
+                )}
                 <InfoRow>
                     <InfoRowLabel>{t('swap_minimum_received')}</InfoRowLabel>
                     <TooltipHost>
@@ -178,7 +167,7 @@ export const SwapTransactionInfo = () => {
                             <InfoSkeleton />
                         ) : (
                             <Body3>
-                                ≈&nbsp;{gasBudgetTon} {BRAND_CONFIG.coinSymbolWithEx}
+                                ≈&nbsp;{gasBudgetTon} {BRAND_CONFIG.coinSymbol}
                             </Body3>
                         )}
                     </InfoRowRight>

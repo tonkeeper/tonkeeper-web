@@ -15,7 +15,8 @@ import { useProState } from '../../../state/pro';
 import { Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { RefreshIcon, SpinnerIcon } from '../../Icon';
+import { RefreshIcon } from '../../Icon';
+import { Loader } from '../../Loader';
 import {
     useInvalidateActiveWalletQueries,
     useInvalidateGlobalQueries
@@ -203,7 +204,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 trigger="hover"
             >
                 <ProButtonPanel type="button" onClick={handleNavigateToSettingsPro}>
-                    {'Tonkeeper Pro'}
+                    {'Keeper Pro'}
                 </ProButtonPanel>
             </DropDown>
         );
@@ -221,7 +222,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 trigger="hover"
             >
                 <ProButtonPanel onClick={handleNavigateToSettingsPro}>
-                    <SpinnerIcon />
+                    <Loader size="small" />
                     {t('processing')}
                 </ProButtonPanel>
             </DropDown>
@@ -240,7 +241,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 trigger="hover"
             >
                 <ProButtonPanel onClick={handleNavigateToSettingsPro}>
-                    <SpinnerIcon />
+                    <Loader size="small" />
                     {t('cancelling')}
                 </ProButtonPanel>
             </DropDown>

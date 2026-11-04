@@ -12,8 +12,14 @@ BATTERY_API_FILE="./battery-api.yml"
 OUTPUT_FILE="./battery-api.yml"
 
 echo "Downloading Swagger files..."
-curl -sSL "https://raw.githubusercontent.com/tonkeeper/opentonapi/refs/heads/master/api/openapi.yml" -o "$WORKDIR/tonapi.yml"
-curl -sSL "https://raw.githubusercontent.com/tonkeeper/custodial-battery/refs/heads/master/api/battery-api.yml?token=${GITHUB_TOKEN}" -o "$WORKDIR/battery-api.yml"
+curl -fsSL "https://raw.githubusercontent.com/tonkeeper/opentonapi/refs/heads/master/api/openapi.yml" -o "$WORKDIR/tonapi.yml"
+# custodial-battery is private: raw.githubusercontent.com ignores a `?token=` query and answers a
+# 404 page, so the file comes through the contents API with the token as a header.
+curl -fsSL \
+    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+    -H "Accept: application/vnd.github.raw" \
+    "https://api.github.com/repos/tonkeeper/custodial-battery/contents/api/battery-api.yml?ref=master" \
+    -o "$WORKDIR/battery-api.yml"
 
 if [[ ! -s "$WORKDIR/tonapi.yml" || ! -s "$WORKDIR/battery-api.yml" ]]; then
   echo "Error: Failed to download Swagger files."

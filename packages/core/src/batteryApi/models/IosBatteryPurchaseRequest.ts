@@ -29,8 +29,6 @@ import {
 export interface IosBatteryPurchaseRequest {
     /**
      * 
-     * @type {Array<IosBatteryPurchaseRequestTransactionsInner>}
-     * @memberof IosBatteryPurchaseRequest
      */
     transactions: Array<IosBatteryPurchaseRequestTransactionsInner>;
 }
@@ -57,11 +55,11 @@ export function IosBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-  export function IosBatteryPurchaseRequestToJSON(json: any): IosBatteryPurchaseRequest {
-      return IosBatteryPurchaseRequestToJSONTyped(json, false);
-  }
+export function IosBatteryPurchaseRequestToJSON(json: any): IosBatteryPurchaseRequest {
+    return IosBatteryPurchaseRequestToJSONTyped(json, false);
+}
 
-  export function IosBatteryPurchaseRequestToJSONTyped(value?: IosBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
+export function IosBatteryPurchaseRequestToJSONTyped(value?: IosBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

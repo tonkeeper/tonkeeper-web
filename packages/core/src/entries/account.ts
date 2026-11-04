@@ -9,15 +9,18 @@ import {
 } from './password';
 import {
     DerivationItem,
+    MultichainWallet,
     TonContract,
     TonWalletStandard,
     WalletId,
-    DerivationItemNamed
+    DerivationItemNamed,
+    isStandardTonWallet
 } from './wallet';
 import { assertUnreachable } from '../utils/types';
 import { Network } from './network';
 import { TronWallet } from './tron/tron-wallet';
 import { SKSigningAlgorithm } from '../service/sign';
+import { ChainId } from '../chains/types';
 
 /**
  * @deprecated
@@ -702,6 +705,141 @@ export class AccountTonMultisig extends Clonable implements IAccount {
     }
 }
 
+/**
+ * Multichain account. Holds a single BIP39 seed (encrypted under `auth`,
+ * same shape `AccountTonMnemonic` uses) and a flat list of per-chain
+ * wallets derived from that seed.
+ *
+ * Invariant: every `AccountMultichain` must include `'ton'` in
+ * `enabledChains` and carry at least one `TonWalletStandard` in
+ * `wallets`. Enforced in the constructor. This keeps `activeTonWallet`
+ * a total function — call sites that read `account.activeTonWallet`
+ * never see `undefined` from a type that nominally returns
+ * `TonWalletStandard`.
+ */
+export class AccountMultichain extends Clonable implements IAccountTonWalletStandard {
+    public readonly type = 'multichain';
+
+    get allTonWallets(): TonWalletStandard[] {
+        return this.wallets.filter(isStandardTonWallet);
+    }
+
+    get activeTonWallet(): TonWalletStandard {
+        const tonWallets = this.allTonWallets;
+        const id = this.activeWalletByChain.ton;
+        const active = tonWallets.find(w => w.id === id);
+        // Constructor invariants guarantee `active` is defined; the
+        // fallback to `tonWallets[0]` is belt-and-braces for callers that
+        // mutate the account state outside the setters below.
+        return active ?? tonWallets[0];
+    }
+
+    /**
+     * @param id Stable account id (derived from the BIP39 seed at boot).
+     */
+    constructor(
+        public readonly id: AccountId,
+        public name: string,
+        public emoji: string,
+        public auth: AuthPassword | AuthKeychain,
+        public enabledChains: ChainId[],
+        public activeWalletByChain: Partial<Record<ChainId, WalletId>>,
+        public wallets: MultichainWallet[],
+        /**
+         * Identifier the multichain backend keys on. New accounts carry
+         * the format-2 id (36-char base32, `ai…` — see
+         * `deriveMultichainWalletAuth`); accounts from before that
+         * migration hold the legacy sha256-hex id the backend no longer
+         * accepts, and accounts older still have nothing. Without a
+         * format-2 id the multichain endpoints cannot be called and the
+         * portfolio falls back to TON+TRON data only — re-importing the
+         * mnemonic upgrades the account.
+         */
+        public multichainWalletId?: string,
+        /**
+         * Root secp256k1 private key of the wallet-auth derivation path,
+         * 32 bytes hex. Proves wallet ownership to the multichain
+         * backend (register proof, `X-Wallet-Authorization`); no chain
+         * derives spending keys from it. Absent on accounts created
+         * before wallet auth landed — their requests degrade to
+         * device-JWT-only, which the backend accepts for wallets already
+         * bound to the device.
+         */
+        public walletAuthKey?: string
+    ) {
+        super();
+
+        if (!enabledChains.includes('ton')) {
+            throw new Error("AccountMultichain v1 requires 'ton' in enabledChains");
+        }
+
+        const tonWallets = this.wallets.filter(isStandardTonWallet);
+        if (tonWallets.length === 0) {
+            throw new Error('AccountMultichain requires at least one TonWalletStandard in wallets');
+        }
+
+        const activeTonId = activeWalletByChain.ton;
+        if (!activeTonId) {
+            throw new Error('AccountMultichain requires activeWalletByChain.ton');
+        }
+        if (!tonWallets.some(w => w.id === activeTonId)) {
+            throw new Error('activeWalletByChain.ton does not match any TON wallet');
+        }
+    }
+
+    getTonWallet(id: WalletId): TonWalletStandard | undefined {
+        return this.allTonWallets.find(w => w.id === id);
+    }
+
+    setActiveTonWallet(walletId: WalletId): void {
+        if (!this.allTonWallets.some(w => w.id === walletId)) {
+            throw new Error('Wallet not found');
+        }
+        this.activeWalletByChain = { ...this.activeWalletByChain, ton: walletId };
+    }
+
+    /**
+     * Returns the active wallet on this account for the given chain, or
+     * `undefined` if the chain is not enabled or has no active wallet.
+     * The runtime backbone behind `selectActiveWalletForChain` for
+     * multichain accounts. Return type is `MultichainWallet` — the
+     * dispatcher in `chains/wallet-selector.ts` narrows it via the
+     * `WalletForChain<C>` map.
+     */
+    getWalletByChain(chain: ChainId): MultichainWallet | undefined {
+        const id = this.activeWalletByChain[chain];
+        if (id === undefined) return undefined;
+        const wallet = this.wallets.find(w => w.id === id);
+        if (!wallet) return undefined;
+        if (chain === 'ton') return isStandardTonWallet(wallet) ? wallet : undefined;
+        return 'chain' in wallet && wallet.chain === chain ? wallet : undefined;
+    }
+
+    static create(params: {
+        id: AccountId;
+        name: string;
+        emoji: string;
+        auth: AuthPassword | AuthKeychain;
+        enabledChains: ChainId[];
+        activeWalletByChain: Partial<Record<ChainId, WalletId>>;
+        wallets: MultichainWallet[];
+        multichainWalletId?: string;
+        walletAuthKey?: string;
+    }) {
+        return new AccountMultichain(
+            params.id,
+            params.name,
+            params.emoji,
+            params.auth,
+            params.enabledChains,
+            params.activeWalletByChain,
+            params.wallets,
+            params.multichainWalletId,
+            params.walletAuthKey
+        );
+    }
+}
+
 export type AccountVersionEditable =
     | AccountTonMnemonic
     | AccountTonOnly
@@ -712,7 +850,8 @@ export type AccountTonWalletStandard =
     | AccountVersionEditable
     | AccountLedger
     | AccountKeystone
-    | AccountMAM;
+    | AccountMAM
+    | AccountMultichain;
 
 export type Account = AccountTonWalletStandard | AccountTonWatchOnly | AccountTonMultisig;
 
@@ -728,6 +867,7 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
         case 'watch-only':
         case 'mam':
         case 'ton-multisig':
+        case 'multichain':
             return false;
         default:
             return assertUnreachable(account);
@@ -743,6 +883,7 @@ export function isAccountTonWalletStandard(account: Account): account is Account
         case 'mam':
         case 'testnet':
         case 'sk':
+        case 'multichain':
             return true;
         case 'watch-only':
         case 'ton-multisig':
@@ -762,6 +903,7 @@ export function isAccountSupportTonConnect(account: Account): boolean {
         case 'testnet':
         case 'sk':
         case 'ton-multisig':
+        case 'multichain':
             return true;
         case 'watch-only':
             return false;
@@ -782,6 +924,45 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
         case 'ton-multisig':
         case 'keystone':
         case 'testnet':
+        // Multisig hosting on a multichain account is not supported —
+        // the multisig flow is tied to legacy mnemonic accounts.
+        case 'multichain':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
+/**
+ * Accounts holding a secret encrypted with the app password (or held in the
+ * keychain). This is the set the password services operate on — validating,
+ * changing, and re-encrypting the app password.
+ *
+ * Distinct from `isMnemonicAndPassword`, which is narrower on purpose: that one
+ * gates legacy TON-only mnemonic edit flows and so excludes multichain.
+ * Password handling must not use it — a multichain-only profile would look like
+ * it has no password at all.
+ */
+export function isSecretBearingAccount(
+    account: Account
+): account is
+    | AccountTonMnemonic
+    | AccountTonTestnet
+    | AccountTonSK
+    | AccountMAM
+    | AccountMultichain {
+    switch (account.type) {
+        case 'mam':
+        case 'mnemonic':
+        case 'testnet':
+        case 'sk':
+        case 'multichain':
+            return true;
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
             return false;
         default:
             return assertUnreachable(account);
@@ -802,6 +983,11 @@ export function isMnemonicAndPassword(
         case 'watch-only':
         case 'ton-multisig':
         case 'keystone':
+        // Multichain seeds also unlock by password/keychain, but the
+        // call sites of this predicate gate legacy TON-only mnemonic
+        // editing flows that mutate `tonWallets` directly. Excluded so
+        // those flows don't trip over the multichain shape.
+        case 'multichain':
             return false;
         default:
             return assertUnreachable(account);
@@ -820,6 +1006,7 @@ export function getNetworkByAccount(account: Account): Network {
         case 'ton-multisig':
         case 'keystone':
         case 'sk':
+        case 'multichain':
             return Network.MAINNET;
         default:
             assertUnreachable(account);
@@ -845,6 +1032,10 @@ export function isAccountTronCompatible(
         case 'ton-multisig':
         case 'keystone':
         case 'sk':
+        // The legacy TRON channel (DerivationItem.tronWallet) is tied to
+        // mnemonic/MAM accounts. Multichain accounts carry TRON via
+        // `MultichainTronWallet` in `wallets` — a different channel.
+        case 'multichain':
             return false;
         default:
             return assertUnreachable(account);
@@ -864,6 +1055,11 @@ export function isAccountBip39(account: Account) {
         case 'keystone':
         case 'sk':
             return false;
+        // AccountMultichain is BIP39 by construction (single seed used
+        // across chains). Predicate returns true regardless of any
+        // future mnemonicType field.
+        case 'multichain':
+            return true;
         default:
             return assertUnreachable(account);
     }
@@ -886,7 +1082,8 @@ const prototypes = {
     'watch-only': AccountTonWatchOnly.prototype,
     mam: AccountMAM.prototype,
     'ton-multisig': AccountTonMultisig.prototype,
-    sk: AccountTonSK.prototype
+    sk: AccountTonSK.prototype,
+    multichain: AccountMultichain.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {

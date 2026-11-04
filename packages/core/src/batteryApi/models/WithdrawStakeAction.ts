@@ -36,26 +36,18 @@ import {
 export interface WithdrawStakeAction {
     /**
      * 
-     * @type {number}
-     * @memberof WithdrawStakeAction
      */
     amount: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof WithdrawStakeAction
      */
     staker: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof WithdrawStakeAction
      */
     pool: AccountAddress;
     /**
      * 
-     * @type {PoolImplementationType}
-     * @memberof WithdrawStakeAction
      */
     implementation: PoolImplementationType;
 }
@@ -90,11 +82,11 @@ export function WithdrawStakeActionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function WithdrawStakeActionToJSON(json: any): WithdrawStakeAction {
-      return WithdrawStakeActionToJSONTyped(json, false);
-  }
+export function WithdrawStakeActionToJSON(json: any): WithdrawStakeAction {
+    return WithdrawStakeActionToJSONTyped(json, false);
+}
 
-  export function WithdrawStakeActionToJSONTyped(value?: WithdrawStakeAction | null, ignoreDiscriminator: boolean = false): any {
+export function WithdrawStakeActionToJSONTyped(value?: WithdrawStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

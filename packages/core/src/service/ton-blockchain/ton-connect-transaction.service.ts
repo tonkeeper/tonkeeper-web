@@ -50,6 +50,10 @@ export class TonConnectTransactionService {
     ): Promise<string> {
         await this.checkTransactionPossibility(sender, transaction, estimation);
 
+        if (sender instanceof GaslessMessageSender) {
+            sender = sender.withConfirmedCommission(estimation);
+        }
+
         let cell: Cell;
         if (sender instanceof LedgerMessageSender) {
             cell = await (await sender.tonConnectTransfer(transaction)).send();

@@ -1,18 +1,33 @@
 import { ComponentProps, FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Route, useHistory, useLocation } from 'react-router-dom';
+import { Route, Switch, useHistory, useLocation, useParams } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useAppWidth } from '../../libs/hooks';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { useTrackLaunchApp } from '@tonkeeper/uikit/dist/hooks/analytics/launch-app';
+import { useTrackWalletOpen } from '@tonkeeper/uikit/dist/hooks/analytics/wallet-open';
+import { useTrackPushClick } from '../../libs/push-click';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import {
     AppProRoute,
     AppRoute,
     DevSettingsRoute,
+    MultichainRoute,
+    scrollPagePathname,
     SettingsRoute,
     StakingRoute,
     WalletSettingsRoute
 } from '@tonkeeper/uikit/dist/libs/routes';
+import { HomeMultichain } from '@tonkeeper/uikit/dist/pages/home/multichain/HomeMultichain';
+import { MultichainAssetPage } from '@tonkeeper/uikit/dist/pages/home/multichain/asset/MultichainAssetPage';
+import { MultichainHistory } from '@tonkeeper/uikit/dist/pages/home/multichain/history/MultichainHistory';
+import { MultichainCollectiblesPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesPage';
+import { MultichainCollectiblesSettingsPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesSettingsPage';
+import { MultichainTradePage } from '@tonkeeper/uikit/dist/pages/home/multichain/trade/MultichainTradePage';
+import { MultichainStakingPositionPage } from '@tonkeeper/uikit/dist/pages/home/multichain/staking/MultichainStakingPositionPage';
+import { MultichainBrowserPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/MultichainBrowserPage';
+import { MultichainSettingsRouting } from '@tonkeeper/uikit/dist/pages/home/multichain/settings/MultichainSettingsRouting';
+import { BrowserCategoryPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/BrowserCategoryPage';
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
@@ -23,7 +38,7 @@ import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import styled, { createGlobalStyle } from 'styled-components';
-import { BackgroundElements, usePrefetch } from './common';
+import { BackgroundElements, MultichainBackgroundElements, usePrefetch } from './common';
 import './ionic-styles';
 import { IonContent, IonMenu, IonModal, IonRouterOutlet } from '@ionic/react';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
@@ -128,6 +143,9 @@ const NarrowContentBody: FC<{
     useWindowsScroll();
     useAppWidth();
     useTrackLocation();
+    useTrackLaunchApp();
+    useTrackWalletOpen();
+    useTrackPushClick();
     usePrefetch();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
@@ -143,7 +161,92 @@ const NarrowContentBody: FC<{
         return <NarrowContentInitialPages accountIsCreated={!!activeAccount} />;
     }
 
+    if (activeAccount.type === 'multichain') {
+        return <NarrowContentMultichainRouting />;
+    }
+
     return <NarrowContentAppRouting />;
+};
+
+const MultichainAssetRoute: FC = () => {
+    const { assetId } = useParams<{ assetId: string }>();
+    return <MultichainAssetPage assetId={decodeURIComponent(assetId)} />;
+};
+
+const MultichainStakingPositionRoute: FC = () => {
+    const { poolAddress } = useParams<{ poolAddress: string }>();
+    return <MultichainStakingPositionPage poolAddress={decodeURIComponent(poolAddress)} />;
+};
+
+/**
+ * The multichain shell — same route set as the web `AppMobile` multichain
+ * branch. The redesigned pages own their chrome, so no Ionic router outlet,
+ * menus or legacy footer: just the routes plus the shared background
+ * notifications and the in-app dApp browser overlay.
+ */
+const NarrowContentMultichainRouting: FC = () => {
+    const isSplashHidden = useRef(false);
+    useEffect(() => {
+        if (!isSplashHidden.current) {
+            isSplashHidden.current = true;
+            SplashScreen.hide();
+        }
+    }, []);
+
+    // Ionic's structure.css pins <body>, so the window scrolling these pages
+    // rely on in other shells doesn't exist here — they scroll inside this
+    // container instead, reset on navigation so a subpage doesn't inherit
+    // the portfolio's scroll offset.
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const { pathname } = useLocation();
+    const scrollPage = scrollPagePathname(pathname);
+    useLayoutEffect(() => {
+        scrollRef.current?.scrollTo({ top: 0 });
+    }, [scrollPage]);
+
+    return (
+        <>
+            <div
+                ref={scrollRef}
+                className="fixed inset-0 overflow-y-auto overflow-x-hidden pt-[env(safe-area-inset-top)]"
+            >
+                <Switch>
+                    <Route path={`${MultichainRoute.asset}/:assetId`}>
+                        <MultichainAssetRoute />
+                    </Route>
+                    <Route path={MultichainRoute.history}>
+                        <MultichainHistory />
+                    </Route>
+                    <Route path={MultichainRoute.collectiblesSettings}>
+                        <MultichainCollectiblesSettingsPage />
+                    </Route>
+                    <Route path={MultichainRoute.collectibles}>
+                        <MultichainCollectiblesPage />
+                    </Route>
+                    <Route path={MultichainRoute.trade}>
+                        <MultichainTradePage />
+                    </Route>
+                    <Route path={`${MultichainRoute.staking}/:poolAddress`}>
+                        <MultichainStakingPositionRoute />
+                    </Route>
+                    <Route path={`${MultichainRoute.browserCategory}/:id`}>
+                        <BrowserCategoryPage />
+                    </Route>
+                    <Route path={MultichainRoute.browser}>
+                        <MultichainBrowserPage />
+                    </Route>
+                    <Route path={MultichainRoute.settings}>
+                        <MultichainSettingsRouting />
+                    </Route>
+                    <Route path="*">
+                        <HomeMultichain />
+                    </Route>
+                </Switch>
+            </div>
+            <MultichainBackgroundElements />
+            <MobileDappBrowserController />
+        </>
+    );
 };
 
 const UnlockPageStyled = styled.div`

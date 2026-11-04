@@ -1,5 +1,6 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import React, { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
@@ -256,7 +257,7 @@ export const MAMIndexesPageContent: FC<{
                                         <Body2Secondary>
                                             {toShortValue(formatAddress(balance.address)) + ' '}·
                                             {' ' + toFormattedTonBalance(balance.tonBalance)}
-                                            &nbsp;TON
+                                            &nbsp;{BRAND_CONFIG.coinSymbol}
                                         </Body2Secondary>
                                     </TextContainer>
                                 </NameContainer>

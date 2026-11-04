@@ -56,7 +56,7 @@ export const DesktopCategoryGroupItem: FC<{
     className?: string;
     onClickApp?: () => void;
 }> = ({ item, className, onClickApp }) => {
-    const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'recommendation');
+    const openAppCallback = useOpenPromotedAppInExternalBrowser(item, 'recommendation');
 
     return (
         <DesktopPromotedItem onClick={onClickApp ?? openAppCallback} className={className}>

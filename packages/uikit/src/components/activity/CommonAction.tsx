@@ -28,7 +28,7 @@ export const FirstLine = styled.div`
     width: 100%;
 
     /* Token symbol (3rd column) wraps instead of forcing its full width and truncating the amount,
-       so the amount stays fully visible and a long ticker like "GRAM (ex TON)" breaks across lines. */
+       so the amount stays fully visible and a long ticker breaks across lines. */
     > *:nth-child(3) {
         white-space: normal;
         overflow-wrap: normal;

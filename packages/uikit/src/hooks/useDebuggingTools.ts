@@ -2,18 +2,17 @@
 import { useEffect } from 'react';
 
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
-import { IMetaEncryptionData } from '@tonkeeper/core/dist/entries/wallet';
 import { decryptMeta } from '@tonkeeper/core/dist/service/meta/metadataService';
 import { Address, beginCell, Cell, external, storeMessage, storeStateInit } from '@ton/core';
+import { KeyPair } from '@ton/crypto';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 
-import { useActiveAccountQuery, useActiveApi, useMetaEncryptionData } from '../state/wallet';
-import { useGetAccountSigner } from '../state/mnemonic';
+import { useActiveAccountQuery, useActiveApi } from '../state/wallet';
+import { getSigner as getSignerWithOptions, useGetAccountSigner } from '../state/mnemonic';
 import { useAppSdk } from './appSdk';
 
 export const useDebuggingTools = () => {
     const api = useActiveApi();
-    const { data: metaEncryptionMap } = useMetaEncryptionData();
     const getSigner = useGetAccountSigner();
     const { data: activeAccount } = useActiveAccountQuery();
     const sdk = useAppSdk();
@@ -96,10 +95,16 @@ export const useDebuggingTools = () => {
 
                     try {
                         const wallet = activeAccount!.activeTonWallet;
-                        const keyPair = metaEncryptionMap?.[wallet.rawAddress]?.keyPair;
+                        let keyPair = undefined as KeyPair | undefined;
+                        await getSignerWithOptions(sdk, activeAccount!.id, {
+                            walletId: wallet.id,
+                            onMetaKeyPair: kp => {
+                                keyPair = kp;
+                            }
+                        });
 
                         if (!keyPair) {
-                            console.error('ERR: no keyPair created!');
+                            console.error('ERR: wallet cannot derive a meta key');
                             return;
                         }
 
@@ -116,41 +121,8 @@ export const useDebuggingTools = () => {
                     } catch (e) {
                         console.error('ERR: ', e);
                     }
-                },
-                async getEncryptionMap() {
-                    if (!this.checkKey()) {
-                        console.error('ERR: method is not supported');
-                        return;
-                    }
-
-                    if (!metaEncryptionMap) {
-                        console.error('ERR: no metaEncryptionMap found');
-                        return;
-                    }
-
-                    function transformWalletsStatus(obj: Record<string, IMetaEncryptionData>) {
-                        const result: Record<string, string> = {};
-
-                        for (const [rawAddress, value] of Object.entries(obj)) {
-                            const friendly = Address.parse(rawAddress).toString({
-                                bounceable: false
-                            });
-
-                            const hasKey = !!value.keyPair;
-                            const hasCert = !!value.certificate;
-
-                            result[friendly] = hasKey && hasCert ? 'Success' : 'Failed';
-                        }
-
-                        return result;
-                    }
-
-                    console.log(
-                        'Meta Encryption Map:\n',
-                        JSON.stringify(transformWalletsStatus(metaEncryptionMap), null, 2)
-                    );
                 }
             };
         }
-    }, [api, activeAccount, getSigner, metaEncryptionMap, sdk.storage]);
+    }, [api, activeAccount, getSigner, sdk]);
 };

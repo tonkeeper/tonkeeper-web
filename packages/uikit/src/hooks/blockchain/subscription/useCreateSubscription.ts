@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Address } from '@ton/core';
+import { KeyPair } from '@ton/crypto';
 import { useActiveApi, useProCompatibleAccountsWallets } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
@@ -10,16 +11,14 @@ import {
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { QueryKey } from '../../../libs/queryKey';
-import { MetaEncryptionSerializedMap } from '@tonkeeper/core/dist/entries/wallet';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { metaEncryptionMapSerializer } from '@tonkeeper/core/dist/utils/metadata';
+import { useAnalyticsAssetId, useTrackTransactionSent } from '../../analytics/events-hooks';
 
 export const useCreateSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
-    const client = useQueryClient();
     const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     return useMutation<boolean, Error, SubscriptionEncodingParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
@@ -34,24 +33,17 @@ export const useCreateSubscription = () => {
 
         if (!accountId) throw new Error('Account id is required!');
 
-        let metaEncryptionMap = await sdk.storage
-            .get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)
-            .then(metaEncryptionMapSerializer);
-
-        const shouldCreateMetaKeys = !metaEncryptionMap?.[selectedWallet.rawAddress];
+        let metaKeyPair = undefined as KeyPair | undefined;
 
         const signer = await getSigner(sdk, accountId, {
             walletId: selectedWallet.id,
-            shouldCreateMetaKeys
+            onMetaKeyPair: keyPair => {
+                metaKeyPair = keyPair;
+            }
         }).catch(() => null);
 
         if (!signer || signer.type !== 'cell') throw new Error('Signer is incorrect!');
-
-        if (shouldCreateMetaKeys) {
-            metaEncryptionMap = await sdk.storage
-                .get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)
-                .then(metaEncryptionMapSerializer);
-        }
+        if (!metaKeyPair) throw new Error('Wallet cannot derive a meta key!');
 
         const sender = new WalletMessageSender(api, selectedWallet, signer);
         const encoder = new SubscriptionEncoder(selectedWallet);
@@ -65,7 +57,7 @@ export const useCreateSubscription = () => {
         });
 
         const outgoingMsg = await encoder.encodeCreateSubscriptionV2(
-            prepareSubscriptionParamsForEncoder(subscriptionParams, metaEncryptionMap)
+            prepareSubscriptionParamsForEncoder(subscriptionParams, metaKeyPair)
         );
 
         if (!extensionAddress.equals(Address.parse(contract))) {
@@ -74,7 +66,13 @@ export const useCreateSubscription = () => {
 
         await sender.send(outgoingMsg);
 
-        await client.invalidateQueries([QueryKey.metaEncryptionData]);
+        trackTransactionSent({
+            category: 'call',
+            category_detail: 'subscription',
+            asset: assetId.tonCoin(),
+            amount: 0,
+            fee_asset: 'coin'
+        });
 
         return true;
     });

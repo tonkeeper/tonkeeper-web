@@ -1,7 +1,9 @@
 import type { Configuration } from 'webpack';
+import webpack from 'webpack';
 
 import { rules } from './webpack.rules';
 import path from 'path';
+import { readAppVersion } from '../../scripts/app-version';
 
 export const mainConfig: Configuration = {
     /**
@@ -13,6 +15,11 @@ export const mainConfig: Configuration = {
     module: {
         rules
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            __APP_VERSION__: JSON.stringify(readAppVersion(__dirname))
+        })
+    ],
     resolve: {
         extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
         alias: {

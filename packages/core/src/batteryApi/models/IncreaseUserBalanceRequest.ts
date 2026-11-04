@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface IncreaseUserBalanceRequest {
     /**
      * amount in TON to increase balance by
-     * @type {string}
-     * @memberof IncreaseUserBalanceRequest
      */
     amount: string;
     /**
      * reason for balance increase
-     * @type {string}
-     * @memberof IncreaseUserBalanceRequest
      */
     reason?: string;
 }
@@ -56,11 +52,11 @@ export function IncreaseUserBalanceRequestFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-  export function IncreaseUserBalanceRequestToJSON(json: any): IncreaseUserBalanceRequest {
-      return IncreaseUserBalanceRequestToJSONTyped(json, false);
-  }
+export function IncreaseUserBalanceRequestToJSON(json: any): IncreaseUserBalanceRequest {
+    return IncreaseUserBalanceRequestToJSONTyped(json, false);
+}
 
-  export function IncreaseUserBalanceRequestToJSONTyped(value?: IncreaseUserBalanceRequest | null, ignoreDiscriminator: boolean = false): any {
+export function IncreaseUserBalanceRequestToJSONTyped(value?: IncreaseUserBalanceRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

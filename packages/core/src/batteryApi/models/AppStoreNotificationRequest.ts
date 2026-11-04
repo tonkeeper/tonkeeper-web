@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface AppStoreNotificationRequest {
     /**
      * 
-     * @type {string}
-     * @memberof AppStoreNotificationRequest
      */
     signedPayload: string;
 }
@@ -49,11 +47,11 @@ export function AppStoreNotificationRequestFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function AppStoreNotificationRequestToJSON(json: any): AppStoreNotificationRequest {
-      return AppStoreNotificationRequestToJSONTyped(json, false);
-  }
+export function AppStoreNotificationRequestToJSON(json: any): AppStoreNotificationRequest {
+    return AppStoreNotificationRequestToJSONTyped(json, false);
+}
 
-  export function AppStoreNotificationRequestToJSONTyped(value?: AppStoreNotificationRequest | null, ignoreDiscriminator: boolean = false): any {
+export function AppStoreNotificationRequestToJSONTyped(value?: AppStoreNotificationRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

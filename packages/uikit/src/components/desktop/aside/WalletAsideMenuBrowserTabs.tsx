@@ -37,6 +37,7 @@ import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 import { useCountryContextTracker } from '../../../hooks/analytics/events-hooks';
+import { urlDappIdentity, useTrackDappAppClick } from '../../../hooks/analytics/dapp-browser';
 import { useSortableDndSensors } from '../../../hooks/useSortableDndSensors';
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
@@ -113,7 +114,7 @@ const EditeModeContext = createContext<{
 
 const useEditMode = () => {
     const { mutate: openTab } = useOpenBrowserTab();
-    const trackDappOpened = useCountryContextTracker();
+    const trackDappAppClick = useTrackDappAppClick();
     const { close: closeWalletMenu, isOpen } = useMenuController('wallet-nav');
 
     const { isEditMode, setIsEditMode } = useContext(EditeModeContext);
@@ -121,13 +122,9 @@ const useEditMode = () => {
     const onClickTab = (tab: BrowserTab) => {
         if (!isEditMode) {
             closeWalletMenu();
-            trackDappOpened(country => ({
-                eventName: 'dapp_click',
-                location: country,
-                url: tab.url,
-                from: 'sidebar'
-            }));
-            openTab(tab);
+            const dapp = { ...urlDappIdentity(tab.url), from: 'sidebar' as const };
+            trackDappAppClick(dapp);
+            openTab({ ...tab, dapp });
         }
     };
 
@@ -271,7 +268,12 @@ const BrowserTabsPinned: FC<{
 
     const unpinTab = (tab: BrowserTab) => {
         changeBrowserTab({ ...tab, isPinned: false });
-        track(country => ({ eventName: 'dapp_unpin', url: tab.url, location: country }));
+        track(country => ({
+            eventName: 'dapp_unpin',
+            url: tab.url,
+            asset_chain: 'ton',
+            location: country
+        }));
     };
 
     if (!tabs) {
@@ -343,7 +345,12 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
 
     const pinTab = (tab: BrowserTab) => {
         changeBrowserTab({ ...tab, isPinned: true });
-        track(country => ({ eventName: 'dapp_pin', url: tab.url, location: country }));
+        track(country => ({
+            eventName: 'dapp_pin',
+            url: tab.url,
+            asset_chain: 'ton',
+            location: country
+        }));
     };
 
     if (!tabs) {

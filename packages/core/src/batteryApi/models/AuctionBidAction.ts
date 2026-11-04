@@ -43,32 +43,22 @@ import {
 export interface AuctionBidAction {
     /**
      * 
-     * @type {string}
-     * @memberof AuctionBidAction
      */
     auctionType: AuctionBidActionAuctionTypeEnum;
     /**
      * 
-     * @type {Price}
-     * @memberof AuctionBidAction
      */
     amount: Price;
     /**
      * 
-     * @type {NftItem}
-     * @memberof AuctionBidAction
      */
     nft?: NftItem;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof AuctionBidAction
      */
     bidder: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof AuctionBidAction
      */
     auction: AccountAddress;
 }
@@ -81,7 +71,7 @@ export const AuctionBidActionAuctionTypeEnum = {
     DnsTon: 'DNS.ton',
     DnsTg: 'DNS.tg',
     NumberTg: 'NUMBER.tg',
-    Getgems: 'getgems'
+    Getgems: 'getgems',
 } as const;
 export type AuctionBidActionAuctionTypeEnum = typeof AuctionBidActionAuctionTypeEnum[keyof typeof AuctionBidActionAuctionTypeEnum];
 
@@ -90,7 +80,7 @@ export type AuctionBidActionAuctionTypeEnum = typeof AuctionBidActionAuctionType
  * Check if a given object implements the AuctionBidAction interface.
  */
 export function instanceOfAuctionBidAction(value: object): value is AuctionBidAction {
-    if (!('auctionType' in value) || value['auctionType'] === undefined) return false;
+    if ((!('auctionType' in (value as Record<string, any>)) && !('auction_type' in (value as Record<string, any>))) || ((value as Record<string, any>)['auctionType'] === undefined && (value as Record<string, any>)['auction_type'] === undefined)) return false;
     if (!('amount' in value) || value['amount'] === undefined) return false;
     if (!('bidder' in value) || value['bidder'] === undefined) return false;
     if (!('auction' in value) || value['auction'] === undefined) return false;
@@ -115,11 +105,11 @@ export function AuctionBidActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function AuctionBidActionToJSON(json: any): AuctionBidAction {
-      return AuctionBidActionToJSONTyped(json, false);
-  }
+export function AuctionBidActionToJSON(json: any): AuctionBidAction {
+    return AuctionBidActionToJSONTyped(json, false);
+}
 
-  export function AuctionBidActionToJSONTyped(value?: AuctionBidAction | null, ignoreDiscriminator: boolean = false): any {
+export function AuctionBidActionToJSONTyped(value?: AuctionBidAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

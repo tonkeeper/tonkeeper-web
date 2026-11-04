@@ -29,39 +29,37 @@ import {
 } from './NftItem';
 
 /**
- * Risk specifies assets that could be lost if a message would be sent to a malicious smart contract. It makes sense to understand the risk BEFORE sending a message to the blockchain.
+ * Conservative upper bound on assets this wallet may lose if the emulated message is sent and the counterparty behaves maliciously. Values may exceed current balances (e.g. already-authorized future receipts). For UI display only.
+ * 
  * @export
  * @interface Risk
  */
 export interface Risk {
     /**
-     * transfer all the remaining balance of the wallet.
-     * @type {boolean}
-     * @memberof Risk
+     * True if the message semantics allow sweeping all current and future remaining Gram balance of the wallet (e.g. “send all” / drain patterns).
+     * 
      */
     transferAllRemainingBalance: boolean;
     /**
-     * 
-     * @type {number}
-     * @memberof Risk
+     * this field will gone after Sept. 2026, use gram instead
+     * @deprecated
      */
-    ton: number;
+    ton?: number;
     /**
-     * 
-     * @type {Array<JettonQuantity>}
-     * @memberof Risk
+     * Maximum Gram amount that may leave the wallet in the worst case, in nanogram.
+     */
+    gram: number;
+    /**
+     * Jetton positions that may be debited from the wallet in the worst case.
      */
     jettons: Array<JettonQuantity>;
     /**
-     * 
-     * @type {Array<NftItem>}
-     * @memberof Risk
+     * NFT items that may be transferred out of the wallet in the worst case.
      */
     nfts: Array<NftItem>;
     /**
-     * Estimated equivalent value of all assets at risk in selected currency (for example USD)
-     * @type {number}
-     * @memberof Risk
+     * Estimated equivalent of all assets at risk (Gram, jettons, NFTs) in the selected currency from currencyQuery (e.g. USD). Approximate, best-effort UI value.
+     * 
      */
     totalEquivalent?: number;
 }
@@ -70,8 +68,8 @@ export interface Risk {
  * Check if a given object implements the Risk interface.
  */
 export function instanceOfRisk(value: object): value is Risk {
-    if (!('transferAllRemainingBalance' in value) || value['transferAllRemainingBalance'] === undefined) return false;
-    if (!('ton' in value) || value['ton'] === undefined) return false;
+    if ((!('transferAllRemainingBalance' in (value as Record<string, any>)) && !('transfer_all_remaining_balance' in (value as Record<string, any>))) || ((value as Record<string, any>)['transferAllRemainingBalance'] === undefined && (value as Record<string, any>)['transfer_all_remaining_balance'] === undefined)) return false;
+    if (!('gram' in value) || value['gram'] === undefined) return false;
     if (!('jettons' in value) || value['jettons'] === undefined) return false;
     if (!('nfts' in value) || value['nfts'] === undefined) return false;
     return true;
@@ -88,18 +86,19 @@ export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk
     return {
         
         'transferAllRemainingBalance': json['transfer_all_remaining_balance'],
-        'ton': json['ton'],
+        'ton': json['ton'] == null ? undefined : json['ton'],
+        'gram': json['gram'],
         'jettons': ((json['jettons'] as Array<any>).map(JettonQuantityFromJSON)),
         'nfts': ((json['nfts'] as Array<any>).map(NftItemFromJSON)),
         'totalEquivalent': json['total_equivalent'] == null ? undefined : json['total_equivalent'],
     };
 }
 
-  export function RiskToJSON(json: any): Risk {
-      return RiskToJSONTyped(json, false);
-  }
+export function RiskToJSON(json: any): Risk {
+    return RiskToJSONTyped(json, false);
+}
 
-  export function RiskToJSONTyped(value?: Risk | null, ignoreDiscriminator: boolean = false): any {
+export function RiskToJSONTyped(value?: Risk | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -108,6 +107,7 @@ export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk
         
         'transfer_all_remaining_balance': value['transferAllRemainingBalance'],
         'ton': value['ton'],
+        'gram': value['gram'],
         'jettons': ((value['jettons'] as Array<any>).map(JettonQuantityToJSON)),
         'nfts': ((value['nfts'] as Array<any>).map(NftItemToJSON)),
         'total_equivalent': value['totalEquivalent'],

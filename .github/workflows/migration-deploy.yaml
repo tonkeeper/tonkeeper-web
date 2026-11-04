@@ -1,0 +1,54 @@
+name: Migration App Deploy
+on:
+    # A push to main redeploys the migration staging only when something the migration
+    # bundle is built from changes. After changing STAGING_MIGRATION_NEW_ORIGIN, run this
+    # workflow by hand with environment `staging`.
+    push:
+        branches:
+            - main
+        paths:
+            - 'apps/migration/**'
+            - 'packages/locales/src/migration/**'
+            - 'packages/uikit/src/styles/fonts/TT-Firs-Neue-*.woff2'
+            - 'scripts/check-deployed-headers.mjs'
+            - '.github/workflows/migration-build.yaml'
+            - '.github/workflows/migration-deploy.yaml'
+    workflow_dispatch:
+        inputs:
+            environment:
+                description:
+                    'Cloudflare Pages branch to deploy to. It becomes the demo hostname —
+                    <branch>.<project>.pages.dev — and therefore the old origin.'
+                required: true
+                type: string
+                default: 'migration-old'
+            migration_new_origin:
+                description: 'Origin the wallet has moved to'
+                required: false
+                type: string
+                default: ''
+            pages_project:
+                description:
+                    'Cloudflare Pages project to publish into. Keep it separate from the wallet
+                    project so the two origins are cross-site, not just cross-origin.'
+                required: false
+                type: string
+                default: 'tonkeeper-web-migration'
+
+# Latest push wins; older in-flight deploys cancel.
+concurrency:
+    group: migration-deploy
+    cancel-in-progress: true
+
+jobs:
+    migration-deploy:
+        uses: ./.github/workflows/migration-build.yaml
+        with:
+            environment:
+                ${{ github.event_name == 'push' && 'staging' || inputs.environment ||
+                'migration-old' }}
+            migration_new_origin:
+                ${{ github.event_name == 'push' && vars.STAGING_MIGRATION_NEW_ORIGIN ||
+                inputs.migration_new_origin }}
+            pages_project: ${{ inputs.pages_project || 'tonkeeper-web-migration' }}
+        secrets: inherit

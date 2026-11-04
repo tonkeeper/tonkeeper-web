@@ -18,6 +18,7 @@ import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAtom } from '../../libs/useAtom';
@@ -47,7 +48,9 @@ const toTonAsset = (asset: SwapAsset): TonAsset => {
         id: packAssetId(BLOCKCHAIN_NAME.TON, address),
         symbol: asset.symbol,
         decimals: asset.decimals,
-        name: asset.name,
+        // The API returns its own display name for the native coin. Identify it by symbol and show
+        // the brand name instead.
+        name: asset.symbol === BRAND_CONFIG.coinSymbol ? BRAND_CONFIG.coinName : asset.name,
         image: patchedTokenImage(tonAssetAddressToString(address), asset.image),
         blockchain: BLOCKCHAIN_NAME.TON,
         noImageCorners: shouldHideTonJettonImageCorners(tonAssetAddressToString(address)),

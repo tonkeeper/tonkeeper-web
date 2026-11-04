@@ -43,20 +43,14 @@ import {
 export interface DepositTokenStakeAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof DepositTokenStakeAction
      */
     staker: AccountAddress;
     /**
      * 
-     * @type {Protocol}
-     * @memberof DepositTokenStakeAction
      */
     protocol: Protocol;
     /**
      * 
-     * @type {Price}
-     * @memberof DepositTokenStakeAction
      */
     stakeMeta?: Price;
 }
@@ -86,11 +80,11 @@ export function DepositTokenStakeActionFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-  export function DepositTokenStakeActionToJSON(json: any): DepositTokenStakeAction {
-      return DepositTokenStakeActionToJSONTyped(json, false);
-  }
+export function DepositTokenStakeActionToJSON(json: any): DepositTokenStakeAction {
+    return DepositTokenStakeActionToJSONTyped(json, false);
+}
 
-  export function DepositTokenStakeActionToJSONTyped(value?: DepositTokenStakeAction | null, ignoreDiscriminator: boolean = false): any {
+export function DepositTokenStakeActionToJSONTyped(value?: DepositTokenStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

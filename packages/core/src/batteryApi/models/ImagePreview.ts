@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface ImagePreview {
     /**
      * 
-     * @type {string}
-     * @memberof ImagePreview
      */
     resolution: string;
     /**
      * 
-     * @type {string}
-     * @memberof ImagePreview
      */
     url: string;
 }
@@ -57,11 +53,11 @@ export function ImagePreviewFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function ImagePreviewToJSON(json: any): ImagePreview {
-      return ImagePreviewToJSONTyped(json, false);
-  }
+export function ImagePreviewToJSON(json: any): ImagePreview {
+    return ImagePreviewToJSONTyped(json, false);
+}
 
-  export function ImagePreviewToJSONTyped(value?: ImagePreview | null, ignoreDiscriminator: boolean = false): any {
+export function ImagePreviewToJSONTyped(value?: ImagePreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

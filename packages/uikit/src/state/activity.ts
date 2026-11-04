@@ -4,7 +4,7 @@ import {
     isTon,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { intlLocale } from '@tonkeeper/core/dist/entries/language';
+import { intlDateLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvent, AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useAtom } from '../libs/useAtom';
@@ -27,7 +27,7 @@ import { TronTonSender } from '@tonkeeper/core/dist/service/tron-blockchain/send
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
-    language = intlLocale(language);
+    language = intlDateLocale(language);
 
     if (date.getFullYear() < new Date().getFullYear()) {
         return new Intl.DateTimeFormat(language, {
@@ -49,7 +49,7 @@ export const formatActivityDate = (language: string, key: string, timestamp: num
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const getActivityTitle = (language: string, key: string, timestamp: number) => {
-    language = intlLocale(language);
+    language = intlDateLocale(language);
 
     if (key === 'today') {
         return capitalize(

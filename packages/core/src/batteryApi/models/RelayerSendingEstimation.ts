@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface RelayerSendingEstimation {
     /**
      * 
-     * @type {string}
-     * @memberof RelayerSendingEstimation
      */
     commission: string;
 }
@@ -49,11 +47,11 @@ export function RelayerSendingEstimationFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function RelayerSendingEstimationToJSON(json: any): RelayerSendingEstimation {
-      return RelayerSendingEstimationToJSONTyped(json, false);
-  }
+export function RelayerSendingEstimationToJSON(json: any): RelayerSendingEstimation {
+    return RelayerSendingEstimationToJSONTyped(json, false);
+}
 
-  export function RelayerSendingEstimationToJSONTyped(value?: RelayerSendingEstimation | null, ignoreDiscriminator: boolean = false): any {
+export function RelayerSendingEstimationToJSONTyped(value?: RelayerSendingEstimation | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

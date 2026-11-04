@@ -118,7 +118,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
 };
 
 export const CategoryGroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
-    const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'recommendation');
+    const openAppCallback = useOpenPromotedAppInExternalBrowser(item, 'recommendation');
 
     return (
         <ListItemStyled key={item.url} onClick={openAppCallback}>

@@ -8,6 +8,8 @@ on:
 
 permissions:
     contents: read
+    issues: write
+    packages: read
     pull-requests: write
 
 # Opt-in builds gated by PR labels (save CI compute on routine PRs):

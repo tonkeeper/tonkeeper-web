@@ -11,9 +11,9 @@ const SentenceInput = styled.input`
     font-size: inherit;
     background: transparent;
     color: ${props => props.theme.textPrimary};
-    font-family: Montserrat, sans-serif;
+    font-family: var(--tk-font-sans, sans-serif);
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 49px;
     text-align: right;
     appearance: textfield;

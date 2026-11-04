@@ -59,9 +59,16 @@ export const isTonAddress = (address: string) => {
     return address.toLowerCase() === CryptoCurrency.TON.toLowerCase();
 };
 
+/**
+ * A hex `0x` prefix carries no information, so it is excluded from the
+ * head budget and re-prepended — `0x71C7…976F`, not `0x71…976F` — keeping
+ * the same number of meaningful characters as for other address kinds.
+ */
 export const toShortValue = (value: string, length = 4): string => {
-    if (value.length > length * 2) {
-        return value.slice(0, length) + '…' + value.slice(-length);
+    const prefix = /^0x/i.test(value) ? value.slice(0, 2) : '';
+    const body = value.slice(prefix.length);
+    if (body.length > length * 2) {
+        return prefix + body.slice(0, length) + '…' + body.slice(-length);
     } else {
         return value;
     }

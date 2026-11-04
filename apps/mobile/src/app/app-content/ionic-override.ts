@@ -11,8 +11,7 @@ export const IonicOverride = css`
     ion-content {
         --background: ${p => p.theme.backgroundPage} !important;
         --color: ${p => p.theme.textPrimary};
-        --ion-font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial,
-            Tahoma, Verdana, 'sans-serif';
+        --ion-font-family: var(--tk-font-sans);
 
         * {
             box-sizing: content-box;

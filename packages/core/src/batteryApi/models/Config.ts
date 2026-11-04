@@ -27,6 +27,20 @@ import {
     ConfigMeanPricesToJSON,
     ConfigMeanPricesToJSONTyped,
 } from './ConfigMeanPrices';
+import type { ConfigTransferCost } from './ConfigTransferCost';
+import {
+    ConfigTransferCostFromJSON,
+    ConfigTransferCostFromJSONTyped,
+    ConfigTransferCostToJSON,
+    ConfigTransferCostToJSONTyped,
+} from './ConfigTransferCost';
+import type { PackageItem } from './PackageItem';
+import {
+    PackageItemFromJSON,
+    PackageItemFromJSONTyped,
+    PackageItemToJSON,
+    PackageItemToJSONTyped,
+} from './PackageItem';
 
 /**
  * 
@@ -36,59 +50,55 @@ import {
 export interface Config {
     /**
      * cost of 1 charge in TON
-     * @type {string}
-     * @memberof Config
      */
     chargeCost: string;
     /**
      * with zero balance it is possible to transfer some jettons (stablecoins, jusdt, etc) to this address to refill the balance. Such transfers would be paid by Battery Service.
-     * @type {string}
-     * @memberof Config
      */
     fundReceiver: string;
     /**
      * when building a message to transfer an NFT or Jetton, use this address to send excess funds back to Battery Service.
-     * @type {string}
-     * @memberof Config
      */
     excessAccount: string;
     /**
      * ttl for message in seconds
-     * @type {number}
-     * @memberof Config
      */
     messageTtl: number;
     /**
      * 
-     * @type {Array<ConfigGasProxyInner>}
-     * @memberof Config
      */
     gasProxy: Array<ConfigGasProxyInner>;
     /**
      * 
-     * @type {ConfigMeanPrices}
-     * @memberof Config
      */
     meanPrices: ConfigMeanPrices;
     /**
      * reserved amount in TON that is kept for gas fees
-     * @type {string}
-     * @memberof Config
      */
     batteryReservedAmount: string;
+    /**
+     * 
+     */
+    packages: Array<PackageItem>;
+    /**
+     * 
+     */
+    transferCost: ConfigTransferCost;
 }
 
 /**
  * Check if a given object implements the Config interface.
  */
 export function instanceOfConfig(value: object): value is Config {
-    if (!('chargeCost' in value) || value['chargeCost'] === undefined) return false;
-    if (!('fundReceiver' in value) || value['fundReceiver'] === undefined) return false;
-    if (!('excessAccount' in value) || value['excessAccount'] === undefined) return false;
-    if (!('messageTtl' in value) || value['messageTtl'] === undefined) return false;
-    if (!('gasProxy' in value) || value['gasProxy'] === undefined) return false;
-    if (!('meanPrices' in value) || value['meanPrices'] === undefined) return false;
-    if (!('batteryReservedAmount' in value) || value['batteryReservedAmount'] === undefined) return false;
+    if ((!('chargeCost' in (value as Record<string, any>)) && !('charge_cost' in (value as Record<string, any>))) || ((value as Record<string, any>)['chargeCost'] === undefined && (value as Record<string, any>)['charge_cost'] === undefined)) return false;
+    if ((!('fundReceiver' in (value as Record<string, any>)) && !('fund_receiver' in (value as Record<string, any>))) || ((value as Record<string, any>)['fundReceiver'] === undefined && (value as Record<string, any>)['fund_receiver'] === undefined)) return false;
+    if ((!('excessAccount' in (value as Record<string, any>)) && !('excess_account' in (value as Record<string, any>))) || ((value as Record<string, any>)['excessAccount'] === undefined && (value as Record<string, any>)['excess_account'] === undefined)) return false;
+    if ((!('messageTtl' in (value as Record<string, any>)) && !('message_ttl' in (value as Record<string, any>))) || ((value as Record<string, any>)['messageTtl'] === undefined && (value as Record<string, any>)['message_ttl'] === undefined)) return false;
+    if ((!('gasProxy' in (value as Record<string, any>)) && !('gas_proxy' in (value as Record<string, any>))) || ((value as Record<string, any>)['gasProxy'] === undefined && (value as Record<string, any>)['gas_proxy'] === undefined)) return false;
+    if ((!('meanPrices' in (value as Record<string, any>)) && !('mean_prices' in (value as Record<string, any>))) || ((value as Record<string, any>)['meanPrices'] === undefined && (value as Record<string, any>)['mean_prices'] === undefined)) return false;
+    if ((!('batteryReservedAmount' in (value as Record<string, any>)) && !('battery_reserved_amount' in (value as Record<string, any>))) || ((value as Record<string, any>)['batteryReservedAmount'] === undefined && (value as Record<string, any>)['battery_reserved_amount'] === undefined)) return false;
+    if (!('packages' in value) || value['packages'] === undefined) return false;
+    if ((!('transferCost' in (value as Record<string, any>)) && !('transfer_cost' in (value as Record<string, any>))) || ((value as Record<string, any>)['transferCost'] === undefined && (value as Record<string, any>)['transfer_cost'] === undefined)) return false;
     return true;
 }
 
@@ -109,14 +119,16 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'gasProxy': ((json['gas_proxy'] as Array<any>).map(ConfigGasProxyInnerFromJSON)),
         'meanPrices': ConfigMeanPricesFromJSON(json['mean_prices']),
         'batteryReservedAmount': json['battery_reserved_amount'],
+        'packages': ((json['packages'] as Array<any>).map(PackageItemFromJSON)),
+        'transferCost': ConfigTransferCostFromJSON(json['transfer_cost']),
     };
 }
 
-  export function ConfigToJSON(json: any): Config {
-      return ConfigToJSONTyped(json, false);
-  }
+export function ConfigToJSON(json: any): Config {
+    return ConfigToJSONTyped(json, false);
+}
 
-  export function ConfigToJSONTyped(value?: Config | null, ignoreDiscriminator: boolean = false): any {
+export function ConfigToJSONTyped(value?: Config | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -130,6 +142,8 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'gas_proxy': ((value['gasProxy'] as Array<any>).map(ConfigGasProxyInnerToJSON)),
         'mean_prices': ConfigMeanPricesToJSON(value['meanPrices']),
         'battery_reserved_amount': value['batteryReservedAmount'],
+        'packages': ((value['packages'] as Array<any>).map(PackageItemToJSON)),
+        'transfer_cost': ConfigTransferCostToJSON(value['transferCost']),
     };
 }
 

@@ -1,16 +1,20 @@
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { useActiveAccount } from '../../../state/wallet';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { anyOfKeysParts, QueryKey } from '../../../libs/queryKey';
+import { schedulePostBroadcastRefresh } from '../../../state/multichain/transfer/pendingActivity';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { useTrackTransactionSent } from '../../analytics/events-hooks';
+import { useAnalyticsAssetId, useTrackTransactionSent } from '../../analytics/events-hooks';
 
 export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) => {
     const getSender = useGetSender();
     const rawTransactionService = useTonRawTransactionService();
     const activeAccount = useActiveAccount();
     const trackTransactionSent = useTrackTransactionSent();
+    const assetId = useAnalyticsAssetId();
+    const client = useQueryClient();
 
     const walletAddress = activeAccount.activeTonWallet.rawAddress;
 
@@ -21,7 +25,21 @@ export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) 
             zeroFeeEstimation,
             nftEncoder.encodeNftLink(args)
         );
-        trackTransactionSent('DomainRenew');
+        // Linking a domain to an address isn't a renewal, a subscription, a
+        // multisig op or a deploy — `unknown` is the only honest detail.
+        trackTransactionSent({
+            category: 'call',
+            category_detail: 'unknown',
+            asset: assetId.tonCoin(),
+            amount: 0,
+            fee_asset: 'coin'
+        });
+        if (activeAccount.type === 'multichain') {
+            await client.invalidateQueries(
+                anyOfKeysParts(QueryKey.multichainActivity, QueryKey.multichainWalletAssets)
+            );
+            schedulePostBroadcastRefresh(client);
+        }
         return true;
     });
 };

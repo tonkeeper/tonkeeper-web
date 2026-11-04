@@ -34,9 +34,14 @@
     "approval": {
         "accepted": "ਦਿੱਖ ਰਿਹਾ",
         "declined": "ਇਨਕਾਰ ਕੀਤਾ",
+        "details_collection": "ਕਲੈਕਸ਼ਨ ਵੇਰਵੇ",
         "details_token": "ਟੋਕਨ ਵੇਰਵੇ",
         "id_collection": "合集 ਆਈਡੀ",
         "id_token": "ਟੋਕਨ ਆਈਡੀ",
+        "move_to_accepted_collection": "ਵਾਲਿਟ ਵਿੱਚ ਕਲੈਕਸ਼ਨ ਦਿਖਾਓ",
+        "move_to_accepted_token": "ਵਾਲਿਟ ਵਿੱਚ ਟੋਕਨ ਦਿਖਾਓ",
+        "move_to_declined_collection": "ਵਾਲਿਟ ਤੋਂ ਕਲੈਕਸ਼ਨ ਲੁਕਾਓ",
+        "move_to_declined_token": "ਵਾਲਿਟ ਤੋਂ ਟੋਕਨ ਲੁਕਾਓ",
         "name": "ਨਾਮ",
         "not_spam": "ਇਹ ਸਪੈਮ ਨਹੀਂ ਹੈ",
         "spam": "ਸਪੈਮ",
@@ -46,7 +51,7 @@
     "battery": {
         "other_ways": {
             "by_crypto": {
-                "title": "{symbol} ਨਾਲ ਰੀਚਾਰਜ ਕਰੋ"
+                "title": "%{symbol} ਨਾਲ ਰੀਚਾਰਜ ਕਰੋ"
             },
             "gift": {
                 "subtitle": "ਦੋਸਤਾਂ ਨਾਲ ਸਾਂਝਾ ਕਰੋ",
@@ -54,22 +59,30 @@
             }
         },
         "packages": {
-            "disclaimer": "ਇੱਕ ਚਾਰਜ ਔਸਤ ਲੈਣ-ਦੇਣ ਫੀਸ ਨੂੰ ਕਵਰ ਕਰਦਾ ਹੈ। ਕੁਝ ਲੈਣ-ਦੇਣ ਦੀ ਲਾਗਤ ਵੱਧ ਹੋ ਸਕਦੀ ਹੈ।"
+            "disclaimer": "ਇੱਕ ਚਾਰਜ ਔਸਤ ਲੈਣ-ਦੇਣ ਫੀਸ ਨੂੰ ਕਵਰ ਕਰਦਾ ਹੈ। ਕੁਝ ਲੈਣ-ਦੇਣ ਦੀ ਲਾਗਤ ਵੱਧ ਹੋ ਸਕਦੀ ਹੈ।",
+            "title": {
+                "large": "ਵੱਡਾ",
+                "medium": "ਮੱਧਮ",
+                "small": "ਛੋਟਾ"
+            }
         },
         "please_wait": "ਬੈਟਰੀ ਕੁਝ ਮਿੰਟਾਂ ਵਿੱਚ ਚਾਰਜ ਹੋ ਜਾਵੇਗੀ",
         "promocode": {
-            "title": "ਪ੍ਰੋਮੋ ਕੋਡ"
+            "title": "ਪ੍ਰੋਮੋ ਕੋਡ",
+            "apply": "ਲਾਗੂ ਕਰੋ",
+            "success": "ਤੁਹਾਡੀ ਬੈਟਰੀ ਚਾਰਜ ਹੋ ਗਈ ਹੈ"
         },
         "recharge_by_crypto": {
             "other": {
                 "subtitle": "ਰਕਮ ਹੱਥੋਂ ਦਰਜ ਕਰੋ",
                 "title": "ਹੋਰ"
             },
-            "title": "ਰੀਚਾਰਜ"
+            "title": "ਰੀਚਾਰਜ",
+            "title_gift": "ਤੋਹਫ਼ਾ"
         },
-        "title": "Tonkeeper ਬੈਟਰੀ",
+        "title": "Keeper ਬੈਟਰੀ",
         "transactions": {
-            "description": "ਚੁਣੀਆਂ ਗਈਆਂ ਲੈਣ-ਦੇਣ Tonkeeper ਬੈਟਰੀ ਦੁਆਰਾ ਅਦਾ ਕੀਤੀਆਂ ਜਾਣਗੀਆਂ।",
+            "description": "ਚੁਣੀਆਂ ਗਈਆਂ ਲੈਣ-ਦੇਣ Keeper ਬੈਟਰੀ ਦੁਆਰਾ ਅਦਾ ਕੀਤੀਆਂ ਜਾਣਗੀਆਂ।",
             "settings": "ਬੈਟਰੀ ਸੈਟਿੰਗਾਂ",
             "title": "ਲੈਣ-ਦੇਣ",
             "types": {
@@ -131,14 +144,14 @@
     "dns_current_address": "ਤੁਹਾਡਾ ਮੌਜੂਦਾ ਪਤਾ",
     "dns_expiration_date": "ਮਿਆਦ ਬੀਤਣ ਦੀ ਤਾਰੀਖ",
     "dns_renew_toast_success": "ਡੋਮੇਨ ਨਵੀਨਕਰਨ ਹੋ ਗਿਆ ਹੈ",
-    "dns_renew_until_btn": "{untilDate} ਤੱਕ ਨਵੀਨਤਾ ਕਰੋ",
+    "dns_renew_until_btn": "%{untilDate} ਤੱਕ ਨਵੀਨਤਾ ਕਰੋ",
     "exchange_method_dont_show_again": "ਫਿਰ ਨਾ ਵੇਖਾਓ",
-    "exchange_method_open_warning": "ਤੁਸੀਂ ਇੱਕ ਬਾਹਰੀ ਐਪ ਖੋਲ੍ਹ ਰਹੇ ਹੋ ਜੋ Tonkeeper ਵੱਲੋਂ ਨਹੀਂ ਚਲਾਈ ਜਾਂਦੀ।",
+    "exchange_method_open_warning": "ਤੁਸੀਂ ਇੱਕ ਬਾਹਰੀ ਐਪ ਖੋਲ੍ਹ ਰਹੇ ਹੋ ਜੋ Keeper ਵੱਲੋਂ ਨਹੀਂ ਚਲਾਈ ਜਾਂਦੀ।",
     "exchange_modal": {
         "other_ways_to_buy": "ਖ਼ਰੀਦਣ ਦੇ ਹੋਰ ਤਰੀਕੇ"
     },
-    "exchange_other_ways": "%{coinSymbolWithEx} ਖਰੀਦਣ ਜਾਂ ਵੇਚਣ ਦੇ ਹੋਰ ਤਰੀਕੇ",
-    "exchange_title": "%{coinSymbolWithEx} ਖਰੀਦੋ",
+    "exchange_other_ways": "%{coinSymbol} ਖਰੀਦਣ ਜਾਂ ਵੇਚਣ ਦੇ ਹੋਰ ਤਰੀਕੇ",
+    "exchange_title": "%{coinSymbol} ਖਰੀਦੋ",
     "import_add_wallet": "ਵਾਲਿਟ ਸ਼ਾਮਲ ਕਰੋ",
     "import_add_wallet_description": "ਨਵਾਂ ਵਾਲਿਟ ਬਣਾਓ ਜਾਂ ਮੌਜੂਦਾ ਵਾਲਿਟ ਜੋੜੋ।",
     "import_existing_wallet": "ਮੌਜੂਦਾ ਵਾਲਟ",
@@ -154,18 +167,16 @@
     "intro_continue_btn": "ਸ਼ੁਰੂ ਕਰੋ",
     "intro_item1_caption": "The Open Network ਦੀ ਵਿਲੱਖਣ ਆਰਕੀਟੈਕਚਰ ਦੇ ਚਲਦੇ, %{chainName} ਲੈਣ-ਦੇਣ ਸੈਕੰਡਾਂ ਵਿੱਚ ਨਿਪਟਾਏ ਜਾਂਦੇ ਹਨ।",
     "intro_item1_title": "ਵਿਸ਼ਵ-ਪੱਧਰੀ ਗਤੀ",
-    "intro_item2_caption": "Tonkeeper ਤੁਹਾਡੀਆਂ ਕ੍ਰਿਪਟੋਗ੍ਰਾਫਿਕ ਕੁੰਜੀਆਂ ਤੁਹਾਡੇ ਡਿਵਾਈਸ 'ਤੇ ਸਟੋਰ ਕਰਦਾ ਹੈ। ਸਾਰੇ ਵਪਾਰ ਵਿਖੇਂਦਰੀਕ੍ਰਿਤ ਪਰੋਟੋਕਾਲਾਂ ਰਾਹੀਂ ਕੀਤੇ ਜਾਂਦੇ ਹਨ ਤਾਂ ਜੋ ਤੁਹਾਡਾ ਕ੍ਰਿਪਟੋ ਕਦੇ ਵੀ ਕੇਂਦ੍ਰਿਤ ਐਕਸਚੇਂਜਾਂ ਦੇ ਹੱਥ ਨਹੀਂ ਲੱਗਦਾ।",
+    "intro_item2_caption": "Keeper ਤੁਹਾਡੀਆਂ ਕ੍ਰਿਪਟੋਗ੍ਰਾਫਿਕ ਕੁੰਜੀਆਂ ਤੁਹਾਡੇ ਡਿਵਾਈਸ 'ਤੇ ਸਟੋਰ ਕਰਦਾ ਹੈ। ਸਾਰੇ ਵਪਾਰ ਵਿਖੇਂਦਰੀਕ੍ਰਿਤ ਪਰੋਟੋਕਾਲਾਂ ਰਾਹੀਂ ਕੀਤੇ ਜਾਂਦੇ ਹਨ ਤਾਂ ਜੋ ਤੁਹਾਡਾ ਕ੍ਰਿਪਟੋ ਕਦੇ ਵੀ ਕੇਂਦ੍ਰਿਤ ਐਕਸਚੇਂਜਾਂ ਦੇ ਹੱਥ ਨਹੀਂ ਲੱਗਦਾ।",
     "intro_item2_title": "ਐਂਡ-ਟੂ-ਐਂਡ ਸੁਰੱਖਿਆ",
     "intro_title": "ਜੀ ਆਯਾਨੁ\n",
-    "jetton_id": "ਟੋਕਨ ਆਈਡੀ: {jettonAddress}",
+    "jetton_id": "ਟੋਕਨ ਆਈਡੀ: %{jettonAddress}",
     "jettons_list_title": "ਟੋਕਨ",
     "later": "ਬਾਅਦ ਵਿੱਚ",
     "ledger": {
         "operation_not_supported": "ਇਹ ਕਾਰਵਾਈ ਲੈਜਰ ਵਾਲਿਟਾਂ ਲਈ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਸੇ ਹੋਰ ਵਾਲਿਟ ਦੀ ਚੋਣ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
     },
-    "legal_font_license": "Montserrat ਫ਼ੌਂਟ",
     "legal_header_title": "ਕਾਨੂੰਨੀ",
-    "legal_licenses_title": "ਲਾਈਸੰਸ",
     "legal_privacy": "ਪਰਾਈਵੇਸੀ ਨੀਤੀ",
     "legal_terms": "ਸੇਵਾ ਦੀਆਂ ਸ਼ਰਤਾਂ",
     "loading": "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ",
@@ -197,7 +208,7 @@
         "title": "NFT ਟ੍ਰਾਂਸਫਰ"
     },
     "nft_transfer_title": "NFT ਟ੍ਰਾਂਸਫਰ ਕਰੋ",
-    "nft_unlink_domain_button": "'{{'address'}}' ਨਾਲ ਜੁੜਿਆ ਹੋਇਆ",
+    "nft_unlink_domain_button": "{{address}} ਨਾਲ ਜੁੜਿਆ ਹੋਇਆ",
     "nft_view_in_explorer": "ਐਕਸਪਲੋਰਰ ਵਿੱਚ ਵੇਖੋ",
     "notifications": {
         "alert": {
@@ -217,7 +228,7 @@
     "recovery_phrase": {
         "copy_button": "ਕਾਪੀ ਕਰੋ"
     },
-    "reminder_notifications_caption": "ਜਦੋਂ ਤੁਹਾਨੂੰ %{coinSymbolWithEx}, ਟੋਕਨ ਅਤੇ NFT ਮਿਲਣ, ਤਾਂ ਨੋਟੀਫਿਕੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ।",
+    "reminder_notifications_caption": "ਜਦੋਂ ਤੁਹਾਨੂੰ %{coinSymbol}, ਟੋਕਨ ਅਤੇ NFT ਮਿਲਣ, ਤਾਂ ਨੋਟੀਫਿਕੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ।",
     "reminder_notifications_enable_button": "ਨੋਟਿਫਿਕੇਸ਼ਨ ਚਾਲੂ ਕਰੋ",
     "reminder_notifications_later_button": "ਬਾਅਦ ਵਿੱਚ",
     "reminder_notifications_title": "ਤੁਰੰਤ ਨੋਟੀਫਿਕੇਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ",
@@ -230,7 +241,7 @@
     "send_publish_tx_error": "ਟ੍ਰਾਂਜੈਕਸ਼ਨ ਭੇਜਣ ਵਿੱਚ ਅਸਫਲ",
     "send_screen_steps": {
         "address": {
-            "delete_alert_text": "ਕੀ ਤੁਸੀਂ ਪੱਕਾ «{name}» ਨੂੰ ਆਪਣੀਆਂ ਮਨਪਸੰਦ ਚੀਜ਼ਾਂ ਵਿੱਚੋਂ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
+            "delete_alert_text": "ਕੀ ਤੁਸੀਂ ਪੱਕਾ «%{name}» ਨੂੰ ਆਪਣੀਆਂ ਮਨਪਸੰਦ ਚੀਜ਼ਾਂ ਵਿੱਚੋਂ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
             "suggest_actions": {
                 "add": "ਮਨਪਸੰਦ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ",
                 "delete": "ਹਟਾਓ",
@@ -241,7 +252,7 @@
         "amount": {
             "insufficient_balance": "ਪਰਯਾਪਤ ਬਕਾਇਆ ਨਹੀਂ",
             "max": " ਵੱਧ ਤੋਂ ਵੱਧ",
-            "remaining": "ਉਪਲਬਧ: {amount}"
+            "remaining": "ਉਪਲਬਧ: %{amount}"
         },
         "comfirm": {
             "comment_required_text": "ਜਦੋਂ ਭੇਜੋ, ਤੀਕਣੀ ਤੋਂ ਮੈਮੋ ਜਾਂ ਟੈਗ ਸ਼ਾਮਲ ਕਰਨਾ ਯਕੀਨੀ ਬਣਾਓ। ਇਸ ਦੇ ਬਿਨਾਂ, ਤੁਹਾਡਾ ਫੰਡ ਜਮ੍ਹਾਂ ਨਹੀਂ ਹੋਵੇਗਾ ਅਤੇ ਖੋ ਸਕਦਾ ਹੈ।",
@@ -250,7 +261,7 @@
         },
         "done": {
             "done_label": "ਮੁਕੰਮਲ",
-            "to": "{name} ਨੂੰ"
+            "to": "%{name} ਨੂੰ"
         }
     },
     "send_sending_wrong_time_description": "ਆਪਣੇ ਡਿਵਾਈਸ ਦੀਆਂ ਸੈਟਿੰਗਜ਼ ਵਿੱਚ ਆਟੋਮੈਟਿਕ ਸਮਾਂ ਅਤੇ ਤਾਰੀਖ ਚਾਲੂ ਕਰੋ। ਫਿਰ ਆਪਣੇ ਟ੍ਰਾਂਸਫਰ ਦੀ ਫਿਰ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
@@ -260,10 +271,10 @@
     "settings_jettons_list": "ਟੋਕੇਨ",
     "settings_legal_documents": "ਕਾਨੂੰਨੀ ਦਸਤਾਵੇਜ਼",
     "settings_network_alert_title": "ਨੈੱਟਵਰਕ ਚੁਣੋ",
-    "settings_news": "Tonkeeper ਖ਼ਬਰਾਂ",
+    "settings_news": "Keeper ਖ਼ਬਰਾਂ",
     "settings_notifications": "ਸੂਚਨਾਵਾਂ",
     "settings_primary_currency": "ਮੁਦਰਾ",
-    "settings_rate": "Tonkeeper ਦੀ ਦਰਜਾ بندی ਕਰੋ",
+    "settings_rate": "Keeper ਦੀ ਦਰਜਾ بندی ਕਰੋ",
     "settings_recovery_phrase": "ਰੀਕਵਰੀ ਫਰੇਜ਼",
     "settings_reset": "ਸਾਈਨ ਆਊਟ ਕਰੋ",
     "settings_reset_alert_title": "🚧 🚨 ਸਾਇਨ ਆਉਟ ਕਰਨਾ ਹੈ? 🚨 🚧",
@@ -293,17 +304,17 @@
     "staking_earnings_section_title": "ਸਾਲਾਨਾ ਅਨੁਮਾਨਿਤ ਕਮਾਈ",
     "staking_enter_amount": "ਇੱਕ ਰਕਮ ਦਰਜ ਕਰੋ",
     "staking_insufficient_balance": "ਪ੍ਰਯਾਪਤ ਬਕਾਇਆ ਨਹੀਂ",
-    "staking_insufficient_recommended_fee_reserve": "ਅਪਰ्यਾਪਤ ਫੰਡ: ਵਾਲਿਟ ਬਕਾਇਆ ਵਿੱਚ 1 %{coinSymbolWithEx} ਰਿਜ਼ਰਵ ਅਤੇ 0.05 %{coinSymbolWithEx} ਫੀ ਹੋਣੀ ਚਾਹੀਦੀ ਹੈ।",
+    "staking_insufficient_recommended_fee_reserve": "ਅਪਰ्यਾਪਤ ਫੰਡ: ਵਾਲਿਟ ਬਕਾਇਆ ਵਿੱਚ 1 %{coinSymbol} ਰਿਜ਼ਰਵ ਅਤੇ 0.05 %{coinSymbol} ਫੀ ਹੋਣੀ ਚਾਹੀਦੀ ਹੈ।",
     "staking_max": "ਅਧਿਕਤਮ",
     "staking_min_deposit_label": "ਘੱਟੋ-ਘੱਟ ਜਮ੍ਹਾਂ",
     "staking_next_cycle_desc_liquid": "ਤੁਰੰਤ ਅਨਸਟੇਕ ਉਪਲਬਧ ਹੈ",
-    "staking_next_cycle_message": "ਅਗਲਾ ਚੱਕਰ {value} ਵਿੱਚ",
-    "staking_pool_detail": "APY ≈ {apy}% · ਘੱਟੋ-ਘੱਟ ਜਮ੍ਹਾਂ {minDeposit} %{coinSymbolWithEx}",
-    "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} ਕਢਵਾਉਣ ਲਈ ਤਿਆਰ",
+    "staking_next_cycle_message": "ਅਗਲਾ ਚੱਕਰ %{value} ਵਿੱਚ",
+    "staking_pool_detail": "APY ≈ %{apy}% · ਘੱਟੋ-ਘੱਟ ਜਮ੍ਹਾਂ %{minDeposit} %{coinSymbol}",
+    "staking_pools_apy": "APY ≈ %{apy}%",
+    "staking_ready_withdraw": "%{amount} %{coinSymbol} ਕਢਵਾਉਣ ਲਈ ਤਿਆਰ",
     "staking_rewards_after_stake": "ਜਮ੍ਹਾਂ ਕਰਨ ਤੋਂ ਬਾਅਦ",
     "staking_rewards_current": "ਮੌਜੂਦਾ",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ %{value} %{coinSymbol}",
     "staking_staked": "ਜਮ੍ਹਾਂ ਕੀਤਾ",
     "staking_title": "ਸਟੇਕਿੰਗ",
     "staking_top_up": "ਜਮ੍ਹਾਂ",
@@ -346,10 +357,9 @@
         "subtitle": "NFT ਹੇਠਾਂ ਦਿੱਤੇ ਕਾਰਣਾਂ ਵਿਚੋਂ ਕਿਸੇ ਇੱਕ ਕਾਰਨ ਕਰਕੇ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਹੋ ਸਕਦਾ.",
         "title": "ਗੈਰ-ਤਸਦੀਕਸ਼ੁਦਾ NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "ਨੈੱਟਵਰਕ ਫੀਸ ਲਈ ਕਾਫ਼ੀ %{coinSymbolWithEx} ਨਹੀਂ ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "ਨੈੱਟਵਰਕ ਫੀਸ ਲਈ ਕਾਫ਼ੀ %{coinSymbol} ਨਹੀਂ (%{required})",
     "swap_exchange_in": "ਵਿੱਚ ਐਕਸਚੇਂਜ",
     "swap_expired_refresh": "ਸਵੈਪ ਦੀ ਮਿਆਦ ਖਤਮ ਹੋ ਗਈ। ਕੋਟ ਨੂੰ ਤਾਜ਼ਾ ਕਰੋ",
-    "swap_price_impact_description": "ਵਪਾਰ ਦੇ ਆਕਾਰ ਕਾਰਨ ਮਾਰਕੀਟ ਕੀਮਤ ਅਤੇ ਅਨੁਮਾਨਿਤ ਕੀਮਤ ਵਿਚਕਾਰ ਅੰਤਰ।",
     "swap_price_impact_ignore_variant": "ਅਣਗੌਲਾ ਕਰੋ",
     "swap_slippage_tolerance": "ਸਲਿਪੇਜ ਸਹਿਣਸ਼ੀਲਤਾ",
     "swap_slippage_tolerance_description": "ਵਪਾਰ ਵਾਪਸ ਹੋਣ ਤੋਂ ਪਹਿਲਾਂ ਕੀਮਤ ਕਿੰਨੀ ਪ੍ਰਤੀਕੂਲ ਬਦਲ ਸਕਦੀ ਹੈ।",
@@ -360,8 +370,8 @@
         "tonviewer_button": "Tonviewer 'ਤੇ ਵੇਖੋ"
     },
     "tonkeeper_pro": "ਟੋਨਕੀਪਰ ਪ੍ਰੋ",
-    "tonkeeper_pro_description": "Tonkeeper Pro ਦੀ ਜਾਂਚ ਲਈ ਚੰਡ ਇਕ ਵਧੀਆ ਵਾਲਿਟ ਵਿਸ਼ੇਸ਼ਤਾ ਨਾਲ ਆਉਂਦੀ ਹੈ, ਜੋ ਕਿ ਕ੍ਰਿਪਟੋ ਪ੍ਰਬੰਧਨ ਲਈ ਇਕ ਟੂਲਸੈੱਟ ਪੇਸ਼ ਕਰਦੀ ਹੈ।",
-    "ton_login_caption": "{name} ਤੁਹਾਡੇ ਵਾਲਿਟ ਪਤੇ ਤੱਕ ਪਹੁੰਚ ਦੀ ਬੇਨਤੀ ਕਰ ਰਿਹਾ ਹੈ",
+    "tonkeeper_pro_description": "Keeper Pro ਦੀ ਜਾਂਚ ਲਈ ਚੰਡ ਇਕ ਵਧੀਆ ਵਾਲਿਟ ਵਿਸ਼ੇਸ਼ਤਾ ਨਾਲ ਆਉਂਦੀ ਹੈ, ਜੋ ਕਿ ਕ੍ਰਿਪਟੋ ਪ੍ਰਬੰਧਨ ਲਈ ਇਕ ਟੂਲਸੈੱਟ ਪੇਸ਼ ਕਰਦੀ ਹੈ।",
+    "ton_login_caption": "%{name} ਤੁਹਾਡੇ ਵਾਲਿਟ ਪਤੇ ਤੱਕ ਪਹੁੰਚ ਦੀ ਬੇਨਤੀ ਕਰ ਰਿਹਾ ਹੈ",
     "ton_login_connect_button": "ਵਾਲਿਟ ਕਨੈਕਟ ਕਰੋ",
     "ton_login_notice": "ਵਾਲਿਟ ਜੋੜਣ ਤੋਂ ਪਹਿਲਾਂ ਸਰਵਿਸ ਪਤੇ ਦੀ ਜਾਂਚ ਕਰਨਾ ਯਕੀਨੀ ਬਣਾਓ।",
     "ton_login_success": "ਹੋ ਗਿਆ",
@@ -375,7 +385,7 @@
     "transaction_fee": "ਫੀਸ",
     "transaction_hash": "ਲੈਣ-ਦੇਣ",
     "transaction_merchant": "ਵਪਾਰੀ",
-    "transaction_receive_date": "{date} ਨੂੰ ਪ੍ਰਾਪਤ ਹੋਇਆ",
+    "transaction_receive_date": "%{date} ਨੂੰ ਪ੍ਰਾਪਤ ਹੋਇਆ",
     "transaction_recipient": "ਪ੍ਰਾਪਤਕਰਤਾ",
     "transaction_recipient_address": " ਪ੍ਰਾਪਤਕਰਤਾ ਦਾ ਪਤਾ",
     "transactions": {
@@ -390,7 +400,7 @@
     },
     "transaction_sender": "ਭੇਜਣ ਵਾਲਾ",
     "transaction_sender_address": "ਭੇਜਣ ਵਾਲੇ ਦਾ ਪਤਾ",
-    "transaction_sent_date": "{date} ਨੂੰ ਭੇਜਿਆ ਗਿਆ",
+    "transaction_sent_date": "%{date} ਨੂੰ ਭੇਜਿਆ ਗਿਆ",
     "transaction_type_bid": "ਬੋਲੀ",
     "transaction_type_contract_deploy": "ਕਰਾਰ ਦੀ ਤੈਅਿਨਾਤੀ",
     "transaction_type_pending": "ਬਕਾਇਆ",
@@ -410,7 +420,7 @@
             "types": {
                 "jettonTransfer": "ਟੋਕਨ ਤਬਾਦਲਾ",
                 "nftItemTransfer": "NFT ਟ੍ਰਾਂਸਫ਼ਰ",
-                "tonTransfer": "%{coinSymbolWithEx} ਟ੍ਰਾਂਸਫਰ",
+                "tonTransfer": "%{coinSymbol} ਟ੍ਰਾਂਸਫਰ",
                 "unknownTransaction": "ਅਣਜਾਣ ਲੈਣ-ਦੇਣ"
             }
         }
@@ -427,21 +437,22 @@
     "wallet_swap": "ਤਬਾਦਲਾ",
     "wallet_title": "ਬੱਟੂਆ",
     "yesterday": "ਕੱਲ੍ਹ",
-    "staking_pool_liquid_desc": "ਜਦੋਂ ਤੁਸੀਂ Tonstakers ਪੂਲ ਵਿੱਚ %{coinSymbolWithEx} ਸਟੇਕ ਕਰਦੇ ਹੋ, ਤੁਹਾਨੂੰ tsTON ਨਾਮ ਦਾ ਟੋਕਨ ਮਿਲਦਾ ਹੈ ਜੋ ਪੂਲ ਵਿੱਚ ਤੁਹਾਡੇ ਹਿੱਸੇ ਨੂੰ ਦਰਸਾਉਂਦਾ ਹੈ। ਜਿਵੇਂ ਪੂਲ ਮੁਨਾਫਾ ਇਕੱਠਾ ਕਰਦਾ ਹੈ, ਤੁਹਾਡਾ tsTON ਵੱਧ %{coinSymbolWithEx} ਦਰਸਾਉਂਦਾ ਹੈ।",
-    "staking_pool_withdraw_date": "{date} ਨੂੰ {amount} %{coinSymbolWithEx} ਕਢੇ ਜਾਣਗੇ",
-    "staking_portfolio_pending_withdraw": "ਸਾਈਕਲ ਖਤਮ ਹੋਣ ਤੋਂ ਬਾਅਦ {amount} %{coinSymbolWithEx} ਕਢੇ ਜਾਣਗੇ",
-    "staking_portfolio_pending_withdraw_countdown": "{value} ਵਿੱਚ {amount} %{coinSymbolWithEx} ਕਢੇ ਜਾਣਗੇ",
+    "staking_pool_liquid_desc": "ਜਦੋਂ ਤੁਸੀਂ Tonstakers ਪੂਲ ਵਿੱਚ %{coinSymbol} ਸਟੇਕ ਕਰਦੇ ਹੋ, ਤੁਹਾਨੂੰ tsTON ਨਾਮ ਦਾ ਟੋਕਨ ਮਿਲਦਾ ਹੈ ਜੋ ਪੂਲ ਵਿੱਚ ਤੁਹਾਡੇ ਹਿੱਸੇ ਨੂੰ ਦਰਸਾਉਂਦਾ ਹੈ। ਜਿਵੇਂ ਪੂਲ ਮੁਨਾਫਾ ਇਕੱਠਾ ਕਰਦਾ ਹੈ, ਤੁਹਾਡਾ tsTON ਵੱਧ %{coinSymbol} ਦਰਸਾਉਂਦਾ ਹੈ।",
+    "staking_pool_withdraw_date": "%{date} ਨੂੰ %{amount} %{coinSymbol} ਕਢੇ ਜਾਣਗੇ",
+    "staking_portfolio_pending_withdraw": "ਸਾਈਕਲ ਖਤਮ ਹੋਣ ਤੋਂ ਬਾਅਦ %{amount} %{coinSymbol} ਕਢੇ ਜਾਣਗੇ",
+    "staking_portfolio_pending_withdraw_countdown": "%{value} ਵਿੱਚ %{amount} %{coinSymbol} ਕਢੇ ਜਾਣਗੇ",
     "staking_confirm_modal_provider": "ਪ੍ਰਦਾਤਾ",
     "staking_confirm_modal_amount": "ਰਕਮ",
     "staking_confirm_modal_apy": "APY",
     "staking_confirm_modal_wallet": "ਵਾਲਿਟ",
-    "staking_unstake_cycle_info": "ਵੈਲੀਡੇਸ਼ਨ ਸਾਈਕਲ ਖਤਮ ਹੋਣ ਤੋਂ {value} ਬਾਅਦ ਬੇਨਤੀ ਪ੍ਰੋਸੈਸ ਹੋਵੇਗੀ",
-    "staking_tonstakers_notice": "ਸਟੇਕਿੰਗ ਤੀਜੀ ਧਿਰ ਦੀਆਂ ਸਮਾਰਟ ਕੰਟ੍ਰੈਕਟਾਂ 'ਤੇ ਆਧਾਰਿਤ ਹੈ। Tonkeeper ਸਟੇਕਿੰਗ ਅਨੁਭਵ ਲਈ ਜ਼ਿੰਮੇਵਾਰ ਨਹੀਂ ਹੈ।",
+    "staking_unstake_cycle_info": "ਵੈਲੀਡੇਸ਼ਨ ਸਾਈਕਲ ਖਤਮ ਹੋਣ ਤੋਂ %{value} ਬਾਅਦ ਬੇਨਤੀ ਪ੍ਰੋਸੈਸ ਹੋਵੇਗੀ",
+    "staking_tonstakers_notice": "ਸਟੇਕਿੰਗ ਤੀਜੀ ਧਿਰ ਦੀਆਂ ਸਮਾਰਟ ਕੰਟ੍ਰੈਕਟਾਂ 'ਤੇ ਆਧਾਰਿਤ ਹੈ। Keeper ਸਟੇਕਿੰਗ ਅਨੁਭਵ ਲਈ ਜ਼ਿੰਮੇਵਾਰ ਨਹੀਂ ਹੈ।",
     "staking_claim": "ਲਵੋ",
     "staking_details_pool_address_label": "ਪੂਲ ਪਤਾ",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} ਸਟੇਕਿੰਗ ਲੰਬਿਤ",
-    "staking_pools_min_deposit": "ਘੱਟੋ-ਘੱਟ ਜਮਾ {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "%{amount} %{coinSymbol} ਸਟੇਕਿੰਗ ਲੰਬਿਤ",
+    "staking_pools_min_deposit": "ਘੱਟੋ-ਘੱਟ ਜਮਾ %{minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "ਸਿਰਫ਼ ਪੂਰਾ ਕਢਾਈ ਉਪਲਬਧ ਹੈ",
+    "trc20_transfer_unavailable": "TRC20 ਭੇਜਣਾ ਆਰਜ਼ੀ ਤੌਰ ’ਤੇ ਉਪਲਬਧ ਨਹੀਂ ਹੈ",
     "twa_closed_title": "ਮਿਨੀ ਐਪ ਬੰਦ ਹੋ ਗਈ",
     "twa_closed_subtitle": "iOS, Android ਜਾਂ ਵੈੱਬ ’ਤੇ ਉੱਥੋਂ ਜਾਰੀ ਰੱਖੋ ਜਿੱਥੇ ਤੁਸੀਂ ਛੱਡਿਆ ਸੀ।",
     "twa_closed_subtitle_wallets": "ਤੁਹਾਡੇ ਵਾਲਿਟ ਸੁਰੱਖਿਅਤ ਹਨ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਰਿਕਵਰੀ ਵਾਕਾਂਸ਼ ਸੰਭਾਲੋ ਅਤੇ iOS, Android ਜਾਂ ਵੈੱਬ ’ਤੇ ਉੱਥੋਂ ਜਾਰੀ ਰੱਖੋ ਜਿੱਥੇ ਤੁਸੀਂ ਛੱਡਿਆ ਸੀ।",

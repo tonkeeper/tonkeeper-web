@@ -1,6 +1,6 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { intlLocale } from '@tonkeeper/core/dist/entries/language';
+import { intlDateLocale } from '@tonkeeper/core/dist/entries/language';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import BigNumber from 'bignumber.js';
 import React, { FC, useEffect, useState } from 'react';
@@ -51,7 +51,7 @@ export const RenewNft: FC<{
         t,
         i18n: { language }
     } = useTranslation();
-    const rtf = new Intl.RelativeTimeFormat(intlLocale(language), { style: 'long' });
+    const rtf = new Intl.RelativeTimeFormat(intlDateLocale(language), { style: 'long' });
 
     const query = useNftDNSExpirationDate(nft);
     const { data: expirationDate, isLoading: isExpirationInfoLoading } = query;
@@ -119,7 +119,7 @@ export const RenewNft: FC<{
                 >
                     {isWaitingForUpdate
                         ? t('renew_nft_in_progress')
-                        : t('dns_renew_until_btn').replace('%{untilDate}', renewUntilFormatted)}
+                        : t('dns_renew_until_btn', { untilDate: renewUntilFormatted })}
                 </RenewDNSButton>
 
                 {daysLeft !== '' && (

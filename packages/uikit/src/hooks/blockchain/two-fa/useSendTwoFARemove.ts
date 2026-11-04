@@ -1,6 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useAnalyticsTrack } from '../../analytics';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../analytics/events-hooks';
 import { useActiveWallet, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useNotifyErrorHandle, useToast } from '../../useNotification';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
@@ -20,6 +25,8 @@ export function useSendTwoFARemove() {
     const queryClient = useQueryClient();
     const toast = useToast();
     const { t } = useTranslation();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -40,6 +47,14 @@ export function useSendTwoFARemove() {
             await sender.sendRemoveExtension();
 
             queryClient.setQueryData([QueryKey.twoFARemovingProcess, wallet.id], true);
+
+            trackTransactionSent({
+                category: 'call',
+                category_detail: 'unknown',
+                asset: assetId.tonCoin(),
+                amount: 0,
+                fee_asset: toAnalyticsFeeAsset(EXTERNAL_SENDER_CHOICE.type)
+            });
 
             track('remove_2fa', {
                 wallet: wallet.rawAddress

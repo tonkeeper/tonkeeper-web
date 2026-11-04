@@ -505,7 +505,7 @@ function convertJettonToTokenMeta(
         return {
             address: 'TON',
             name: BRAND_CONFIG.coinName,
-            symbol: BRAND_CONFIG.coinSymbolWithEx,
+            symbol: BRAND_CONFIG.coinSymbol,
             color: tokenColor('TON'),
             image: BRAND_CONFIG.coinIcon,
             price,

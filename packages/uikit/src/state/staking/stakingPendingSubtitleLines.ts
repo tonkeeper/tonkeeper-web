@@ -1,5 +1,5 @@
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { formatter } from '../../hooks/balance';
+import { formatAmount } from '@tonkeeper/core/dist/utils/numberFormat';
 import { isSignificantPendingWithdraw } from './pendingWithdraw';
 
 type StakingTranslate = (key: string, options?: Record<string, string>) => string;
@@ -31,7 +31,7 @@ export function getStakingPendingCycleLine(
     if (!isSignificantPendingWithdraw(pendingWithdrawRaw)) {
         return '';
     }
-    const amount = formatter.formatDisplay(shiftedDecimals(pendingWithdrawRaw));
+    const amount = formatAmount(shiftedDecimals(pendingWithdrawRaw));
     return countdown
         ? t('staking_portfolio_pending_withdraw_countdown', { amount, value: countdown })
         : t('staking_portfolio_pending_withdraw', { amount });
@@ -54,14 +54,14 @@ export function getStakingPendingSubtitleLine(
     const rw = position.readyWithdraw ?? 0;
     if (isSignificantPendingWithdraw(rw)) {
         return t('staking_ready_withdraw', {
-            amount: formatter.formatDisplay(shiftedDecimals(rw))
+            amount: formatAmount(shiftedDecimals(rw))
         });
     }
 
     const pd = position.pendingDeposit ?? 0;
     if (isSignificantPendingWithdraw(pd)) {
         return t('staking_pending_deposit', {
-            amount: formatter.formatDisplay(shiftedDecimals(pd))
+            amount: formatAmount(shiftedDecimals(pd))
         });
     }
 

@@ -157,9 +157,9 @@ module.exports = {
                                 '[A-Z_-]+',
                                 require('eslint-plugin-i18next/lib/options/htmlEntities'),
                                 /^\p{Emoji}+$/u,
-                                'Tonkeeper',
-                                'Tonkeeper Pro',
-                                'Tonkeeper Web',
+                                'Keeper',
+                                'Keeper Pro',
+                                'Keeper Web',
                                 'Ton Console',
                                 'Tonviewer',
                                 'TRC20',
@@ -196,6 +196,72 @@ module.exports = {
             files: ['**/task/**/*.ts', '**/*.config.ts', '**/forge.config.ts'],
             rules: {
                 'no-console': 'off'
+            }
+        },
+        {
+            // Phase 2 multichain surface is Tailwind-only — see CONTRIBUTING.md
+            // ("Styling: Tailwind + styled-components"). Block styled-components
+            // imports here so the rule self-documents at lint time.
+            files: ['packages/uikit/src/multichain/**/*.{ts,tsx}'],
+            rules: {
+                'no-restricted-imports': [
+                    'error',
+                    {
+                        patterns: [
+                            {
+                                group: ['styled-components', 'styled-components/*'],
+                                message:
+                                    'multichain/** is Tailwind-only. Use utility classes instead of styled-components.'
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            // User-visible numbers go through @tonkeeper/core utils/numberFormat,
+            // which takes separators from the app language and keeps digits Latin.
+            files: [
+                'packages/uikit/src/**/*.{ts,tsx}',
+                'apps/{web,extension,desktop,mobile}/src/**/*.{ts,tsx}'
+            ],
+            rules: {
+                'no-restricted-properties': [
+                    'error',
+                    ...['toPrecision', 'toLocaleString', 'toFormat'].map(property => ({
+                        property,
+                        message: 'Format display numbers with utils/numberFormat.'
+                    })),
+                    {
+                        object: 'Intl',
+                        property: 'NumberFormat',
+                        message: 'Format display numbers with utils/numberFormat.'
+                    }
+                ]
+            }
+        },
+        {
+            // Amount input editing re-groups the raw text the user is typing.
+            files: ['packages/uikit/src/components/transfer/amountView/amountState.ts'],
+            rules: { 'no-restricted-properties': 'off' }
+        },
+        {
+            files: ['packages/uikit/src/components/swap/SwapConfirmationNotification.tsx'],
+            rules: { 'no-restricted-properties': 'warn' }
+        },
+        {
+            // Playwright component tests + CT harness: literal UI strings are
+            // expected in fixtures, and they import devDependencies (Playwright).
+            files: [
+                '**/*.ct.tsx',
+                '**/*Harness.tsx',
+                '**/*Story.tsx',
+                '**/playwright/**/*.ts',
+                '**/playwright/**/*.tsx'
+            ],
+            rules: {
+                'i18next/no-literal-string': 'off',
+                'import/no-extraneous-dependencies': ['error', { devDependencies: true }]
             }
         }
     ]

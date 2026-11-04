@@ -29,50 +29,34 @@ import {
 export interface ComputePhase {
     /**
      * 
-     * @type {boolean}
-     * @memberof ComputePhase
      */
     skipped: boolean;
     /**
      * 
-     * @type {ComputeSkipReason}
-     * @memberof ComputePhase
      */
     skipReason?: ComputeSkipReason;
     /**
      * 
-     * @type {boolean}
-     * @memberof ComputePhase
      */
     success?: boolean;
     /**
      * 
-     * @type {number}
-     * @memberof ComputePhase
      */
     gasFees?: number;
     /**
      * 
-     * @type {number}
-     * @memberof ComputePhase
      */
     gasUsed?: number;
     /**
      * 
-     * @type {number}
-     * @memberof ComputePhase
      */
     vmSteps?: number;
     /**
      * 
-     * @type {number}
-     * @memberof ComputePhase
      */
     exitCode?: number;
     /**
      * 
-     * @type {string}
-     * @memberof ComputePhase
      */
     exitCodeDescription?: string;
 }
@@ -108,11 +92,11 @@ export function ComputePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function ComputePhaseToJSON(json: any): ComputePhase {
-      return ComputePhaseToJSONTyped(json, false);
-  }
+export function ComputePhaseToJSON(json: any): ComputePhase {
+    return ComputePhaseToJSONTyped(json, false);
+}
 
-  export function ComputePhaseToJSONTyped(value?: ComputePhase | null, ignoreDiscriminator: boolean = false): any {
+export function ComputePhaseToJSONTyped(value?: ComputePhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

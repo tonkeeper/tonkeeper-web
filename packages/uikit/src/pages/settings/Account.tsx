@@ -21,7 +21,7 @@ import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
-import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
+import { useAddWalletFlow } from '../../components/modals/AddWalletFlow';
 
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../state/folders';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -226,7 +226,7 @@ const SortableItem: FC<{ account: AccountType | AccountsFolder }> = ({ account }
 };
 
 export const Account = () => {
-    const { onOpen: addWallet } = useAddWalletNotification();
+    const { onOpen: addWallet } = useAddWalletFlow();
     const { t } = useTranslation();
     const sdk = useAppSdk();
 

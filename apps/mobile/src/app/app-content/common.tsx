@@ -1,4 +1,5 @@
 import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
+import { MultichainPromo } from '@tonkeeper/uikit/dist/components/modals/MultichainPromoModal';
 import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
 import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
 import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
@@ -13,11 +14,13 @@ import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeyst
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { TonConnectSubscription } from '../components/TonConnectSubscription';
+import { MultichainConnectSubscription } from '@tonkeeper/uikit/dist/pages/home/multichain/connect/MultichainConnectSubscription';
+import { MultichainBackgroundElements as MultichainSendListener } from '@tonkeeper/uikit/dist/pages/home/multichain/MultichainBackgroundElements';
 
-export const BackgroundElements = () => {
+/** The listeners both account kinds need, in the order they've always mounted. */
+const SharedBackgroundElements = () => {
     return (
         <>
-            <SendActionNotification />
             <ReceiveNotification />
             <TonConnectSubscription />
             <NftNotification />
@@ -25,9 +28,33 @@ export const BackgroundElements = () => {
             <AddFavoriteNotification />
             <EditFavoriteNotification />
             <DeepLinkSubscription />
+            <MultichainConnectSubscription />
             <PairSignerNotification />
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
+        </>
+    );
+};
+
+export const BackgroundElements = () => {
+    return (
+        <>
+            <SendActionNotification />
+            <SharedBackgroundElements />
+            <MultichainPromo />
+        </>
+    );
+};
+
+/**
+ * Same set, with the multichain send flow answering transfer intents in
+ * place of the legacy TON-only send notification.
+ */
+export const MultichainBackgroundElements = () => {
+    return (
+        <>
+            <MultichainSendListener />
+            <SharedBackgroundElements />
         </>
     );
 };

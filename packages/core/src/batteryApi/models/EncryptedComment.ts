@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface EncryptedComment {
     /**
      * 
-     * @type {string}
-     * @memberof EncryptedComment
      */
     encryptionType: string;
     /**
      * 
-     * @type {string}
-     * @memberof EncryptedComment
      */
     cipherText: string;
 }
@@ -37,8 +33,8 @@ export interface EncryptedComment {
  * Check if a given object implements the EncryptedComment interface.
  */
 export function instanceOfEncryptedComment(value: object): value is EncryptedComment {
-    if (!('encryptionType' in value) || value['encryptionType'] === undefined) return false;
-    if (!('cipherText' in value) || value['cipherText'] === undefined) return false;
+    if ((!('encryptionType' in (value as Record<string, any>)) && !('encryption_type' in (value as Record<string, any>))) || ((value as Record<string, any>)['encryptionType'] === undefined && (value as Record<string, any>)['encryption_type'] === undefined)) return false;
+    if ((!('cipherText' in (value as Record<string, any>)) && !('cipher_text' in (value as Record<string, any>))) || ((value as Record<string, any>)['cipherText'] === undefined && (value as Record<string, any>)['cipher_text'] === undefined)) return false;
     return true;
 }
 
@@ -57,11 +53,11 @@ export function EncryptedCommentFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function EncryptedCommentToJSON(json: any): EncryptedComment {
-      return EncryptedCommentToJSONTyped(json, false);
-  }
+export function EncryptedCommentToJSON(json: any): EncryptedComment {
+    return EncryptedCommentToJSONTyped(json, false);
+}
 
-  export function EncryptedCommentToJSONTyped(value?: EncryptedComment | null, ignoreDiscriminator: boolean = false): any {
+export function EncryptedCommentToJSONTyped(value?: EncryptedComment | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

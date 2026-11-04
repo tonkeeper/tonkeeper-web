@@ -16,7 +16,7 @@ import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { estimateWalletContractExecutionGasFee } from '@tonkeeper/core/dist/service/wallet/contractService';
-import { createFakeMetaEncryptionData } from '@tonkeeper/core/dist/service/meta';
+import nacl from 'tweetnacl';
 
 export const useEstimateDeploySubscription = () => {
     const api = useActiveApi();
@@ -42,9 +42,7 @@ export const useEstimateDeploySubscription = () => {
         const config = await new BlockchainApi(api.tonApiV2).getBlockchainConfig();
 
         const outgoingMsg = await encoder.encodeCreateSubscriptionV2(
-            prepareSubscriptionParamsForEncoder(subscriptionParams, {
-                [selectedWallet.rawAddress]: createFakeMetaEncryptionData()
-            })
+            prepareSubscriptionParamsForEncoder(subscriptionParams, nacl.sign.keyPair())
         );
 
         const inMsg = await sender.toExternal(outgoingMsg);

@@ -36,56 +36,48 @@ import {
 export interface JettonSwapAction {
     /**
      * 
-     * @type {string}
-     * @memberof JettonSwapAction
      */
     dex: string;
     /**
      * 
-     * @type {string}
-     * @memberof JettonSwapAction
      */
     amountIn: string;
     /**
      * 
-     * @type {string}
-     * @memberof JettonSwapAction
      */
     amountOut: string;
     /**
-     * 
-     * @type {number}
-     * @memberof JettonSwapAction
+     * this field will gone after Sept. 2026, use gram_in instead
+     * @deprecated
      */
     tonIn?: number;
     /**
-     * 
-     * @type {number}
-     * @memberof JettonSwapAction
+     * this field will gone after Sept. 2026, use gram_out instead
+     * @deprecated
      */
     tonOut?: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof JettonSwapAction
+     */
+    gramIn?: number;
+    /**
+     * 
+     */
+    gramOut?: number;
+    /**
+     * 
      */
     userWallet: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof JettonSwapAction
      */
     router: AccountAddress;
     /**
      * 
-     * @type {JettonPreview}
-     * @memberof JettonSwapAction
      */
     jettonMasterIn?: JettonPreview;
     /**
      * 
-     * @type {JettonPreview}
-     * @memberof JettonSwapAction
      */
     jettonMasterOut?: JettonPreview;
 }
@@ -95,9 +87,9 @@ export interface JettonSwapAction {
  */
 export function instanceOfJettonSwapAction(value: object): value is JettonSwapAction {
     if (!('dex' in value) || value['dex'] === undefined) return false;
-    if (!('amountIn' in value) || value['amountIn'] === undefined) return false;
-    if (!('amountOut' in value) || value['amountOut'] === undefined) return false;
-    if (!('userWallet' in value) || value['userWallet'] === undefined) return false;
+    if ((!('amountIn' in (value as Record<string, any>)) && !('amount_in' in (value as Record<string, any>))) || ((value as Record<string, any>)['amountIn'] === undefined && (value as Record<string, any>)['amount_in'] === undefined)) return false;
+    if ((!('amountOut' in (value as Record<string, any>)) && !('amount_out' in (value as Record<string, any>))) || ((value as Record<string, any>)['amountOut'] === undefined && (value as Record<string, any>)['amount_out'] === undefined)) return false;
+    if ((!('userWallet' in (value as Record<string, any>)) && !('user_wallet' in (value as Record<string, any>))) || ((value as Record<string, any>)['userWallet'] === undefined && (value as Record<string, any>)['user_wallet'] === undefined)) return false;
     if (!('router' in value) || value['router'] === undefined) return false;
     return true;
 }
@@ -117,6 +109,8 @@ export function JettonSwapActionFromJSONTyped(json: any, ignoreDiscriminator: bo
         'amountOut': json['amount_out'],
         'tonIn': json['ton_in'] == null ? undefined : json['ton_in'],
         'tonOut': json['ton_out'] == null ? undefined : json['ton_out'],
+        'gramIn': json['gram_in'] == null ? undefined : json['gram_in'],
+        'gramOut': json['gram_out'] == null ? undefined : json['gram_out'],
         'userWallet': AccountAddressFromJSON(json['user_wallet']),
         'router': AccountAddressFromJSON(json['router']),
         'jettonMasterIn': json['jetton_master_in'] == null ? undefined : JettonPreviewFromJSON(json['jetton_master_in']),
@@ -124,11 +118,11 @@ export function JettonSwapActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function JettonSwapActionToJSON(json: any): JettonSwapAction {
-      return JettonSwapActionToJSONTyped(json, false);
-  }
+export function JettonSwapActionToJSON(json: any): JettonSwapAction {
+    return JettonSwapActionToJSONTyped(json, false);
+}
 
-  export function JettonSwapActionToJSONTyped(value?: JettonSwapAction | null, ignoreDiscriminator: boolean = false): any {
+export function JettonSwapActionToJSONTyped(value?: JettonSwapAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -140,6 +134,8 @@ export function JettonSwapActionFromJSONTyped(json: any, ignoreDiscriminator: bo
         'amount_out': value['amountOut'],
         'ton_in': value['tonIn'],
         'ton_out': value['tonOut'],
+        'gram_in': value['gramIn'],
+        'gram_out': value['gramOut'],
         'user_wallet': AccountAddressToJSON(value['userWallet']),
         'router': AccountAddressToJSON(value['router']),
         'jetton_master_in': JettonPreviewToJSON(value['jettonMasterIn']),

@@ -12,6 +12,15 @@ export interface GlobalPreferences {
         tron: boolean;
     };
     interceptTonLinks: InterceptTonLinksConfig;
+    /**
+     * Avatar colour per account, as a `WALLET_COLORS` id (see
+     * `entries/walletColor`). Kept here rather than on the `Account`
+     * classes: it is presentation metadata keyed by account id, like
+     * `sideBarOrder` and `folders`, and storing it here needs no change to
+     * the nine account shapes on disk. Accounts absent from the map fall
+     * back to `defaultWalletColor`.
+     */
+    walletColors: Record<string, string>;
 }
 
 const defaultGlobalPreferences: GlobalPreferences = {
@@ -21,7 +30,8 @@ const defaultGlobalPreferences: GlobalPreferences = {
     highlightFeatures: {
         tron: true
     },
-    interceptTonLinks: 'ask'
+    interceptTonLinks: 'ask',
+    walletColors: {}
 };
 
 export async function getGlobalPreferences(storage: IStorage) {

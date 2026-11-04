@@ -1,83 +1,86 @@
 import { FC, PropsWithChildren } from 'react';
-import styled, { css } from 'styled-components';
-import { hexToRGBA } from '../../libs/css';
-import { Label3Class } from '../Text';
+import { cn } from '../../libs/css';
 
-const BadgeStyled = styled.div<{
-    color: string;
-    display: string;
-    size: 'm' | 's';
-    background?: string;
-    $marginLeft?: string;
-}>`
-    display: ${p => p.display};
-    flex-shrink: 0;
-    height: fit-content;
-    ${p =>
-        p.size === 'm'
-            ? css`
-                  padding: 3px 5px;
-                  border-radius: ${p.theme.corner3xSmall};
-                  font-weight: 600;
-                  font-size: 10px;
-                  line-height: 14px;
-              `
-            : css`
-                  padding: 2px 4px;
-                  border-radius: 3px;
-                  font-size: 9px;
-                  font-style: normal;
-                  font-weight: 510;
-                  line-height: 12px;
-              `}
-    color: ${p => p.theme[p.color]};
-    background-color: ${p =>
-        p.background ? p.theme[p.background] : hexToRGBA(p.theme[p.color], 0.16)};
-    text-transform: uppercase;
-    font-style: normal;
+export type BadgeColor =
+    | 'accentBlue'
+    | 'accentBlueConstant'
+    | 'accentGreen'
+    | 'accentRed'
+    | 'accentOrange'
+    | 'accentPurple'
+    | 'textSecondary';
 
-    ${p =>
-        p.$marginLeft &&
-        css`
-            margin-left: ${p.$marginLeft};
-        `}
-`;
+export type BadgeBackground = 'backgroundContentAttention' | 'backgroundContentTint';
+
+const textColor: Record<BadgeColor, string> = {
+    accentBlue: 'text-accentBlue',
+    accentBlueConstant: 'text-accentBlueConstant',
+    accentGreen: 'text-accentGreen',
+    accentRed: 'text-accentRed',
+    accentOrange: 'text-accentOrange',
+    accentPurple: 'text-accentPurple',
+    textSecondary: 'text-textSecondary'
+};
+
+/**
+ * With no explicit `background` the fill is the label color at 16%.
+ * `color-mix` derives it from the live theme variable, so the tint keeps
+ * following a theme switch instead of freezing at the value read on mount.
+ */
+const tintBackground: Record<BadgeColor, string> = {
+    accentBlue: 'bg-[color-mix(in_srgb,var(--tk-accent-blue)_16%,transparent)]',
+    accentBlueConstant: 'bg-[color-mix(in_srgb,var(--tk-accent-blue-constant)_16%,transparent)]',
+    accentGreen: 'bg-[color-mix(in_srgb,var(--tk-accent-green)_16%,transparent)]',
+    accentRed: 'bg-[color-mix(in_srgb,var(--tk-accent-red)_16%,transparent)]',
+    accentOrange: 'bg-[color-mix(in_srgb,var(--tk-accent-orange)_16%,transparent)]',
+    accentPurple: 'bg-[color-mix(in_srgb,var(--tk-accent-purple)_16%,transparent)]',
+    textSecondary: 'bg-[color-mix(in_srgb,var(--tk-text-secondary)_16%,transparent)]'
+};
+
+const solidBackground: Record<BadgeBackground, string> = {
+    backgroundContentAttention: 'bg-backgroundContentAttention',
+    backgroundContentTint: 'bg-backgroundContentTint'
+};
+
+const sizeClasses = {
+    m: 'px-[5px] py-[3px] rounded-corner3xSmall text-[10px] leading-[14px] font-semibold',
+    s: 'px-1 py-0.5 rounded-[3px] text-[9px] leading-3 [font-weight:510]'
+} as const;
 
 export const Badge: FC<
     PropsWithChildren<{
         className?: string;
-        color?: string;
-        display?: string;
+        color?: BadgeColor;
+        display?: 'block' | 'inline-block';
         size?: 'm' | 's';
-        background?: string;
-        marginLeft?: string;
+        background?: BadgeBackground;
     }>
-> = ({ color, className, children, display = 'block', size = 'm', marginLeft, background }) => {
-    return (
-        <BadgeStyled
-            className={className}
-            color={color || 'accentBlue'}
-            display={display}
-            size={size}
-            $marginLeft={marginLeft}
-            background={background}
-        >
-            {children}
-        </BadgeStyled>
-    );
-};
+> = ({ color = 'accentBlue', className, children, display = 'block', size = 'm', background }) => (
+    <div
+        className={cn(
+            'h-fit shrink-0 uppercase not-italic',
+            display === 'inline-block' ? 'inline-block' : 'block',
+            sizeClasses[size],
+            textColor[color],
+            background ? solidBackground[background] : tintBackground[color],
+            className
+        )}
+    >
+        {children}
+    </div>
+);
 
-export const RoundedBadge = styled.div`
-    background-color: ${p => p.theme.accentRed};
-    color: ${p => p.theme.textPrimary};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: ${p => p.theme.cornerFull};
-    padding: 0 4px;
-    aspect-ratio: 1 / 1;
-    box-sizing: border-box;
-    min-width: 16px;
-
-    ${Label3Class};
-`;
+export const RoundedBadge: FC<PropsWithChildren<{ className?: string }>> = ({
+    className,
+    children
+}) => (
+    <div
+        className={cn(
+            'flex aspect-square min-w-4 items-center justify-center rounded-cornerFull box-border px-1',
+            'bg-accentRed text-textPrimary text-label3',
+            className
+        )}
+    >
+        {children}
+    </div>
+);

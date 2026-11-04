@@ -1,5 +1,5 @@
 import { TonConnectRequestNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectRequestNotification';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
     useDisconnectTonConnectConnection
@@ -14,20 +14,38 @@ import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTonConnectHttpResponseMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { isAccountConnectionHttp } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { sendBadRequestResponse } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
+    /** Set as soon as a request is accepted; one request is confirmed at a time. */
+    const pendingRequestId = useRef<string | undefined>(undefined);
 
     const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
 
     const queryClient = useQueryClient();
+    const { mutateAsync: responseAsync } = useTonConnectHttpResponseMutation();
 
     const onTransaction = useCallback(
-        async (request: TonConnectAppRequestPayload) => {
+        async (value: TonConnectAppRequestPayload) => {
+            if (pendingRequestId.current !== undefined) {
+                if (value.connection.type === 'http') {
+                    await responseAsync({
+                        connection: value.connection,
+                        response: sendBadRequestResponse(
+                            value.id,
+                            value.kind,
+                            'Another request is in progress'
+                        )
+                    });
+                }
+                return;
+            }
+            pendingRequestId.current = value.id;
             await queryClient.invalidateQueries([QueryKey.account]);
-            setRequest(request);
+            setRequest(value);
         },
-        [setRequest]
+        [queryClient, responseAsync]
     );
 
     useEffect(() => {
@@ -52,7 +70,6 @@ export const TonConnectSubscription = () => {
         });
     }, []);
 
-    const { mutateAsync: responseAsync } = useTonConnectHttpResponseMutation();
     const handleClose = useCallback(
         async (response: WalletResponse<RpcMethod>) => {
             if (request?.connection.type !== 'http') {
@@ -63,6 +80,7 @@ export const TonConnectSubscription = () => {
                 await responseAsync({ connection: request.connection, response });
             } finally {
                 setRequest(undefined);
+                pendingRequestId.current = undefined;
             }
         },
         [responseAsync, request?.connection]

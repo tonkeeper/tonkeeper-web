@@ -29,78 +29,66 @@ import {
 } from './AccountAddress';
 
 /**
- * An event is built on top of a trace which is a series of transactions caused by one inbound message. TonAPI looks for known patterns inside the trace and splits the trace into actions, where a single action represents a meaningful high-level operation like a Jetton Transfer or an NFT Purchase. Actions are expected to be shown to users. It is advised not to build any logic on top of actions because actions can be changed at any time.
+ * High-level view over a transaction trace caused by a single inbound message. TonAPI analyses the trace, detects known patterns and groups low-level transactions into user-facing actions (Jetton transfer, NFT purchase, etc.). Actions are a best-effort UI abstraction and may change; do not rely on them for protocol-critical logic.
+ * 
  * @export
  * @interface AccountEvent
  */
 export interface AccountEvent {
     /**
      * 
-     * @type {string}
-     * @memberof AccountEvent
      */
     eventId: string;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof AccountEvent
      */
     account: AccountAddress;
     /**
      * 
-     * @type {number}
-     * @memberof AccountEvent
      */
     timestamp: number;
     /**
      * 
-     * @type {Array<Action>}
-     * @memberof AccountEvent
      */
     actions: Array<Action>;
     /**
      * scam
-     * @type {boolean}
-     * @memberof AccountEvent
      */
     isScam: boolean;
     /**
      * 
-     * @type {number}
-     * @memberof AccountEvent
      */
     lt: number;
     /**
-     * Event is not finished yet. Transactions still happening
-     * @type {boolean}
-     * @memberof AccountEvent
+     * Event trace is not finished yet. Transactions still happening.
      */
     inProgress: boolean;
     /**
-     * TODO
-     * @type {number}
-     * @memberof AccountEvent
+     * Net Gram change for this account not explained by actions, in nanograms: extra = final_balance - initial_balance - sum(explicit Gram changes from actions). extra < 0 - implicit fee, extra > 0 - refund. For UI display only
+     * 
      */
     extra: number;
     /**
-     * 
-     * @type {number}
-     * @memberof AccountEvent
+     * Event completion ratio in [0,1]
      */
     progress: number;
+    /**
+     * Normalized hash of the root external inbound message (hex).
+     */
+    extMsgHash?: string;
 }
 
 /**
  * Check if a given object implements the AccountEvent interface.
  */
 export function instanceOfAccountEvent(value: object): value is AccountEvent {
-    if (!('eventId' in value) || value['eventId'] === undefined) return false;
+    if ((!('eventId' in (value as Record<string, any>)) && !('event_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['eventId'] === undefined && (value as Record<string, any>)['event_id'] === undefined)) return false;
     if (!('account' in value) || value['account'] === undefined) return false;
     if (!('timestamp' in value) || value['timestamp'] === undefined) return false;
     if (!('actions' in value) || value['actions'] === undefined) return false;
-    if (!('isScam' in value) || value['isScam'] === undefined) return false;
+    if ((!('isScam' in (value as Record<string, any>)) && !('is_scam' in (value as Record<string, any>))) || ((value as Record<string, any>)['isScam'] === undefined && (value as Record<string, any>)['is_scam'] === undefined)) return false;
     if (!('lt' in value) || value['lt'] === undefined) return false;
-    if (!('inProgress' in value) || value['inProgress'] === undefined) return false;
+    if ((!('inProgress' in (value as Record<string, any>)) && !('in_progress' in (value as Record<string, any>))) || ((value as Record<string, any>)['inProgress'] === undefined && (value as Record<string, any>)['in_progress'] === undefined)) return false;
     if (!('extra' in value) || value['extra'] === undefined) return false;
     if (!('progress' in value) || value['progress'] === undefined) return false;
     return true;
@@ -125,14 +113,15 @@ export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'inProgress': json['in_progress'],
         'extra': json['extra'],
         'progress': json['progress'],
+        'extMsgHash': json['ext_msg_hash'] == null ? undefined : json['ext_msg_hash'],
     };
 }
 
-  export function AccountEventToJSON(json: any): AccountEvent {
-      return AccountEventToJSONTyped(json, false);
-  }
+export function AccountEventToJSON(json: any): AccountEvent {
+    return AccountEventToJSONTyped(json, false);
+}
 
-  export function AccountEventToJSONTyped(value?: AccountEvent | null, ignoreDiscriminator: boolean = false): any {
+export function AccountEventToJSONTyped(value?: AccountEvent | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -148,6 +137,7 @@ export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'in_progress': value['inProgress'],
         'extra': value['extra'],
         'progress': value['progress'],
+        'ext_msg_hash': value['extMsgHash'],
     };
 }
 

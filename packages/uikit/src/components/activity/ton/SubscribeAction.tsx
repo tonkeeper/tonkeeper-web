@@ -147,7 +147,7 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, 
                         ? `- ${new AssetAmount({
                               asset: TON_ASSET,
                               weiAmount: amount
-                          }).toStringAbsoluteRelativeAmount()} ${BRAND_CONFIG.coinSymbolWithEx}`
+                          }).toStringAbsoluteRelativeAmount()} ${BRAND_CONFIG.coinSymbol}`
                         : ''
                 }
                 address={

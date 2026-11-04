@@ -10,7 +10,8 @@ const version = tag.replace(/^v/, '');
 
 // Desktop auto-update uses update.electronjs.org, which only considers releases
 // with valid SemVer tags. Numeric identifiers must not contain leading zeroes.
-const semverRegexp = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+const semverRegexp =
+    /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 
 if (!semverRegexp.test(version)) {
     console.error(
@@ -22,7 +23,7 @@ if (!semverRegexp.test(version)) {
 const root = path.resolve(__dirname, '..');
 const targets = [
     root,
-    ...['desktop', 'extension', 'web', 'mobile'].map(app => path.join(root, 'apps', app)),
+    ...['desktop', 'extension', 'web', 'mobile'].map(app => path.join(root, 'apps', app))
 ];
 
 for (const dir of targets) {

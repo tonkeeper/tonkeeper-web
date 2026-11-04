@@ -5,7 +5,8 @@ import { Body2 } from '../../Text';
 import { useDateTimeFormatFromNow } from '../../../hooks/useDateTimeFormat';
 import { HistoryAction } from './ton/HistoryAction';
 import { HistoryGridCell } from './ton/HistoryGrid';
-import { ChevronDownIcon, SpinnerRing } from '../../Icon';
+import { ChevronDownIcon } from '../../Icon';
+import { Loader } from '../../Loader';
 import { useTranslation } from '../../../hooks/translation';
 import { ActivityNotificationData } from '../../activity/ton/ActivityNotification';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
@@ -100,7 +101,7 @@ const HistoryEventSingle: FC<{
             >
                 {item.event.inProgress ? (
                     <PendingEventCell>
-                        <SpinnerRing />
+                        <Loader size="small" className="text-iconSecondary" />
                         <Body2>{t('transaction_type_pending') + '…'}</Body2>
                     </PendingEventCell>
                 ) : (
@@ -156,7 +157,7 @@ const HistoryEventSingle: FC<{
                                     ) : (
                                         <GroupItemLeftSpacer />
                                     ))}
-                                <SpinnerRing />
+                                <Loader size="small" className="text-iconSecondary" />
                                 <Body2>{t('transaction_type_pending') + '…'}</Body2>
                             </PendingEventCell>
                         ) : (

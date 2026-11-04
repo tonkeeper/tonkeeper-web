@@ -27,7 +27,6 @@ import {
     WalletVersions
 } from '../entries/wallet';
 import { AccountsApi, WalletApi } from '../tonApiV2';
-import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
 import { KeychainTonAccount, TonKeychainRoot } from '@ton-keychain/core';
@@ -735,21 +734,6 @@ async function _checkMamAccountForDeprecatedTronAddress(
         address: rootTronAddress.address,
         usdtBalance: new AssetAmount({ asset: TRON_USDT_ASSET, weiAmount: balance.usdt })
     });
-}
-
-export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
-    let index;
-    if (/^[0-9A-Fa-f]+$/g.test(publicKeyOrBase64)) {
-        index = Number('0x' + publicKeyOrBase64.slice(-6)) % emojis.length;
-    } else {
-        try {
-            index = Buffer.from(publicKeyOrBase64, 'base64').readUint32BE() % emojis.length;
-        } catch (_) {
-            index = Buffer.from(publicKeyOrBase64).readUint32BE() % emojis.length;
-        }
-    }
-
-    return emojis[index];
 }
 
 async function getRelevantMAMTonAccountsToImport(

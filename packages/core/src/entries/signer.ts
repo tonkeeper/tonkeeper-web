@@ -1,19 +1,17 @@
-import { Cell } from '@ton/core';
-import { LedgerTransaction } from '../service/ledger/connector';
-import type { SignedTransaction, Transaction } from 'tronweb/src/types/Transaction';
-
-export type BaseSigner = (message: Cell) => Promise<Buffer>;
-
-export type CellSigner = BaseSigner & { type: 'cell' };
-
-export type LedgerSigner = ((messages: LedgerTransaction[]) => Promise<Cell[]>) & {
-    type: 'ledger';
-};
-
-export type Signer = CellSigner | LedgerSigner;
-
-export type TronSigner = (tx: Transaction) => Promise<Transaction & SignedTransaction>;
-
-export type MultiTransactionsSigner = (
-    txs: (Transaction | Cell)[]
-) => Promise<((Transaction & SignedTransaction) | Buffer)[]>;
+/**
+ * Compatibility re-export. The signer type union now lives in
+ * `service/sign/types.ts` alongside the factory/registry that produces it.
+ * Existing callers that import from `@tonkeeper/core/dist/entries/signer`
+ * keep working unchanged.
+ */
+export type {
+    BaseSigner,
+    CellSigner,
+    ChainSigner,
+    LedgerSigner,
+    MultiTransactionsSigner,
+    Signer,
+    SignerFactory,
+    SignerFactoryArgs,
+    TronSigner
+} from '../service/sign/types';

@@ -3,8 +3,9 @@ import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerRpm } from '@electron-forge/maker-rpm';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
-import MakerAppImage from '@pengx17/electron-forge-maker-appimage';
+import type MakerAppImageType from '@pengx17/electron-forge-maker-appimage';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
+import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
 import { PublisherGithub } from '@electron-forge/publisher-github';
 import type { ForgeConfig } from '@electron-forge/shared-types';
@@ -13,17 +14,20 @@ import path from 'path';
 
 import { MakerDebConfigOptions } from '@electron-forge/maker-deb/dist/Config';
 import { spawnSync } from 'child_process';
-import { existsSync, readdirSync, renameSync, rmSync, unlinkSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, renameSync, rmSync, unlinkSync } from 'fs';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 import { mainWindowName } from './src/constants';
 import { getRequestedArchitecture } from './src/forgeCli';
+import { electronFuses, fuseBinaryPath, fuseMismatches } from './src/forgeFuses';
+import { resolveAppVersion } from '../../scripts/app-version';
 
 const isDev = process.env.NODE_ENV === 'development';
 const isPrerelease = process.env.GITHUB_REF_NAME?.includes('-') ?? false;
 const githubToken = process.env.GITHUB_TOKEN;
 const requestedArchitecture = getRequestedArchitecture(process.argv);
 const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const executableName = 'Tonkeeper';
 
 // Bundle libsecret + transitive deps into the AppImage so it runs on systems
 // where libsecret is not preinstalled. See github.com/tonkeeper/tonkeeper-web/issues/374
@@ -94,7 +98,20 @@ function bundleLibsecretIntoAppImage(appImagePath: string) {
     console.log(`[libsecret bundling] repacked ${appImagePath}`);
 }
 
-const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
+// Flipping fuses and writing the asar integrity hash invalidate Electron's
+// stock ad-hoc signature. osxSign only re-signs when a Developer ID identity
+// is available, so local builds would be killed at launch without this.
+function restoreAdHocSignature(appPath: string) {
+    if (spawnSync('codesign', ['--verify', '--deep', '--strict', appPath]).status === 0) {
+        return;
+    }
+    const sign = spawnSync('codesign', ['--sign', '-', '--force', '--deep', appPath], {
+        stdio: 'inherit'
+    });
+    if (sign.status !== 0) throw new Error(`Ad-hoc signing ${appPath} failed`);
+}
+
+const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc', 'wc'];
 const squirrelRemoteReleases = githubToken
     ? {
           // SyncReleases uses the GitHub API for repo URLs, so keep PR/local builds offline.
@@ -104,16 +121,39 @@ const squirrelRemoteReleases = githubToken
     : {};
 
 const devAndRpmOptions = {
+    // Compatibility identifiers stay Tonkeeper so upgrades retain the existing
+    // install and data. genericName and description are display-only metadata.
     name: 'Tonkeeper',
     productName: 'Tonkeeper',
-    genericName: 'Tonkeeper',
+    genericName: 'Keeper',
     license: 'Apache-2.0',
     maintainer: 'Ton Apps Group',
     bin: 'Tonkeeper', // bin name
-    description: 'Your desktop wallet on The Open Network',
+    description: 'Secure multichain crypto wallet',
     homepage: 'https://tonkeeper.com',
     icon: path.join(__dirname, 'public', 'icon.png'),
     mimeType: schemes.map(schema => `x-scheme-handler/${schema}`)
+};
+
+const osxNotarize =
+    process.env.APPLE_API_KEY && process.env.APPLE_API_KEY_ID && process.env.APPLE_API_ISSUER
+        ? ({
+              appleApiKey: process.env.APPLE_API_KEY,
+              appleApiKeyId: process.env.APPLE_API_KEY_ID,
+              appleApiIssuer: process.env.APPLE_API_ISSUER
+          } as NotaryToolCredentials)
+        : undefined;
+
+// The AppImage maker imports app-builder-lib internals that the pinned app-builder-lib no longer
+// ships, so a top-level import fails config loading on every platform. Load it only where it runs.
+const linuxAppImageMakers = () => {
+    if (process.platform !== 'linux' || requestedArchitecture !== 'x64') {
+        return [];
+    }
+
+    const MakerAppImage: typeof MakerAppImageType =
+        require('@pengx17/electron-forge-maker-appimage').default;
+    return [new MakerAppImage({ options: devAndRpmOptions }, ['linux'])];
 };
 
 const config: ForgeConfig = {
@@ -121,10 +161,10 @@ const config: ForgeConfig = {
         asar: true,
         icon: path.join(__dirname, 'public', 'icon'),
         name: 'Tonkeeper',
-        executableName: 'Tonkeeper',
+        executableName,
         protocols: [
             {
-                name: 'Tonkeeper Protocol',
+                name: 'Keeper Protocol',
                 schemes: schemes
             }
         ],
@@ -136,11 +176,7 @@ const config: ForgeConfig = {
                 };
             }
         },
-        osxNotarize: {
-            appleApiKey: process.env.APPLE_API_KEY,
-            appleApiKeyId: process.env.APPLE_API_KEY_ID,
-            appleApiIssuer: process.env.APPLE_API_ISSUER
-        } as NotaryToolCredentials,
+        osxNotarize,
         extraResource: ['./public']
     },
     rebuildConfig: {},
@@ -149,7 +185,7 @@ const config: ForgeConfig = {
             {
                 name: 'Tonkeeper',
                 authors: 'Ton Apps Group',
-                description: 'Your desktop wallet on The Open Network',
+                description: 'Secure multichain crypto wallet',
                 iconUrl: 'https://tonkeeper.com/assets/icon.ico',
                 setupIcon: path.join(process.cwd(), 'public', 'icon.ico'),
                 loadingGif: path.join(process.cwd(), 'public', 'install.gif'),
@@ -192,16 +228,7 @@ const config: ForgeConfig = {
             },
             ['linux']
         ),
-        ...(requestedArchitecture === 'x64'
-            ? [
-                  new MakerAppImage(
-                      {
-                          options: devAndRpmOptions
-                      },
-                      ['linux']
-                  )
-              ]
-            : [])
+        ...linuxAppImageMakers()
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),
@@ -221,7 +248,8 @@ const config: ForgeConfig = {
                     }
                 ]
             }
-        })
+        }),
+        new FusesPlugin(electronFuses)
     ],
     publishers: [
         new PublisherGithub({
@@ -234,6 +262,27 @@ const config: ForgeConfig = {
         })
     ],
     hooks: {
+        // Forge reads package.json through this hook for the packager, the makers and the
+        // package.json copied into the app, so it also sets what `app.getVersion()` returns.
+        readPackageJson: async (_config, packageJson) => ({
+            ...packageJson,
+            version: resolveAppVersion(packageJson.version)
+        }),
+        postPackage: async (_config, { platform, outputPaths }) => {
+            for (const outputPath of outputPaths) {
+                const binaryPath = fuseBinaryPath(outputPath, platform, executableName);
+                const mismatches = fuseMismatches(readFileSync(binaryPath));
+                if (mismatches.length > 0) {
+                    throw new Error(
+                        `Electron fuses are not set in ${binaryPath}: ${mismatches.join('; ')}`
+                    );
+                }
+
+                if (platform === 'darwin') {
+                    restoreAdHocSignature(path.join(outputPath, `${executableName}.app`));
+                }
+            }
+        },
         postMake: async (_config, makeResults) => {
             const linuxX64AppImages = makeResults
                 .filter(result => result.platform === 'linux' && result.arch === 'x64')

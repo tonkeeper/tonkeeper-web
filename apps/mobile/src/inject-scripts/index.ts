@@ -20,4 +20,4 @@ window.tonkeeper = {
 
 setupHistoryNotifier();
 
-console.info('Tonkeeper Pro inject script loaded');
+console.info('Keeper Pro inject script loaded');

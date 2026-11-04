@@ -19,6 +19,7 @@ import { QueryKey } from '../../libs/queryKey';
 import { useGetTonConnectConnectResponse } from '../../state/tonConnect';
 import { useAccountsState, useActiveAccount } from '../../state/wallet';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon, SwitchIcon } from '../Icon';
+import IcLogo from '../../icons/components/IcLogo';
 import { Notification, NotificationBlock } from '../Notification';
 import { Body2, Body3, H2, Label2 } from '../Text';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
@@ -31,6 +32,7 @@ import { isStandardTonWallet, WalletId, WalletVersion } from '@tonkeeper/core/di
 import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/events-hooks';
 import { useAnalyticsTrack } from '../../hooks/analytics';
+import { useTonConnectConnectOperation } from '../../hooks/analytics/ton-connect';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { originFromUrl } from '@tonkeeper/core/dist/utils/url';
 import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
@@ -68,6 +70,17 @@ const Image = styled.img`
     width: 72px;
     height: 72px;
     border-radius: ${props => props.theme.cornerMedium};
+`;
+
+const WalletMark = styled.span`
+    display: flex;
+    width: 72px;
+    height: 72px;
+    align-items: center;
+    justify-content: center;
+    border-radius: ${props => props.theme.cornerMedium};
+    background-color: ${props => props.theme.backgroundContent};
+    color: ${props => props.theme.iconPrimary};
 `;
 
 const ErrorDescription = styled(Body2)`
@@ -115,9 +128,14 @@ const ConnectContent: FC<{
     const { mutateAsync, isLoading } = useGetTonConnectConnectResponse();
     useTrackTonConnectConnectionRequest(params.manifestUrl);
     const track = useAnalyticsTrack();
+    const connectOperation = useTonConnectConnectOperation({
+        connectionType: origin !== undefined ? 'injected' : 'http',
+        dappUrl: manifest.url
+    });
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
+        connectOperation.start();
         try {
             const replyItems = await mutateAsync({
                 request: params,
@@ -135,6 +153,7 @@ const ConnectContent: FC<{
                     ? 255
                     : 4;
 
+            connectOperation.succeed();
             setDone(true);
             setTimeout(
                 () =>
@@ -159,6 +178,7 @@ const ConnectContent: FC<{
                 allow_notifications: false
             });
         } catch (err) {
+            connectOperation.fail(err);
             setDone(true);
             console.error(err);
             setError(err as Error);
@@ -182,15 +202,15 @@ const ConnectContent: FC<{
     return (
         <NotificationBlock onSubmit={onSubmit}>
             <ImageRow>
-                <Image src="https://tonkeeper.com/assets/tonconnect-icon.png" />
+                <WalletMark>
+                    <IcLogo width="40" height="40" />
+                </WalletMark>
                 <Image src={manifest.iconUrl} />
             </ImageRow>
 
             <div>
-                <Title>{t('ton_login_title_web').replace('%{name}', shortUrl)}</Title>
-                <SubTitle>
-                    {t('ton_login_caption').replace('%{name}', getDomain(manifest.name))}{' '}
-                </SubTitle>
+                <Title>{t('ton_login_title_web', { name: shortUrl })}</Title>
+                <SubTitle>{t('ton_login_caption', { name: getDomain(manifest.name) })} </SubTitle>
             </div>
 
             <SelectAccountDropDown
@@ -311,7 +331,7 @@ const useManifest = (params: ConnectRequest | null) => {
 
     return useQuery<DAppManifest, Error>(
         [QueryKey.estimate, params],
-        async () => {
+        async (): Promise<DAppManifest> => {
             sdk.uiEvents.emit('copy', {
                 method: 'copy',
                 params: t('loading')

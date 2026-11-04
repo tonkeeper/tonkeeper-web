@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import styled from 'styled-components';
 import { replaceTypedDecimalSeparator, seeIfValueValid } from '../transfer/amountView/AmountViewUI';
-import { getTextWidth } from '../../hooks/textWidth';
+import { getTextWidth, getUiFontFamily } from '../../hooks/textWidth';
 import { formatSendValue, isNumeric, removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import BigNumber from 'bignumber.js';
@@ -24,9 +24,9 @@ const SentenceInput = styled.input`
     font-size: inherit;
     background: transparent;
     color: ${props => props.theme.textPrimary};
-    font-family: Montserrat, sans-serif;
+    font-family: var(--tk-font-sans, sans-serif);
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 49px;
     text-align: right;
     appearance: textfield;
@@ -80,12 +80,13 @@ const getInputSize = (
 ) => {
     const max = parent.clientWidth - label.clientWidth - 1;
     let fontSize = originalFontSize;
-    let width = getTextWidth(value, `600 ${fontSize}px 'Montserrat'`);
+    const fontFamily = getUiFontFamily();
+    let width = getTextWidth(value, `500 ${fontSize}px ${fontFamily}`);
 
     let iteration = 0;
     while (Math.round(width) > max - 115) {
         fontSize = Math.max(1, fontSize - 1);
-        width = getTextWidth(value, `600 ${fontSize}px 'Montserrat'`);
+        width = getTextWidth(value, `500 ${fontSize}px ${fontFamily}`);
         iteration = iteration + 1;
         if (iteration > 100) {
             return {

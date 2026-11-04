@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface ConfigMeanPrices {
     /**
      * 
-     * @type {number}
-     * @memberof ConfigMeanPrices
      */
     batteryMeanPriceSwap: number;
     /**
      * 
-     * @type {number}
-     * @memberof ConfigMeanPrices
      */
     batteryMeanPriceJetton: number;
     /**
      * 
-     * @type {number}
-     * @memberof ConfigMeanPrices
      */
     batteryMeanPriceNft: number;
     /**
      * 
-     * @type {number}
-     * @memberof ConfigMeanPrices
      */
     batteryMeanPriceTronUsdt?: number;
     /**
      * 
-     * @type {number}
-     * @memberof ConfigMeanPrices
      */
     tonMeanPriceTronUsdt?: number;
 }
@@ -55,9 +45,9 @@ export interface ConfigMeanPrices {
  * Check if a given object implements the ConfigMeanPrices interface.
  */
 export function instanceOfConfigMeanPrices(value: object): value is ConfigMeanPrices {
-    if (!('batteryMeanPriceSwap' in value) || value['batteryMeanPriceSwap'] === undefined) return false;
-    if (!('batteryMeanPriceJetton' in value) || value['batteryMeanPriceJetton'] === undefined) return false;
-    if (!('batteryMeanPriceNft' in value) || value['batteryMeanPriceNft'] === undefined) return false;
+    if ((!('batteryMeanPriceSwap' in (value as Record<string, any>)) && !('battery_mean_price_swap' in (value as Record<string, any>))) || ((value as Record<string, any>)['batteryMeanPriceSwap'] === undefined && (value as Record<string, any>)['battery_mean_price_swap'] === undefined)) return false;
+    if ((!('batteryMeanPriceJetton' in (value as Record<string, any>)) && !('battery_mean_price_jetton' in (value as Record<string, any>))) || ((value as Record<string, any>)['batteryMeanPriceJetton'] === undefined && (value as Record<string, any>)['battery_mean_price_jetton'] === undefined)) return false;
+    if ((!('batteryMeanPriceNft' in (value as Record<string, any>)) && !('battery_mean_price_nft' in (value as Record<string, any>))) || ((value as Record<string, any>)['batteryMeanPriceNft'] === undefined && (value as Record<string, any>)['battery_mean_price_nft'] === undefined)) return false;
     return true;
 }
 
@@ -79,11 +69,11 @@ export function ConfigMeanPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function ConfigMeanPricesToJSON(json: any): ConfigMeanPrices {
-      return ConfigMeanPricesToJSONTyped(json, false);
-  }
+export function ConfigMeanPricesToJSON(json: any): ConfigMeanPrices {
+    return ConfigMeanPricesToJSONTyped(json, false);
+}
 
-  export function ConfigMeanPricesToJSONTyped(value?: ConfigMeanPrices | null, ignoreDiscriminator: boolean = false): any {
+export function ConfigMeanPricesToJSONTyped(value?: ConfigMeanPrices | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

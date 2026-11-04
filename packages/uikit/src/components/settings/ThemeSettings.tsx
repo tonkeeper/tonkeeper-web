@@ -16,7 +16,7 @@ export const ThemeSettings = () => {
     const navigate = useNavigate();
 
     const { fiat } = useAppContext();
-    const fiatDisplay = fiat === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : fiat;
+    const fiatDisplay = fiat === FiatCurrencies.GRAM ? BRAND_CONFIG.coinSymbol : fiat;
 
     const secondaryItems = useMemo(() => {
         const items: SettingsItem[] = [];

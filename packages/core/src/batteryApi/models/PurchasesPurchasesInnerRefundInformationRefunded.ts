@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface PurchasesPurchasesInnerRefundInformationRefunded {
     /**
      * 
-     * @type {string}
-     * @memberof PurchasesPurchasesInnerRefundInformationRefunded
      */
     amount: string;
     /**
      * 
-     * @type {number}
-     * @memberof PurchasesPurchasesInnerRefundInformationRefunded
      */
     charges: number;
 }
@@ -57,11 +53,11 @@ export function PurchasesPurchasesInnerRefundInformationRefundedFromJSONTyped(js
     };
 }
 
-  export function PurchasesPurchasesInnerRefundInformationRefundedToJSON(json: any): PurchasesPurchasesInnerRefundInformationRefunded {
-      return PurchasesPurchasesInnerRefundInformationRefundedToJSONTyped(json, false);
-  }
+export function PurchasesPurchasesInnerRefundInformationRefundedToJSON(json: any): PurchasesPurchasesInnerRefundInformationRefunded {
+    return PurchasesPurchasesInnerRefundInformationRefundedToJSONTyped(json, false);
+}
 
-  export function PurchasesPurchasesInnerRefundInformationRefundedToJSONTyped(value?: PurchasesPurchasesInnerRefundInformationRefunded | null, ignoreDiscriminator: boolean = false): any {
+export function PurchasesPurchasesInnerRefundInformationRefundedToJSONTyped(value?: PurchasesPurchasesInnerRefundInformationRefunded | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

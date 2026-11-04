@@ -29,14 +29,10 @@ import {
 export interface EstimatedTronTxInstantFee {
     /**
      * 
-     * @type {string}
-     * @memberof EstimatedTronTxInstantFee
      */
     feeAddress: string;
     /**
      * 
-     * @type {Array<EstimatedTronTxInstantFeeAcceptedAssetsInner>}
-     * @memberof EstimatedTronTxInstantFee
      */
     acceptedAssets: Array<EstimatedTronTxInstantFeeAcceptedAssetsInner>;
 }
@@ -45,8 +41,8 @@ export interface EstimatedTronTxInstantFee {
  * Check if a given object implements the EstimatedTronTxInstantFee interface.
  */
 export function instanceOfEstimatedTronTxInstantFee(value: object): value is EstimatedTronTxInstantFee {
-    if (!('feeAddress' in value) || value['feeAddress'] === undefined) return false;
-    if (!('acceptedAssets' in value) || value['acceptedAssets'] === undefined) return false;
+    if ((!('feeAddress' in (value as Record<string, any>)) && !('fee_address' in (value as Record<string, any>))) || ((value as Record<string, any>)['feeAddress'] === undefined && (value as Record<string, any>)['fee_address'] === undefined)) return false;
+    if ((!('acceptedAssets' in (value as Record<string, any>)) && !('accepted_assets' in (value as Record<string, any>))) || ((value as Record<string, any>)['acceptedAssets'] === undefined && (value as Record<string, any>)['accepted_assets'] === undefined)) return false;
     return true;
 }
 
@@ -65,11 +61,11 @@ export function EstimatedTronTxInstantFeeFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-  export function EstimatedTronTxInstantFeeToJSON(json: any): EstimatedTronTxInstantFee {
-      return EstimatedTronTxInstantFeeToJSONTyped(json, false);
-  }
+export function EstimatedTronTxInstantFeeToJSON(json: any): EstimatedTronTxInstantFee {
+    return EstimatedTronTxInstantFeeToJSONTyped(json, false);
+}
 
-  export function EstimatedTronTxInstantFeeToJSONTyped(value?: EstimatedTronTxInstantFee | null, ignoreDiscriminator: boolean = false): any {
+export function EstimatedTronTxInstantFeeToJSONTyped(value?: EstimatedTronTxInstantFee | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

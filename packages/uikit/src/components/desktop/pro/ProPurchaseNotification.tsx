@@ -172,6 +172,9 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
     );
 };
 
+const APPLE_ICON =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAFGSURBVHgBxZeLccIwEEQ3VKAOohLcQZQOUoI7CB2EDpIO7A4owUkF0IFJBaQDohuOwQjLOn9OvJkdwEjaRfIdACyP89p6Hb0sMmLY+NRRVnaBeYOMfAbmpBKZsD3mrXTyCvMpgtcHr1cIWTpAzeYHCHmCHMuPf6xuAHrvu3Odrhl+vg/Gj8LifINRTXfPmO74Erd17ryqnrGXiigxkvfIYn2LS8ad+MOI+BAuOEVVytwqmtNOuVSARjFAkTIvFM03ELBWMj/GDMNG9AIdfiAMYKDDHsIA2ckV4BnCAL/Q4Q2R4w0DRM9qJmS+lgx00OsDVIrJRmQg/2KZohaCVlwrBrjriqtIgIfTQHcHbCqAUzT/gpCtgnmLEX/XDE9YMoDDSJb8fbDBRMqBRalnNKzdwLgaM7G4VgaZVujfTstmlzA0Z7AF/wM+DIDjUlLo2wAAAABJRU5ErkJggg==';
+
 const QrCodeSection = ({ qrValue = '' }: { qrValue?: string }) => {
     const { t } = useTranslation();
 
@@ -184,7 +187,7 @@ const QrCodeSection = ({ qrValue = '' }: { qrValue?: string }) => {
                     quietZone={0}
                     bgColor="#fff"
                     qrStyle="squares"
-                    logoImage="https://wallet.tonkeeper.com/img/apple-icon.png"
+                    logoImage={APPLE_ICON}
                     logoWidth={16}
                     logoHeight={16}
                     logoPadding={6}

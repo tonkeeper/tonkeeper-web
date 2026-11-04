@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddFundsOptionSchema } from './AddFundsOptionSchema';
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
 /**
  * User sees the amount entry screen for the onramp purchase
@@ -11,10 +12,7 @@ export type DepositViewRampInsertAmountSchema = {
     eventName: string;
     from: RampSourceSchema;
     add_funds_option: AddFundsOptionSchema;
-    /**
-     * Carried from deposit_click_asset
-     */
-    buy_asset: string;
+    buy_asset: AssetSchema;
     /**
      * Carried from deposit_view_fiat_payment_method
      */

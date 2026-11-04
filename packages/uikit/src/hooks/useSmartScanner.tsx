@@ -15,7 +15,7 @@ export const useSmartScanner = () => {
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
 
-    const { mutateAsync, reset } = useDeeplinkHandlers();
+    const { mutateAsync, reset } = useDeeplinkHandlers({ origin: 'qr_code' });
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useCompleteHttpConnection();
 

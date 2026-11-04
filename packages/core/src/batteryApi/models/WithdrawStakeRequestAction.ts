@@ -43,32 +43,22 @@ import {
 export interface WithdrawStakeRequestAction {
     /**
      * 
-     * @type {number}
-     * @memberof WithdrawStakeRequestAction
      */
     amount?: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof WithdrawStakeRequestAction
      */
     staker: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof WithdrawStakeRequestAction
      */
     pool: AccountAddress;
     /**
-     *
-     * @type {PoolImplementationType}
-     * @memberof WithdrawStakeRequestAction
+     * 
      */
     implementation: PoolImplementationType;
     /**
-     * If present, should be used instead of amount
-     * @type {Price}
-     * @memberof WithdrawStakeRequestAction
+     * 
      */
     stakeMeta?: Price;
 }
@@ -94,7 +84,7 @@ export function WithdrawStakeRequestActionFromJSONTyped(json: any, ignoreDiscrim
         return json;
     }
     return {
-
+        
         'amount': json['amount'] == null ? undefined : json['amount'],
         'staker': AccountAddressFromJSON(json['staker']),
         'pool': AccountAddressFromJSON(json['pool']),
@@ -103,17 +93,17 @@ export function WithdrawStakeRequestActionFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-  export function WithdrawStakeRequestActionToJSON(json: any): WithdrawStakeRequestAction {
-      return WithdrawStakeRequestActionToJSONTyped(json, false);
-  }
+export function WithdrawStakeRequestActionToJSON(json: any): WithdrawStakeRequestAction {
+    return WithdrawStakeRequestActionToJSONTyped(json, false);
+}
 
-  export function WithdrawStakeRequestActionToJSONTyped(value?: WithdrawStakeRequestAction | null, ignoreDiscriminator: boolean = false): any {
+export function WithdrawStakeRequestActionToJSONTyped(value?: WithdrawStakeRequestAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
-
+        
         'amount': value['amount'],
         'staker': AccountAddressToJSON(value['staker']),
         'pool': AccountAddressToJSON(value['pool']),

@@ -62,14 +62,21 @@ export const useInputFocusScroll = (
             const activeElement = event.target;
             if (!(activeElement instanceof HTMLInputElement)) return;
 
+            // Without an on-screen keyboard the browser already scrolls the
+            // focused input into view; the offset math below assumes the
+            // viewport is shortened by the keyboard and, applied to a modal
+            // scroll area on desktop, yields a negative target that jumps
+            // the form to the top.
+            const keyboardHeight = scrollContainerRef.current.style.paddingBottom
+                ? parseInt(scrollContainerRef.current.style.paddingBottom)
+                : 0;
+            if (keyboardHeight === 0) return;
+
             const { scrollElement, scrollTo } = getScrollProps(scrollContainerRef.current);
 
             const rect = activeElement.getBoundingClientRect();
             const containerRect = scrollElement.getBoundingClientRect();
 
-            const keyboardHeight = scrollContainerRef.current.style.paddingBottom
-                ? parseInt(scrollContainerRef.current.style.paddingBottom)
-                : 0;
             const visibleScreenHeight = window.innerHeight - keyboardHeight;
             const elementTopRelativeToContainer = rect.top - containerRect.top;
 
@@ -125,20 +132,18 @@ export const useInputFocusScroll = (
     const sdk = useAppSdk();
 
     useEffect(() => {
-        if (!scrollContainerRef.current) return;
+        const container = scrollContainerRef.current;
+        if (!container) return;
 
-        const inputs = scrollContainerRef.current.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('focus', handleFocus);
-        });
+        // Delegated so inputs mounted later (e.g. the 12 → 24 word toggle)
+        // are covered without re-subscribing.
+        container.addEventListener('focusin', handleFocus);
 
         const unsubscribeWillShow = sdk.keyboard.willShow.subscribe(handleKeyboardShow);
         const unsubscribeWillHide = sdk.keyboard.willHide.subscribe(handleKeyboardHide);
 
         return () => {
-            inputs.forEach(input => {
-                input.removeEventListener('focus', handleFocus);
-            });
+            container.removeEventListener('focusin', handleFocus);
             unsubscribeWillShow();
             unsubscribeWillHide();
         };

@@ -1,41 +1,5 @@
-import React, { FC, Suspense, useContext, useId, forwardRef } from 'react';
-import styled, { useTheme } from 'styled-components';
-
-const TonkeeperLottieIcon = React.lazy(() => import('./lottie/TonkeeperLottie'));
-
-export const DarkThemeContext = React.createContext<boolean>(true);
-
-const TonkeeperSvgIcon: FC<{ size?: string }> = ({ size = '128' }) => {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={size}
-            height={size}
-            viewBox="0 0 128 128"
-            fill="none"
-        >
-            <path opacity="0.5" d="M64 58L118 34L64 118V58Z" fill="currentColor" />
-            <path opacity="0.75" d="M64 58L10 34L64 118V58Z" fill="currentColor" />
-            <path d="M64 58L10 34L64 10L118 34L64 58Z" fill="currentColor" />
-        </svg>
-    );
-};
-export const TonkeeperIcon: FC<{
-    width?: string;
-    height?: string;
-    loop?: boolean;
-}> = ({ width = '128', height = '128', loop = false }) => {
-    const isDark = useContext(DarkThemeContext);
-    if (isDark) {
-        return (
-            <Suspense fallback={<div style={{ width: `${width}px`, height: `${height}px` }}></div>}>
-                <TonkeeperLottieIcon width={width} height={height} loop={loop} />
-            </Suspense>
-        );
-    } else {
-        return <TonkeeperSvgIcon size={width} />;
-    }
-};
+import React, { FC, useId, forwardRef } from 'react';
+import { useTheme } from 'styled-components';
 
 export const ChevronLeftIcon: FC<{ className?: string }> = ({ className }) => {
     return (
@@ -293,46 +257,28 @@ export const WriteIcon = () => {
     );
 };
 
-export const SpinnerIcon: FC<{ className?: string }> = ({ className }) => (
-    <StyledSpinner viewBox="0 0 50 50" width="1em" height="1em" className={className}>
-        <circle className="path" cx="25" cy="25" r="20" fill="none" strokeWidth="4" />
-    </StyledSpinner>
-);
-
-const StyledSpinner = styled.svg`
-    animation: rotate 1s linear infinite;
-    width: 1em;
-    height: 1em;
-
-    & .path {
-        stroke: currentColor;
-        stroke-linecap: round;
-        animation: dash 1.5s ease-in-out infinite;
-    }
-
-    @keyframes rotate {
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    @keyframes dash {
-        0% {
-            stroke-dasharray: 1, 150;
-            stroke-dashoffset: 0;
-        }
-
-        50% {
-            stroke-dasharray: 90, 150;
-            stroke-dashoffset: -35;
-        }
-
-        100% {
-            stroke-dasharray: 90, 150;
-            stroke-dashoffset: -124;
-        }
-    }
-`;
+export const ToncoinIcon: FC<{ width?: string; height?: string }> = ({
+    width = '44',
+    height = '44'
+}) => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={width}
+            height={height}
+            viewBox="0 0 44 44"
+            fill="none"
+        >
+            <rect width="44" height="44" rx="22" fill="#0088CC" />
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M23.1557 31.4672L30.0161 19.9928C30.7071 18.8369 31.0526 18.259 31.1463 17.7999C31.4212 16.4532 30.6595 15.1104 29.3626 14.6552C28.9205 14.5 28.2471 14.5 26.9005 14.5H17.0997C15.7531 14.5 15.0797 14.5 14.6376 14.6552C13.3407 15.1104 12.579 16.4532 12.8539 17.7999C12.9476 18.259 13.2931 18.8369 13.9841 19.9928L20.8445 31.4672C21.0894 31.8768 21.2119 32.0816 21.3417 32.1913C21.7218 32.5126 22.2784 32.5126 22.6585 32.1913C22.7884 32.0816 22.9108 31.8768 23.1557 31.4672ZM21.0001 16.5V27.9L15.1768 17.9916C14.9921 17.6774 14.8997 17.5202 14.875 17.3953C14.8027 17.029 15.0108 16.6653 15.3633 16.542C15.4835 16.5 15.6658 16.5 16.0303 16.5H21.0001ZM23.0001 27.9V16.5H27.9699C28.3345 16.5 28.5167 16.5 28.6369 16.542C28.9894 16.6653 29.1975 17.029 29.1252 17.3953C29.1005 17.5202 29.0081 17.6774 28.8235 17.9916L23.0001 27.9Z"
+                fill="white"
+            />
+        </svg>
+    );
+};
 
 export const CheckboxIcon = () => {
     return (
@@ -1419,67 +1365,6 @@ export const EmptyIcon: FC<{ className?: string; color?: string }> = ({ color, c
     );
 };
 
-const SpinnerRingContainer = styled.div<{ color?: string }>`
-    color: ${props => props.color};
-    position: relative;
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    @keyframes rotate {
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    > svg:last-child {
-        position: absolute;
-        left: 0;
-        top: 0;
-        animation: rotate 1s linear infinite;
-    }
-`;
-
-export const SpinnerRing: FC<{ className?: string; color?: string }> = ({ color, className }) => {
-    const theme = useTheme();
-    return (
-        <SpinnerRingContainer className={className} color={theme[color || 'iconSecondary']}>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-            >
-                <path
-                    opacity="0.32"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M7 2C4.23858 2 2 4.23858 2 7C2 9.76142 4.23858 12 7 12C9.76142 12 12 9.76142 12 7C12 4.23858 9.76142 2 7 2ZM0 7C0 3.13401 3.13401 0 7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7Z"
-                    fill="currentColor"
-                />
-            </svg>
-
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-            >
-                <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M5.49968 3.66992C3.10821 5.05063 2.28884 8.10858 3.66955 10.5C3.94569 10.9783 3.78182 11.5899 3.30353 11.8661C2.82523 12.1422 2.21364 11.9783 1.9375 11.5C0.00450337 8.152 1.15163 3.87086 4.49968 1.93787C4.97797 1.66172 5.58956 1.8256 5.8657 2.30389C6.14185 2.78218 5.97797 3.39377 5.49968 3.66992Z"
-                    fill="currentColor"
-                />
-            </svg>
-        </SpinnerRingContainer>
-    );
-};
-
 export const ArrowLeftIcon: FC<{ className?: string; color?: string }> = ({ color, className }) => {
     const theme = useTheme();
     return (
@@ -1729,16 +1614,6 @@ export const DotIcon: FC<{ className?: string; color?: string }> = ({ color, cla
             <circle cx="8" cy="8" r="3" fill="currentColor" />
         </svg>
     );
-};
-
-export const ResponsiveSpinner: FC<{ className?: string }> = ({ className }) => {
-    const { displayType } = useTheme();
-
-    if (displayType === 'full-width') {
-        return <SpinnerRing className={className} />;
-    }
-
-    return <SpinnerIcon className={className} />;
 };
 
 export const LockIcon = () => {

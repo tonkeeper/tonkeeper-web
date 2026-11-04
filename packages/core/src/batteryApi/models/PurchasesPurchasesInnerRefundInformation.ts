@@ -29,32 +29,22 @@ import {
 export interface PurchasesPurchasesInnerRefundInformation {
     /**
      * 
-     * @type {boolean}
-     * @memberof PurchasesPurchasesInnerRefundInformation
      */
     fullyRefunded: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof PurchasesPurchasesInnerRefundInformation
      */
     partiallyRefunded: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof PurchasesPurchasesInnerRefundInformation
      */
     pendingRefund: boolean;
     /**
      * 
-     * @type {PurchasesPurchasesInnerRefundInformationRefunded}
-     * @memberof PurchasesPurchasesInnerRefundInformation
      */
     refunded?: PurchasesPurchasesInnerRefundInformationRefunded;
     /**
      * 
-     * @type {PurchasesPurchasesInnerRefundInformationRefunded}
-     * @memberof PurchasesPurchasesInnerRefundInformation
      */
     refundable?: PurchasesPurchasesInnerRefundInformationRefunded;
 }
@@ -63,9 +53,9 @@ export interface PurchasesPurchasesInnerRefundInformation {
  * Check if a given object implements the PurchasesPurchasesInnerRefundInformation interface.
  */
 export function instanceOfPurchasesPurchasesInnerRefundInformation(value: object): value is PurchasesPurchasesInnerRefundInformation {
-    if (!('fullyRefunded' in value) || value['fullyRefunded'] === undefined) return false;
-    if (!('partiallyRefunded' in value) || value['partiallyRefunded'] === undefined) return false;
-    if (!('pendingRefund' in value) || value['pendingRefund'] === undefined) return false;
+    if ((!('fullyRefunded' in (value as Record<string, any>)) && !('fully_refunded' in (value as Record<string, any>))) || ((value as Record<string, any>)['fullyRefunded'] === undefined && (value as Record<string, any>)['fully_refunded'] === undefined)) return false;
+    if ((!('partiallyRefunded' in (value as Record<string, any>)) && !('partially_refunded' in (value as Record<string, any>))) || ((value as Record<string, any>)['partiallyRefunded'] === undefined && (value as Record<string, any>)['partially_refunded'] === undefined)) return false;
+    if ((!('pendingRefund' in (value as Record<string, any>)) && !('pending_refund' in (value as Record<string, any>))) || ((value as Record<string, any>)['pendingRefund'] === undefined && (value as Record<string, any>)['pending_refund'] === undefined)) return false;
     return true;
 }
 
@@ -87,11 +77,11 @@ export function PurchasesPurchasesInnerRefundInformationFromJSONTyped(json: any,
     };
 }
 
-  export function PurchasesPurchasesInnerRefundInformationToJSON(json: any): PurchasesPurchasesInnerRefundInformation {
-      return PurchasesPurchasesInnerRefundInformationToJSONTyped(json, false);
-  }
+export function PurchasesPurchasesInnerRefundInformationToJSON(json: any): PurchasesPurchasesInnerRefundInformation {
+    return PurchasesPurchasesInnerRefundInformationToJSONTyped(json, false);
+}
 
-  export function PurchasesPurchasesInnerRefundInformationToJSONTyped(value?: PurchasesPurchasesInnerRefundInformation | null, ignoreDiscriminator: boolean = false): any {
+export function PurchasesPurchasesInnerRefundInformationToJSONTyped(value?: PurchasesPurchasesInnerRefundInformation | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

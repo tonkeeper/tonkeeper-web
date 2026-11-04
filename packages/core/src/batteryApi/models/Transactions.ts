@@ -29,20 +29,14 @@ import {
 export interface Transactions {
     /**
      * 
-     * @type {number}
-     * @memberof Transactions
      */
     totalTransactions: number;
     /**
      * if set, then there are more transactions to be loaded. Use this value as offset parameter in the next request.
-     * @type {number}
-     * @memberof Transactions
      */
     nextOffset?: number;
     /**
      * 
-     * @type {Array<TransactionsTransactionsInner>}
-     * @memberof Transactions
      */
     transactions: Array<TransactionsTransactionsInner>;
 }
@@ -51,7 +45,7 @@ export interface Transactions {
  * Check if a given object implements the Transactions interface.
  */
 export function instanceOfTransactions(value: object): value is Transactions {
-    if (!('totalTransactions' in value) || value['totalTransactions'] === undefined) return false;
+    if ((!('totalTransactions' in (value as Record<string, any>)) && !('total_transactions' in (value as Record<string, any>))) || ((value as Record<string, any>)['totalTransactions'] === undefined && (value as Record<string, any>)['total_transactions'] === undefined)) return false;
     if (!('transactions' in value) || value['transactions'] === undefined) return false;
     return true;
 }
@@ -72,11 +66,11 @@ export function TransactionsFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function TransactionsToJSON(json: any): Transactions {
-      return TransactionsToJSONTyped(json, false);
-  }
+export function TransactionsToJSON(json: any): Transactions {
+    return TransactionsToJSONTyped(json, false);
+}
 
-  export function TransactionsToJSONTyped(value?: Transactions | null, ignoreDiscriminator: boolean = false): any {
+export function TransactionsToJSONTyped(value?: Transactions | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -11,6 +11,8 @@ import {
 } from './electron/protocol';
 import { tonConnectSSE } from './electron/sseEvetns';
 
+// Compatibility-sensitive: Electron derives its default userData directory from
+// this internal name. User-facing branding is applied in menus and page metadata.
 app.setName('Tonkeeper Pro');
 
 log.initialize({ preload: true });

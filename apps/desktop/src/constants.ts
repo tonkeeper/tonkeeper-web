@@ -1,18 +1,17 @@
 export const mainWindowName = 'main_window';
 
-export function isMainWindowUrl(url: string) {
-    try {
-        let path = new URL(url).pathname;
-        if (path.startsWith('/')) {
-            path = path.slice(1);
-        }
-        if (path.endsWith('/')) {
-            path = path.slice(0, -1);
-        }
+const documentPath = (url: URL) => url.pathname.replace(/\/+$/, '');
 
-        return path === mainWindowName;
-    } catch (e) {
-        console.error(e);
+export function isAppDocumentUrl(url: string, appEntryUrl: string) {
+    try {
+        const actual = new URL(url);
+        const expected = new URL(appEntryUrl);
+        return (
+            actual.protocol === expected.protocol &&
+            actual.host === expected.host &&
+            documentPath(actual) === documentPath(expected)
+        );
+    } catch {
         return false;
     }
 }

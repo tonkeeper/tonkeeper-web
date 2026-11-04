@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface EcPreview {
     /**
      * 
-     * @type {number}
-     * @memberof EcPreview
      */
     id: number;
     /**
      * 
-     * @type {string}
-     * @memberof EcPreview
      */
     symbol: string;
     /**
      * 
-     * @type {number}
-     * @memberof EcPreview
      */
     decimals: number;
     /**
      * 
-     * @type {string}
-     * @memberof EcPreview
      */
     image: string;
 }
@@ -73,11 +65,11 @@ export function EcPreviewFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function EcPreviewToJSON(json: any): EcPreview {
-      return EcPreviewToJSONTyped(json, false);
-  }
+export function EcPreviewToJSON(json: any): EcPreview {
+    return EcPreviewToJSONTyped(json, false);
+}
 
-  export function EcPreviewToJSONTyped(value?: EcPreview | null, ignoreDiscriminator: boolean = false): any {
+export function EcPreviewToJSONTyped(value?: EcPreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

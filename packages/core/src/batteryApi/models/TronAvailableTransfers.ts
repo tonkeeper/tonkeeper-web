@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface TronAvailableTransfers {
     /**
      * Number of available free TRON transfers
-     * @type {number}
-     * @memberof TronAvailableTransfers
      */
     availableTransfers: number;
     /**
      * Availability type. 'inactive' if source is telegram.
-     * @type {string}
-     * @memberof TronAvailableTransfers
      */
     type: string;
     /**
      * Unix timestamp of next free transfers reset date (either next month after last reset or next charge date, whichever is closer)
-     * @type {number}
-     * @memberof TronAvailableTransfers
      */
     nextResetDate?: number;
 }
@@ -43,7 +37,7 @@ export interface TronAvailableTransfers {
  * Check if a given object implements the TronAvailableTransfers interface.
  */
 export function instanceOfTronAvailableTransfers(value: object): value is TronAvailableTransfers {
-    if (!('availableTransfers' in value) || value['availableTransfers'] === undefined) return false;
+    if ((!('availableTransfers' in (value as Record<string, any>)) && !('available_transfers' in (value as Record<string, any>))) || ((value as Record<string, any>)['availableTransfers'] === undefined && (value as Record<string, any>)['available_transfers'] === undefined)) return false;
     if (!('type' in value) || value['type'] === undefined) return false;
     return true;
 }
@@ -52,10 +46,7 @@ export function TronAvailableTransfersFromJSON(json: any): TronAvailableTransfer
     return TronAvailableTransfersFromJSONTyped(json, false);
 }
 
-export function TronAvailableTransfersFromJSONTyped(
-    json: any,
-    ignoreDiscriminator: boolean
-): TronAvailableTransfers {
+export function TronAvailableTransfersFromJSONTyped(json: any, ignoreDiscriminator: boolean): TronAvailableTransfers {
     if (json == null) {
         return json;
     }
@@ -71,10 +62,7 @@ export function TronAvailableTransfersToJSON(json: any): TronAvailableTransfers 
     return TronAvailableTransfersToJSONTyped(json, false);
 }
 
-export function TronAvailableTransfersToJSONTyped(
-    value?: TronAvailableTransfers | null,
-    ignoreDiscriminator: boolean = false
-): any {
+export function TronAvailableTransfersToJSONTyped(value?: TronAvailableTransfers | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -86,3 +74,4 @@ export function TronAvailableTransfersToJSONTyped(
         'next_reset_date': value['nextResetDate'],
     };
 }
+

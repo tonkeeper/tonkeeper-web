@@ -11,7 +11,13 @@ import {
 import { useSignTonProof } from '../hooks/accountUtils';
 import { useEffect, useMemo } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import {
+    Account,
+    AccountMAM,
+    AccountMultichain,
+    AccountTonMnemonic,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import BigNumber from 'bignumber.js';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -20,6 +26,11 @@ import { patchedTokenImage, useJettonList } from './jetton';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { toNano } from '@ton/core';
 import type { Config } from '@tonkeeper/core/dist/batteryApi/models/Config';
+import type { PromoCodeBatteryPurchaseStatusErrorCodeEnum } from '@tonkeeper/core/dist/batteryApi/models/PromoCodeBatteryPurchaseStatusError';
+import type {
+    PurchasesPurchasesInner,
+    PurchasesPurchasesInnerTypeEnum
+} from '@tonkeeper/core/dist/batteryApi/models/PurchasesPurchasesInner';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import { Configuration, ConnectApi, DefaultApi, WalletApi } from '@tonkeeper/core/dist/batteryApi';
 import { getAppVersionHeaders } from '@tonkeeper/core/dist/utils/appVersion';
@@ -28,18 +39,31 @@ import {
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/battery/BatteryIcons';
+import { batteryPackIcons } from '../components/settings/battery/BatteryIcons';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { multichainApiWalletCredentials } from '@tonkeeper/core/dist/service/chainkit/walletAuthService';
+import { createMultichainAuthorizedFetch } from '@tonkeeper/core/dist/service/chainkit/multichainApiAuth';
 import { useTwoFAWalletConfig } from './two-fa';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from './tonendpoint';
+import { removeLastSlash } from '@tonkeeper/core/dist/utils/url';
+
+/**
+ * Accounts whose TON key the app itself holds and can sign a proof with. A
+ * multichain (BIP39) account qualifies through its TON wallet, exactly like a
+ * TON mnemonic — the relayer keys the battery on that wallet's address.
+ */
+const isAccountBatteryCapable = (
+    account: Account
+): account is AccountTonMnemonic | AccountMAM | AccountMultichain =>
+    account.type === 'mnemonic' || account.type === 'mam' || account.type === 'multichain';
 
 const useIsAccountSuitableForBattery = () => {
     const network = useActiveTonNetwork();
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
     const account = useActiveAccount();
 
-    const isAccountSuitable = account.type === 'mnemonic' || account.type === 'mam';
+    const isAccountSuitable = isAccountBatteryCapable(account);
 
     let disableDueToTwoFA = false;
     if (network === Network.MAINNET) {
@@ -73,39 +97,50 @@ export const useCanBuyBattery = () => {
     return isAccountSuitable && batteryEnabled;
 };
 
+/**
+ * A multichain wallet is identified to the battery service the way the
+ * native apps do it: device JWT plus `X-Wallet-ID` / `X-Wallet-Authorization`
+ * alongside the TonProof token. The backend keys the multichain wallet's
+ * battery on that id, so with the TonProof alone the web would read (and
+ * spend) the balance of a different, address-keyed account.
+ */
 export const useBatteryApi = () => {
     const config = useActiveConfig();
+    const { data: account } = useActiveAccountQuery();
+    const credentials = account ? multichainApiWalletCredentials(account) : undefined;
+    const walletId = credentials?.walletId;
+    const walletAuthKey = credentials?.walletAuthKey;
     return useMemo(() => {
         return new Configuration({
-            basePath: config.batteryHost,
-            headers: getAppVersionHeaders()
+            basePath: removeLastSlash(config.batteryHost),
+            headers: getAppVersionHeaders(),
+            fetchApi: walletId
+                ? createMultichainAuthorizedFetch({ walletId, walletAuthKey })
+                : undefined
         });
-    }, [config.batteryHost]);
+    }, [config.batteryHost, walletId, walletAuthKey]);
 };
 
-export const useBatteryServiceConfigQuery = () => {
+export const useBatteryServiceConfigNonSuspense = () => {
     const batteryApi = useBatteryApi();
-
-    return useQuery<Config>(
-        [QueryKey.batteryServiceConfig],
-        async () => {
-            return new DefaultApi(batteryApi).getConfig();
-        },
-        {
-            keepPreviousData: true,
-            suspense: true
-        }
+    return useQuery<Config>([QueryKey.batteryServiceConfig], () =>
+        new DefaultApi(batteryApi).getConfig()
     );
 };
 
-export const useBatteryServiceConfig = () => {
-    const { data } = useBatteryServiceConfigQuery();
+/**
+ * Undefined until the battery service answers. Hooks mounted on the home read
+ * it, so a missing config must not throw during render — callers check it at
+ * the point they actually build a battery transfer.
+ */
+export const useBatteryServiceConfig = (): Config | undefined =>
+    useBatteryServiceConfigNonSuspense().data;
 
-    if (!data) {
+export const requireBatteryServiceConfig = (config: Config | undefined): Config => {
+    if (!config) {
         throw new Error('Battery service config not found');
     }
-
-    return data;
+    return config;
 };
 
 export const useBatteryOnChainRechargeMethods = () => {
@@ -165,7 +200,7 @@ export const useBatteryAuthToken = () => {
             return null;
         }
 
-        const val = await sdk.storage.get<{ token: string }>(tokenStorageKey(publicKey));
+        const val = await sdk.storage.get<{ token: string }>(batteryAuthTokenStorageKey(publicKey));
 
         return val?.token ?? null;
     });
@@ -181,20 +216,26 @@ export const useRequestBatteryAuthToken = () => {
     return useMutation<
         string,
         Error,
-        { signer?: (b: Buffer) => Promise<Uint8Array | Buffer>; wallet?: TonWalletStandard } | void
+        {
+            signer?: (b: Buffer) => Promise<Uint8Array | Buffer>;
+            wallet?: TonWalletStandard;
+            /** Overrides the active account's battery config, e.g. for a wallet of another account. */
+            batteryApi?: Configuration;
+        } | void
     >(async args => {
+        const api = args?.batteryApi ?? batteryApi;
         let wallet = args?.wallet;
         if (!wallet) {
-            if (account?.type !== 'mnemonic' && account?.type !== 'mam') {
+            if (!account || !isAccountBatteryCapable(account)) {
                 throw new Error('Invalid account type');
             }
             wallet = account.activeTonWallet;
         }
-        const { payload } = await new ConnectApi(batteryApi).getTonConnectPayload();
-        const origin = batteryApi.basePath;
+        const { payload } = await new ConnectApi(api).getTonConnectPayload();
+        const origin = api.basePath;
 
         const proof = await signTonProof({ payload, origin, signer: args?.signer, wallet });
-        const res = await new WalletApi(batteryApi).tonConnectProof({
+        const res = await new WalletApi(api).tonConnectProof({
             tonConnectProofRequest: {
                 address: wallet.rawAddress,
                 proof: {
@@ -210,7 +251,7 @@ export const useRequestBatteryAuthToken = () => {
             }
         });
 
-        await sdk.storage.set(tokenStorageKey(wallet.publicKey), {
+        await sdk.storage.set(batteryAuthTokenStorageKey(wallet.publicKey), {
             token: res.token
         });
         await client.invalidateQueries([QueryKey.batteryAuthToken]);
@@ -218,7 +259,8 @@ export const useRequestBatteryAuthToken = () => {
     });
 };
 
-const tokenStorageKey = (publicKey: string) => `${AppKey.BATTERY_AUTH_TOKEN}_${publicKey}`;
+export const batteryAuthTokenStorageKey = (publicKey: string) =>
+    `${AppKey.BATTERY_AUTH_TOKEN}_${publicKey}`;
 
 export const useRemoveBatteryAuthToken = () => {
     const account = useActiveAccount();
@@ -229,7 +271,7 @@ export const useRemoveBatteryAuthToken = () => {
         const tonWallets = account.allTonWallets;
         for (const wallet of tonWallets) {
             if (isStandardTonWallet(wallet)) {
-                await sdk.storage.delete(tokenStorageKey(wallet.publicKey));
+                await sdk.storage.delete(batteryAuthTokenStorageKey(wallet.publicKey));
             }
         }
 
@@ -276,7 +318,7 @@ export const useBatteryUnitTonRate = () => {
  *         `min = Math.MAX(shouldReserveInJetton, minJettonBootstrapValue)`
  */
 export const useBatteryMinBootstrapValue = (asset: TonAsset) => {
-    const methods = useBatteryAvailableRechargeMethods();
+    const { data: methods } = useBatteryOnChainRechargeMethods();
     const { data: balance } = useBatteryBalance();
     const shouldReserve = useBatteryShouldBeReservedAmount();
     const tokenRate = usePurchaseBatteryUnitTokenRate(tonAssetAddressToString(asset.address));
@@ -373,6 +415,132 @@ export const useBatteryBalance = () => {
     });
 };
 
+export class BatteryPromoCodeError extends Error {
+    constructor(
+        readonly code: PromoCodeBatteryPurchaseStatusErrorCodeEnum | undefined,
+        msg: string
+    ) {
+        super(msg);
+        this.name = 'BatteryPromoCodeError';
+    }
+}
+
+/**
+ * Redeems a promo code straight into the battery balance. Resolves with the
+ * credited TON amount; a rejected code surfaces as {@link BatteryPromoCodeError}
+ * so the field can tell "not valid" apart from a network failure.
+ */
+export const useRedeemBatteryPromoCode = () => {
+    const { data: token } = useBatteryAuthToken();
+    const batteryApi = useBatteryApi();
+    const client = useQueryClient();
+
+    return useMutation<BigNumber, Error, string>(async promoCode => {
+        if (!token) {
+            throw new Error('Battery auth token is missing');
+        }
+        const res = await new DefaultApi(batteryApi).promoCodeBatteryPurchase({
+            xTonConnectAuth: token,
+            promoCodeBatteryPurchaseRequest: { promoCode: promoCode.trim() }
+        });
+        if (!res.success) {
+            throw new BatteryPromoCodeError(
+                res.error?.code,
+                res.error?.msg ?? 'Promo code rejected'
+            );
+        }
+        await client.invalidateQueries([QueryKey.batteryBalance]);
+        return new BigNumber(res.balanceChange);
+    });
+};
+
+export type BatteryPurchaseType = PurchasesPurchasesInnerTypeEnum;
+
+export type BatteryPurchaseStatus = 'completed' | 'refund_pending' | 'refunded';
+
+/** Money side of a purchase or of its refund: the charges and what was paid for them. */
+export interface BatteryPurchaseValue {
+    charges: number;
+    /** Paid amount in `BatteryPurchase.currency`; store purchases may carry no price. */
+    amount?: string;
+}
+
+export interface BatteryPurchase {
+    id: number;
+    type: BatteryPurchaseType;
+    status: BatteryPurchaseStatus;
+    timestamp: number;
+    charges: number;
+    amount?: string;
+    currency?: string;
+    /** Recipient of a gift purchase, raw TON address. */
+    forAccount?: string;
+    /** Part already sent back to the wallet. */
+    refunded?: BatteryPurchaseValue;
+    /** Part the user can still ask back. */
+    refundable?: BatteryPurchaseValue;
+}
+
+const toBatteryPurchase = (raw: PurchasesPurchasesInner): BatteryPurchase => {
+    const refund = raw.refundInformation;
+    return {
+        id: raw.purchaseId,
+        type: raw.type,
+        status: refund?.pendingRefund
+            ? 'refund_pending'
+            : refund?.fullyRefunded
+            ? 'refunded'
+            : 'completed',
+        timestamp: new Date(raw.datetime).getTime(),
+        charges: raw.charges,
+        amount: raw.amount,
+        currency: raw.currency,
+        forAccount: raw.forAccountId,
+        refunded: refund?.refunded,
+        refundable: refund?.refundable
+    };
+};
+
+/**
+ * Every recharge of the wallet's battery, newest first, with its refund
+ * state. Refunds settle on the relayer's side, so the list re-polls while
+ * it is on screen to move a pending refund to refunded without a reopen.
+ */
+export const useBatteryPurchases = (enabled = true) => {
+    const { data: token } = useBatteryAuthToken();
+    const batteryApi = useBatteryApi();
+
+    return useQuery<BatteryPurchase[]>(
+        [QueryKey.batteryPurchases, token],
+        async () => {
+            const res = await new DefaultApi(batteryApi).getPurchases({
+                xTonConnectAuth: token!,
+                includeGiftsOnTheWay: true
+            });
+            return res.purchases.map(toBatteryPurchase).sort((a, b) => b.timestamp - a.timestamp);
+        },
+        { enabled: enabled && !!token, refetchInterval: 10_000 }
+    );
+};
+
+export const useRequestBatteryRefund = () => {
+    const { data: token } = useBatteryAuthToken();
+    const batteryApi = useBatteryApi();
+    const client = useQueryClient();
+
+    return useMutation<void, Error, number>(async purchaseId => {
+        if (!token) {
+            throw new Error('Battery auth token is missing');
+        }
+        await new DefaultApi(batteryApi).requestRefund({
+            xTonConnectAuth: token,
+            requestRefundRequest: { purchaseId }
+        });
+        await client.invalidateQueries([QueryKey.batteryPurchases]);
+        await client.invalidateQueries([QueryKey.batteryBalance]);
+    });
+};
+
 export const useBatteryShouldBeReservedAmount = () => {
     const { data: balance } = useBatteryBalance();
     const config = useActiveConfig();
@@ -404,7 +572,7 @@ export const useBatteryShouldBeReservedAmount = () => {
  * @param assetAddress
  */
 export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
-    const methods = useBatteryAvailableRechargeMethods();
+    const { data: methods } = useBatteryOnChainRechargeMethods();
     const unitTonRate = useBatteryUnitTonRate();
 
     return useMemo(() => {
@@ -423,37 +591,43 @@ export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
     }, [methods, assetAddress, unitTonRate]);
 };
 
-const imgUrlToName = (url: string) => {
-    return (url.split('/').pop() as string).replace('.png', '').replace('.webp', '');
-};
+export type BatteryPackName = keyof typeof batteryPackIcons;
 
+const isBatteryPackName = (name: string): name is BatteryPackName => name in batteryPackIcons;
+
+/**
+ * The fixed packs the Battery service offers, largest first. Its `other` entry
+ * is the custom amount, which every screen renders as its own row.
+ */
 export const useBatteryPacks = () => {
     const rate = useBatteryUnitTonRate();
-    const config = useActiveConfig();
+    const { data: serviceConfig } = useBatteryServiceConfigNonSuspense();
 
-    const configPackages = config.battery_packages;
+    return useMemo(
+        () =>
+            serviceConfig?.packages.flatMap(pkg => {
+                const name = pkg.name;
+                if (!isBatteryPackName(name) || pkg.charges <= 0) {
+                    return [];
+                }
 
-    return useMemo(() => {
-        const shouldUseSvgImages = configPackages.every(p =>
-            Object.keys(batteryImagesMap).some(key => key === imgUrlToName(p.image))
-        );
-        return configPackages.map(pkg => ({
-            id: pkg.value.toString(),
-            price: AssetAmount.fromRelativeAmount({
-                asset: TON_ASSET,
-                amount: rate.multipliedBy(pkg.value)
+                const value = AssetAmount.fromRelativeAmount({
+                    asset: TON_ASSET,
+                    amount: rate.multipliedBy(pkg.charges)
+                });
+
+                return [
+                    {
+                        id: name,
+                        name,
+                        price: value,
+                        value,
+                        image: batteryPackIcons[name]
+                    }
+                ];
             }),
-            value: AssetAmount.fromRelativeAmount({
-                asset: TON_ASSET,
-                amount: rate.multipliedBy(pkg.value)
-            }),
-            image: shouldUseSvgImages ? (
-                batteryImagesMap[imgUrlToName(pkg.image) as keyof typeof batteryImagesMap]
-            ) : (
-                <FallbackBatteryIcon url={pkg.image} />
-            )
-        }));
-    }, [rate, configPackages]);
+        [rate, serviceConfig]
+    );
 };
 
 export const useBatteryPacksReservedApplied = () => {
@@ -461,7 +635,7 @@ export const useBatteryPacksReservedApplied = () => {
     const reserveAmount = useBatteryShouldBeReservedAmount();
 
     return useMemo(() => {
-        if (!reserveAmount) {
+        if (!packs || !reserveAmount) {
             return undefined;
         }
 

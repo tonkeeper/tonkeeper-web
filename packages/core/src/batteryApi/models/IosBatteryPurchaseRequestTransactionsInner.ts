@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface IosBatteryPurchaseRequestTransactionsInner {
     /**
      * 
-     * @type {string}
-     * @memberof IosBatteryPurchaseRequestTransactionsInner
      */
     id: string;
     /**
      * 
-     * @type {string}
-     * @memberof IosBatteryPurchaseRequestTransactionsInner
      */
     promo?: string;
 }
@@ -56,11 +52,11 @@ export function IosBatteryPurchaseRequestTransactionsInnerFromJSONTyped(json: an
     };
 }
 
-  export function IosBatteryPurchaseRequestTransactionsInnerToJSON(json: any): IosBatteryPurchaseRequestTransactionsInner {
-      return IosBatteryPurchaseRequestTransactionsInnerToJSONTyped(json, false);
-  }
+export function IosBatteryPurchaseRequestTransactionsInnerToJSON(json: any): IosBatteryPurchaseRequestTransactionsInner {
+    return IosBatteryPurchaseRequestTransactionsInnerToJSONTyped(json, false);
+}
 
-  export function IosBatteryPurchaseRequestTransactionsInnerToJSONTyped(value?: IosBatteryPurchaseRequestTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
+export function IosBatteryPurchaseRequestTransactionsInnerToJSONTyped(value?: IosBatteryPurchaseRequestTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

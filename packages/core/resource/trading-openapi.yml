@@ -1,0 +1,2131 @@
+openapi: 3.0.3
+info:
+    title: Trading UI Backend API
+    version: 1.0.0
+    description: >
+        API для клиента Trading UI. Задача — чтобы клиент был тонкий: структура витрины (полки),
+        списки, каталог, детали ассета и trade-config приходят с сервера. Сервер же применяет все
+        правила (pin/exclude/лимиты/geo), чтобы не хардкодить это на клиенте.
+servers:
+    - url: https://api.example.com
+      description: Production
+    - url: https://staging-api.example.com
+      description: Staging
+
+tags:
+    - name: Shelves
+      description: Конфигурация витрины и полок (порядок, включение, правила, geo).
+    - name: Market
+      description: Рыночные списки и котировки (то, что показываем в полках и списках).
+    - name: Assets
+      description: Каталог ассетов и детали ассета.
+    - name: Trading
+      description: Trade-config и ограничения торговли (пары/действия/роутинг).
+    - name: Instruments
+      description:
+          Опционально. Канонический инструмент + листинги по сетям (когда один RWA в нескольких
+          chain).
+
+paths:
+    /api/v1/trading/shelves/config:
+        get:
+            tags: [Shelves]
+            summary: Конфиг полок для трейд-вкладки
+            description: >
+                Клиент дергает при открытии Trade tab (и может периодически обновлять). Сервер
+                возвращает список полок в нужном порядке и с правилами, которые сервер же применит
+                на выдаче контента полок. Клиент не принимает решения: порядок/лимит/видимость — это
+                всё backend. Geo-ограничения применяются здесь же, чтобы клиент не гадал, что
+                показывать.
+            operationId: getShelvesConfig
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+            responses:
+                '200':
+                    description: Конфиг полок
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ShelvesConfigResponse'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/trading/shelves/config:
+        get:
+            tags: [Shelves]
+            summary: Конфиг полок для трейд-вкладки V2
+            description: >
+                Клиент дергает при открытии Trade tab (и может периодически обновлять). Сервер
+                возвращает список полок в нужном порядке и с правилами, которые сервер же применит
+                на выдаче контента полок. Клиент не принимает решения: порядок/лимит/видимость — это
+                всё backend. Geo-ограничения применяются здесь же, чтобы клиент не гадал, что
+                показывать.
+            operationId: getShelvesConfigV2
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+            responses:
+                '200':
+                    description: Конфиг полок
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ShelvesConfigResponseV2'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/trading/assets:
+        get:
+            tags: [Assets]
+            summary: Каталог ассетов (infinite scroll) + фильтры
+            description: >
+                Основной экран "Assets" и результаты поиска. Сервер сортирует и фильтрует. Клиент
+                передает tab/type, query, cursor. Сервер возвращает items и next_cursor. Если filter
+                недоступен у провайдера, сервер не падает, а возвращает warnings и fallback.
+            operationId: getAssetsCatalog
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+                - name: tab
+                  in: query
+                  required: false
+                  description: >
+                      Таб на экране Assets: all, tokens или perpetuals. stocks/etfs/commodities
+                      поддерживаются только для обратной совместимости — вместо них используйте
+                      filter.
+                  schema:
+                      $ref: '#/components/schemas/AssetsTab'
+                  example: all
+                - name: q
+                  in: query
+                  required: false
+                  description:
+                      Поиск по тикеру/имени по префиксу (тикер или имя начинается с запроса).
+                      Результаты упорядочены по sort/order (по умолчанию market_cap desc),
+                      совпадения с запросом разрешают только ничьи. Каталог (и поиск, и обычный
+                      список) возвращает только активы, у которых есть хотя бы один swap-провайдер
+                      (is_swappable); для клиентов версии >= 26.09.0 (по User-Agent) провайдер
+                      omniston не учитывается. Для tab=perpetuals фильтр не применяется.
+                  schema:
+                      type: string
+                      maxLength: 128
+                - name: show_perps
+                  in: query
+                  required: false
+                  description: >
+                      Показывать perp-рынки (lighter/...) вместе с остальными активами на любом
+                      табе, в том числе в поиске. По умолчанию false — perp-рынки только на
+                      tab=perpetuals. Рынки, которые Lighter ещё не листит, каталог не отдаёт (кроме
+                      запроса по ids). На tab=perpetuals флаг ничего не меняет. Игнорируется при
+                      выбранной сети (chain).
+                  schema:
+                      type: boolean
+                      default: false
+                - name: chain
+                  in: query
+                  required: false
+                  description: >
+                      Ограничить выдачу одной сетью (ton/eth/...). Если не задано — мультичейн. При
+                      выбранной сети perp-рынки (lighter/...) не показываются никогда: ни по
+                      show_perps, ни на tab=perpetuals (он вернёт пустой список).
+                  schema:
+                      type: string
+                - name: sort
+                  in: query
+                  required: false
+                  description: Сортировка. По умолчанию volume_24h.
+                  schema:
+                      $ref: '#/components/schemas/AssetsSort'
+                  example: volume_24h
+                - name: order
+                  in: query
+                  required: false
+                  description: Порядок сортировки. По умолчанию desc.
+                  schema:
+                      $ref: '#/components/schemas/AssetsOrder'
+                  example: desc
+                - name: filter
+                  in: query
+                  required: false
+                  description: >
+                      Фильтр по типу актива внутри таба: all (по умолчанию), tokens, stocks, etfs,
+                      commodities. Комбинируется с tab и q.
+                  schema:
+                      $ref: '#/components/schemas/AssetsFilter'
+                  example: all
+                - name: source_shelf
+                  in: query
+                  required: false
+                  description: >
+                      Откуда пришли (для аналитики и корректного fallback). Например most_traded или
+                      top_gainers. Не обязателен, но полезен.
+                  schema:
+                      type: string
+                - name: cursor
+                  in: query
+                  required: false
+                  description: Курсор пагинации. Если не задан — первая страница.
+                  schema:
+                      type: string
+                - name: page_size
+                  in: query
+                  required: false
+                  description: >
+                      Размер страницы. Сервер может clamp-нуть. Клиенту не надо ставить огромные
+                      значения.
+                  schema:
+                      type: integer
+                      minimum: 10
+                      maximum: 200
+                      default: 50
+            responses:
+                '200':
+                    description: Страница каталога
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssetsCatalogResponse'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/trading/assets:
+        get:
+            tags: [Assets]
+            summary: Каталог ассетов (infinite scroll) + фильтры
+            description: >
+                Основной экран "Assets" и результаты поиска. Сервер сортирует и фильтрует. Клиент
+                передает tab/type, query, cursor. Сервер возвращает items и next_cursor. Если filter
+                недоступен у провайдера, сервер не падает, а возвращает warnings и fallback.
+            operationId: getAssetsCatalogV2
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+                - name: tab
+                  in: query
+                  required: false
+                  description: >
+                      Таб на экране Assets: all, tokens или perpetuals. stocks/etfs/commodities
+                      поддерживаются только для обратной совместимости — вместо них используйте
+                      filter.
+                  schema:
+                      $ref: '#/components/schemas/AssetsTab'
+                  example: all
+                - name: q
+                  in: query
+                  required: false
+                  description:
+                      Поиск по тикеру/имени по префиксу (тикер или имя начинается с запроса).
+                      Результаты упорядочены по sort/order (по умолчанию market_cap desc),
+                      совпадения с запросом разрешают только ничьи. Каталог (и поиск, и обычный
+                      список) возвращает только активы, у которых есть хотя бы один swap-провайдер
+                      (is_swappable); для клиентов версии >= 26.09.0 (по User-Agent) провайдер
+                      omniston не учитывается. Для tab=perpetuals фильтр не применяется.
+                  schema:
+                      type: string
+                      maxLength: 128
+                - name: show_perps
+                  in: query
+                  required: false
+                  description: >
+                      Показывать perp-рынки (lighter/...) вместе с остальными активами на любом
+                      табе, в том числе в поиске. По умолчанию false — perp-рынки только на
+                      tab=perpetuals. Рынки, которые Lighter ещё не листит, каталог не отдаёт (кроме
+                      запроса по ids). На tab=perpetuals флаг ничего не меняет. Игнорируется при
+                      выбранной сети (chain).
+                  schema:
+                      type: boolean
+                      default: false
+                - name: chain
+                  in: query
+                  required: false
+                  description: >
+                      Ограничить выдачу одной сетью (ton/eth/...). Если не задано — мультичейн. При
+                      выбранной сети perp-рынки (lighter/...) не показываются никогда: ни по
+                      show_perps, ни на tab=perpetuals (он вернёт пустой список).
+                  schema:
+                      type: string
+                - name: sort
+                  in: query
+                  required: false
+                  description: Сортировка. По умолчанию volume_24h.
+                  schema:
+                      $ref: '#/components/schemas/AssetsSort'
+                  example: volume_24h
+                - name: order
+                  in: query
+                  required: false
+                  description: Порядок сортировки. По умолчанию desc.
+                  schema:
+                      $ref: '#/components/schemas/AssetsOrder'
+                  example: desc
+                - name: filter
+                  in: query
+                  required: false
+                  description: >
+                      Фильтр по типу актива внутри таба: all (по умолчанию), tokens, stocks, etfs,
+                      commodities. Комбинируется с tab и q.
+                  schema:
+                      $ref: '#/components/schemas/AssetsFilter'
+                  example: all
+                - name: source_shelf
+                  in: query
+                  required: false
+                  description: >
+                      Откуда пришли (для аналитики и корректного fallback). Например most_traded или
+                      top_gainers. Не обязателен, но полезен.
+                  schema:
+                      type: string
+                - name: ids
+                  in: query
+                  required: false
+                  description: Список ассетов, которые нужно получить
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          maxItems: 10
+                - name: cursor
+                  in: query
+                  required: false
+                  description: Курсор пагинации. Если не задан — первая страница.
+                  schema:
+                      type: string
+                - name: page_size
+                  in: query
+                  required: false
+                  description: >
+                      Размер страницы. Сервер может clamp-нуть. Клиенту не надо ставить огромные
+                      значения.
+                  schema:
+                      type: integer
+                      minimum: 10
+                      maximum: 200
+                      default: 50
+            responses:
+                '200':
+                    description: Страница каталога
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssetsCatalogResponse'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/trading/assets/{assetId}/details:
+        get:
+            tags: [Assets]
+            summary: Детали ассета для экрана ассета
+            description: >
+                Сервер возвращает секции, которые надо показать на экране, и данные для этих секций.
+                Это важно: для разных типов активов секции могут отличаться (например у stocks/RWA
+                скрываем overview/activity, оставляем about company). Клиент не должен сам решать,
+                что показывать.
+            operationId: getAssetDetails
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+                - name: assetId
+                  in: path
+                  required: true
+                  description:
+                      'Уникальный идентификатор ассета (chain-agnostic). Пример: ton:token:...,
+                      eth:token:..., rwa:TSLA.'
+                  schema:
+                      type: string
+                      minLength: 3
+                      maxLength: 256
+            responses:
+                '200':
+                    description: Данные для экрана ассета
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssetDetailsResponse'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/trading/assets/{assetId}/details:
+        get:
+            tags: [Assets]
+            summary: Детали ассета для экрана ассета
+            description: >
+                Сервер возвращает секции, которые надо показать на экране, и данные для этих секций.
+                Это важно: для разных типов активов секции могут отличаться (например у stocks/RWA
+                скрываем overview/activity, оставляем about company). Клиент не должен сам решать,
+                что показывать.
+            operationId: getAssetDetailsV2
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+                - name: assetId
+                  in: path
+                  required: true
+                  description:
+                      'Уникальный идентификатор ассета (chain-agnostic). Пример: ton:token:...,
+                      eth:token:..., rwa:TSLA.'
+                  schema:
+                      type: string
+                      minLength: 3
+                      maxLength: 256
+            responses:
+                '200':
+                    description: Данные для экрана ассета
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssetDetailsResponse'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/trading/assets/{assetId}/charts:
+        get:
+            tags: [Assets]
+            summary: График цен для ассета
+            description: >
+                Сервер возвращает график цен для ассета.
+            operationId: getAssetCharts
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+                - name: start_date
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      format: int64
+                      maximum: 2114380800
+                      example: 1668436763
+                - name: end_date
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      format: int64
+                      maximum: 2114380800
+                      example: 1668436763
+                - name: points_count
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      format: int
+                      maximum: 200
+                      minimum: 0
+                      default: 200
+                - name: assetId
+                  in: path
+                  required: true
+                  description:
+                      'Уникальный идентификатор ассета (chain-agnostic). Пример:
+                      ton/mainnet/jetton/..., eth/mainnet/erc20/...'
+                  schema:
+                      type: string
+                      minLength: 3
+                      maxLength: 256
+            responses:
+                '200':
+                    description: Данные для экрана ассета
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ChartPoints'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/trading/assets/{assetId}/charts:
+        get:
+            tags: [Assets]
+            summary: График цен для ассета
+            description: >
+                Сервер возвращает график цен для ассета.
+            operationId: getAssetChartsV2
+            parameters:
+                - $ref: '#/components/parameters/UserAgent'
+                - $ref: '#/components/parameters/XLang'
+                - $ref: '#/components/parameters/currency'
+                - $ref: '#/components/parameters/storeCountyCodeQuery'
+                - $ref: '#/components/parameters/simCountryQuery'
+                - $ref: '#/components/parameters/deviceCountyCodeQuery'
+                - $ref: '#/components/parameters/timezoneQuery'
+                - $ref: '#/components/parameters/isVpnActiveQuery'
+                - name: start_date
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      format: int64
+                      maximum: 2114380800
+                      example: 1668436763
+                - name: end_date
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      format: int64
+                      maximum: 2114380800
+                      example: 1668436763
+                - name: points_count
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      format: int
+                      maximum: 200
+                      minimum: 0
+                      default: 200
+                - name: assetId
+                  in: path
+                  required: true
+                  description:
+                      'Уникальный идентификатор ассета (chain-agnostic). Пример:
+                      ton/mainnet/jetton/..., eth/mainnet/erc20/...'
+                  schema:
+                      type: string
+                      minLength: 3
+                      maxLength: 256
+            responses:
+                '200':
+                    description: Данные для экрана ассета
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ChartPoints'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/internal/assets/metadata:
+        get:
+            summary: Экспорт метаданных ассетов для других сервисов
+            description: >
+                Редко меняющиеся данные ассетов (идентификация, decimals, картинка, тип,
+                верификация, score, ссылки, reference_id, описания на всех языках) плюс медленные
+                флаги is_swappable, is_perp_depositable и max_leverage. Возвращает только ассеты,
+                чьи метаданные изменились после after_date, в порядке (updated_at, id); листать
+                через next_cursor. Требует Bearer-токен внутреннего API. Рынки Lighter, которые
+                Lighter ещё не листит, не отдаются; после листинга рынок приходит как изменённый.
+                server_time удобно передавать как after_date следующего опроса (переведя в
+                Unix-секунды, с небольшим запасом назад и дедупликацией по id — записи с одинаковой
+                секундой могут прийти в разных страницах).
+            operationId: getInternalAssetsMetadata
+            security:
+                - internalToken: []
+            parameters:
+                - $ref: '#/components/parameters/ExportAfterDate'
+                - $ref: '#/components/parameters/ExportCursor'
+                - $ref: '#/components/parameters/ExportLimit'
+                - $ref: '#/components/parameters/ExportEarnOnly'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssetsMetadataExportResponse'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/internal/assets/market:
+        get:
+            summary: Экспорт рыночных данных ассетов для других сервисов
+            description: >
+                Быстро меняющиеся данные за 24ч (объёмы, buy/sell, market cap и его изменение,
+                total/circulating supply, open interest) без цены — цену сервисы берут из rate
+                manager. Возвращает только ассеты, чьи рыночные данные изменились после after_date,
+                в порядке (updated_at, id); листать через next_cursor. Рынки Lighter, которые
+                Lighter ещё не листит, не отдаются. Требует Bearer-токен внутреннего API.
+            operationId: getInternalAssetsMarket
+            security:
+                - internalToken: []
+            parameters:
+                - $ref: '#/components/parameters/ExportAfterDate'
+                - $ref: '#/components/parameters/ExportCursor'
+                - $ref: '#/components/parameters/ExportLimit'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssetsMarketExportResponse'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+components:
+    parameters:
+        ExportAfterDate:
+            name: after_date
+            in: query
+            required: false
+            description:
+                Вернуть только записи, изменённые строго после этого момента (Unix-время в секундах,
+                UTC). По умолчанию — все.
+            schema:
+                type: integer
+                format: int64
+                minimum: 0
+            example: 1756382400
+        ExportCursor:
+            name: cursor
+            in: query
+            required: false
+            description: next_cursor из предыдущего ответа; непрозрачная строка.
+            schema:
+                type: string
+        ExportEarnOnly:
+            name: earn_only
+            in: query
+            required: false
+            description: >
+                Только волты Keeper Earn (vaults.fyi): записи с блоком earn. Share-токены волтов
+                хранятся как обычные ассеты каталога с DeFi-строкой; волты, которых каталог ещё не
+                знал, тир earn_vaults добавляет сам. Тир обновляет earn раз в 6 часов (по
+                умолчанию), и каждое обновление сдвигает updated_at записи, так что инкрементальный
+                опрос по after_date видит изменения APY/TVL. Пороги витрины (TVL, score, APY, лимит)
+                потребитель применяет сам.
+            schema:
+                type: boolean
+                default: false
+        ExportLimit:
+            name: limit
+            in: query
+            required: false
+            description: Размер страницы.
+            schema:
+                type: integer
+                minimum: 1
+                maximum: 5000
+                default: 1000
+        storeCountyCodeQuery:
+            description: >
+                App-store storefront country, ISO 3166-1 alpha-2, case-insensitive (note: United
+                Kingdom is GB, not UK). iOS: SKStorefront/Storefront countryCode. Android: Play
+                Store account country. The client should ALWAYS send it — the server uses it
+                (together with the other geo signals) to resolve the user's country for geo-gated
+                features and asset capabilities; omit only if the storefront is genuinely
+                unavailable.
+            in: query
+            name: store_country_code
+            required: false
+            schema:
+                type: string
+                #        pattern: '^[A-Za-z]{2}$'
+                example: 'GB'
+        currency:
+            description: >
+                Display currency for prices and amounts (fiat ISO 4217 like usd/eur, or an asset
+                id). Defaults to usd when omitted. Send the user's currency from app settings.
+            in: query
+            name: currency
+            required: false
+            schema:
+                type: string
+                example: 'usd'
+        deviceCountyCodeQuery:
+            description: >
+                Region from the device locale/settings, ISO 3166-1 alpha-2 (note: United Kingdom is
+                GB, not UK). iOS: Locale.current region. Android: device locale country. The client
+                should ALWAYS send it — it is one of the geo signals the server combines to resolve
+                the user's country.
+            in: query
+            name: device_country_code
+            required: false
+            schema:
+                type: string
+                #        pattern: '^[A-Za-z]{2}$'
+                example: 'GB'
+        simCountryQuery:
+            description: >
+                Country of the SIM card (ISO 3166-1 alpha-2), from the carrier/MCC (iOS: CTCarrier
+                isoCountryCode / carrier info; Android: TelephonyManager simCountryIso). Send it
+                whenever a SIM is present; omit ONLY on devices without a SIM (e.g. Wi-Fi-only
+                tablets). It is the strongest geo signal after IP, so missing it lowers country
+                detection confidence.
+            in: query
+            name: sim_country
+            required: false
+            schema:
+                type: string
+                example: 'DE'
+        timezoneQuery:
+            description: >
+                Device timezone as an IANA name (e.g. Europe/Berlin), not an offset. iOS:
+                TimeZone.current.identifier. Android: TimeZone.getDefault().getID(). The client
+                should ALWAYS send it — it is used as a supporting geo signal.
+            in: query
+            name: timezone
+            required: false
+            schema:
+                type: string
+                example: 'Europe/Berlin'
+        isVpnActiveQuery:
+            description: >
+                Whether a VPN tunnel is currently active on the device. The client should ALWAYS
+                send an explicit true or false — an omitted value means "unknown" and lowers the
+                confidence of IP-based country detection (true tells the server to distrust the IP
+                country; false confirms it).
+            in: query
+            name: is_vpn_active
+            required: false
+            schema:
+                type: boolean
+                example: false
+        XLang:
+            name: X-Lang
+            in: header
+            required: false
+            description: >
+                Язык для локализуемых текстов (например about), ISO 639-1 (en, ru, ...). Клиент
+                должен ВСЕГДА передавать язык интерфейса. Если не задан — дефолт en.
+            schema:
+                type: string
+            example: ru
+        UserAgent:
+            name: User-Agent
+            in: header
+            required: false
+            description: >
+                Юзер агент (для совместимости и фичефлагов). Формат: "Tonkeeper/<app version> (<OS>;
+                <OS version>; <device model>)". Должен передаваться как обычный текст, БЕЗ
+                URL-кодирования (iOS-клиент сейчас шлет "Tonkeeper%2F26.07.1%20..." — так
+                platform/build не распарсятся у downstream-сервисов, которым он форвардится).
+            schema:
+                type: string
+            example: 'Tonkeeper/4.9.0 (iOS; 17.2; iPhone15,3)'
+
+    responses:
+        BadRequest:
+            description: 'Invalid request'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [code, message]
+                        properties:
+                            code:
+                                type: string
+                            message:
+                                type: string
+                            request_id:
+                                type: string
+                                nullable: true
+                                description: Идентификатор запроса для саппорта/логов.
+        Unauthorized:
+            description: 'Unauthorized'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [code, message]
+                        properties:
+                            code:
+                                type: string
+                            message:
+                                type: string
+                            request_id:
+                                type: string
+                                nullable: true
+                                description: Идентификатор запроса для саппорта/логов.
+        NotFound:
+            description: 'Resource not found'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [code, message]
+                        properties:
+                            code:
+                                type: string
+                            message:
+                                type: string
+                            request_id:
+                                type: string
+                                nullable: true
+                                description: Идентификатор запроса для саппорта/логов.
+        TooManyRequests:
+            description: 'Too many requests'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [code, message]
+                        properties:
+                            code:
+                                type: string
+                            message:
+                                type: string
+                            request_id:
+                                type: string
+                                nullable: true
+                                description: Идентификатор запроса для саппорта/логов.
+        InternalError:
+            description: 'Internal server error'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [code, message]
+                        properties:
+                            code:
+                                type: string
+                            message:
+                                type: string
+                            request_id:
+                                type: string
+                                nullable: true
+                                description: Идентификатор запроса для саппорта/логов.
+
+    schemas:
+        MarketListKey:
+            type: string
+            description: Ключ списка/полки.
+            enum:
+                [
+                    top_gainers,
+                    top_losers,
+                    most_traded,
+                    core,
+                    rwa,
+                    market_cap,
+                    volume,
+                    commodities,
+                    stocks,
+                    etfs
+                ]
+
+        ShelfType:
+            type: string
+            description: Тип разметки полки.
+            enum: [grid, list]
+
+        AssetsTab:
+            type: string
+            description: >
+                Табы на экране Assets. Актуальные значения: all, tokens, perpetuals. all — все
+                активы (perp-рынки только при show_perps=true); tokens — все активы кроме
+                perp-рынков; perpetuals — только perp-рынки (lighter/...). stocks/etfs/commodities
+                оставлены для обратной совместимости и работают как раньше; новые клиенты вместо них
+                используют tab=all|tokens вместе с filter.
+            enum: [all, tokens, stocks, etfs, commodities, perpetuals]
+
+        AssetsSort:
+            type: string
+            description: >
+                По чему сортировать каталог. По умолчанию market_cap. open_interest_usd доступен
+                только при tab=perpetuals, иначе 400. При tab=all и filter=all выдача сначала
+                группируется по классу актива — токены, акции, ETF, товары, затем perp-рынки — и уже
+                внутри каждого блока сортируется по sort/order (и по совпадению с q при поиске).
+            enum: [volume_24h, market_cap, price_24h, volume, open_interest_usd]
+            default: market_cap
+
+        AssetsOrder:
+            type: string
+            description: В каком порядке сортировать каталог.
+            enum: [desc, asc]
+            default: desc
+
+        AssetsFilter:
+            type: string
+            description: >
+                Фильтр по типу актива внутри таба. all — без фильтра (по умолчанию); tokens — только
+                крипто-токены (type=crypto); stocks — токенизированные акции; etfs —
+                токенизированные ETF; commodities — активы с type=commodities (perp-рынки на золото,
+                нефть и т.п.) плюс pin-лист секции commodities (спотовые токены на золото, серебро,
+                нефть). Тип perp-рынков берётся из tokenlist Lighter, так что фильтры работают и на
+                tab=perpetuals.
+            enum: [all, tokens, stocks, etfs, commodities]
+            default: all
+
+        LinkType:
+            type: string
+            description: Типы ссылок у ассетов.
+            enum:
+                [
+                    unspecified,
+                    website,
+                    telegram,
+                    twitter,
+                    facebook,
+                    instagram,
+                    discord,
+                    github,
+                    getgems,
+                    other
+                ]
+
+        ShelvesConfigResponse:
+            type: object
+            required: [groups, generated_at]
+            properties:
+                groups:
+                    type: array
+                    description: >
+                        Список групп полок в том порядке, в котором клиент должен их отрисовать.
+                        Полка может быть выключена сервером (enabled=false).
+                    items:
+                        $ref: '#/components/schemas/ShelfGroup'
+                generated_at:
+                    type: string
+                    format: date-time
+                    description: Когда сервер сгенерировал конфиг.
+
+        ShelvesConfigResponseV2:
+            type: object
+            required: [groups, generated_at]
+            properties:
+                groups:
+                    type: array
+                    description: >
+                        Список групп полок в том порядке, в котором клиент должен их отрисовать.
+                        Полка может быть выключена сервером (enabled=false).
+                    items:
+                        $ref: '#/components/schemas/MultichainShelfGroup'
+                generated_at:
+                    type: string
+                    format: date-time
+                    description: Когда сервер сгенерировал конфиг.
+
+        MultichainShelfGroup:
+            type: object
+            required: [id, name, groups]
+            properties:
+                id:
+                    type: string
+                    description: Айди группы.
+                name:
+                    type: string
+                    description: Имя мультичейн группы.
+                groups:
+                    type: array
+                    description: Группы мультичейна
+                    items:
+                        $ref: '#/components/schemas/ShelfGroup'
+
+        ShelfGroup:
+            type: object
+            required: [name, items]
+            properties:
+                name:
+                    type: string
+                    description: Имя группы. (в контексте мультичейн группы - имя сети)
+                items:
+                    type: array
+                    description: Элементы группы.
+                    items:
+                        $ref: '#/components/schemas/ShelfConfig'
+
+        ShelfConfig:
+            type: object
+            required: [key, title, type, enabled, limit, source, see_all]
+            properties:
+                key:
+                    $ref: '#/components/schemas/MarketListKey'
+                title:
+                    type: string
+                    description: Заголовок полки для UI (может быть локализуемым).
+                type:
+                    $ref: '#/components/schemas/ShelfType'
+                source:
+                    type: string
+                    description: Источник данных (например dyor/internal).
+                    example: dyor
+                see_all:
+                    type: object
+                    required: [enabled, route]
+                    description: >
+                        Настройки перехода See all. Если enabled=false — клиент не показывает CTA
+                        "See all".
+                    properties:
+                        enabled:
+                            type: boolean
+                            default: true
+                        route:
+                            $ref: '#/components/schemas/AssetsTab'
+                items:
+                    type: array
+                    description: Элементы полки.
+                    items:
+                        $ref: '#/components/schemas/MarketItem'
+
+        MarketListResponse:
+            type: object
+            required: [list, items, data_freshness_sec]
+            properties:
+                list:
+                    $ref: '#/components/schemas/MarketListKey'
+                items:
+                    type: array
+                    description: Элементы списка.
+                    items:
+                        $ref: '#/components/schemas/MarketItem'
+                next_cursor:
+                    type: string
+                    nullable: true
+                    description: Курсор следующей страницы (если включена пагинация).
+                data_freshness_sec:
+                    type: integer
+                    description: Приблизительная свежесть данных (секунды).
+                    minimum: 0
+                warnings:
+                    type: array
+                    description:
+                        Предупреждения, если данные частично отсутствуют или использован fallback.
+                    items:
+                        $ref: '#/components/schemas/Warning'
+
+        AssetsCatalogResponse:
+            type: object
+            required: [items, data_freshness_sec]
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/MarketItem'
+                next_cursor:
+                    type: string
+                    nullable: true
+                data_freshness_sec:
+                    type: integer
+                    description: Приблизительная свежесть данных (секунды).
+                    minimum: 0
+                warnings:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Warning'
+                chains:
+                    type: array
+                    description: >
+                        Только v2, только первая страница (без cursor и ids). Сети, в которых при
+                        текущих tab и filter есть ассеты, — значения для параметра chain (ton, eth,
+                        sol, ...), по алфавиту. Клиент показывает чипы только этих сетей. Не зависит
+                        от chain и q. При tab=perpetuals пустой: с выбранной сетью perp-рынки не
+                        отдаются. Если поля нет — сервер не смог посчитать список, клиент оставляет
+                        свои чипы.
+                    items:
+                        type: string
+
+        MarketItem:
+            type: object
+            required: [asset, metrics]
+            properties:
+                asset:
+                    $ref: '#/components/schemas/AssetRefSummary'
+                metrics:
+                    $ref: '#/components/schemas/MarketMetricsSummary'
+
+        AssetRef:
+            type: object
+            required:
+                [
+                    asset_type,
+                    id,
+                    address,
+                    symbol,
+                    name,
+                    decimals,
+                    trust_score,
+                    image_url,
+                    is_scam,
+                    verification
+                ]
+            properties:
+                asset_type:
+                    $ref: '#/components/schemas/AssetType'
+                id:
+                    type: string
+                    description:
+                        Айди ассета (ton/mainnet/jetton/0:b11...,ton/mainnet/stocks/0:abc...)
+                symbol:
+                    type: string
+                    description: Тикер (display).
+                name:
+                    type: string
+                    description: Название (display).
+                decimals:
+                    type: integer
+                    description: Decimals для отображения и форматирования.
+                    minimum: 0
+                    maximum: 30
+                trust_score:
+                    type: integer
+                    description: Trust score of the token
+                    minimum: 0
+                    maximum: 100
+                image_url:
+                    type: string
+                    description: URL иконки/логотипа.
+                is_scam:
+                    type: boolean
+                    deprecated: true
+                    description: Ассет скам или нет
+                verification:
+                    type: string
+                    description: Усовершенствованная версия is_scam
+                    enum: [trusted, whitelist, none, blacklist]
+                reference_id:
+                    type: string
+                    description: >
+                        Айди связанного spot-ассета, у которого заимствованы метаданные (например
+                        для perp-рынка lighter/... это ассет с тем же тикером). Отсутствует, если
+                        связи нет.
+                    example: btc/mainnet/coin
+                perps:
+                    $ref: '#/components/schemas/PerpMarket'
+                perp_markets:
+                    type: array
+                    description: >
+                        Perp-рынки на базовый актив этого spot-ассета — точка входа в Perps со
+                        страницы обычного актива. Поле есть только если хотя бы один рынок найден;
+                        отсутствие поля означает, что perp-рынка нет. У самих perp-рынков
+                        (asset_type=perpetuals) поле не приходит никогда. Связь строится на сервере,
+                        а не по тикеру на клиенте: рынок привязан, если его reference_id — этот же
+                        ассет (или та же нативная монета в другой сети: ETH в
+                        eth/base/arb/robinhood), другой контракт той же монеты по CoinMarketCap
+                        (мосты), а для stocks/etfs — токен того же типа под тикером рынка или его
+                        tokenized-вариантом (TSLA, TSLAx, TSLAon). Рынков может быть несколько;
+                        первым идёт рынок, для которого этот ассет — прямой reference_id, дальше —
+                        по объёму за 24ч. Открывать рынок по id (он же assetId для /details).
+                    items:
+                        $ref: '#/components/schemas/PerpMarketLink'
+                    example:
+                        - id: lighter/mainnet/market/1
+                          market_index: 1
+                          symbol: BTC
+                          category: crypto
+                          max_leverage: 50
+
+        AssetRefSummary:
+            type: object
+            required:
+                [
+                    asset_type,
+                    id,
+                    address,
+                    symbol,
+                    name,
+                    decimals,
+                    trust_score,
+                    image_url,
+                    is_scam,
+                    verification
+                ]
+            properties:
+                asset_type:
+                    $ref: '#/components/schemas/AssetType'
+                id:
+                    type: string
+                    description:
+                        Айди ассета (ton/mainnet/jetton/0:b11...,ton/mainnet/stocks/0:abc...)
+                symbol:
+                    type: string
+                    description: Тикер (display).
+                name:
+                    type: string
+                    description: Название (display).
+                decimals:
+                    type: integer
+                    description: Decimals для отображения и форматирования.
+                    minimum: 0
+                    maximum: 30
+                trust_score:
+                    type: integer
+                    description: Trust score of the token
+                    minimum: 0
+                    maximum: 100
+                image_url:
+                    type: string
+                    description: URL иконки/логотипа.
+                is_scam:
+                    type: boolean
+                    deprecated: true
+                    description: Ассет скам или нет
+                verification:
+                    type: string
+                    description: Усовершенствованная версия is_scam
+                    enum: [trusted, whitelist, none, blacklist]
+                leverage:
+                    type: integer
+                    description: Leverage для отображения и плеча.
+
+        AssetType:
+            type: string
+            description:
+                Тип ассета. commodities сейчас выставляется только perp-рынкам (золото, нефть, ...),
+                спотовые товарные токены остаются asset.
+            enum: [asset, stocks, etfs, commodities, perpetuals]
+
+        Link:
+            type: object
+            required: [name, url, type]
+            description: >
+                Ссылка на ресурсы ассета.
+            properties:
+                name:
+                    type: string
+                    description: Имя ссылки.
+                    example: 'Community in Telegram'
+                url:
+                    type: string
+                    description: Ссылка на ресурс.
+                    example: 'https://www.google.com'
+                type:
+                    $ref: '#/components/schemas/LinkType'
+
+        MarketMetrics:
+            type: object
+            required: [price, change_24h_percent, market_cap, provider, as_of]
+            description: >
+                Рыночные метрики. Все числовые поля — decimal string (не float). Если метрика
+                недоступна — поле может отсутствовать или быть null (зависит от вашей политики).
+            properties:
+                price:
+                    type: string
+                    description: Цена.
+                    example: '1.0002'
+                change_24h_percent:
+                    type: string
+                    description: Изменение за 24ч в процентах.
+                    example: '-0.12'
+                market_cap:
+                    type: string
+                    description: Рыночная капитализация в USD.
+                    example: '987654321.00'
+                provider:
+                    type: string
+                    description: Какой провайдер отдал метрики (для дебага/наблюдаемости).
+                as_of:
+                    type: string
+                    format: date-time
+                    description: Timestamp, когда метрика была актуальна у провайдера.
+
+        MarketMetricsSummary:
+            type: object
+            required: [price, volume, change_24h_percent, provider, as_of]
+            description: >
+                Краткое описание рыночных метрик.
+            properties:
+                volume:
+                    type: string
+                    description: Объем торгов
+                    example: 10000000000
+                market_cap:
+                    type: string
+                    description:
+                        Рыночная капитализация в USD (decimal string). Отсутствует, если неизвестна.
+                    example: '987654321.00'
+                price:
+                    type: string
+                    description: Цена.
+                    example: '1.0002'
+                change_24h_percent:
+                    type: string
+                    description: Изменение за 24ч в процентах.
+                    example: '-0.12'
+                provider:
+                    type: string
+                    description: Какой провайдер отдал метрики (для дебага/наблюдаемости).
+                as_of:
+                    type: string
+                    format: date-time
+                    description: Timestamp, когда метрика была актуальна у провайдера.
+
+        AssetDetailsResponse:
+            type: object
+            required: [asset, sections, data_freshness_sec, info_source]
+            properties:
+                asset:
+                    $ref: '#/components/schemas/AssetRef'
+                sections:
+                    $ref: '#/components/schemas/AssetSections'
+                capabilities:
+                    $ref: '#/components/schemas/AssetCapabilities'
+                data_freshness_sec:
+                    type: integer
+                    description: Приблизительная свежесть данных (секунды).
+                info_source:
+                    $ref: '#/components/schemas/AssetInfoSource'
+                warnings:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Warning'
+
+        PerpMarketLink:
+            type: object
+            description: Ссылка spot-ассета на perp-рынок его базового актива.
+            required: [id, market_index, symbol, category]
+            properties:
+                id:
+                    type: string
+                    description:
+                        Айди perp-рынка (lighter/<network>/market/<market_index>) — assetId для
+                        /details и каталога.
+                    example: lighter/mainnet/market/1
+                market_index:
+                    type: integer
+                    description: Номер рынка на бирже (как market_index в PerpMarket / tk-perps).
+                    example: 1
+                symbol:
+                    type: string
+                    description: Тикер рынка на бирже (BTC, TSLA, 1000PEPE).
+                    example: BTC
+                category:
+                    type: string
+                    description: Класс рынка из tokenlist биржи.
+                    enum: [crypto, stocks, etfs, commodities]
+                max_leverage:
+                    type: integer
+                    description: Максимальное плечо; отсутствует, если неизвестно.
+                    example: 50
+
+        PerpMarket:
+            type: object
+            description: >
+                Perpetual market data for p/<protocol>/... assets (Lighter), present only for them.
+                Mirrors the tk-perps /screens/markets Market object field for field, served from a
+                2-second snapshot of the exchange. Monetary/price/size fields are human-unit decimal
+                strings in USD (not converted to the requested currency); the *_decimals fields tell
+                the client how to scale them back into integer units when building/signing a tx.
+            required:
+                [
+                    market_index,
+                    symbol,
+                    base_asset,
+                    quote_asset,
+                    status,
+                    price_decimals,
+                    size_decimals,
+                    tick_size,
+                    step_size,
+                    min_size_base,
+                    max_size_base,
+                    min_size_quote,
+                    max_size_quote,
+                    max_leverage,
+                    maker_fee_pct,
+                    taker_fee_pct,
+                    initial_margin_fraction,
+                    maintenance_margin_fraction,
+                    closeout_margin_fraction,
+                    open_interest_usd,
+                    volume_24h_usd,
+                    last_price,
+                    index_price,
+                    mark_price,
+                    price_change_24h,
+                    high_24h,
+                    low_24h
+                ]
+            properties:
+                market_index:
+                    type: integer
+                symbol:
+                    type: string
+                base_asset:
+                    type: string
+                quote_asset:
+                    type: string
+                status:
+                    type: string
+                    description: Market trading status (e.g. active, inactive).
+                price_decimals:
+                    type: integer
+                    description: Number of decimal places used to scale prices for signing.
+                size_decimals:
+                    type: integer
+                    description: Number of decimal places used to scale base sizes for signing.
+                tick_size:
+                    type: string
+                    description: Minimum price increment, human-unit decimal string.
+                    example: '0.01'
+                step_size:
+                    type: string
+                    description: Minimum base size increment, human-unit decimal string.
+                    example: '0.0001'
+                min_size_base:
+                    type: string
+                    description: Minimum order size in base units.
+                max_size_base:
+                    type: string
+                    description:
+                        Maximum order size in base units; empty when the exchange publishes none.
+                min_size_quote:
+                    type: string
+                    description: Minimum order notional in quote units.
+                max_size_quote:
+                    type: string
+                    description: Maximum order notional in quote units.
+                max_leverage:
+                    type: integer
+                maker_fee_pct:
+                    type: string
+                    description: Maker fee as a percentage string.
+                taker_fee_pct:
+                    type: string
+                    description: Taker fee as a percentage string.
+                initial_margin_fraction:
+                    type: integer
+                    description: Initial margin fraction in basis points (1/10000).
+                maintenance_margin_fraction:
+                    type: integer
+                    description: Maintenance margin fraction in basis points (1/10000).
+                closeout_margin_fraction:
+                    type: integer
+                    description: Closeout margin fraction in basis points (1/10000).
+                funding_rate_hourly:
+                    type: string
+                    description:
+                        Current hourly funding rate, decimal string. Absent when the exchange
+                        reports none.
+                    example: '0.0000125'
+                next_funding_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                open_interest_usd:
+                    type: string
+                    description: Open interest as reported by the exchange, decimal string.
+                volume_24h_usd:
+                    type: string
+                last_price:
+                    type: string
+                index_price:
+                    type: string
+                mark_price:
+                    type: string
+                price_change_24h:
+                    type: string
+                    description: 24h price change in percent.
+                high_24h:
+                    type: string
+                low_24h:
+                    type: string
+
+        EarnVaultExport:
+            type: object
+            required:
+                [
+                    asset_id,
+                    network,
+                    vault_id,
+                    chain_id,
+                    address,
+                    name,
+                    symbol,
+                    decimals,
+                    underlying,
+                    protocol,
+                    tags,
+                    apy,
+                    is_transactional,
+                    is_app_featured,
+                    has_warnings,
+                    lend_url
+                ]
+            properties:
+                asset_id:
+                    type: string
+                    description:
+                        Универсальный айди share/receipt-токена волта (eth/mainnet/erc20/0x...) —
+                        идентификатор волта для клиентов.
+                network:
+                    type: string
+                    description:
+                        Имя сети в vaults.fyi (mainnet, base, arbitrum, bsc, polygon, avalanche,
+                        robinhood).
+                vault_id:
+                    type: string
+                    description:
+                        vaultId в vaults.fyi; вместе с network адресует волт во встроенном UI и в
+                        API vaults.fyi.
+                chain_id:
+                    type: integer
+                    format: int64
+                address:
+                    type: string
+                    description: Адрес контракта волта (может отличаться от адреса share-токена).
+                name:
+                    type: string
+                    description: Название волта.
+                symbol:
+                    type: string
+                    description: Символ share-токена.
+                decimals:
+                    type: integer
+                    description: Decimals share-токена.
+                underlying:
+                    $ref: '#/components/schemas/EarnVaultAsset'
+                protocol:
+                    $ref: '#/components/schemas/EarnVaultProtocol'
+                curator:
+                    type: string
+                    description: Куратор волта (Morpho/Euler); отсутствует, если нет.
+                tags:
+                    type: array
+                    items:
+                        type: string
+                apy:
+                    $ref: '#/components/schemas/EarnVaultAPYs'
+                tvl_usd:
+                    type: string
+                    description: TVL в USD, десятичная строка; отсутствует, если неизвестно.
+                score:
+                    type: number
+                    format: double
+                    description:
+                        Reputation score vaults.fyi, шкала 0–100; отсутствует, если vaults.fyi его
+                        не считает.
+                is_transactional:
+                    type: boolean
+                    description: Депозит/вывод доступны во встроенном интерфейсе vaults.fyi.
+                is_app_featured:
+                    type: boolean
+                has_warnings:
+                    type: boolean
+                    description:
+                        У волта есть предупреждения или действующие флаги уровня warning/critical.
+                lend_url:
+                    type: string
+                    description: Страница волта в app.vaults.fyi.
+                data_updated_at:
+                    type: string
+                    format: date-time
+                    description: Время данных по версии vaults.fyi (lastUpdateTimestamp).
+
+        EarnVaultAsset:
+            type: object
+            description: >
+                Базовый актив волта. name/symbol/decimals/image берутся из нашего каталога, если
+                актив в нём есть, иначе — из vaults.fyi.
+            required: [asset_id, name, symbol, decimals, image]
+            properties:
+                asset_id:
+                    type: string
+                    description: Универсальный айди (eth/mainnet/coin для нативной монеты).
+                name:
+                    type: string
+                symbol:
+                    type: string
+                decimals:
+                    type: integer
+                image:
+                    type: string
+                price_usd:
+                    type: string
+                    description:
+                        Цена по данным vaults.fyi, десятичная строка; отсутствует, если неизвестна.
+
+        EarnVaultProtocol:
+            type: object
+            required: [id, name, logo]
+            properties:
+                id:
+                    type: string
+                    description: protocolId в vaults.fyi (например morpho, aave-v3, ether.fi-eth).
+                name:
+                    type: string
+                    description: Отображаемое имя протокола.
+                logo:
+                    type: string
+                url:
+                    type: string
+
+        EarnVaultAPYs:
+            type: object
+            description: APY по окнам 1/7/30 дней, десятичные доли (0.0534 = 5,34%).
+            required: ['1day', '7day', '30day']
+            properties:
+                '1day':
+                    $ref: '#/components/schemas/EarnAPY'
+                '7day':
+                    $ref: '#/components/schemas/EarnAPY'
+                '30day':
+                    $ref: '#/components/schemas/EarnAPY'
+
+        EarnAPY:
+            type: object
+            required: [base, reward, total]
+            properties:
+                base:
+                    type: number
+                    format: double
+                reward:
+                    type: number
+                    format: double
+                    description: APY от наград протокола.
+                total:
+                    type: number
+                    format: double
+                    description: base + reward — значение для витрины и сортировки.
+
+        AssetsMetadataExportResponse:
+            type: object
+            required: [items, server_time]
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetMetadataExport'
+                next_cursor:
+                    type: string
+                    nullable: true
+                    description: Курсор следующей страницы; null, если страница последняя.
+                server_time:
+                    type: string
+                    format: date-time
+                    description:
+                        Время сервера на момент ответа — кандидат в after_date следующего опроса.
+
+        AssetMetadataExport:
+            type: object
+            required:
+                [
+                    id,
+                    symbol,
+                    name,
+                    decimals,
+                    image_url,
+                    asset_type,
+                    verification,
+                    trust_score,
+                    links,
+                    is_swappable,
+                    swap_providers,
+                    is_perp_depositable,
+                    is_lp,
+                    descriptions,
+                    updated_at
+                ]
+            properties:
+                id:
+                    type: string
+                symbol:
+                    type: string
+                name:
+                    type: string
+                decimals:
+                    type: integer
+                image_url:
+                    type: string
+                asset_type:
+                    $ref: '#/components/schemas/AssetType'
+                verification:
+                    type: string
+                    enum: [trusted, whitelist, none, blacklist]
+                trust_score:
+                    type: integer
+                links:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Link'
+                reference_id:
+                    type: string
+                    description:
+                        Айди связанного spot-ассета (для perp-рынков); отсутствует, если связи нет.
+                is_swappable:
+                    type: boolean
+                swap_providers:
+                    type: array
+                    description:
+                        Агрегаторы swap-бэкенда (например omniston), через которые ассет можно
+                        обменять. Пустой список, если is_swappable=false.
+                    items:
+                        type: string
+                is_perp_depositable:
+                    type: boolean
+                    description: Ассет можно использовать для депозита в перпы через relay.link.
+                is_lp:
+                    type: boolean
+                    description:
+                        LP-токен (доля пула DEX, Curve или Pendle). Такие токены не обмениваются
+                        через swap, is_swappable у них всегда false.
+                max_leverage:
+                    type: integer
+                    description: Только для perp-рынков.
+                descriptions:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Описание по языкам, например {"en": "...", "ru": "..."}.'
+                defi:
+                    $ref: '#/components/schemas/DefiMetadata'
+                earn:
+                    $ref: '#/components/schemas/EarnVaultExport'
+                    description: >
+                        Данные волта Keeper Earn (vaults.fyi), если токен — share-токен такого
+                        волта: APY, TVL, score, протокол, куратор, vault_id. Хранятся в DeFi-строке
+                        токена (defi) и обновляются тиром earn_vaults.
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Когда в последний раз менялось любое из этих полей.
+
+        DefiMetadata:
+            type: object
+            description: >
+                DeFi-метаданные для токенов, выпущенных протоколами (aToken, vault shares, Pendle
+                PT/LP, LP DEX). Присутствует только у таких токенов. Иконка токена — image_url
+                родительского ассета (underlying + бейдж протокола).
+            required: [protocol, kind, status, listed, rebasing, source]
+            properties:
+                protocol:
+                    type: string
+                    description: Слаг протокола (aave-v3, morpho, pendle, lido, ...).
+                kind:
+                    type: string
+                    enum:
+                        [
+                            atoken,
+                            stata,
+                            comet,
+                            vtoken,
+                            jtoken,
+                            erc4626,
+                            gm,
+                            glv,
+                            pt,
+                            yt,
+                            lp,
+                            rate,
+                            plain,
+                            curve_lp,
+                            pair_lp
+                        ]
+                status:
+                    type: string
+                    enum: [active, unlisted, frozen, deprecated, expired]
+                underlying_asset_id:
+                    type: string
+                    description: Айди ассета, который токен оборачивает (USDC для aEthUSDC).
+                accounting_asset_id:
+                    type: string
+                    description: Айди ассета, в котором считается номинал (stETH для PT-wstETH).
+                market_asset_id:
+                    type: string
+                    description: Айди рынка/LP (Pendle PT → его market), если отличается.
+                components:
+                    type: array
+                    description: Состав LP-токена.
+                    items:
+                        type: object
+                        required: [asset_id]
+                        properties:
+                            asset_id:
+                                type: string
+                            weight:
+                                type: number
+                expires_at:
+                    type: string
+                    format: date-time
+                    description: Срок погашения (Pendle).
+                listed:
+                    type: boolean
+                    description: Токен в кураторском списке самого протокола.
+                rebasing:
+                    type: boolean
+                    description: Баланс меняется без трансферов (aToken, stETH).
+                tvl_usd:
+                    type: string
+                    description: TVL по данным протокола, decimal string.
+                display_name:
+                    type: string
+                protocol_icon_url:
+                    type: string
+                    description: Бейдж протокола для наложения на иконку underlying.
+                registry:
+                    type: string
+                    description:
+                        Контракт (pool/comptroller/factory), подтвердивший происхождение токена.
+                source:
+                    type: string
+                    enum: [api, registry, config, hardcode, mirroring]
+
+        AssetsMarketExportResponse:
+            type: object
+            required: [items, server_time]
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetMarketExport'
+                next_cursor:
+                    type: string
+                    nullable: true
+                server_time:
+                    type: string
+                    format: date-time
+
+        AssetMarketExport:
+            type: object
+            required: [id, updated_at]
+            description: >
+                Десятичные строки: денежные суммы в USD, supply — в минимальных единицах; поле
+                отсутствует, если значение неизвестно.
+            properties:
+                id:
+                    type: string
+                volume_24h:
+                    type: string
+                volume_change_24h:
+                    type: string
+                    description: Проценты.
+                buy_24h:
+                    type: string
+                sell_24h:
+                    type: string
+                market_cap:
+                    type: string
+                market_cap_change_24h:
+                    type: string
+                    description: Проценты.
+                total_supply:
+                    type: string
+                    description:
+                        В минимальных единицах (умножено на 10^decimals); отсутствует, если
+                        неизвестно.
+                circulating_supply:
+                    type: string
+                    description:
+                        В минимальных единицах (умножено на 10^decimals); отсутствует, если
+                        неизвестно.
+                open_interest_usd:
+                    type: string
+                    description: Только для perp-рынков, как отдаёт биржа.
+                updated_at:
+                    type: string
+                    format: date-time
+
+        AssetInfoSource:
+            type: object
+            required: [displayed_name, url]
+            properties:
+                displayed_name:
+                    type: string
+                    description: Название источника для подписи под данными ассета.
+                    example: 'dyor.io'
+                url:
+                    type: string
+                    format: uri
+                    description: Ссылка на страницу .
+                    example: 'https://dyor.io/'
+
+        AssetSections:
+            type: object
+            description: >
+                Секции экрана ассета. Важно: сервер определяет enabled/disabled для каждой секции в
+                зависимости от типа ассета и правил (например stocks/RWA).
+            required: [about, overview, trading_activity, links, chart, transaction_history]
+            properties:
+                about:
+                    $ref: '#/components/schemas/SectionAbout'
+                overview:
+                    $ref: '#/components/schemas/SectionOverview'
+                trading_activity:
+                    $ref: '#/components/schemas/SectionTradingActivity'
+                links:
+                    $ref: '#/components/schemas/SectionLinks'
+
+        SectionAbout:
+            type: object
+            required: [enabled]
+            properties:
+                enabled:
+                    type: boolean
+                text:
+                    type: string
+                    nullable: true
+                    description: Описание ассета/компании.
+                source:
+                    type: string
+                    nullable: true
+                    description: Источник текста (local/dyor/...).
+                note:
+                    type: string
+                    nullable: true
+                    description: Причина выключения (например для stocks).
+
+        SectionOverview:
+            type: object
+            required: [enabled]
+            properties:
+                enabled:
+                    type: boolean
+                market_cap:
+                    type: string
+                    nullable: true
+                total_supply:
+                    type: string
+                    nullable: true
+                circulating_supply:
+                    type: string
+                    nullable: true
+                note:
+                    type: string
+                    nullable: true
+                    description: Причина выключения (например для stocks).
+
+        SectionTradingActivity:
+            type: object
+            required: [enabled]
+            properties:
+                enabled:
+                    type: boolean
+                volume_change_24h:
+                    type: string
+                    nullable: true
+                    example: '-2.29'
+                volume_24h:
+                    type: string
+                    nullable: true
+                    example: '12345678'
+                buy_24h:
+                    type: string
+                    nullable: true
+                    example: '12345678'
+                sell_24h:
+                    type: string
+                    nullable: true
+                    example: '12345678'
+                note:
+                    type: string
+                    nullable: true
+
+        SectionLinks:
+            type: object
+            required: [enabled]
+            properties:
+                enabled:
+                    type: boolean
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Link'
+                note:
+                    type: string
+                    nullable: true
+                    description: Причина выключения (например для stocks).
+
+        ChartPoints:
+            type: array
+            items:
+                type: array
+                minItems: 2
+                maxItems: 2
+                items:
+                    type: number
+            description: |
+                Each inner array is a pair [timestamp, price]:
+                  • index 0 — Unix timestamp (int64)  
+                  • index 1 — token price (decimal) in the requested currency.
+            example: [[1668436763, 97.21323234]]
+
+        AssetCapability:
+            type: string
+            description: Capability flag. Clients must tolerate unknown values added later
+            enum:
+                - onramp
+                - offramp
+                - swap
+                - p2p
+        AssetCapabilityMerchants:
+            type: object
+            properties:
+                merchants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExchangeMerchantSlug'
+        ExchangeMerchantSlug:
+            type: string
+            enum:
+                - mercuryo
+                - transak
+                - moonpay
+                - avanchange
+                - changelly
+                - wallet
+        AssetCapabilityAggregators:
+            type: object
+            properties:
+                aggregators:
+                    type: array
+                    items:
+                        type: string
+        AssetCapabilityP2PInfo:
+            type: object
+            properties:
+                symbol:
+                    type: string
+                    description: P2P symbol matched against this asset (e.g. `TON`, `USDT`)
+        AssetCapabilityDetails:
+            type: object
+            description:
+                Per-capability extra info. Keys appear only when meaningful for the listed
+                capability
+            properties:
+                onramp:
+                    $ref: '#/components/schemas/AssetCapabilityMerchants'
+                offramp:
+                    $ref: '#/components/schemas/AssetCapabilityMerchants'
+                swap:
+                    $ref: '#/components/schemas/AssetCapabilityAggregators'
+                p2p:
+                    $ref: '#/components/schemas/AssetCapabilityP2PInfo'
+        AssetCapabilities:
+            type: object
+            required:
+                - capabilities
+            properties:
+                capabilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetCapability'
+                details:
+                    $ref: '#/components/schemas/AssetCapabilityDetails'
+
+        Warning:
+            type: object
+            required: [code]
+            properties:
+                code:
+                    type: string
+                    description: Код предупреждения.
+                    enum: [STALE_DATA, PARTIAL_DATA, DEPENDENCY_FAILURE, FILTER_NOT_SUPPORTED]
+                message:
+                    type: string
+                    nullable: true
+                    description:
+                        Человекочитаемое описание (для логов/дебага, UI обычно не показывает).
+                details:
+                    type: object
+                    nullable: true
+                    additionalProperties: true
+                    description: Доп. контекст.
+
+        ErrorResponse:
+            type: object
+            required: [code, message]
+            properties:
+                code:
+                    type: string
+                message:
+                    type: string
+                request_id:
+                    type: string
+                    nullable: true
+                    description: Идентификатор запроса для саппорта/логов.
+
+    securitySchemes:
+        internalToken:
+            type: http
+            scheme: bearer
+            description:
+                Токен внутреннего API (env INTERNAL_API_TOKEN) для сервис-сервисных вызовов.

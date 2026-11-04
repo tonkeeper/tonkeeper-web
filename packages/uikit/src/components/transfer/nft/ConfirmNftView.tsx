@@ -11,7 +11,11 @@ import { FullHeightBlock, NotificationFooter, NotificationFooterPortal } from '.
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { useTrackTransactionSent } from '../../../hooks/analytics/events-hooks';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../../hooks/analytics/events-hooks';
 import { QueryKey } from '../../../libs/queryKey';
 import { ConfirmViewImage, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {
@@ -92,7 +96,7 @@ const useNftTransferEstimation = (
 
     return useQuery<TonEstimation, Error>(
         [QueryKey.estimate, data?.address, accounts, getSenderKey],
-        async () => {
+        async (): Promise<TonEstimation> => {
             try {
                 if (account.type === 'watch-only') {
                     throw new Error('account not controllable');
@@ -131,6 +135,7 @@ const useSendNft = (
 ) => {
     const account = useActiveAccount();
     const trackTransactionSent = useTrackTransactionSent();
+    const assetId = useAnalyticsAssetId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
     const getSender = useGetSender();
@@ -197,7 +202,15 @@ const useSendNft = (
                 });
                 await rawTransactionService.send(sender, zeroFeeEstimation, nftTransferMsg);
             }
-            trackTransactionSent('NftItemTransfer');
+            trackTransactionSent({
+                category: 'transfer',
+                category_detail: 'nft',
+                asset: assetId.tonNft(nftItem.address),
+                amount: 1,
+                fee_asset: toAnalyticsFeeAsset(
+                    account.type === 'ton-multisig' ? 'multisig' : options.selectedSenderType
+                )
+            });
         } catch (e) {
             await notifyError(e);
         }

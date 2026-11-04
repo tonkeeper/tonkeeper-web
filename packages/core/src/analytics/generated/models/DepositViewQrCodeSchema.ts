@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddFundsOptionSchema } from './AddFundsOptionSchema';
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
  * User opened the Payment QR code screen to scan or copy the deposit address. Shared across buy_ton_with_crypto and buy_with_stablecoins flows.
  *
@@ -11,14 +13,9 @@ import type { RampSourceSchema } from './RampSourceSchema';
 export type DepositViewQrCodeSchema = {
     eventName: string;
     from: RampSourceSchema;
+    wallet_mode: WalletModeSchema;
     add_funds_option: AddFundsOptionSchema;
-    /**
-     * Carried from deposit_view_send_asset
-     */
-    sell_asset: string;
-    /**
-     * Carried from deposit_view_send_asset
-     */
-    buy_asset: string;
+    sell_asset: AssetSchema;
+    buy_asset: AssetSchema;
 };
 

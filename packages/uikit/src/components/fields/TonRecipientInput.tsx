@@ -7,12 +7,13 @@ import {
 import React, { ForwardedRef, forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { ErrorOption, UseFormSetError } from 'react-hook-form';
 import styled from 'styled-components';
-import { SpinnerRing, XMarkCircleIcon } from '../Icon';
+import { XMarkCircleIcon } from '../Icon';
+import { Loader } from '../Loader';
 import { Body2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { useAsyncValidator } from '../../hooks/useAsyncValidator';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
-import { IconButton } from './IconButton';
+import { LegacyIconButton } from './IconButton';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { seeIfInvalidDns } from '../transfer/RecipientView';
 import { DNSApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -21,8 +22,9 @@ import { InputBlock, Label } from './Input';
 import { userInputAddressIsBounceable } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useActiveApi } from '../../state/wallet';
 
-const SpinnerRingStyled = styled(SpinnerRing)`
+const SpinnerRingStyled = styled(Loader)`
     transform: scale(1.2);
+    color: ${p => p.theme.iconSecondary};
 `;
 
 const Body2Secondary = styled(Body2)`
@@ -167,7 +169,7 @@ export const TonRecipientInput = forwardRef<
                 </Label>
 
                 <AlignCenter>
-                    {isValidating && <SpinnerRingStyled />}
+                    {isValidating && <SpinnerRingStyled size="small" />}
                     {!isValidating &&
                         validationProduct &&
                         'dns' in validationProduct &&
@@ -179,14 +181,14 @@ export const TonRecipientInput = forwardRef<
                             </AddressText>
                         ))}
                     {!isValidating && inputValue && (
-                        <IconButton
+                        <LegacyIconButton
                             onClick={() => {
                                 inputTouched.current = true;
                                 setInputValue('');
                             }}
                         >
                             <XMarkCircleIcon />
-                        </IconButton>
+                        </LegacyIconButton>
                     )}
                 </AlignCenter>
             </InputBlockStyled>

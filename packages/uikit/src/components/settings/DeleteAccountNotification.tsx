@@ -72,7 +72,7 @@ export const DeleteNotificationContent: FC<{
                             </DisclaimerText>
                             {t('Back_up_now')}
                         </DisclaimerLink>
-                        <Checkbox checked={checked} onChange={setChecked} light />
+                        <Checkbox checked={checked} onChange={setChecked} />
                     </DisclaimerBlock>
                 )}
             </CentralBlockStyled>
@@ -142,7 +142,7 @@ const DeleteAllContent = () => {
 
                 <DisclaimerBlock>
                     <Body3>{t('I_have_a_backup_copy_of_recovery_phrase')}</Body3>
-                    <Checkbox checked={checked} onChange={setChecked} light />
+                    <Checkbox checked={checked} onChange={setChecked} />
                 </DisclaimerBlock>
             </CentralBlockStyled>
 

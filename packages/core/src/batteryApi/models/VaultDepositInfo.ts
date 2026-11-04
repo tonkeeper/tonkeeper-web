@@ -29,14 +29,10 @@ import {
 export interface VaultDepositInfo {
     /**
      * 
-     * @type {Price}
-     * @memberof VaultDepositInfo
      */
     price: Price;
     /**
      * 
-     * @type {string}
-     * @memberof VaultDepositInfo
      */
     vault: string;
 }
@@ -65,11 +61,11 @@ export function VaultDepositInfoFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function VaultDepositInfoToJSON(json: any): VaultDepositInfo {
-      return VaultDepositInfoToJSONTyped(json, false);
-  }
+export function VaultDepositInfoToJSON(json: any): VaultDepositInfo {
+    return VaultDepositInfoToJSONTyped(json, false);
+}
 
-  export function VaultDepositInfoToJSONTyped(value?: VaultDepositInfo | null, ignoreDiscriminator: boolean = false): any {
+export function VaultDepositInfoToJSONTyped(value?: VaultDepositInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

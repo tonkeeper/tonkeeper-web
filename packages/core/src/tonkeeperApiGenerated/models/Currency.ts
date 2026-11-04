@@ -43,6 +43,12 @@ export interface Currency {
      * @memberof Currency
      */
     type: CurrencyTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Currency
+     */
+    symbol?: string;
 }
 
 
@@ -81,6 +87,7 @@ export function CurrencyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'name': json['name'],
         'image': json['image'],
         'type': json['type'],
+        'symbol': json['symbol'] == null ? undefined : json['symbol'],
     };
 }
 
@@ -99,6 +106,7 @@ export function CurrencyToJSONTyped(value?: Currency | null, ignoreDiscriminator
         'name': value['name'],
         'image': value['image'],
         'type': value['type'],
+        'symbol': value['symbol'],
     };
 }
 

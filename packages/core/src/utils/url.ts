@@ -1,5 +1,12 @@
 export const removeLastSlash = (url: string) => url.replace(/\/$/, '');
 
+/**
+ * Appends `path` to `base`, keeping any path the base already has. Config-provided
+ * service URLs may be a bare host or carry a path prefix, with or without a trailing slash.
+ */
+export const joinUrl = (base: string, path: string) =>
+    `${base.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
+
 export function eqOrigins(origin1: string, origin2: string | undefined): boolean {
     return origin2 !== undefined && removeLastSlash(origin1) === removeLastSlash(origin2);
 }

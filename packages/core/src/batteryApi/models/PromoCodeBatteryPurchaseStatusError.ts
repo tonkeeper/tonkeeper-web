@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface PromoCodeBatteryPurchaseStatusError {
     /**
      * 
-     * @type {string}
-     * @memberof PromoCodeBatteryPurchaseStatusError
      */
     msg: string;
     /**
      * 
-     * @type {string}
-     * @memberof PromoCodeBatteryPurchaseStatusError
      */
     code: PromoCodeBatteryPurchaseStatusErrorCodeEnum;
 }
@@ -40,7 +36,7 @@ export interface PromoCodeBatteryPurchaseStatusError {
 export const PromoCodeBatteryPurchaseStatusErrorCodeEnum = {
     PromoCodeNotFound: 'promo-code-not-found',
     PromoExceededAttempts: 'promo-exceeded-attempts',
-    TemporaryError: 'temporary-error'
+    TemporaryError: 'temporary-error',
 } as const;
 export type PromoCodeBatteryPurchaseStatusErrorCodeEnum = typeof PromoCodeBatteryPurchaseStatusErrorCodeEnum[keyof typeof PromoCodeBatteryPurchaseStatusErrorCodeEnum];
 
@@ -69,11 +65,11 @@ export function PromoCodeBatteryPurchaseStatusErrorFromJSONTyped(json: any, igno
     };
 }
 
-  export function PromoCodeBatteryPurchaseStatusErrorToJSON(json: any): PromoCodeBatteryPurchaseStatusError {
-      return PromoCodeBatteryPurchaseStatusErrorToJSONTyped(json, false);
-  }
+export function PromoCodeBatteryPurchaseStatusErrorToJSON(json: any): PromoCodeBatteryPurchaseStatusError {
+    return PromoCodeBatteryPurchaseStatusErrorToJSONTyped(json, false);
+}
 
-  export function PromoCodeBatteryPurchaseStatusErrorToJSONTyped(value?: PromoCodeBatteryPurchaseStatusError | null, ignoreDiscriminator: boolean = false): any {
+export function PromoCodeBatteryPurchaseStatusErrorToJSONTyped(value?: PromoCodeBatteryPurchaseStatusError | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

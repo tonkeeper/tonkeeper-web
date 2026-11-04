@@ -8,7 +8,15 @@
 export type AssetButtonClickSchema = {
     eventName: string;
     /**
-     * Which action button the user tapped
+     * Which action button the user tapped:
+     *
+     * - buy: opens the native swap flow (asset as buy target), emitting
+     * swap_open and, on completion, swap_success
+     * - sell: opens the native swap flow (asset as sell source), emitting
+     * swap_open and, on completion, swap_success
+     * - send: opens the send flow
+     * - receive: opens the receive screen
+     *
      */
     button: 'buy' | 'sell' | 'send' | 'receive';
     /**

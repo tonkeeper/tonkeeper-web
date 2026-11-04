@@ -6,6 +6,7 @@ import {
     WalletId
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import {
     AccountId,
     AccountVersionEditable,
@@ -94,7 +95,8 @@ export const WalletVersionPageContent: FC<{
         selectedAccount.type === 'keystone' ||
         selectedAccount.type === 'watch-only' ||
         selectedAccount.type === 'mam' ||
-        selectedAccount.type === 'ton-multisig'
+        selectedAccount.type === 'ton-multisig' ||
+        selectedAccount.type === 'multichain'
     ) {
         return <Navigate to="../" />;
     }
@@ -184,7 +186,7 @@ export const WalletVersionPageContentInternal: FC<{
                                 <Body2Secondary>
                                     {toShortValue(formatAddress(wallet.address, network)) + ' '}·
                                     {' ' + toFormattedTonBalance(wallet.tonBalance)}
-                                    &nbsp;TON
+                                    &nbsp;{BRAND_CONFIG.coinSymbol}
                                     {wallet.hasJettons && t('wallet_version_and_tokens')}
                                 </Body2Secondary>
                             </TextContainer>

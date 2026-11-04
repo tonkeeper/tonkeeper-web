@@ -50,6 +50,7 @@ export class TronTrxSender extends BaseTronSender implements ITronSender {
         await this.checkBandwidthIsEnough(estimation.resources.bandwidth, signedTx.raw_data_hex);
 
         await this.tronApi.broadcastSignedTransaction(signedTx);
+        return signedTx.txID;
     }
 
     async estimate(

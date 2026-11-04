@@ -1,0 +1,139 @@
+name: Component Tests
+on:
+    pull_request:
+    push:
+        branches: [main]
+    # Manually regenerate & commit screenshot baselines on the runner.
+    # Runs in the same container as the verify job, so the result matches CI.
+    workflow_dispatch:
+        inputs:
+            update-snapshots:
+                description: Regenerate and commit screenshot baselines
+                type: boolean
+                default: true
+            update-all:
+                description:
+                    Rewrite every baseline that changed at all, ignoring the small-diff tolerance
+                    (use after sweeping visual changes, e.g. a font swap)
+                type: boolean
+                default: false
+
+env:
+    NODE_AUTH_TOKEN: ${{ github.token }}
+
+permissions:
+    contents: read
+    packages: read
+
+jobs:
+    component-tests:
+        name: component-tests
+        # Skip the verify job on manual snapshot-update runs.
+        if: github.event_name != 'workflow_dispatch'
+        runs-on: ubuntu-latest
+        # Pinned Playwright image: browsers + system deps preinstalled, and the
+        # exact rendering environment screenshot baselines are generated against.
+        # Keep this tag in sync with the @playwright/* version in packages/uikit.
+        container: mcr.microsoft.com/playwright:v1.62.1-jammy
+        timeout-minutes: 20
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+              with:
+                  # Need history so the changed-files diff against the base ref works.
+                  fetch-depth: 0
+
+            # Checkout in a container runs as root; mark the workspace safe for git.
+            - name: Trust workspace
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - name: Enable Corepack
+              run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              run: yarn install --immutable
+
+            # uikit imports @tonkeeper/core from dist/, so build shared packages first.
+            - name: Build shared packages
+              run: yarn build:pkg
+
+            # PRs: run only the component tests affected by the diff (fast).
+            - name: Run affected component tests
+              if: github.event_name == 'pull_request'
+              working-directory: ./packages/uikit
+              env:
+                  BASE_REF: origin/${{ github.base_ref }}
+              run: yarn test:ct:changed
+
+            # main: run the full suite as the authoritative baseline check.
+            - name: Run full component test suite
+              if: github.event_name != 'pull_request'
+              working-directory: ./packages/uikit
+              run: yarn test:ct
+
+            - name: Upload Playwright report
+              uses: actions/upload-artifact@v4
+              if: failure()
+              with:
+                  name: playwright-ct-report
+                  path: packages/uikit/playwright-report/
+                  retention-days: 7
+
+    update-snapshots:
+        name: update-snapshots
+        if: github.event_name == 'workflow_dispatch' && inputs.update-snapshots
+        runs-on: ubuntu-latest
+        container: mcr.microsoft.com/playwright:v1.62.1-jammy
+        timeout-minutes: 20
+        permissions:
+            contents: write
+            packages: read
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Trust workspace
+              run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+            - name: Enable Corepack
+              run: corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              run: yarn install --immutable
+
+            - name: Build shared packages
+              run: yarn build:pkg
+
+            - name: Update screenshot baselines
+              working-directory: ./packages/uikit
+              env:
+                  CT_UPDATE_ALL: ${{ inputs.update-all && '1' || '' }}
+              run: yarn test:ct:update
+
+            - name: Commit updated baselines
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  if [ -z "$(git status --porcelain -- ':(glob)packages/uikit/**/__screenshots__/**')" ]; then
+                      echo "No baseline changes."
+                  else
+                      git add -- ':(glob)packages/uikit/**/__screenshots__/**'
+                      git commit -m "test(uikit): update component screenshot baselines"
+                      git push
+                  fi

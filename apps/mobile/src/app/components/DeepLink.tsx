@@ -21,7 +21,7 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useParseAndAddSigner } from '@tonkeeper/uikit/dist/state/wallet';
 import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
-import { closeNotification } from '@tonkeeper/uikit/dist/components/Notification';
+import { closeModal } from '@tonkeeper/uikit/dist/primitives/Modal';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import {
     RedirectToTonkeeperMobile,
@@ -37,6 +37,7 @@ import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
 import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
+import { useTrackDeeplinkOpen } from '@tonkeeper/uikit/dist/hooks/analytics/deeplink-open';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -44,7 +45,7 @@ export const useMobileProPairSignerSubscription = () => {
     useEffect(() => {
         return subscribeToSignerUrlOpened(link => {
             mutateAsync({ link, source: 'deeplink' }).then(acc => {
-                closeNotification('add-wallet-signer');
+                closeModal('add-wallet-signer');
                 onOpen({ accountId: acc.id });
             });
         });
@@ -166,9 +167,11 @@ export const DeepLinkSubscription = () => {
     };
 
     const notifyError = useToast();
+    const trackDeeplinkOpen = useTrackDeeplinkOpen();
 
     useEffect(() => {
-        return subscribeToTonOrTonConnectUrlOpened(async (url: string) => {
+        return subscribeToTonOrTonConnectUrlOpened(async (url: string, isColdStart: boolean) => {
+            trackDeeplinkOpen(url, isColdStart);
             reset();
 
             let unsupportedLinkError = undefined;
@@ -186,7 +189,7 @@ export const DeepLinkSubscription = () => {
                 notifyError(unsupportedLinkError);
             }
         });
-    }, [reset, onNewParamsReceived, mutateAsync, notifyError]);
+    }, [reset, onNewParamsReceived, mutateAsync, notifyError, trackDeeplinkOpen]);
 
     return (
         <>

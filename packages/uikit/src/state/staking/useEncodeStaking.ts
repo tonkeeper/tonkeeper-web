@@ -19,7 +19,8 @@ export const useEncodeStakingDeposit = () => {
             const encoder = new StakingEncoder(api, wallet.rawAddress);
             return encoder.encodeDeposit({
                 poolAddress: pool.address,
-                amount
+                amount,
+                implementation: pool.implementation
             });
         }
     );

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
@@ -6,6 +7,7 @@ import { fallbackRenderOver } from '../../components/Error';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 import { StakingRoute } from '../../libs/routes';
 import { useStakingEntryPoint } from '../../state/staking/useStakingEntryPoint';
+import { consumeStakingOpenSource } from '../../hooks/analytics/staking';
 import { StakingFormPage } from './StakingFormPage';
 import { UnstakeFormPage } from './UnstakeFormPage';
 import { StakingPoolsPage } from './StakingPoolsPage';
@@ -13,12 +15,13 @@ import { StakingPoolDetailPage } from './StakingPoolDetailPage';
 
 const StakingDefaultView = () => {
     const entryPoint = useStakingEntryPoint();
+    const [from] = useState(consumeStakingOpenSource);
 
     if (!entryPoint) return null;
 
     switch (entryPoint.view) {
         case 'stake-form':
-            return <StakingFormPage poolAddress={entryPoint.poolAddress} />;
+            return <StakingFormPage poolAddress={entryPoint.poolAddress} from={from} />;
         case 'pool-detail':
             return <StakingPoolDetailPage poolAddress={entryPoint.poolAddress} />;
         case 'pools-list':

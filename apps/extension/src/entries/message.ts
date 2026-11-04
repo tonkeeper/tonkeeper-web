@@ -1,8 +1,19 @@
+/**
+ * dApp page identity read from its DOM by the content script — the only
+ * context that can see the page's title and favicon without the `tabs`
+ * permission.
+ */
+export interface DAppPageMeta {
+    title?: string;
+    icon?: string;
+}
+
 export interface DAppMessage {
     id: number;
     method: string;
     params: unknown[];
     origin: string;
+    pageMeta?: DAppPageMeta;
 }
 
 export type TonkeeperApiMessage = TonkeeperApiResponse | TonkeeperApiTonConnectEvent;

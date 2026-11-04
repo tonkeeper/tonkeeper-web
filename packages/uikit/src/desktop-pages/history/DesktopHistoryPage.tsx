@@ -14,7 +14,8 @@ import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig, useActiveWallet } from '../../state/wallet';
 import { Body2, Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
-import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
+import { LinkOutIcon } from '../../components/Icon';
+import { Loader } from '../../components/Loader';
 import {
     defaultHistoryFilters,
     useFetchFilteredActivity,
@@ -210,7 +211,7 @@ const DesktopHistoryPageContent: FC = () => {
                 </DesktopViewHeader>
                 <HistoryContainer>
                     <LoaderContainer>
-                        <SpinnerRing />
+                        <Loader size="small" className="text-iconSecondary" />
                     </LoaderContainer>
                 </HistoryContainer>
             </HistoryPageWrapper>

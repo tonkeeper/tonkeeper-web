@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { fallbackRenderOver } from '../../Error';
 import { ExportIcon, SlidersIcon } from '../../Icon';
-import { Button } from '../../fields/Button';
+import { Button, useButtonClassName } from '../../fields/Button';
 import { useAllWalletsTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
 import { CategoriesModal } from '../../dashboard/CategoriesModal';
@@ -57,6 +57,7 @@ const DesktopDashboardHeaderPayload = () => {
     }, [data, columns, selectedColumns]);
 
     const platform = useAppTargetEnv();
+    const exportClassName = useButtonClassName({ size: 'small' });
 
     return (
         <DesktopHeaderContainer>
@@ -67,18 +68,22 @@ const DesktopDashboardHeaderPayload = () => {
             />
             <DesktopRightPart>
                 <ButtonsContainer>
-                    {platform !== 'tablet' && (
-                        <Button
-                            size="small"
-                            as="a"
-                            href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent || '')}
-                            download={'tonkeeper-wallets' + '.csv'}
-                            loading={!downloadContent}
-                        >
-                            <ExportIcon />
-                            {t('export_dot_csv')}
-                        </Button>
-                    )}
+                    {platform !== 'tablet' &&
+                        (downloadContent ? (
+                            <a
+                                className={exportClassName}
+                                href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent)}
+                                download="tonkeeper-wallets.csv"
+                            >
+                                <ExportIcon />
+                                {t('export_dot_csv')}
+                            </a>
+                        ) : (
+                            <Button size="small" loading>
+                                <ExportIcon />
+                                {t('export_dot_csv')}
+                            </Button>
+                        ))}
                     <Button size="small" onClick={onOpen}>
                         <SlidersIcon />
                         {t('Manage')}

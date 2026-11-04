@@ -20,6 +20,13 @@ import {
     UnSubscriptionActionToJSON,
     UnSubscriptionActionToJSONTyped,
 } from './UnSubscriptionAction';
+import type { BuyXTRAction } from './BuyXTRAction';
+import {
+    BuyXTRActionFromJSON,
+    BuyXTRActionFromJSONTyped,
+    BuyXTRActionToJSON,
+    BuyXTRActionToJSONTyped,
+} from './BuyXTRAction';
 import type { ExtraCurrencyTransferAction } from './ExtraCurrencyTransferAction';
 import {
     ExtraCurrencyTransferActionFromJSON,
@@ -111,6 +118,27 @@ import {
     JettonBurnActionToJSON,
     JettonBurnActionToJSONTyped,
 } from './JettonBurnAction';
+import type { FlawedJettonTransferAction } from './FlawedJettonTransferAction';
+import {
+    FlawedJettonTransferActionFromJSON,
+    FlawedJettonTransferActionFromJSONTyped,
+    FlawedJettonTransferActionToJSON,
+    FlawedJettonTransferActionToJSONTyped,
+} from './FlawedJettonTransferAction';
+import type { WithdrawXTRAction } from './WithdrawXTRAction';
+import {
+    WithdrawXTRActionFromJSON,
+    WithdrawXTRActionFromJSONTyped,
+    WithdrawXTRActionToJSON,
+    WithdrawXTRActionToJSONTyped,
+} from './WithdrawXTRAction';
+import type { OracleRequestAction } from './OracleRequestAction';
+import {
+    OracleRequestActionFromJSON,
+    OracleRequestActionFromJSONTyped,
+    OracleRequestActionToJSON,
+    OracleRequestActionToJSONTyped,
+} from './OracleRequestAction';
 import type { PurchaseAction } from './PurchaseAction';
 import {
     PurchaseActionFromJSON,
@@ -146,6 +174,13 @@ import {
     JettonSwapActionToJSON,
     JettonSwapActionToJSONTyped,
 } from './JettonSwapAction';
+import type { DepositXTRAction } from './DepositXTRAction';
+import {
+    DepositXTRActionFromJSON,
+    DepositXTRActionFromJSONTyped,
+    DepositXTRActionToJSON,
+    DepositXTRActionToJSONTyped,
+} from './DepositXTRAction';
 import type { ElectionsDepositStakeAction } from './ElectionsDepositStakeAction';
 import {
     ElectionsDepositStakeActionFromJSON,
@@ -218,188 +253,146 @@ import {
 export interface Action {
     /**
      * 
-     * @type {string}
-     * @memberof Action
      */
     type: ActionTypeEnum;
     /**
      * 
-     * @type {string}
-     * @memberof Action
      */
     status: ActionStatusEnum;
     /**
      * 
-     * @type {TonTransferAction}
-     * @memberof Action
      */
     tonTransfer?: TonTransferAction;
     /**
      * 
-     * @type {ExtraCurrencyTransferAction}
-     * @memberof Action
      */
     extraCurrencyTransfer?: ExtraCurrencyTransferAction;
     /**
      * 
-     * @type {ContractDeployAction}
-     * @memberof Action
      */
     contractDeploy?: ContractDeployAction;
     /**
      * 
-     * @type {JettonTransferAction}
-     * @memberof Action
      */
     jettonTransfer?: JettonTransferAction;
     /**
      * 
-     * @type {JettonBurnAction}
-     * @memberof Action
+     */
+    flawedJettonTransfer?: FlawedJettonTransferAction;
+    /**
+     * 
      */
     jettonBurn?: JettonBurnAction;
     /**
      * 
-     * @type {JettonMintAction}
-     * @memberof Action
      */
     jettonMint?: JettonMintAction;
     /**
      * 
-     * @type {NftItemTransferAction}
-     * @memberof Action
      */
     nftItemTransfer?: NftItemTransferAction;
     /**
      * 
-     * @type {SubscriptionAction}
-     * @memberof Action
      */
     subscribe?: SubscriptionAction;
     /**
      * 
-     * @type {UnSubscriptionAction}
-     * @memberof Action
      */
     unSubscribe?: UnSubscriptionAction;
     /**
      * 
-     * @type {AuctionBidAction}
-     * @memberof Action
      */
     auctionBid?: AuctionBidAction;
     /**
      * 
-     * @type {NftPurchaseAction}
-     * @memberof Action
      */
     nftPurchase?: NftPurchaseAction;
     /**
      * 
-     * @type {DepositStakeAction}
-     * @memberof Action
      */
     depositStake?: DepositStakeAction;
     /**
      * 
-     * @type {WithdrawStakeAction}
-     * @memberof Action
      */
     withdrawStake?: WithdrawStakeAction;
     /**
      * 
-     * @type {WithdrawStakeRequestAction}
-     * @memberof Action
      */
     withdrawStakeRequest?: WithdrawStakeRequestAction;
     /**
      * 
-     * @type {ElectionsDepositStakeAction}
-     * @memberof Action
      */
     electionsDepositStake?: ElectionsDepositStakeAction;
     /**
      * 
-     * @type {ElectionsRecoverStakeAction}
-     * @memberof Action
      */
     electionsRecoverStake?: ElectionsRecoverStakeAction;
     /**
      * 
-     * @type {JettonSwapAction}
-     * @memberof Action
      */
     jettonSwap?: JettonSwapAction;
     /**
      * 
-     * @type {SmartContractAction}
-     * @memberof Action
      */
     smartContractExec?: SmartContractAction;
     /**
      * 
-     * @type {DomainRenewAction}
-     * @memberof Action
      */
     domainRenew?: DomainRenewAction;
     /**
      * 
-     * @type {PurchaseAction}
-     * @memberof Action
      */
     purchase?: PurchaseAction;
     /**
      * 
-     * @type {AddExtensionAction}
-     * @memberof Action
      */
     addExtension?: AddExtensionAction;
     /**
      * 
-     * @type {RemoveExtensionAction}
-     * @memberof Action
      */
     removeExtension?: RemoveExtensionAction;
     /**
      * 
-     * @type {SetSignatureAllowedAction}
-     * @memberof Action
      */
     setSignatureAllowedAction?: SetSignatureAllowedAction;
     /**
      * 
-     * @type {GasRelayAction}
-     * @memberof Action
      */
     gasRelay?: GasRelayAction;
     /**
      * 
-     * @type {DepositTokenStakeAction}
-     * @memberof Action
      */
     depositTokenStake?: DepositTokenStakeAction;
     /**
      * 
-     * @type {WithdrawTokenStakeRequestAction}
-     * @memberof Action
      */
     withdrawTokenStakeRequest?: WithdrawTokenStakeRequestAction;
     /**
      * 
-     * @type {LiquidityDepositAction}
-     * @memberof Action
      */
     liquidityDeposit?: LiquidityDepositAction;
     /**
      * 
-     * @type {ActionSimplePreview}
-     * @memberof Action
+     */
+    oracleRequest?: OracleRequestAction;
+    /**
+     * 
+     */
+    withdrawXTR?: WithdrawXTRAction;
+    /**
+     * 
+     */
+    depositXTR?: DepositXTRAction;
+    /**
+     * 
+     */
+    buyXTR?: BuyXTRAction;
+    /**
+     * 
      */
     simplePreview: ActionSimplePreview;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof Action
      */
     baseTransactions: Array<string>;
 }
@@ -413,6 +406,7 @@ export const ActionTypeEnum = {
     ExtraCurrencyTransfer: 'ExtraCurrencyTransfer',
     ContractDeploy: 'ContractDeploy',
     JettonTransfer: 'JettonTransfer',
+    FlawedJettonTransfer: 'FlawedJettonTransfer',
     JettonBurn: 'JettonBurn',
     JettonMint: 'JettonMint',
     NftItemTransfer: 'NftItemTransfer',
@@ -436,7 +430,11 @@ export const ActionTypeEnum = {
     DepositTokenStake: 'DepositTokenStake',
     WithdrawTokenStakeRequest: 'WithdrawTokenStakeRequest',
     LiquidityDeposit: 'LiquidityDeposit',
-    Unknown: 'Unknown'
+    OracleRequest: 'OracleRequest',
+    BuyXtr: 'BuyXTR',
+    DepositXtr: 'DepositXTR',
+    WithdrawXtr: 'WithdrawXTR',
+    Unknown: 'Unknown',
 } as const;
 export type ActionTypeEnum = typeof ActionTypeEnum[keyof typeof ActionTypeEnum];
 
@@ -445,7 +443,7 @@ export type ActionTypeEnum = typeof ActionTypeEnum[keyof typeof ActionTypeEnum];
  */
 export const ActionStatusEnum = {
     Ok: 'ok',
-    Failed: 'failed'
+    Failed: 'failed',
 } as const;
 export type ActionStatusEnum = typeof ActionStatusEnum[keyof typeof ActionStatusEnum];
 
@@ -456,8 +454,8 @@ export type ActionStatusEnum = typeof ActionStatusEnum[keyof typeof ActionStatus
 export function instanceOfAction(value: object): value is Action {
     if (!('type' in value) || value['type'] === undefined) return false;
     if (!('status' in value) || value['status'] === undefined) return false;
-    if (!('simplePreview' in value) || value['simplePreview'] === undefined) return false;
-    if (!('baseTransactions' in value) || value['baseTransactions'] === undefined) return false;
+    if ((!('simplePreview' in (value as Record<string, any>)) && !('simple_preview' in (value as Record<string, any>))) || ((value as Record<string, any>)['simplePreview'] === undefined && (value as Record<string, any>)['simple_preview'] === undefined)) return false;
+    if ((!('baseTransactions' in (value as Record<string, any>)) && !('base_transactions' in (value as Record<string, any>))) || ((value as Record<string, any>)['baseTransactions'] === undefined && (value as Record<string, any>)['base_transactions'] === undefined)) return false;
     return true;
 }
 
@@ -477,6 +475,7 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'extraCurrencyTransfer': json['ExtraCurrencyTransfer'] == null ? undefined : ExtraCurrencyTransferActionFromJSON(json['ExtraCurrencyTransfer']),
         'contractDeploy': json['ContractDeploy'] == null ? undefined : ContractDeployActionFromJSON(json['ContractDeploy']),
         'jettonTransfer': json['JettonTransfer'] == null ? undefined : JettonTransferActionFromJSON(json['JettonTransfer']),
+        'flawedJettonTransfer': json['FlawedJettonTransfer'] == null ? undefined : FlawedJettonTransferActionFromJSON(json['FlawedJettonTransfer']),
         'jettonBurn': json['JettonBurn'] == null ? undefined : JettonBurnActionFromJSON(json['JettonBurn']),
         'jettonMint': json['JettonMint'] == null ? undefined : JettonMintActionFromJSON(json['JettonMint']),
         'nftItemTransfer': json['NftItemTransfer'] == null ? undefined : NftItemTransferActionFromJSON(json['NftItemTransfer']),
@@ -500,16 +499,20 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'depositTokenStake': json['DepositTokenStake'] == null ? undefined : DepositTokenStakeActionFromJSON(json['DepositTokenStake']),
         'withdrawTokenStakeRequest': json['WithdrawTokenStakeRequest'] == null ? undefined : WithdrawTokenStakeRequestActionFromJSON(json['WithdrawTokenStakeRequest']),
         'liquidityDeposit': json['LiquidityDeposit'] == null ? undefined : LiquidityDepositActionFromJSON(json['LiquidityDeposit']),
+        'oracleRequest': json['OracleRequest'] == null ? undefined : OracleRequestActionFromJSON(json['OracleRequest']),
+        'withdrawXTR': json['WithdrawXTR'] == null ? undefined : WithdrawXTRActionFromJSON(json['WithdrawXTR']),
+        'depositXTR': json['DepositXTR'] == null ? undefined : DepositXTRActionFromJSON(json['DepositXTR']),
+        'buyXTR': json['BuyXTR'] == null ? undefined : BuyXTRActionFromJSON(json['BuyXTR']),
         'simplePreview': ActionSimplePreviewFromJSON(json['simple_preview']),
         'baseTransactions': json['base_transactions'],
     };
 }
 
-  export function ActionToJSON(json: any): Action {
-      return ActionToJSONTyped(json, false);
-  }
+export function ActionToJSON(json: any): Action {
+    return ActionToJSONTyped(json, false);
+}
 
-  export function ActionToJSONTyped(value?: Action | null, ignoreDiscriminator: boolean = false): any {
+export function ActionToJSONTyped(value?: Action | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -522,6 +525,7 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'ExtraCurrencyTransfer': ExtraCurrencyTransferActionToJSON(value['extraCurrencyTransfer']),
         'ContractDeploy': ContractDeployActionToJSON(value['contractDeploy']),
         'JettonTransfer': JettonTransferActionToJSON(value['jettonTransfer']),
+        'FlawedJettonTransfer': FlawedJettonTransferActionToJSON(value['flawedJettonTransfer']),
         'JettonBurn': JettonBurnActionToJSON(value['jettonBurn']),
         'JettonMint': JettonMintActionToJSON(value['jettonMint']),
         'NftItemTransfer': NftItemTransferActionToJSON(value['nftItemTransfer']),
@@ -545,6 +549,10 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'DepositTokenStake': DepositTokenStakeActionToJSON(value['depositTokenStake']),
         'WithdrawTokenStakeRequest': WithdrawTokenStakeRequestActionToJSON(value['withdrawTokenStakeRequest']),
         'LiquidityDeposit': LiquidityDepositActionToJSON(value['liquidityDeposit']),
+        'OracleRequest': OracleRequestActionToJSON(value['oracleRequest']),
+        'WithdrawXTR': WithdrawXTRActionToJSON(value['withdrawXTR']),
+        'DepositXTR': DepositXTRActionToJSON(value['depositXTR']),
+        'BuyXTR': BuyXTRActionToJSON(value['buyXTR']),
         'simple_preview': ActionSimplePreviewToJSON(value['simplePreview']),
         'base_transactions': value['baseTransactions'],
     };

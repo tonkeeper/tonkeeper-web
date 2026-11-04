@@ -2,36 +2,36 @@
 
 ## Scope
 
-- Platform: `TBD`
-- Repo path: `TBD`
-- Regress path: `TBD`
-- Base branch: `TBD`
-- Release branch: `TBD`
-- Generated test collection path: `TBD`
-- Execution date: `TBD`
-- Assumptions:
-- `TBD`
+-   Platform: `TBD`
+-   Repo path: `TBD`
+-   Regress path: `TBD`
+-   Base branch: `TBD`
+-   Release branch: `TBD`
+-   Generated test collection path: `TBD`
+-   Execution date: `TBD`
+-   Assumptions:
+-   `TBD`
 
 ## Changed Areas
 
-- `TBD`
+-   `TBD`
 
 ## Changed Files Without Known QA Area
 
-- `TBD`
+-   `TBD`
 
 ## Run These Existing Regression Blocks
 
-- `TBD`
+-   `TBD`
 
 ## Add These Missing Blocks
 
-- `TBD`
+-   `TBD`
 
 ## Additional Checks
 
-- `TBD`
+-   `TBD`
 
 ## Open Questions
 
-- `TBD`
+-   `TBD`

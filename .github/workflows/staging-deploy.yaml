@@ -10,9 +10,16 @@ concurrency:
     group: staging-deploy
     cancel-in-progress: true
 
+# The wallet half of the staging pair. Its old origin is the migration staging, which
+# Migration App Deploy rebuilds only when the migration app changes. Both origins come from
+# the STAGING_MIGRATION_OLD_ORIGIN / STAGING_MIGRATION_NEW_ORIGIN repository variables;
+# unset, the build falls back to the production origins. RC and release builds never read
+# them.
 jobs:
     web-build:
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: staging
+            migration_old_origin: ${{ vars.STAGING_MIGRATION_OLD_ORIGIN }}
+            migration_new_origin: ${{ vars.STAGING_MIGRATION_NEW_ORIGIN }}
         secrets: inherit

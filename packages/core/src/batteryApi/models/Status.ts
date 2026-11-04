@@ -29,8 +29,6 @@ import {
 export interface Status {
     /**
      * 
-     * @type {Array<StatusPendingTransactionsInner>}
-     * @memberof Status
      */
     pendingTransactions: Array<StatusPendingTransactionsInner>;
 }
@@ -39,7 +37,7 @@ export interface Status {
  * Check if a given object implements the Status interface.
  */
 export function instanceOfStatus(value: object): value is Status {
-    if (!('pendingTransactions' in value) || value['pendingTransactions'] === undefined) return false;
+    if ((!('pendingTransactions' in (value as Record<string, any>)) && !('pending_transactions' in (value as Record<string, any>))) || ((value as Record<string, any>)['pendingTransactions'] === undefined && (value as Record<string, any>)['pending_transactions'] === undefined)) return false;
     return true;
 }
 
@@ -57,11 +55,11 @@ export function StatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): St
     };
 }
 
-  export function StatusToJSON(json: any): Status {
-      return StatusToJSONTyped(json, false);
-  }
+export function StatusToJSON(json: any): Status {
+    return StatusToJSONTyped(json, false);
+}
 
-  export function StatusToJSONTyped(value?: Status | null, ignoreDiscriminator: boolean = false): any {
+export function StatusToJSONTyped(value?: Status | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

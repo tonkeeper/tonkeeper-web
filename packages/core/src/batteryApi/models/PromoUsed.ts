@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { PromoUsedPurchasesInner } from './PromoUsedPurchasesInner';
+import {
+    PromoUsedPurchasesInnerFromJSON,
+    PromoUsedPurchasesInnerFromJSONTyped,
+    PromoUsedPurchasesInnerToJSON,
+    PromoUsedPurchasesInnerToJSONTyped,
+} from './PromoUsedPurchasesInner';
+
 /**
  * 
  * @export
@@ -21,24 +29,24 @@ import { mapValues } from '../runtime';
 export interface PromoUsed {
     /**
      * 
-     * @type {boolean}
-     * @memberof PromoUsed
      */
     promoUsed: boolean;
     /**
      * 
-     * @type {string}
-     * @memberof PromoUsed
      */
     bonusCharges: string;
+    /**
+     * 
+     */
+    purchases?: Array<PromoUsedPurchasesInner>;
 }
 
 /**
  * Check if a given object implements the PromoUsed interface.
  */
 export function instanceOfPromoUsed(value: object): value is PromoUsed {
-    if (!('promoUsed' in value) || value['promoUsed'] === undefined) return false;
-    if (!('bonusCharges' in value) || value['bonusCharges'] === undefined) return false;
+    if ((!('promoUsed' in (value as Record<string, any>)) && !('promo_used' in (value as Record<string, any>))) || ((value as Record<string, any>)['promoUsed'] === undefined && (value as Record<string, any>)['promo_used'] === undefined)) return false;
+    if ((!('bonusCharges' in (value as Record<string, any>)) && !('bonus_charges' in (value as Record<string, any>))) || ((value as Record<string, any>)['bonusCharges'] === undefined && (value as Record<string, any>)['bonus_charges'] === undefined)) return false;
     return true;
 }
 
@@ -54,14 +62,15 @@ export function PromoUsedFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'promoUsed': json['promo_used'],
         'bonusCharges': json['bonus_charges'],
+        'purchases': json['purchases'] == null ? undefined : ((json['purchases'] as Array<any>).map(PromoUsedPurchasesInnerFromJSON)),
     };
 }
 
-  export function PromoUsedToJSON(json: any): PromoUsed {
-      return PromoUsedToJSONTyped(json, false);
-  }
+export function PromoUsedToJSON(json: any): PromoUsed {
+    return PromoUsedToJSONTyped(json, false);
+}
 
-  export function PromoUsedToJSONTyped(value?: PromoUsed | null, ignoreDiscriminator: boolean = false): any {
+export function PromoUsedToJSONTyped(value?: PromoUsed | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -70,6 +79,7 @@ export function PromoUsedFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'promo_used': value['promoUsed'],
         'bonus_charges': value['bonusCharges'],
+        'purchases': value['purchases'] == null ? undefined : ((value['purchases'] as Array<any>).map(PromoUsedPurchasesInnerToJSON)),
     };
 }
 

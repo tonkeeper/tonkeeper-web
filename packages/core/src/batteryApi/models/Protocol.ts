@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface Protocol {
     /**
      * 
-     * @type {string}
-     * @memberof Protocol
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof Protocol
      */
     image?: string;
 }
@@ -56,11 +52,11 @@ export function ProtocolFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-  export function ProtocolToJSON(json: any): Protocol {
-      return ProtocolToJSONTyped(json, false);
-  }
+export function ProtocolToJSON(json: any): Protocol {
+    return ProtocolToJSONTyped(json, false);
+}
 
-  export function ProtocolToJSONTyped(value?: Protocol | null, ignoreDiscriminator: boolean = false): any {
+export function ProtocolToJSONTyped(value?: Protocol | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

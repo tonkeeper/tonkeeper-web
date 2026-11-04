@@ -28,9 +28,13 @@ import { handleSubmit } from '@tonkeeper/uikit/dist/libs/form';
 import { iosKeyboardTransition } from '@tonkeeper/uikit/dist/libs/css';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    useCountryContextTracker,
-    useTrackDappBrowserOpened
-} from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
+    catalogDappIdentity,
+    DappOpenSource,
+    urlDappIdentity,
+    useTrackDappAppClick,
+    useTrackDappBrowserOpen,
+    useTrackDappBrowserSearch
+} from '@tonkeeper/uikit/dist/hooks/analytics/dapp-browser';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 import { FLAGGED_FEATURE } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { IfFeatureEnabled } from '@tonkeeper/uikit/dist/components/shared/IfFeatureEnabled';
@@ -140,8 +144,9 @@ const useRelevantApps = (recommendations: Recommendations | undefined, inputValu
 };
 
 export const MobileDappBrowserNewTab = () => {
-    useTrackDappBrowserOpened();
-    const trackDappOpened = useCountryContextTracker();
+    useTrackDappBrowserOpen();
+    const trackDappAppClick = useTrackDappAppClick();
+    const { trackSearchOpen, trackSearchResultOpen } = useTrackDappBrowserSearch();
     const { t } = useTranslation();
     const { data } = useRecommendations();
     const [isInputFocused, _setIsInputFocused] = useState(false);
@@ -159,50 +164,52 @@ export const MobileDappBrowserNewTab = () => {
     const search = useSearchEngine();
 
     const onSelectApp = useCallback(
-        (app: PromotedApp, from: 'banner' | 'browser' = 'browser') => {
-            trackDappOpened(country => ({
-                eventName: 'dapp_click',
-                location: country,
-                url: app.url,
+        (app: PromotedApp, from: DappOpenSource = 'browser') => {
+            const dapp = {
+                ...catalogDappIdentity(app),
                 from
-            }));
+            };
+            trackDappAppClick(dapp);
             openTab({
                 url: app.url,
                 title: app.name,
-                iconUrl: app.icon
+                iconUrl: app.icon,
+                dapp
             });
         },
-        [openTab, trackDappOpened]
+        [openTab, trackDappAppClick]
     );
 
+    /**
+     * Opens a URL the catalog doesn't know: a typed address, a search page, a
+     * query suggestion. None of those is a search result being taken, so they
+     * report the search itself and stop there — a query suggestion opens the
+     * search engine, it doesn't pick anything out of the search.
+     */
+    const openSearchedUrl = (url: string) => {
+        trackSearchOpen(url);
+        const dapp = { ...urlDappIdentity(url), from: 'browser_search' as const };
+        trackDappAppClick(dapp);
+        openTab({ url, dapp });
+    };
+
     const onSubmit = () => {
+        // Submitting the field resolves it straight to the best catalog match,
+        // so the search and its result are the same moment here.
         if (relevantApps?.length) {
             const relevantApp = relevantApps[0];
-            trackDappOpened(country => ({
-                eventName: 'dapp_click',
-                location: country,
-                url: relevantApp.url,
-                from: 'browser_search'
-            }));
-            return onSelectApp(relevantApp);
+            trackSearchResultOpen(relevantApp.url);
+            return onSelectApp(relevantApp, 'browser_search');
         }
 
         if (isValidUrlProtocol(inputValue, ['https:', 'http:'])) {
-            openTab({
-                url: inputValue
-            });
+            openSearchedUrl(inputValue);
         } else {
-            openTab({
-                url: search(inputValue)
-            });
+            openSearchedUrl(search(inputValue));
         }
     };
 
-    const onSelectSearchRecommendations = (query: string) => {
-        openTab({
-            url: search(query)
-        });
-    };
+    const onSelectSearchRecommendations = (query: string) => openSearchedUrl(search(query));
 
     if (!data || !relevantApps) {
         return null;

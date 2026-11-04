@@ -9,7 +9,7 @@ export const useBuyNotification = hook;
 
 export const BuyNotificationControlled = () => {
     const { isOpen, onClose } = useBuyNotification();
-    const { data } = useTonendpointBuyMethods();
+    const { data } = useTonendpointBuyMethods(isOpen);
 
     return <BuyNotification buy={data} open={isOpen} handleClose={onClose} />;
 };

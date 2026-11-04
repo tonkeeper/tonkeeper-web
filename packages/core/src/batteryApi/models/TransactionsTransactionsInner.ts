@@ -21,26 +21,18 @@ import { mapValues } from '../runtime';
 export interface TransactionsTransactionsInner {
     /**
      * 
-     * @type {string}
-     * @memberof TransactionsTransactionsInner
      */
     id: string;
     /**
      * represents the amount of money paid by the user for this transaction.
-     * @type {string}
-     * @memberof TransactionsTransactionsInner
      */
     paidAmount: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionsTransactionsInner
      */
     status: TransactionsTransactionsInnerStatusEnum;
     /**
      * 
-     * @type {string}
-     * @memberof TransactionsTransactionsInner
      */
     createdAt: string;
 }
@@ -52,7 +44,7 @@ export interface TransactionsTransactionsInner {
 export const TransactionsTransactionsInnerStatusEnum = {
     Pending: 'pending',
     Completed: 'completed',
-    Failed: 'failed'
+    Failed: 'failed',
 } as const;
 export type TransactionsTransactionsInnerStatusEnum = typeof TransactionsTransactionsInnerStatusEnum[keyof typeof TransactionsTransactionsInnerStatusEnum];
 
@@ -62,9 +54,9 @@ export type TransactionsTransactionsInnerStatusEnum = typeof TransactionsTransac
  */
 export function instanceOfTransactionsTransactionsInner(value: object): value is TransactionsTransactionsInner {
     if (!('id' in value) || value['id'] === undefined) return false;
-    if (!('paidAmount' in value) || value['paidAmount'] === undefined) return false;
+    if ((!('paidAmount' in (value as Record<string, any>)) && !('paid_amount' in (value as Record<string, any>))) || ((value as Record<string, any>)['paidAmount'] === undefined && (value as Record<string, any>)['paid_amount'] === undefined)) return false;
     if (!('status' in value) || value['status'] === undefined) return false;
-    if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
+    if ((!('createdAt' in (value as Record<string, any>)) && !('created_at' in (value as Record<string, any>))) || ((value as Record<string, any>)['createdAt'] === undefined && (value as Record<string, any>)['created_at'] === undefined)) return false;
     return true;
 }
 
@@ -85,11 +77,11 @@ export function TransactionsTransactionsInnerFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function TransactionsTransactionsInnerToJSON(json: any): TransactionsTransactionsInner {
-      return TransactionsTransactionsInnerToJSONTyped(json, false);
-  }
+export function TransactionsTransactionsInnerToJSON(json: any): TransactionsTransactionsInner {
+    return TransactionsTransactionsInnerToJSONTyped(json, false);
+}
 
-  export function TransactionsTransactionsInnerToJSONTyped(value?: TransactionsTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
+export function TransactionsTransactionsInnerToJSONTyped(value?: TransactionsTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

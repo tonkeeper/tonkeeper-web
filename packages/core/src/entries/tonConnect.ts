@@ -5,12 +5,15 @@ import {
 } from '../service/tonConnect/connectionService';
 import { z } from 'zod';
 import { assertTypesEqual } from '../utils/types';
+import type { WalletId } from './wallet';
 
 /* Protocol types */
 
 export const protocolVersionSchema = z.number();
 
-const rawAddressSchema = z.string().regex(/^(0|-1):[0-9a-fA-F]{64}$/);
+// Shape check only: the injected extension provider bundles this schema, and parsing the address
+// would pull @ton/core into every page. checkTonConnectFromAndNetwork does the real comparison.
+const tonAddressSchema = z.string().regex(/^(?:(?:0|-1):[0-9a-fA-F]{64}|[A-Za-z0-9_\-+/]{48})$/);
 const tonConnectNetworkSchema = z.union([
     z.literal(-239),
     z.literal(-3),
@@ -61,7 +64,7 @@ export type GaslessMessagesVariant = z.infer<typeof gaslessMessagesVariantSchema
 
 export const transactionRequestPayloadSchema = z.object({
     network: tonConnectNetworkSchema.optional(),
-    from: rawAddressSchema.optional(),
+    from: tonAddressSchema.optional(),
     valid_until: z.number(),
     messages: z.array(TonConnectTransactionPayloadMessageSchema),
     messagesVariants: z
@@ -325,7 +328,7 @@ export type SignDataRpcRequest = z.infer<typeof signDataRpcRequestSchema>;
 
 const signDataRequestPayloadBinarySchema = z.object({
     network: tonConnectNetworkSchema.optional(),
-    from: rawAddressSchema.optional(),
+    from: tonAddressSchema.optional(),
     type: z.literal('binary'),
     bytes: z.string() // base64 string
 });
@@ -333,7 +336,7 @@ export type SignDataRequestPayloadBinary = z.infer<typeof signDataRequestPayload
 
 const signDataRequestPayloadCellSchema = z.object({
     network: tonConnectNetworkSchema.optional(),
-    from: rawAddressSchema.optional(),
+    from: tonAddressSchema.optional(),
     type: z.literal('cell'),
     schema: z.string(), // TL-B scheme
     cell: z.string() // base64 string
@@ -342,7 +345,7 @@ export type SignDataRequestPayloadCell = z.infer<typeof signDataRequestPayloadCe
 
 const signDataRequestPayloadTextSchema = z.object({
     network: tonConnectNetworkSchema.optional(),
-    from: rawAddressSchema.optional(),
+    from: tonAddressSchema.optional(),
     type: z.literal('text'),
     text: z.string()
 });
@@ -459,6 +462,8 @@ export interface SendTransactionAppRequest<
         : T extends 'injected'
         ? AccountConnectionInjected
         : AccountConnection;
+    /** The wallet the connection belongs to, resolved when the request arrives. */
+    walletId: WalletId;
     kind: 'sendTransaction';
     payload: TonConnectTransactionPayload;
 }
@@ -472,6 +477,8 @@ export interface SignDatAppRequest<
         : T extends 'injected'
         ? AccountConnectionInjected
         : AccountConnection;
+    /** The wallet the connection belongs to, resolved when the request arrives. */
+    walletId: WalletId;
     kind: 'signData';
     payload: SignDataRequestPayload;
 }

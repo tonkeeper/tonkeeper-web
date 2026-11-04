@@ -8,12 +8,15 @@ import { QueryKey } from '../../../libs/queryKey';
 import { CancelParams } from './commonTypes';
 import { Address } from '@ton/core';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { useAnalyticsAssetId, useTrackTransactionSent } from '../../analytics/events-hooks';
 
 export const useCancelSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
     const client = useQueryClient();
     const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     return useMutation<boolean, Error, CancelParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
@@ -41,6 +44,14 @@ export const useCancelSubscription = () => {
         const outgoingMsg = encoder.encodeDestructAction(extensionAddress, BigInt(destroyValue));
 
         await sender.send(outgoingMsg);
+
+        trackTransactionSent({
+            category: 'call',
+            category_detail: 'subscription',
+            asset: assetId.tonCoin(),
+            amount: 0,
+            fee_asset: 'coin'
+        });
 
         await client.invalidateQueries([QueryKey.pro]);
 

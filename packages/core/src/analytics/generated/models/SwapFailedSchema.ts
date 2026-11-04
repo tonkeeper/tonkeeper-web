@@ -2,6 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetSchema } from './AssetSchema';
+import type { FeeAssetSchema } from './FeeAssetSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
  * Swap failed
  */
@@ -11,25 +14,22 @@ export type SwapFailedSchema = {
      * Type of swap implementation
      */
     type: 'native';
+    wallet_mode: WalletModeSchema;
+    asset_from: AssetSchema;
+    asset_to: AssetSchema;
+    fee_asset: FeeAssetSchema;
+    /**
+     * Name of the swap provider (e.g. stonfi, dedust, swap.coffee)
+     */
+    provider_name: string;
     /**
      * Error message returned for the failed swap
      */
     error_message: string;
     /**
-     * Currency used to pay network fees
+     * Optional. True when the user chose to swap the entire balance of asset_from.
+     *
      */
-    fee_paid_in: 'ton' | 'battery';
-    /**
-     * Symbol of the jetton being swapped from
-     */
-    jetton_symbol_from: string;
-    /**
-     * Symbol of the jetton being swapped to
-     */
-    jetton_symbol_to: string;
-    /**
-     * Name of the swap provider
-     */
-    provider_name: string;
+    is_max?: boolean;
 };
 

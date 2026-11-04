@@ -15,15 +15,41 @@ import { ISubscriptionService } from './entries/pro';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
+/**
+ * Outside surface that opened a send flow, for the `initiated_by` analytics
+ * dimension. Absent means the user started the flow inside the wallet.
+ */
+export type TransferOrigin = 'deep_link' | 'qr_code';
+
 export type TransferInitParams =
     | (TonTransferParams & {
           chain: BLOCKCHAIN_NAME.TON;
           from: string;
+          origin?: TransferOrigin;
       })
     | {
           chain: BLOCKCHAIN_NAME.TRON;
           from: string;
           address?: string;
+          origin?: TransferOrigin;
+      }
+    | {
+          /**
+           * A multichain transfer intent — from an `asset_id` deeplink
+           * param or an ERC-681 `ethereum:` link — which may name any
+           * chain, so there is no `chain` discriminant. Multichain
+           * accounts only. `assetId` pins the asset; `erc20Contract`
+           * names a token without a network (ERC-681 link with no chain
+           * id); neither means a recipient-only intent.
+           */
+          chain?: undefined;
+          assetId?: string;
+          erc20Contract?: string;
+          from: string;
+          address?: string;
+          amount?: string;
+          text?: string;
+          origin?: TransferOrigin;
       }
     | Record<string, never>;
 
@@ -80,19 +106,44 @@ export interface KeychainSecurity {
     password?: boolean;
 }
 
+export type KeychainScope =
+    | { operation: 'get' | 'set' | 'remove'; key: string }
+    | { operation: 'clear' }
+    | { operation: 'settings' };
+
 export interface IKeychainService {
     setData: (key: string, value: string) => Promise<void>;
     getData: (key: string) => Promise<string>;
     removeData: (key: string) => Promise<void>;
     clearStorage: () => Promise<void>;
 
+    /**
+     * Orthogonal namespace alongside `setData/getData/removeData`. Stores
+     * non-mnemonic values (per-chain derived pubkeys, future privacy-chain
+     * view keys, etc.) in the same secure store, but reads do **not**
+     * trigger the password/biometry prompt — these values are not the
+     * mnemonic, and prompting on every chain switch would be hostile.
+     *
+     * Keys are namespaced as `chain::<prefix>::<key>` internally to avoid
+     * collision with the legacy `<publicKey>` keys consumed by
+     * `setData/getData/removeData`.
+     */
+    setValue: (prefix: string, key: string, value: string) => Promise<void>;
+    getValue: (prefix: string, key: string) => Promise<string | null>;
+    deleteValue: (prefix: string, key: string) => Promise<void>;
+    deletePrefix: (prefix: string) => Promise<void>;
+
     security: ReadonlyAtom<KeychainSecurity | undefined>;
 
     /**
-     * Do an additional security check e.g. when changing settings
-     * @param type
+     * Do an additional security check e.g. when changing settings.
+     * `scope` names the one operation the check is for; platforms that
+     * authorize operations separately allow only that operation after it.
      */
-    securityCheck: (type?: 'biometry' | 'password' | 'preferred') => Promise<void>;
+    securityCheck: (
+        type?: 'biometry' | 'password' | 'preferred',
+        scope?: KeychainScope
+    ) => Promise<void>;
 
     checkPassword: (password: string) => Promise<boolean>;
     updatePassword: (password: string) => Promise<void>;
@@ -206,6 +257,12 @@ export interface IAppSdk {
     };
 
     getAppCountryInfo(): Promise<AppCountryInfo>;
+
+    /**
+     * Fires when the OS reports the user took a screenshot. Only native shells
+     * can observe this; browsers expose no such event.
+     */
+    screenshotTaken?: ReadonlySubject<void>;
 }
 
 export interface IDappBrowser {
@@ -364,11 +421,13 @@ class WebConnectionService implements InternetConnectionService {
     isOnline = atom(this.checkIsOnline());
 
     constructor() {
+        if (typeof window === 'undefined') return;
         window.addEventListener('online', () => this.isOnline.next(true));
         window.addEventListener('offline', () => this.isOnline.next(false));
     }
 
     private checkIsOnline() {
+        if (typeof window === 'undefined') return true;
         return window.navigator.onLine;
     }
 

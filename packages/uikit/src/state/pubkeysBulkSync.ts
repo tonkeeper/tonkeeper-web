@@ -30,11 +30,18 @@ export const useSyncPubkeysBulk = () => {
 
             const persistentUserId = await sdk.userIdentity.getPersistentUserId();
 
-            // Fire-and-forget for analytics purposes only; result processing to be added later.
-            await new WalletApi(getTonClientV2(mainnetConfig)).getWalletsByPublicKeysBulk({
-                publicKeys: pubkeys,
-                persistentUserId
-            });
+            // Fire-and-forget for analytics purposes only. The generated
+            // client's response decoder crashes when the backend returns
+            // a `Wallets` payload without a `wallets` array (a no-result
+            // shape), so swallow the decode error rather than rejecting.
+            try {
+                await new WalletApi(getTonClientV2(mainnetConfig)).getWalletsByPublicKeysBulk({
+                    publicKeys: pubkeys,
+                    persistentUserId
+                });
+            } catch (err) {
+                console.warn('pubkeysBulkSync: ignored', err);
+            }
         },
         [accounts, sdk, mainnetConfig]
     );

@@ -9,7 +9,8 @@ import {
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useAppContext } from '../../../hooks/appContext';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { LinkOutIcon, SpinnerIcon } from '../../Icon';
+import { LinkOutIcon } from '../../Icon';
+import { Loader } from '../../Loader';
 import { ConfirmImportNotification } from './ConfirmImportNotification';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { useTranslation } from '../../../hooks/translation';
@@ -71,7 +72,7 @@ export const SwapTokensList: FC<{
                     ))}
                     {isLoadingMore && (
                         <LoadingMoreContainer>
-                            <SpinnerIcon />
+                            <Loader size="small" />
                         </LoadingMoreContainer>
                     )}
                 </>
@@ -107,7 +108,7 @@ const TokenNotFound: FC<{ onSelect: (asset: TonAsset) => void }> = ({ onSelect }
     if (isFetching) {
         return (
             <TokensNotFoundContainer>
-                <SpinnerIcon />
+                <Loader size="small" />
             </TokensNotFoundContainer>
         );
     }

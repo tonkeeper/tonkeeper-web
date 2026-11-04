@@ -192,7 +192,7 @@ const PoolListRow: FC<PoolListRowProps> = ({
     );
 
     const displayAmount = useMemo(() => {
-        return formatTokenDisplay(tonAmount, BRAND_CONFIG.coinSymbolWithEx);
+        return formatTokenDisplay(tonAmount, BRAND_CONFIG.coinSymbol);
     }, [tonAmount]);
 
     const minStakeTON = shiftedDecimals(new BigNumber(pool.minStake)).toFixed(0);

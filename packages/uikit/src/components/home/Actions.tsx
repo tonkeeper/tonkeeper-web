@@ -1,9 +1,16 @@
-import React, { FC, useContext, useLayoutEffect, useRef, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React, { FC, PropsWithChildren, useContext, useLayoutEffect, useRef, useState } from 'react';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { Label3 } from '../Text';
 import { useAnalyticsTrack } from '../../hooks/analytics';
+import { cn } from '../../libs/css';
+import { IconButton } from '../IconButton';
+
+/**
+ * App-level home actions (Buy / Send / Receive / Sell / Swap). These are NOT
+ * UI-kit parts — `Action` composes the design-system `IconButton` with analytics,
+ * the SDK and i18n, and drives the hover state from `AppSelectionContext` on iOS
+ * (where there is no CSS `:hover`). `ActionsRow` lays them out.
+ */
 
 interface ActionProps {
     icon: React.ReactNode;
@@ -11,79 +18,6 @@ interface ActionProps {
     disabled?: boolean;
     action: () => void;
 }
-
-const Text = styled(Label3)`
-    color: ${props => props.theme.textSecondary};
-`;
-
-const Button = styled.div`
-    width: 44px;
-    height: 44px;
-    border-radius: ${props => props.theme.cornerFull};
-    color: ${props => props.theme.textPrimary};
-    background-color: ${props => props.theme.backgroundContent};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-`;
-
-const Block = styled.div<{
-    disabled?: boolean;
-    ios: boolean;
-    isHover?: boolean;
-}>`
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    width: 65px;
-    text-align: center;
-    user-select: none;
-
-    ${props => {
-        if (props.disabled) {
-            return css`
-                cursor: auto;
-
-                ${Text} {
-                    color: ${props.theme.buttonSecondaryForegroundDisabled};
-                }
-                ${Button} {
-                    background-color: ${props.theme.buttonSecondaryBackgroundDisabled};
-                    color: ${props.theme.buttonSecondaryForegroundDisabled};
-                }
-            `;
-        }
-
-        if (props.ios) {
-            if (props.isHover) {
-                return css`
-                    ${Text} {
-                        color: ${props.theme.textPrimary};
-                        transition: color 0.1s ease;
-                    }
-                    ${Button} {
-                        background-color: ${props.theme.backgroundContentTint};
-                        transition: background-color 0.1s ease;
-                    }
-                `;
-            }
-            return undefined;
-        } else {
-            return css`
-                &:hover ${Text} {
-                    color: ${props.theme.textPrimary};
-                    transition: color 0.1s ease;
-                }
-                &:hover ${Button} {
-                    background-color: ${props.theme.backgroundContentTint};
-                    transition: background-color 0.1s ease;
-                }
-            `;
-        }
-    }}
-`;
 
 export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
     const track = useAnalyticsTrack();
@@ -109,18 +43,29 @@ export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
     };
 
     return (
-        <Block ref={ref} disabled={disabled} onClick={onClick} isHover={isHover} ios={ios}>
-            <Button>{icon}</Button>
-            <Text>{t(title)}</Text>
-        </Block>
+        <IconButton
+            ref={ref}
+            icon={icon}
+            label={t(title)}
+            disabled={disabled}
+            hovered={ios && isHover}
+            onClick={onClick}
+        />
     );
 };
 
-export const ActionsRow = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-`;
+export const ActionsRow: FC<PropsWithChildren<{ className?: string }>> = ({
+    className,
+    children
+}) => (
+    // Buttons sit edge to edge at 76px and shrink equally when five don't fit a
+    // phone width; a label wider than its shrunk button overflows centred.
+    <div
+        className={cn(
+            'mb-8 flex flex-row items-center justify-center [&>*]:w-[76px] [&>*]:min-w-0 [&>*]:shrink',
+            className
+        )}
+    >
+        {children}
+    </div>
+);

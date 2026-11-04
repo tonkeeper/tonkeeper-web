@@ -4,7 +4,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { useAtomValue } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
-import { KeychainSecurity } from '@tonkeeper/core/dist/AppSdk';
+import { KeychainScope, KeychainSecurity } from '@tonkeeper/core/dist/AppSdk';
 import { useMemo } from 'react';
 import { usePasswordStorage } from '../hooks/useStorage';
 import { getPasswordByNotification } from './mnemonic';
@@ -45,9 +45,9 @@ export const useKeychainSecuritySettings = () => {
 export const useSecurityCheck = () => {
     const sdk = useAppSdk();
     const passwordStorage = usePasswordStorage();
-    return useMutation(async () => {
+    return useMutation(async (scope: KeychainScope | void) => {
         if (sdk.keychain) {
-            return sdk.keychain.securityCheck();
+            return sdk.keychain.securityCheck(undefined, scope || undefined);
         }
 
         if (await passwordStorage.getIsPasswordSet()) {

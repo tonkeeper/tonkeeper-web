@@ -17,6 +17,7 @@ import { StakingPoolSelector } from './StakingPoolSelector';
 import { Body3 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { PoolImplementationType } from '@tonkeeper/core/dist/tonApiV2';
+import { useStakingAnalyticsProps, useTrackStakingConfirm } from '../../hooks/analytics/staking';
 
 const MainFormWrapper = styled.div`
     display: flex;
@@ -58,12 +59,15 @@ export const StakingForm: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
 
     const pool = selectedPool ?? pools?.[0];
+    const analyticsProps = useStakingAnalyticsProps(pool);
+    const trackConfirm = useTrackStakingConfirm('stake', analyticsProps);
 
     const onConfirm = async () => {
         if (!pool || !amount) return;
         const amountBN = new BigNumber(amount);
         if (amountBN.isNaN() || amountBN.isZero() || amountBN.isNegative()) return;
         const amountNano = toNano(amountBN.toFixed(9));
+        trackConfirm();
         try {
             const params = await encode({ pool, amount: amountNano });
             setModalParams(params);

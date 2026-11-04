@@ -1,11 +1,10 @@
 import { Address } from '@ton/core';
 
-import { IMetaEncryptionData } from '../../../../entries/wallet';
 import { DeployParams, SubscriptionEncodingParams } from './types';
 
 export const prepareSubscriptionParamsForEncoder = (
     subscriptionParams: SubscriptionEncodingParams,
-    metaEncryptionMap: Record<string, IMetaEncryptionData> | null
+    walletMetaKeyPair: DeployParams['walletMetaKeyPair']
 ): DeployParams => {
     const {
         admin,
@@ -17,14 +16,9 @@ export const prepareSubscriptionParamsForEncoder = (
         caller_fee,
         recipient,
         withdraw_msg_body,
-        selectedWallet,
         deploy_value,
         metadata
     } = subscriptionParams;
-
-    if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
-        throw new Error('No walletMetaKeyPair found!');
-    }
 
     return {
         beneficiary: Address.parse(admin),
@@ -38,6 +32,6 @@ export const prepareSubscriptionParamsForEncoder = (
         withdrawAddress: Address.parse(recipient),
         withdrawMsgBody: withdraw_msg_body,
         metadata,
-        walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
+        walletMetaKeyPair
     };
 };

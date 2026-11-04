@@ -72,7 +72,7 @@ export const TonAsset = forwardRef<
                 <TokenLogo src={TON_ASSET.image} noRadius={TON_ASSET.noImageCorners} />
                 <TokenLayout
                     name={t('Toncoin')}
-                    symbol={BRAND_CONFIG.coinSymbolWithEx}
+                    symbol={BRAND_CONFIG.coinSymbol}
                     balance={balance.stringRelativeAmount}
                     secondary={fiatPrice}
                     fiatAmount={fiatAmount}
@@ -201,7 +201,7 @@ export const StakingPositionAsset = forwardRef<
         [stakingPosition.position.amount]
     );
     const balanceStr = useMemo(
-        () => `${tonAmount.toFixed(2, BigNumber.ROUND_DOWN)} TON`,
+        () => `${tonAmount.toFixed(2, BigNumber.ROUND_DOWN)} ${BRAND_CONFIG.coinSymbol}`,
         [tonAmount]
     );
     const { fiatAmount } = useFormatFiat(tonRate, tonAmount);

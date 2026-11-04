@@ -29,14 +29,10 @@ import {
 export interface SetSignatureAllowedAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof SetSignatureAllowedAction
      */
     wallet: AccountAddress;
     /**
      * 
-     * @type {boolean}
-     * @memberof SetSignatureAllowedAction
      */
     allowed: boolean;
 }
@@ -65,11 +61,11 @@ export function SetSignatureAllowedActionFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-  export function SetSignatureAllowedActionToJSON(json: any): SetSignatureAllowedAction {
-      return SetSignatureAllowedActionToJSONTyped(json, false);
-  }
+export function SetSignatureAllowedActionToJSON(json: any): SetSignatureAllowedAction {
+    return SetSignatureAllowedActionToJSONTyped(json, false);
+}
 
-  export function SetSignatureAllowedActionToJSONTyped(value?: SetSignatureAllowedAction | null, ignoreDiscriminator: boolean = false): any {
+export function SetSignatureAllowedActionToJSONTyped(value?: SetSignatureAllowedAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -27,7 +27,7 @@ import {
     NotificationHeaderPortal
 } from '../Notification';
 import { Body2 } from '../Text';
-import { TextArea } from '../fields/Input';
+import { TextArea } from '../fields/TextArea';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { useResolveDns } from '../../state/dns';

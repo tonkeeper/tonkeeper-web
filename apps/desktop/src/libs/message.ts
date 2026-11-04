@@ -1,5 +1,5 @@
 import { AccountConnectionHttp } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { ConfirmOptions } from '@tonkeeper/core/dist/AppSdk';
+import { ConfirmOptions, KeychainScope } from '@tonkeeper/core/dist/AppSdk';
 import MessageBoxSyncOptions = Electron.MessageBoxSyncOptions;
 
 export interface GetStorageMessage {
@@ -25,6 +25,30 @@ export interface DeleteStorageMessage {
 
 export interface ClearStorageMessage {
     king: 'storage-clear';
+}
+
+export interface GetKeychainSettingsMessage {
+    king: 'keychain-settings-get';
+}
+
+export interface CheckKeychainPasswordMessage {
+    king: 'keychain-settings-check-password';
+    password: string;
+    scope?: KeychainScope;
+}
+
+export interface SetKeychainPasswordMessage {
+    king: 'keychain-settings-set-password';
+    password: string;
+}
+
+export interface SetKeychainBiometryMessage {
+    king: 'keychain-settings-set-biometry';
+    enabled: boolean;
+}
+
+export interface ResetKeychainSettingsMessage {
+    king: 'keychain-settings-reset';
 }
 
 export interface OpenPageMessage {
@@ -71,6 +95,7 @@ export interface CanPromptTouchIdMessage {
 export interface PromptTouchIdMessage {
     king: 'prompt-touch-id';
     reason: string;
+    scope?: KeychainScope;
 }
 
 export interface TonConnectSendDisconnectMessage {
@@ -93,6 +118,11 @@ export type Message =
     | SetBatchStorageMessage
     | DeleteStorageMessage
     | ClearStorageMessage
+    | GetKeychainSettingsMessage
+    | CheckKeychainPasswordMessage
+    | SetKeychainPasswordMessage
+    | SetKeychainBiometryMessage
+    | ResetKeychainSettingsMessage
     | OpenPageMessage
     | SetKeychainMessage
     | GetKeychainMessage

@@ -1,12 +1,13 @@
 import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
 import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import { PushNotifications, RegistrationError, Token } from '@capacitor/push-notifications';
+import { PluginListenerHandle } from '@capacitor/core';
 import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { Device } from '@capacitor/device';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { removeLastSlash } from '@tonkeeper/core/dist/utils/url';
+import { joinUrl } from '@tonkeeper/core/dist/utils/url';
 
 const requestPushPermission = async () => {
     const permission = await PushNotifications.requestPermissions();
@@ -14,24 +15,33 @@ const requestPushPermission = async () => {
         throw new Error('Push notifications permission not granted');
     }
 
-    const p = new Promise<string>((res, rej) => {
-        PushNotifications.addListener('registration', (token: Token) => {
-            if (!token.value) {
-                rej(new Error('Push notifications permission not granted'));
-                return;
-            }
-            res(token.value);
-            PushNotifications.removeAllListeners();
-        });
+    // Only this request's own listeners are removed: `removeAllListeners` would
+    // also drop the app-wide push-tap listener.
+    const handles: Promise<PluginListenerHandle>[] = [];
+    const removeListeners = () => handles.splice(0).forEach(h => h.then(l => l.remove()));
 
-        PushNotifications.addListener('registrationError', (error: RegistrationError) => {
-            rej(error);
-            PushNotifications.removeAllListeners();
-        });
+    const p = new Promise<string>((res, rej) => {
+        handles.push(
+            PushNotifications.addListener('registration', (token: Token) => {
+                if (!token.value) {
+                    rej(new Error('Push notifications permission not granted'));
+                    return;
+                }
+                res(token.value);
+                removeListeners();
+            })
+        );
+
+        handles.push(
+            PushNotifications.addListener('registrationError', (error: RegistrationError) => {
+                rej(error);
+                removeListeners();
+            })
+        );
 
         setTimeout(() => {
             rej(new Error('Push notifications permission timeout'));
-            PushNotifications.removeAllListeners();
+            removeListeners();
         }, 10000);
     });
 
@@ -44,7 +54,7 @@ export class CapacitorNotifications implements NotificationService {
     private readonly baseUrl: string;
 
     constructor(config: TonendpointConfig, private readonly storage: IStorage) {
-        this.baseUrl = removeLastSlash(config.tonapiIOEndpoint!);
+        this.baseUrl = config.tonapiIOEndpoint!;
     }
 
     async subscribe(
@@ -54,7 +64,7 @@ export class CapacitorNotifications implements NotificationService {
     ) {
         const token = await requestPushPermission();
 
-        const endpoint = `${this.baseUrl}/v1/internal/pushes/plain/subscribe`;
+        const endpoint = joinUrl(this.baseUrl, '/v1/internal/pushes/plain/subscribe');
         const deviceId = await Device.getId();
 
         const result = await (
@@ -83,7 +93,7 @@ export class CapacitorNotifications implements NotificationService {
 
     async unsubscribe(address?: string) {
         const deviceId = await Device.getId();
-        const endpoint = `${this.baseUrl}/v1/internal/pushes/plain/unsubscribe`;
+        const endpoint = joinUrl(this.baseUrl, '/v1/internal/pushes/plain/unsubscribe');
 
         const result = await (
             await fetch(endpoint, {

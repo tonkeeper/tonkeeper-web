@@ -22,7 +22,7 @@ import {
     TonConnectNetwork,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
-import { eqRawAddresses, isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
+import { isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
 import { WalletVersion } from '../../entries/wallet';
 import { accountsStorage } from '../accountsStorage';
 import { walletContractFromState } from '../wallet/contractService';
@@ -39,19 +39,20 @@ import {
 import { SessionCrypto } from './protocol';
 import { Account, getAccountByWalletById, isAccountSupportTonConnect } from '../../entries/account';
 import { eqOrigins, originFromUrl } from '../../utils/url';
+import { areEqAddresses } from '../../utils/common';
 
 export const tonConnectTonkeeperAppName = 'tonkeeper';
 export const tonConnectTonkeeperProAppName = 'tonkeeper-pro';
 
 export const tonConnectTonkeeperWalletInfo: InjectedWalletInfo = {
-    name: 'Tonkeeper',
+    name: 'Keeper',
     image: 'https://tonkeeper.com/assets/tonconnect-icon.png',
     tondns: 'tonkeeper.ton',
     about_url: 'https://tonkeeper.com'
 };
 
 export const tonConnectTonkeeperProWalletInfo: InjectedWalletInfo = {
-    name: 'Tonkeeper Pro',
+    name: 'Keeper Pro',
     image: 'https://tonkeeper.com/assets/tonconnect-icon-pro.png',
     tondns: 'tonkeeper.ton',
     about_url: 'https://tonkeeper.com/pro'
@@ -155,14 +156,6 @@ export const getManifest = async (request: ConnectRequest) => {
 
     if (!isValid) {
         throw new Error('Manifest is not valid');
-    }
-
-    const requestOrigin = originFromUrl(request.manifestUrl);
-    const manifestOrigin = originFromUrl(manifest.url);
-    if (!requestOrigin || !manifestOrigin || requestOrigin !== manifestOrigin) {
-        throw new Error(
-            'Manifest origin mismatch — manifest must be hosted on the same origin as declared in manifest.url'
-        );
     }
 
     return manifest;
@@ -280,10 +273,12 @@ export const getAppConnections = async (
         isAccountSupportTonConnect
     );
     if (!accounts.length) {
-        throw new TonConnectError(
-            'Missing active wallet',
-            CONNECT_EVENT_ERROR_CODES.UNKNOWN_APP_ERROR
-        );
+        // No TonConnect-compatible accounts (e.g. only watch-only
+        // accounts) — return empty rather than throwing.
+        // Throwing surfaces as a console error and trips react-query's
+        // "Query data cannot be undefined" guard at every consumer that
+        // calls this from a `useQuery`.
+        return [];
     }
 
     return Promise.all(
@@ -590,7 +585,7 @@ export async function checkTonConnectFromAndNetwork(
     params: { from?: string; network?: TonConnectNetwork }
 ) {
     if (params.from !== undefined) {
-        if (!eqRawAddresses(wallet.rawAddress, params.from)) {
+        if (!areEqAddresses(wallet.rawAddress, params.from)) {
             throw new TonConnectError(
                 'Invalid account provided',
                 SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR

@@ -6,7 +6,16 @@ const isDev = process.env.NODE_ENV === 'development';
 
 export const sharedConfig: UserConfig = {
     envPrefix: 'REACT_APP_',
-    plugins: [nodePolyfills()],
+    // Scope polyfills to the builtins our deps actually use, mirroring apps/web.
+    // The bare `nodePolyfills()` maps every builtin (fs, dns, …) to an empty
+    // mock, which then fails to resolve the `*/promises` subpath that
+    // @tonkeeper/chainkit's Node networking module imports.
+    plugins: [
+        nodePolyfills({
+            globals: { Buffer: true, global: true, process: true },
+            include: ['stream', 'buffer', 'crypto', 'util']
+        })
+    ],
     resolve: {
         alias: {
             react: resolve(__dirname, './node_modules/react'),

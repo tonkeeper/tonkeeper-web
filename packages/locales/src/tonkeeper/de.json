@@ -34,9 +34,14 @@
     "approval": {
         "accepted": "Akzeptiert",
         "declined": "Abgelehnt",
+        "details_collection": "Sammlungsdetails",
         "details_token": "Tokendetails",
         "id_collection": "Sammlungs-ID",
         "id_token": "Token-ID",
+        "move_to_accepted_collection": "Sammlung im Wallet anzeigen",
+        "move_to_accepted_token": "Token im Wallet anzeigen",
+        "move_to_declined_collection": "Sammlung aus Wallet ausblenden",
+        "move_to_declined_token": "Token aus Wallet ausblenden",
         "name": "Name",
         "not_spam": "Kein Spam",
         "spam": "Spam",
@@ -46,7 +51,7 @@
     "battery": {
         "other_ways": {
             "by_crypto": {
-                "title": "Mit {symbol} aufladen"
+                "title": "Mit %{symbol} aufladen"
             },
             "gift": {
                 "subtitle": "Teilen Sie mit Freunden",
@@ -54,22 +59,30 @@
             }
         },
         "packages": {
-            "disclaimer": "Eine Ladung deckt die durchschnittliche Transaktionsgebühr ab. Einige Transaktionen können mehr kosten."
+            "disclaimer": "Eine Ladung deckt die durchschnittliche Transaktionsgebühr ab. Einige Transaktionen können mehr kosten.",
+            "title": {
+                "large": "Groß",
+                "medium": "Mittel",
+                "small": "Klein"
+            }
         },
         "please_wait": "Bitte warten, Ihre Batterie wird in den nächsten Minuten aufgeladen",
         "promocode": {
-            "title": "Aktionscode"
+            "title": "Aktionscode",
+            "apply": "Anwenden",
+            "success": "Ihre Batterie wurde aufgeladen"
         },
         "recharge_by_crypto": {
             "other": {
                 "subtitle": "Menge manuell eingeben",
                 "title": "Andere Menge"
             },
-            "title": "Batterie laden"
+            "title": "Batterie laden",
+            "title_gift": "Geschenk"
         },
-        "title": "Tonkeeper Batterie",
+        "title": "Keeper Batterie",
         "transactions": {
-            "description": "Ausgewählte Transaktionen werden von der Tonkeeper Batterie bezahlt.",
+            "description": "Ausgewählte Transaktionen werden von der Keeper Batterie bezahlt.",
             "settings": "Batterie-Einstellungen",
             "title": "Transaktionen",
             "types": {
@@ -131,14 +144,14 @@
     "dns_current_address": "Ihre aktuelle Adresse",
     "dns_expiration_date": "Ablaufdatum",
     "dns_renew_toast_success": "Domain erneuert",
-    "dns_renew_until_btn": "Verlängern bis {untilDate}",
+    "dns_renew_until_btn": "Verlängern bis %{untilDate}",
     "exchange_method_dont_show_again": "Nicht mehr anzeigen",
-    "exchange_method_open_warning": "Sie öffnen eine externe App, die nicht von Tonkeeper betrieben wird.",
+    "exchange_method_open_warning": "Sie öffnen eine externe App, die nicht von Keeper betrieben wird.",
     "exchange_modal": {
         "other_ways_to_buy": "Andere Möglichkeiten zu kaufen"
     },
-    "exchange_other_ways": "Andere Möglichkeiten, %{coinSymbolWithEx} zu kaufen oder zu verkaufen",
-    "exchange_title": "%{coinSymbolWithEx} kaufen",
+    "exchange_other_ways": "Andere Möglichkeiten, %{coinSymbol} zu kaufen oder zu verkaufen",
+    "exchange_title": "%{coinSymbol} kaufen",
     "import_add_wallet": "Wallet hinzufügen",
     "import_add_wallet_description": "Ein neues Wallet erstellen oder ein vorhandenes hinzufügen",
     "import_existing_wallet": "Vorhandenes Wallet",
@@ -154,18 +167,16 @@
     "intro_continue_btn": "Erste Schritte",
     "intro_item1_caption": "Dank der einzigartigen Architektur des offenen Netzwerks werden Transaktionen in Sekundenschnelle abgewickelt.",
     "intro_item1_title": "Geschwindigkeit von Weltklasse",
-    "intro_item2_caption": "Tonkeeper speichert Ihre kryptografischen Schlüssel auf Ihrem Gerät. Alle Trades werden über dezentrale Protokolle ausgeführt, so dass Ihre Krypto niemals in die Hände zentraler Börsen gelangt.",
+    "intro_item2_caption": "Keeper speichert Ihre kryptografischen Schlüssel auf Ihrem Gerät. Alle Trades werden über dezentrale Protokolle ausgeführt, so dass Ihre Krypto niemals in die Hände zentraler Börsen gelangt.",
     "intro_item2_title": "Ende-zu-Ende-Sicherheit",
     "intro_title": "Herzlich willkommen zu",
-    "jetton_id": "Token ID: {jettonAddress}",
+    "jetton_id": "Token ID: %{jettonAddress}",
     "jettons_list_title": "Tokens",
     "later": "Später",
     "ledger": {
         "operation_not_supported": "Der Vorgang ist für Ledger-Wallets nicht verfügbar. Wählen Sie ein anderes Wallet und versuchen Sie es erneut."
     },
-    "legal_font_license": "Montserrat Schriftart",
     "legal_header_title": "Rechtliches",
-    "legal_licenses_title": "Softwarelizenzen",
     "legal_privacy": "Datenschutzerklärung",
     "legal_terms": "Servicebedingungen",
     "loading": "Es läuft",
@@ -197,7 +208,7 @@
         "title": "NFT-Übertragung"
     },
     "nft_transfer_title": "NFT Überweisung",
-    "nft_unlink_domain_button": "Verknüpft mit '{{'address'}}' ",
+    "nft_unlink_domain_button": "Verknüpft mit {{address}} ",
     "nft_view_in_explorer": "Im Explorer anzeigen",
     "notifications": {
         "alert": {
@@ -217,7 +228,7 @@
     "recovery_phrase": {
         "copy_button": "Kopieren"
     },
-    "reminder_notifications_caption": "Erhalten Sie Benachrichtigungen, wenn Sie %{coinSymbolWithEx}, Token und NFTs erhalten.",
+    "reminder_notifications_caption": "Erhalten Sie Benachrichtigungen, wenn Sie %{coinSymbol}, Token und NFTs erhalten.",
     "reminder_notifications_enable_button": "Benachrichtigungen aktivieren",
     "reminder_notifications_later_button": "Später",
     "reminder_notifications_title": "Erhalten Sie sofortige Benachrichtigungen",
@@ -230,7 +241,7 @@
     "send_publish_tx_error": "Senden der Transaktion fehlgeschlagen",
     "send_screen_steps": {
         "address": {
-            "delete_alert_text": "Möchten Sie «{name}» wirklich aus Ihren Favoriten löschen?",
+            "delete_alert_text": "Möchten Sie «%{name}» wirklich aus Ihren Favoriten löschen?",
             "suggest_actions": {
                 "add": "Zu Favoriten hinzufügen",
                 "delete": "Löschen",
@@ -241,7 +252,7 @@
         "amount": {
             "insufficient_balance": "Unzureichendes Guthaben",
             "max": "MAX",
-            "remaining": "Verfügbar: {amount}"
+            "remaining": "Verfügbar: %{amount}"
         },
         "comfirm": {
             "comment_required_text": "Sie müssen die Notiz vom Austausch für die Übertragung einfügen. Ohne diese gehen Ihre Gelder verloren",
@@ -250,7 +261,7 @@
         },
         "done": {
             "done_label": "Fertig",
-            "to": "An: {name}"
+            "to": "An: %{name}"
         }
     },
     "send_sending_wrong_time_description": "Schalten Sie die automatische Zeit- und Datumseinstellung in Ihren Geräteeinstellungen ein. Versuchen Sie dann erneut, Ihre Übertragung durchzuführen.",
@@ -260,10 +271,10 @@
     "settings_jettons_list": "Tokens",
     "settings_legal_documents": "Rechtliches",
     "settings_network_alert_title": "Netzwerk auswählen",
-    "settings_news": "Tonkeeper Nachrichten",
+    "settings_news": "Keeper Nachrichten",
     "settings_notifications": "Benachrichtigungen",
     "settings_primary_currency": "Währung",
-    "settings_rate": "Bewerten Sie Tonkeeper",
+    "settings_rate": "Bewerten Sie Keeper",
     "settings_recovery_phrase": "Wiederherstellungsphrase",
     "settings_reset": "Abmelden",
     "settings_reset_alert_title": "Abmelden?",
@@ -293,17 +304,17 @@
     "staking_earnings_section_title": "Erwarteter Jahresertrag",
     "staking_enter_amount": "Geben Sie einen Betrag ein",
     "staking_insufficient_balance": "Unzureichendes Guthaben",
-    "staking_insufficient_recommended_fee_reserve": "Unzureichende Mittel: Im Wallet-Guthaben sind 1 %{coinSymbolWithEx} Reserve und 0.05 %{coinSymbolWithEx} Gebühr erforderlich.",
+    "staking_insufficient_recommended_fee_reserve": "Unzureichende Mittel: Im Wallet-Guthaben sind 1 %{coinSymbol} Reserve und 0.05 %{coinSymbol} Gebühr erforderlich.",
     "staking_max": "MAX",
     "staking_min_deposit_label": "Minimale Einzahlung",
     "staking_next_cycle_desc_liquid": "Sofortiges Unstaking verfügbar",
-    "staking_next_cycle_message": "Nächster Zyklus in {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · Min. Einzahlung {minDeposit} %{coinSymbolWithEx}",
-    "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} bereit zum Abheben",
+    "staking_next_cycle_message": "Nächster Zyklus in %{value}",
+    "staking_pool_detail": "APY ≈ %{apy}% · Min. Einzahlung %{minDeposit} %{coinSymbol}",
+    "staking_pools_apy": "APY ≈ %{apy}%",
+    "staking_ready_withdraw": "%{amount} %{coinSymbol} bereit zum Abheben",
     "staking_rewards_after_stake": "Nach Einzahlung",
     "staking_rewards_current": "Aktuell",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ %{value} %{coinSymbol}",
     "staking_staked": "Eingesetzt",
     "staking_title": "Staking",
     "staking_top_up": "Einzahlung",
@@ -346,10 +357,9 @@
         "subtitle": "NFT ist möglicherweise aus einem der folgenden Gründe nicht sicher zu verwenden.",
         "title": "Unverifiziertes NFT"
     },
-    "swap_confirm_not_enough_ton_for_fee": "Nicht genug %{coinSymbolWithEx} für Netzwerkgebühr ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "Nicht genug %{coinSymbol} für Netzwerkgebühr (%{required})",
     "swap_exchange_in": "Tausch in",
     "swap_expired_refresh": "Swap abgelaufen. Kurs aktualisieren",
-    "swap_price_impact_description": "Die Differenz zwischen dem Marktpreis und dem geschätzten Preis aufgrund der Handelsgröße.",
     "swap_price_impact_ignore_variant": "Ignorieren",
     "swap_slippage_tolerance": "Slippage-Toleranz",
     "swap_slippage_tolerance_description": "Der Betrag, um den sich der Preis ungünstig ändern kann, bevor die Transaktion rückgängig gemacht wird.",
@@ -359,9 +369,9 @@
     "tokenDetails": {
         "tonviewer_button": "Auf Tonviewer anzeigen"
     },
-    "tonkeeper_pro": "Tonkeeper Pro",
-    "tonkeeper_pro_description": "Das Abonnement von Tonkeeper Pro beinhaltet eine erweiterte Wallet-Funktion und bietet ein Toolset für das Krypto-Management",
-    "ton_login_caption": "{name} möchte auf Ihre Wallet-Adresse zugreifen",
+    "tonkeeper_pro": "Keeper Pro",
+    "tonkeeper_pro_description": "Das Abonnement von Keeper Pro beinhaltet eine erweiterte Wallet-Funktion und bietet ein Toolset für das Krypto-Management",
+    "ton_login_caption": "%{name} möchte auf Ihre Wallet-Adresse zugreifen",
     "ton_login_connect_button": "Wallet verbinden",
     "ton_login_notice": "Überprüfen Sie die Serviceadresse, bevor Sie die Wallet verbinden.",
     "ton_login_success": "Fertig",
@@ -375,7 +385,7 @@
     "transaction_fee": "Gebühr",
     "transaction_hash": "Transaktion",
     "transaction_merchant": "Händler",
-    "transaction_receive_date": "Empfangen am {date}",
+    "transaction_receive_date": "Empfangen am %{date}",
     "transaction_recipient": "Empfänger",
     "transaction_recipient_address": "Empfängersadresse",
     "transactions": {
@@ -390,7 +400,7 @@
     },
     "transaction_sender": "Absender",
     "transaction_sender_address": "Absenderadresse",
-    "transaction_sent_date": "Gesendet am {date}",
+    "transaction_sent_date": "Gesendet am %{date}",
     "transaction_type_bid": "Gebot",
     "transaction_type_contract_deploy": "Vertrag bereitstellen",
     "transaction_type_pending": "Anhängig",
@@ -410,7 +420,7 @@
             "types": {
                 "jettonTransfer": "Token Überweisung",
                 "nftItemTransfer": "NFT Überweisung",
-                "tonTransfer": "%{coinSymbolWithEx}-Überweisung",
+                "tonTransfer": "%{coinSymbol}-Überweisung",
                 "unknownTransaction": "Unbekannte Transaktion"
             }
         }
@@ -437,7 +447,7 @@
             "received": "Empfangt",
             "sent": "Gesendet",
             "swapped": "Getauscht",
-            "time_on": "am {time}",
+            "time_on": "am %{time}",
             "withdraw": "Auszahlen"
         },
         "activity": {
@@ -454,11 +464,11 @@
             "notification_desc_did_change": "Ihre Wallet-Adresse wurde auf das UQ-Format aktualisiert. Die alte Adresse funktioniert weiterhin.",
             "notification_desc_will_change": "Am 5. Oktober wird Ihre Wallet-Adresse auf das UQ-Format aktualisiert, was einfach besser ist. Die alte Adresse funktioniert auch weiterhin. Sie müssen nichts tun.",
             "old_style": "Alte Adresse",
-            "post_dates": "\n5 October, 2023: Alle Adressen ändern sich zum UQ-Format in Tonkeeper.\n\n1 January, 2024: Tonkeeper hört auf, den Vertragsstatus zu überprüfen und verwendet das „bounceable“-Flag in der Adresse. Münzen, die an nicht veröffentlichte Verträge mit einer EQ-Adresse gesendet werden, werden an den Absender zurückgeschickt.",
+            "post_dates": "\n5 October, 2023: Alle Adressen ändern sich zum UQ-Format in Keeper.\n\n1 January, 2024: Keeper hört auf, den Vertragsstatus zu überprüfen und verwendet das „bounceable“-Flag in der Adresse. Münzen, die an nicht veröffentlichte Verträge mit einer EQ-Adresse gesendet werden, werden an den Absender zurückgeschickt.",
             "post_published_date": "Gesendet: 27 September, 2023",
             "post_rest": "Auf der TON-Blockchain gibt es zwei Adressarten, von denen bisher nur eine für Apps und Wallets verwendet wurde.\n\nDas EQ-Format ist am besten für Smart Contracts geeignet, die eingehende Gelder verarbeiten. Wenn ein intelligenter Vertrag noch nicht veröffentlicht ist - d.h. der Code ist nicht auf der Blockchain - dann werden die TONs, die an diese Adresse gesendet werden, an den Absender zurückgeschickt. Und das ist eine Sicherheitsfunktion: Wenn ein Fehler auftritt, werden die TONs zurückgeschickt.\n\nDas UQ-Format ist am besten für Wallets geeignet. Münzen werden nie zurückgeschickt, weil Wallets einfach dazu gedacht sind, Geld zu speichern. Jedes Wallet beginnt als einfache Adresse ohne Code auf der Blockchain. Es würde also keinen Sinn machen, wenn Münzen zurückspringen würden.\n\nIn diesem Jahr stellen wir die Wallets auf das besser geeignete UQ-Format um. Wenn Sie weiterhin Geld an eine alte EQ-Adresse senden, die Ihnen jemand gegeben hat, gibt es zwei Möglichkeiten:\n",
             "post_top": "Bis zum Ende dieses Jahres wird das gesamte TON-Netzwerk Wallet-Adressen anders anzeigen. Die neue Adresse beginnt mit UQ anstelle von EQ. Und die letzten vier Buchstaben werden sich ebenfalls ändern. Die alte Adresse funktioniert weiterhin und leitet zur gleichen Wallet weiter. Dies hat keinerlei Auswirkungen auf die Sicherheit der in Ihrer Wallet gespeicherten Gelder.",
-            "second_option": "Es ist unwahrscheinlicher, dass das Wallet noch nie für Zahlungen verwendet wurde. Und Tonkeeper wird nächstes Jahr keine Münzen an diese Adresse senden. Sie müssen den Empfänger um eine neue UQ-Adresse bitten.",
+            "second_option": "Es ist unwahrscheinlicher, dass das Wallet noch nie für Zahlungen verwendet wurde. Und Keeper wird nächstes Jahr keine Münzen an diese Adresse senden. Sie müssen den Empfänger um eine neue UQ-Adresse bitten.",
             "title": "Addresse ändern",
             "why_change": "Warum ändern?",
             "your_wallet": "Ihr Wallet"
@@ -497,7 +507,7 @@
             "azure": "Azure",
             "coral": "Koralle",
             "cosmos": "Kosmos",
-            "default": "Tonkeeper",
+            "default": "Keeper",
             "flamingo": "Flamingo",
             "fluid": "Fluid",
             "galaxy": "Galaxie",
@@ -509,41 +519,36 @@
         "appearance_confirm": "Speichern",
         "appearance_description": "Das TON Diamonds NFT wird Ihr Wallet bunter und einzigartiger machen.",
         "appearance_title": "Schema",
-        "app_name": "Tonkeeper",
+        "app_name": "Keeper",
         "approval": {
             "accept": "Akzeptieren",
-            "accepted_at_collection": "Akzeptiert am {date}",
-            "accepted_at_token": "Akzeptiert am {date}",
+            "accepted_at_collection": "Akzeptiert am %{date}",
+            "accepted_at_token": "Akzeptiert am %{date}",
             "accepted_collection": "Akzeptierte Sammlung",
             "accepted_token": "Akzeptierter Token",
             "approve_all": "Alles bestätigen",
-            "approve_collection_many": "Bestätigen Sie eingehende Token aus der \"{collection}\" -Sammlung",
-            "approve_collection_one": "Bestätigen Sie eingehendes Token aus der \"{collection}\" -Sammlung",
-            "approve_many": "{count} eingehende Token genehmigen",
+            "approve_collection_many": "Bestätigen Sie eingehende Token aus der \"%{collection}\" -Sammlung",
+            "approve_collection_one": "Bestätigen Sie eingehendes Token aus der \"%{collection}\" -Sammlung",
+            "approve_many": "%{count} eingehende Token genehmigen",
             "approve_many.one": "Ein eingehendes Token genehmigen",
-            "approve_token": "Eingehenden Token „{name}“ genehmigen",
-            "approve_two_collections": "Eingehende Token aus \"{collection1}\", \"{collection2}\"-Sammlungen genehmigen",
-            "approve_two_tokens": "Eingehende Token \"{name1}\" und \"{name2}\" genehmigen",
+            "approve_token": "Eingehenden Token „%{name}“ genehmigen",
+            "approve_two_collections": "Eingehende Token aus \"%{collection1}\", \"%{collection2}\"-Sammlungen genehmigen",
+            "approve_two_tokens": "Eingehende Token \"%{name1}\" und \"%{name2}\" genehmigen",
             "blacklisted_collection": "Verbotene Sammlung",
             "blacklisted_token": "Verbotener Token",
             "decline": "Ablehnen",
-            "declined_at_collection": "Abgelehnt am {date}",
-            "declined_at_token": "Abgelehnt am {date}",
-            "details_collection": "Sammlungsdetails",
+            "declined_at_collection": "Abgelehnt am %{date}",
+            "declined_at_token": "Abgelehnt am %{date}",
             "manage_tokens": "Token verwalten",
             "move_to_accepted": "Zu „Akzeptiert“ verschieben",
-            "move_to_accepted_collection": "Sammlung im Wallet anzeigen",
-            "move_to_accepted_token": "Token im Wallet anzeigen",
             "move_to_declined": "Zu „Abgelehnt“ verschieben",
-            "move_to_declined_collection": "Sammlung aus Wallet ausblenden",
-            "move_to_declined_token": "Token aus Wallet ausblenden",
             "pending": "Anhängig",
             "show_all": "Alle anzeigen",
             "single_token": "Einziger Token",
             "token_copied": "Token ID kopiert",
             "token_count": {
-                "one": "{count} Token",
-                "other": "{count} Token"
+                "one": "%{count} Token",
+                "other": "%{count} Token"
             },
             "verify_collection": "Verifizieren Sie die Sammlung",
             "verify_description_collection": "Diese Tokens stammen von einem unbekannten Herausgeber. Um Fälschungen zu erkennen, überprüfen Sie die Sammlungs-ID mit der offiziellen Quelle des Herausgebers. Sie können die Sichtbarkeit der Tokens später in den Einstellungen ändern.",
@@ -554,13 +559,13 @@
         },
         "auth_failed": "Authentifizierung ausgefallen",
         "backup_check": {
-            "caption": "Lassen Sie uns, bitte, sehen, ob Sie alles richtig abgeschrieben haben. Geben Sie die Wörter {one}, {two} und {three} ein.",
+            "caption": "Lassen Sie uns, bitte, sehen, ob Sie alles richtig abgeschrieben haben. Geben Sie die Wörter %{one}, %{two} und %{three} ein.",
             "done_button": "Fertig",
             "title": "Backup überprüfen"
         },
         "backup_screen": {
-            "backup_warning": "Ihr Guthaben beträgt {totalFiat} und wird nur durch eine Wiederherstellungsphrase geschützt, die Sie noch nicht aufgeschrieben haben. Sichern Sie die Phrase, um zu verhindern, dass Sie bei Problemen mit dem Gerät Geld verlieren.",
-            "last_backup_time": "Letztes Backup am {time}",
+            "backup_warning": "Ihr Guthaben beträgt %{totalFiat} und wird nur durch eine Wiederherstellungsphrase geschützt, die Sie noch nicht aufgeschrieben haben. Sichern Sie die Phrase, um zu verhindern, dass Sie bei Problemen mit dem Gerät Geld verlieren.",
+            "last_backup_time": "Letztes Backup am %{time}",
             "manual_backup_on": "Manuelles Backup On",
             "manual_button": "Manuell sichern",
             "manual_caption": "Sichern Sie Ihr Wallet manuell, indem Sie die Wiederherstellungsphrase aufschreiben.",
@@ -572,8 +577,8 @@
             "cancel_button": "Abbrechen",
             "caption": "Bitte lesen Sie die folgenden Informationen sorgfältig durch, bevor Sie Ihre Wiederherstellungsphrase anzeigen.",
             "continue_button": "Weiter",
-            "p1": "Geben Sie Ihre Wiederherstellungsphrase NIEMALS an einem anderen Ort als Tonkeeper ein, um auf Ihr Wallet zuzugreifen.",
-            "p2": "Der Tonkeeper Support wird Sie NIEMALS nach Ihrer Wiederherstellungsphrase fragen.",
+            "p1": "Geben Sie Ihre Wiederherstellungsphrase NIEMALS an einem anderen Ort als Keeper ein, um auf Ihr Wallet zuzugreifen.",
+            "p2": "Der Keeper Support wird Sie NIEMALS nach Ihrer Wiederherstellungsphrase fragen.",
             "p3": "JEDER mit ihrer Wiederherstellungsphrase hatt ABSOLUTEN Zugriff zu ihrem Wallet und kann PROBLEMLOS all ihre Geld stehlen.",
             "title": "ACHTUNG!"
         },
@@ -582,16 +587,16 @@
                 "empty": "Tausche und sende Token und NFTs.",
                 "less_10": "Sie haben genug Batterieladung für weniger als 10 Transaktionen.",
                 "other": "Sie haben genug Batterieladung für mehr als %{cnt} Transaktionen.",
-                "other.few": "Ihre Batterie hat nur {count} Ladungen",
-                "other.many": "Ihre Batterie hat {count} Ladungen",
-                "other.one": "Ihre Batterie hat nur {count} Ladung",
-                "other.other": "Ihre Batterie hat {count} Ladungen"
+                "other.few": "Ihre Batterie hat nur %{count} Ladungen",
+                "other.many": "Ihre Batterie hat %{count} Ladungen",
+                "other.one": "Ihre Batterie hat nur %{count} Ladung",
+                "other.other": "Ihre Batterie hat %{count} Ladungen"
             },
-            "max_input_amount": "Maximale Eingabemenge ist {amount}",
+            "max_input_amount": "Maximale Eingabemenge ist %{amount}",
             "ok": "OK",
             "other_ways": {
                 "by_crypto": {
-                    "subtitle": "Mit {methods}"
+                    "subtitle": "Mit %{methods}"
                 },
                 "promo": {
                     "subtitle": "Sie haben Glück",
@@ -605,26 +610,18 @@
                 "refund": "Rückerstattung",
                 "restore": "Einkäufe wiederherstellen",
                 "subtitle": {
-                    "few": "Nur {count} Ladungen",
-                    "many": "{count} Ladungen",
-                    "one": "Nur {count} Ladung",
-                    "other": "{count} Ladungen"
-                },
-                "title": {
-                    "large": "Groß",
-                    "medium": "Mittel",
-                    "small": "Klein"
+                    "few": "Nur %{count} Ladungen",
+                    "many": "%{count} Ladungen",
+                    "one": "Nur %{count} Ladung",
+                    "other": "%{count} Ladungen"
                 }
             },
             "promocode": {
-                "apply": "Anwenden",
                 "button": "Aufladen durch Aktionscode",
-                "placeholder": "Aktionscode",
-                "success": "Ihre Batterie wurde aufgeladen"
+                "placeholder": "Aktionscode"
             },
             "recharge_by_crypto": {
                 "continue": "Weiter",
-                "title_gift": "Geschenk",
                 "tokens": "Token"
             },
             "refilled": "Ihre Batterie wurde aufgeladen",
@@ -639,10 +636,10 @@
             "settings": "Batterie",
             "transactions": {
                 "charges_per_action": {
-                    "few": "≈ {count} Ladungen pro {transactionName}",
-                    "many": "≈ {count} Ladungen pro {transactionName}",
-                    "one": "≈ {count} Ladung für {transactionName}",
-                    "other": "≈ {count} Ladungen pro {transactionName}"
+                    "few": "≈ %{count} Ladungen pro %{transactionName}",
+                    "many": "≈ %{count} Ladungen pro %{transactionName}",
+                    "one": "≈ %{count} Ladung für %{transactionName}",
+                    "other": "≈ %{count} Ladungen pro %{transactionName}"
                 },
                 "supported": "Unterstützte Transaktionen",
                 "types": {
@@ -650,7 +647,7 @@
                     "swap": "Swaps",
                     "ton": "TON-Überweisungen"
                 },
-                "will_be_paid": "Wird bezahlt: {enabledTransactions}"
+                "will_be_paid": "Wird bezahlt: %{enabledTransactions}"
             }
         },
         "biometry": {
@@ -688,14 +685,14 @@
             }
         },
         "browser": {
-            "about_dapps_caption": "Entdecken Sie Apps und Dienste, bei denen Sie Tonkeeper für die Anmeldung und Zahlungen verwenden können.",
+            "about_dapps_caption": "Entdecken Sie Apps und Dienste, bei denen Sie Keeper für die Anmeldung und Zahlungen verwenden können.",
             "about_dapps_learn_more": "Mehr erfahren",
-            "about_dapps_title": "Benutzen Sie Tonkeeper mit allen TON Apps und Diensten",
+            "about_dapps_title": "Benutzen Sie Keeper mit allen TON Apps und Diensten",
             "actions": {
                 "disconnect": "Trennen",
                 "mute": "Stummschalten"
             },
-            "connected_empty_text": "Erkunden Sie Apps und Dienste im Tonkeeper Browser.",
+            "connected_empty_text": "Erkunden Sie Apps und Dienste im Keeper Browser.",
             "connected_empty_title": "Verbundene Apps werden hier angezeigt",
             "connected_title": "Verbunden",
             "empty_search": "Ihre Suche ergab keine Ergebnisse",
@@ -707,11 +704,11 @@
             "popular_title": "Beliebtes",
             "remove_alert": {
                 "approve_button": "Löschen",
-                "title": "Wollen Sie das wirklich “{name}” löschen?"
+                "title": "Wollen Sie das wirklich “%{name}” löschen?"
             },
             "search_label": "Suchen Sie oder geben die Adresse ein",
             "start_typing": "Geben eine Adresse ein oder suchen Sie im Web",
-            "web_search_title": "{searchEngine} suchen"
+            "web_search_title": "%{searchEngine} suchen"
         },
         "buy_ton": {
             "subtitle": "Sofort mit einer Kreditkarte",
@@ -782,7 +779,7 @@
         "confirm_sending_liquid_warn_description": "Sie erhalten keine Belohnungen mehr für die gesendeten gestakten TON. Der neue Besitzer wird Belohnungen erhalten.",
         "confirm_sending_liquid_warn_title": "Bemerkung",
         "confirm_sending_message": "Kommentar",
-        "confirm_sending_method_title": "Senden Sie an {name}?",
+        "confirm_sending_method_title": "Senden Sie an %{name}?",
         "confirm_sending_recipient": "Empfänger",
         "confirm_sending_recipient_address": "Empfängersadresse",
         "confirm_sending_sent_caption_btc": "Ihre Transaktion wird an das Netzwerk gesendet und innerhalb einer Stunde verarbeitet.",
@@ -792,14 +789,14 @@
             "refund": "Rückerstattung",
             "title": "Bestätigen Sie die Aktion",
             "title_multiwallets": "Aktion für %{walletName}",
-            "total_risk": "Gesamt: {totalAmount}",
+            "total_risk": "Gesamt: %{totalAmount}",
             "to_your_address": "Zu Ihrer Adresse",
             "transaction_type": {
                 "burn": "Verbrennen",
                 "receive": "Empfangen",
                 "send": "Senden"
             },
-            "will_be_paid_with_battery": "Wird mit der Tonkeeper Batterie bezahlt"
+            "will_be_paid_with_battery": "Wird mit der Keeper Batterie bezahlt"
         },
         "copy_error_log": "Fehlerprotokoll kopieren",
         "create_wallet_continue_button": "Weiter",
@@ -812,28 +809,28 @@
         "deploy_contract_title": "Vertrag bereitstellen",
         "disable_nft_marketplace_banner_description": "Sammeln und umtauschen.",
         "dns_addresses": {
-            "few": "{count} Addressen",
-            "many": "{count} Addressen",
-            "one": "{count} Addresse",
-            "other": "{count} Addressen"
+            "few": "%{count} Addressen",
+            "many": "%{count} Addressen",
+            "one": "%{count} Addresse",
+            "other": "%{count} Addressen"
         },
         "dns_alert_expiring_many": {
-            "few": "Sie haben {count} auslaufende Domains. Alles verlängern bis {untilDate}",
-            "many": "Sie haben {count} auslaufende Domains. Alles verlängern bis {untilDate}",
-            "one": "Sie haben {count} auslaufende Domains. Alles verlängern bis {untilDate}",
-            "other": "Sie haben {count} auslaufende Domains. Alles verlängern bis {untilDate}"
+            "few": "Sie haben %{count} auslaufende Domains. Alles verlängern bis %{untilDate}",
+            "many": "Sie haben %{count} auslaufende Domains. Alles verlängern bis %{untilDate}",
+            "one": "Sie haben %{count} auslaufende Domains. Alles verlängern bis %{untilDate}",
+            "other": "Sie haben %{count} auslaufende Domains. Alles verlängern bis %{untilDate}"
         },
-        "dns_alert_expiring_one": "{domain} läuft sich in {count} Tage aus. Verlängern Sie es bis {untilDate}",
+        "dns_alert_expiring_one": "%{domain} läuft sich in %{count} Tage aus. Verlängern Sie es bis %{untilDate}",
         "dns_link_title": "Transaktion bestätigen",
         "dns_on_sale_text": "Die Domain steht jetzt auf dem Marktplatz zum Verkauf. Für die Übertragung sollten Sie es zuerst aus dem Verkauf entfernen.",
-        "dns_renew_all_until_btn": "Alles verlängern bis {untilDate}",
+        "dns_renew_all_until_btn": "Alles verlängern bis %{untilDate}",
         "dns_renew_in_progress_btn": "Domain-Verlängerung läuft…",
         "dns_renew_valid_caption": {
-            "one": "Läuft ab in {count} Tag",
-            "other": "Läuft ab in {count} Tage"
+            "one": "Läuft ab in %{count} Tag",
+            "other": "Läuft ab in %{count} Tage"
         },
         "dns_replace_button": "Ersetzen",
-        "dns_replace_description": "Fügen Sie die Walletsadresse hinzu, mit der die Domain '{{'domain'}}' verknüpft wird.",
+        "dns_replace_description": "Fügen Sie die Walletsadresse hinzu, mit der die Domain {{domain}} verknüpft wird.",
         "dns_replace_save": "Speichern",
         "dns_unlink_title": "Verknüpfungaufhebung bestätigen",
         "dns_wallet_address": "Walletsaddresse",
@@ -871,16 +868,16 @@
             "done_button": "Fertig",
             "enable_notifications": "Transaktionsbenachrichtigungen aktivieren",
             "header_title": "Einrichtung abschließen",
-            "join_tg": "Tonkeeper-Kanal beitreten",
-            "use_biometry": "Verwenden {name} zur Transaktiongenehmigung"
+            "join_tg": "Keeper-Kanal beitreten",
+            "use_biometry": "Verwenden %{name} zur Transaktiongenehmigung"
         },
         "form_optional_indicator": "Optional",
         "gasless": {
-            "switch_label": "Tippen Sie auf, um {currency} einzuzahlen"
+            "switch_label": "Tippen Sie auf, um %{currency} einzuzahlen"
         },
         "import_wallet_reset_caption": "Bitte stellen Sie den Zugriff auf Ihr Wallet wieder her durch Eingabe von 24 geheimen Wörtern, die Sie aufgeschrieben und dann das Wallet erstellt haben.",
         "indexer_latency_error": "Sendefehler, versuchen Sie es später erneut",
-        "info_about_inactive_desc1": "Tonkeeper ist unbekannt, ob es sich bei dieser Adresse um ein Wallet oder einen intelligenten Vertrag handelt.",
+        "info_about_inactive_desc1": "Keeper ist unbekannt, ob es sich bei dieser Adresse um ein Wallet oder einen intelligenten Vertrag handelt.",
         "info_about_inactive_desc2": "Wenn Sie einfach Geld ins Wallet einzahlen möchten— können Sie fortfahren",
         "info_about_inactive_desc3_1": "Wenn Sie eine automatische Aktion von einem intelligenten Vertrag erwarten,",
         "info_about_inactive_desc3_2": "— Ihre Überweisung könnte an dieser Adresse hängen bleiben.",
@@ -889,9 +886,9 @@
         "it_expires_on": "Es läuft ab am",
         "jetton_buy_tether": "USDT kaufen",
         "jetton_id_copied": "Token-ID kopiert",
-        "jetton_locked_till": "Gesperrt bis{date}",
+        "jetton_locked_till": "Gesperrt bis%{date}",
         "jetton_migrate_tether": "Swap jUSDT zu USD₮",
-        "jetton_name": "{name} Token",
+        "jetton_name": "%{name} Token",
         "jetton_open_explorer": "Details anzeigen",
         "jetton_price": "Preis:",
         "jettons_manage_tokens": "Token verwalten",
@@ -941,7 +938,7 @@
         },
         "manage_other_coins": "Meine Kryptowährung verwalten",
         "migration_cancel_btn": "Später aktualisieren",
-        "migration_caption": "Tonkeeper führt ein neues Wallet-Format ein, das Abonnementzahlungen unterstützt. Ihr Guthaben wird auf eine neue Adresse übertragen. Ihre Wiederherstellungsphrase bleibt gleich.",
+        "migration_caption": "Keeper führt ein neues Wallet-Format ein, das Abonnementzahlungen unterstützt. Ihr Guthaben wird auf eine neue Adresse übertragen. Ihre Wiederherstellungsphrase bleibt gleich.",
         "migration_failed": "Migration fehlgeschlagen. Ihr Guthaben kann nicht übertragen werden.",
         "migration_fee_info": "Netzwerk Gebühr ≈%{tonFee} TON (%{fiatFee})",
         "migration_in_progress": "Migration zu Wallet v4 läuft",
@@ -950,8 +947,8 @@
         "migration_old_wallet": "Alte Adresse",
         "migration": {
             "subtitle": "Wallet entsperren, um fortzufahren.",
-            "title": "Migrieren Sie Ihr Wallet auf die neue Version von Tonkeeper",
-            "with_biometry": "Weiter mit {type}"
+            "title": "Migrieren Sie Ihr Wallet auf die neue Version von Keeper",
+            "with_biometry": "Weiter mit %{type}"
         },
         "migration_title": "Aktualisieren Sie Ihr Wallet",
         "nft_about_dns": "TON DNS ist ein Dienst, der es Benutzern ermöglicht, Krypto-Wallets, Smart Contracts und Websites einen menschenlesbaren Namen zuzuweisen. \n\nMit TON DNS ist der Zugriff auf dezentrale Dienste analog zum Zugriff auf Websites im Internet.",
@@ -966,7 +963,7 @@
         "nft_change_theme": "Thema ändern",
         "nft_collection_name": "Sammlungsname",
         "nft_confirm_operation": "Bestätigen",
-        "nft_diamonds_description": "TON Diamonds besitzen die Kraft, das Thema in Ihrem Tonkeeper-Wallet zu ändern und es an die Farbe Ihres NFT anzupassen.",
+        "nft_diamonds_description": "TON Diamonds besitzen die Kraft, das Thema in Ihrem Keeper-Wallet zu ändern und es an die Farbe Ihres NFT anzupassen.",
         "nft_features": "Funktionen",
         "nft_fee": "Gebühr",
         "nft_fee_and_royalties": "Gebühren & Lizenzgebühren",
@@ -1005,7 +1002,7 @@
                 "fee": {
                     "label": "Gebühr",
                     "refund_label": "Rückerstattung",
-                    "value": "≈ {value} TON"
+                    "value": "≈ %{value} TON"
                 }
             }
         },
@@ -1015,16 +1012,16 @@
         "nft_unnamed_collection": "Unbenannte Sammlung",
         "nokyc": "kein KYC",
         "notcoin": {
-            "all": "Alles in Tonkeeper Pro umtauschen",
+            "all": "Alles in Keeper Pro umtauschen",
             "burn_not_available": {
-                "hours": "Der Austausch wird in {count} Stunden verfügbar sein",
-                "minutes": "Der Austausch wird in {count} Minuten verfügbar sein",
-                "seconds": "Der Austausch wird in {count} Sekunden verfügbar sein"
+                "hours": "Der Austausch wird in %{count} Stunden verfügbar sein",
+                "minutes": "Der Austausch wird in %{count} Minuten verfügbar sein",
+                "seconds": "Der Austausch wird in %{count} Sekunden verfügbar sein"
             },
             "count": "Anzahl der Gutscheine",
             "count_max": "Maximal 4 pro Austausch",
             "exchange": "Gutscheine\nin NOT umtauschen",
-            "exchange_all": "Alles in Tonkeeper Pro umtauschen",
+            "exchange_all": "Alles in Keeper Pro umtauschen",
             "exchange_subtitle": "NOT wird kurz nach dem Austausch auf Ihrem Guthaben verfügbar sein.",
             "exchange_title": "Tauschen Sie Ihre Gutscheine in NOT um",
             "exchange_to_not": "In NOT umtauschen",
@@ -1046,7 +1043,7 @@
             "allow_notifications": "Benachrichtigungen aktivieren",
             "apps": "Apps",
             "apps_description": "Benachrichtigungen von verbundenen Apps in Ihrer Aktivität",
-            "disconnect_app": "{app_name} trennen",
+            "disconnect_app": "%{app_name} trennen",
             "disconnected_app": "App getrennt",
             "earlier": "Früher",
             "from_connected": "Von verbundenen Apps",
@@ -1054,7 +1051,7 @@
             "mute_notifications": "Benachrichtigungen stummschalten",
             "notifications": "Benachrichtigungen",
             "placeholder": {
-                "description": "Erkunden Sie Apps und Dienste im Tonkeeper Browser.",
+                "description": "Erkunden Sie Apps und Dienste im Keeper Browser.",
                 "title": "Benachrichtigungen werden hier angezeigt"
             },
             "report": "Bericht"
@@ -1066,8 +1063,8 @@
         "notifications_switch_title": "Push-Benachrichtigungen",
         "notifications_title": "Benachrichtigungen",
         "notification_switch_description": "Erhalte Benachrichtigungen, wenn du TON, Token und NFTs erhältst. Benachrichtigungen von verbundenen Apps.",
-        "notify_connection_err_caption": "{host} reagiert nicht. Bitte versuchen Sie es später erneut.",
-        "notify_connection_err_caption_few": "{hosts} und {lastHost} reagieren nicht. Bitte versuchen Sie es später erneut.",
+        "notify_connection_err_caption": "%{host} reagiert nicht. Bitte versuchen Sie es später erneut.",
+        "notify_connection_err_caption_few": "%{hosts} und %{lastHost} reagieren nicht. Bitte versuchen Sie es später erneut.",
         "notify_connection_err_title": "Verbindung zum Server konnte nicht hergestellt werden",
         "notify_incorrect_time_err_caption": "Aktivieren Sie in den Geräteeinstellungen die automatische Zeit- und Datumseinstellung. Wenn die Zeit nicht automatisch eingestellt wird, kann dies Überweisungen beeinträchtigen.",
         "notify_incorrect_time_err_title": "Zeit und Datum sind falsch",
@@ -1103,7 +1100,7 @@
         "programmable_nfts": {
             "alert": {
                 "cancel": "Abbrechen",
-                "description": "Besuchen Sie diesen externen Link nur, wenn Sie dem Autor der Sammlung vertrauen.\n\n'{{'uri'}}'",
+                "description": "Besuchen Sie diesen externen Link nur, wenn Sie dem Autor der Sammlung vertrauen.\n\n{{uri}}",
                 "open": "Trotzdem öffnen",
                 "title": "Sind Sie sicher, dass Sie einen externen Link öffnen möchten?"
             }
@@ -1114,14 +1111,14 @@
         "receive_copy": "Kopieren",
         "receiveModal": {
             "receive": "Empfang",
-            "receive_description": "Senden Sie nur {tokenName} und Tokens im TON-Netzwerk an diese Adresse, sonst könnten Sie Ihr Geld verlieren.",
-            "receive_title": "Empfangen {tokenName}",
+            "receive_description": "Senden Sie nur %{tokenName} und Tokens im TON-Netzwerk an diese Adresse, sonst könnten Sie Ihr Geld verlieren.",
+            "receive_title": "Empfangen %{tokenName}",
             "receive_ton": "Senden Sie nur Toncoin TON und Tokens im TON-Netzwerk an diese Adresse, sonst könnten Sie Ihr Geld verlieren."
         },
         "receive_qr_title": "QR-Code anzeigen, um zu empfangen",
-        "receive_received_title": "Sie haben\n{amount} {currency} erhalten",
+        "receive_received_title": "Sie haben\n%{amount} %{currency} erhalten",
         "receive_share": "Teilen",
-        "receive_title": "Erhalten {currency}",
+        "receive_title": "Erhalten %{currency}",
         "receive_ton_and_jettons": "TON und andere Token empfangen",
         "recovery_phrase": {
             "caption": "Schreiben Sie diese Wörter mit ihren Nummern auf und bewahren Sie sie an einem sicheren Ort auf.",
@@ -1131,8 +1128,8 @@
         "refresh_app": "Neustart",
         "region_nokyc": "Neutrale Gewässer",
         "renew_in_progress": "Verlängerung läuft…",
-        "renew_progress_of": "{current} von {count}",
-        "require_create_wallet_modal_caption": "Sie benötigen ein verbundenes Wallet, um Tonkeeper zu verwenden. Erstellen Sie entweder ein neues Wallet oder importieren Sie ein vorhandenes.",
+        "renew_progress_of": "%{current} von %{count}",
+        "require_create_wallet_modal_caption": "Sie benötigen ein verbundenes Wallet, um Keeper zu verwenden. Erstellen Sie entweder ein neues Wallet oder importieren Sie ein vorhandenes.",
         "require_create_wallet_modal_create_new": "Neues Wallet erstellen",
         "require_create_wallet_modal_import": "Vorhandenes Wallet importieren",
         "require_create_wallet_modal_title": "Richten wir Ihr Wallet ein",
@@ -1140,13 +1137,13 @@
             "stake_into_step": "Verfügbare TON in Tonstakers staken.",
             "stake_into_tonstakers_action": "In Tonstakers staken",
             "title": "Verdienen Sie mehr TON mit %apy im Tonstakers Liquid Staking",
-            "unstake_action_all": "Auszahlen {amount}",
+            "unstake_action_all": "Auszahlen %{amount}",
             "unstake_action_manual": "Manuell eingeben",
             "unstake_step": "TON von Ihrem aktuellen Staking-Anbieter abziehen.",
             "wait_step": "Warten Sie, bis Ihre TON verfügbar sind.",
             "wait_step_collect": "Sammeln",
             "wait_step_cooldown": "Ihr TON wird bald verfügbar sein. Sie können ihn in Kürze abholen.",
-            "wait_step_pending": "Ihre TON werden in {0, number}uration verfügbar sein. Nach dieser Zeit können Sie sie einsammeln.",
+            "wait_step_pending": "Ihre TON werden in %{0, number}uration verfügbar sein. Nach dieser Zeit können Sie sie einsammeln.",
             "wait_step_withdraw": "Verfügbare TON von Ihrem vorherigen Staking-Anbieter einsammeln."
         },
         "scan_qr_open_settings": "Einstellungen öffnen",
@@ -1159,7 +1156,7 @@
         "security_migration_title": "Wallet-Sicherheit aktualisieren",
         "security_reset_passcode": "Passwort zurücksetzen",
         "security_title": "Sicherheit",
-        "security_use_biometry_switch": "{biometryType} verwenden",
+        "security_use_biometry_switch": "%{biometryType} verwenden",
         "security_use_biometry_tip": "Sie können Ihre Brieftasche immer mit einem Passcode entsperren.",
         "send_address_placeholder": "Adresse oder Name",
         "send_all_warning_title": "Sind Sie sicher, dass Sie Ihr gesamtes Guthaben senden möchten?",
@@ -1182,14 +1179,14 @@
                 "title": "Empfänger"
             },
             "amount": {
-                "less_than_min": "Minimum {minAmount} TON",
-                "less_than_min_with_symbol": "Minimum {minAmount} {symbol}",
+                "less_than_min": "Minimum %{minAmount} TON",
+                "less_than_min_with_symbol": "Minimum %{minAmount} %{symbol}",
                 "liquid_jetton_note": "tsTON-Liquiditätstoken senden",
                 "recipient_label": "An:",
                 "title": "Betrag"
             },
             "comfirm": {
-                "action": "{coin} Überweisung",
+                "action": "%{coin} Überweisung",
                 "comment_ascii_text": "Verwenden Sie nur ASCII-Zeichen: Ziffern, Buchstaben des lateinischen Alphabets und Satzzeichen.",
                 "comment_decrypt": "Entschlüsseln",
                 "comment_description": "Wird für alle sichtbar sein.",
@@ -1199,17 +1196,17 @@
                 "comment_label_encrypted": "Verschlüsselter Kommentar",
                 "comment_label_required": "Erforderlicher Kommentar",
                 "details_label": "Details",
-                "details_max_balance_label": "Maximalen Kontostand von {currency} senden",
-                "will_be_paid_with_battery": "Wird mit der Tonkeeper Batterie bezahlt"
+                "details_max_balance_label": "Maximalen Kontostand von %{currency} senden",
+                "will_be_paid_with_battery": "Wird mit der Keeper Batterie bezahlt"
             },
             "done": {
                 "add_favorite": "Adresse zu Favoriten speichern",
-                "address": "Adresse: {address}",
-                "comment": "Kommentar: {comment}",
+                "address": "Adresse: %{address}",
+                "comment": "Kommentar: %{comment}",
                 "description": "Ihre Transaktion wurde an das Netzwerk gesendet und wird innerhalb ein paar Sekunden verarbeitet.",
                 "favorite_saved": "Zu Favoriten gespeichert",
-                "fee": "Gebühr: {fee}",
-                "title": "{currency} gesendet!"
+                "fee": "Gebühr: %{fee}",
+                "title": "%{currency} gesendet!"
             }
         },
         "send_sending_failed": "Senden fehlgeschlagen",
@@ -1236,9 +1233,9 @@
         },
         "settings_to_mainnet": "Zum Mainnet wechseln",
         "settings_to_testnet": "Zum Testnet wechseln",
-        "setup_biometry_caption": "{biometryType} ermöglicht es Ihnen, Ihr Wallet schneller zu öffnen, ohne Ihr Passwort eingeben zu müssen.",
-        "setup_biometry_enable_button": "{biometryType} aktivieren",
-        "setup_biometry_title": "Schnelles Anmelden mit {biometryType}",
+        "setup_biometry_caption": "%{biometryType} ermöglicht es Ihnen, Ihr Wallet schneller zu öffnen, ohne Ihr Passwort eingeben zu müssen.",
+        "setup_biometry_enable_button": "%{biometryType} aktivieren",
+        "setup_biometry_title": "Schnelles Anmelden mit %{biometryType}",
         "setup_notifications_caption": "Lassen Sie sich benachrichtigen, wenn Sie TON, Token und NFTs erhalten",
         "setup_notifications_enable_button": "Benachrichtigungen aktivieren",
         "setup_notifications_title": "Erhalten Sie sofortige Benachrichtigungen",
@@ -1246,7 +1243,7 @@
             "confirm": "Transaktion in Signer bestätigen",
             "scan_qr": "Scannen Sie den QR-Code mit Signer",
             "scan_signed_qr": "Signierten Transaktions-QR-Code vom Signer scannen",
-            "step": "Schritt {value}",
+            "step": "Schritt %{value}",
             "title": "Aktion bestätigen"
         },
         "skip": "Überspringen",
@@ -1258,11 +1255,11 @@
                 },
                 "amount": {
                     "label": "Betrag",
-                    "value": "{value} TON"
+                    "value": "%{value} TON"
                 },
                 "fee": {
                     "label": "Gebühr",
-                    "value": "≈ {value} TON"
+                    "value": "≈ %{value} TON"
                 },
                 "recipient": {
                     "label": "Empfänger"
@@ -1279,7 +1276,7 @@
                 "apy": {
                     "highest_tag": "MAX",
                     "label": "APY",
-                    "value": "≈ {value}%"
+                    "value": "≈ %{value}%"
                 },
                 "balance": "Staking-Guthaben",
                 "cooldown": {
@@ -1289,26 +1286,26 @@
                 },
                 "frequency": {
                     "label": "Belohnungshäufigkeit",
-                    "value": "Alle {count} Stunden"
+                    "value": "Alle %{count} Stunden"
                 },
                 "links_title": "Links",
                 "liquidity_token": {
-                    "label": "{token}-Liquiditätstoken",
+                    "label": "%{token}-Liquiditätstoken",
                     "value": "Mehr erfahren"
                 },
                 "min_deposit": {
                     "label": "Minimale Einzahlung",
-                    "value": "{value} TON"
+                    "value": "%{value} TON"
                 },
                 "next_cycle": {
                     "desc": "Alle Transaktionen treten in Kraft, sobald der Zyklus endet.",
                     "desc_liquid": "Unstake-Anfragen sind abgeschlossen, nachdem der Zyklus endet.",
                     "in": "In",
-                    "message": "Die Unstake-Anfrage wird nach dem Ende des Validierungszyklus in {value} bearbeitet",
+                    "message": "Die Unstake-Anfrage wird nach dem Ende des Validierungszyklus in %{value} bearbeitet",
                     "reward_title": "Nächste Belohnung",
                     "title": "Nächster Zyklus"
                 },
-                "note": "Staking basiert auf Smart Contracts von Drittanbietern. Tonkeeper ist nicht für das Staking-Erlebnis verantwortlich.",
+                "note": "Staking basiert auf Smart Contracts von Drittanbietern. Keeper ist nicht für das Staking-Erlebnis verantwortlich.",
                 "pendingDeposit": "Ausstehender Einsatz",
                 "pendingWithdraw": "Ausstehende Auszahlung",
                 "pendingWithdrawDesc": "nach dem Ende des Zyklus",
@@ -1319,17 +1316,17 @@
                 },
                 "tap_to_collect": "Zum Sammeln tippen"
             },
-            "estimated_profit": "{amount} TON – jährlicher Gewinn wenn Sie TON heute staken",
-            "estimated_profit_compare": "Profitabler um {amount} TON pro Jahr als Ihr aktuelles Staking",
+            "estimated_profit": "%{amount} TON – jährlicher Gewinn wenn Sie TON heute staken",
+            "estimated_profit_compare": "Profitabler um %{amount} TON pro Jahr als Ihr aktuelles Staking",
             "get_withdrawal": "Abhebung erhalten",
             "highest_apy": "MAX APY",
-            "jetton_note": "Wenn Sie TON in einem {poolName}-Pool einsetzen, erhalten Sie einen Token namens {token}, der Ihren Anteil am Pool darstellt. Wenn der Pool Gewinne anhäuft, stellt Ihr {token} eine größere Menge an TON dar.",
+            "jetton_note": "Wenn Sie TON in einem %{poolName}-Pool einsetzen, erhalten Sie einen Token namens %{token}, der Ihren Anteil am Pool darstellt. Wenn der Pool Gewinne anhäuft, stellt Ihr %{token} eine größere Menge an TON dar.",
             "learn_more": "Mehr erfahren",
             "message": {
-                "pendingDeposit": "{amount} TON eingesetzt\n",
-                "pendingWithdraw": "{amount} TON nicht abgesteckt\n",
-                "pendingWithdrawLiquid": "{amount} TON nicht eingesetzt nach dem Ende des Zyklus",
-                "readyWithdraw": "{amount} TON bereit.\nTippen zum Sammeln"
+                "pendingDeposit": "%{amount} TON eingesetzt\n",
+                "pendingWithdraw": "%{amount} TON nicht abgesteckt\n",
+                "pendingWithdrawLiquid": "%{amount} TON nicht eingesetzt nach dem Ende des Zyklus",
+                "readyWithdraw": "%{amount} TON bereit.\nTippen zum Sammeln"
             },
             "no_funds": "Keine Mittel zum Unstaking verfügbar",
             "not_exists": "Ungültige Pool-Adresse",
@@ -1338,29 +1335,29 @@
                 "after_top_up": "Nach Einzahlung",
                 "current": "Aktuell",
                 "title": "Ihr APY",
-                "value": "≈ {value} TON"
+                "value": "≈ %{value} TON"
             },
             "send_staked_ton": "Eingesetzte TON",
             "staked": "Eingesetzt",
             "staked_ton": "Eingesetzte TON",
-            "staking_desc": "Mindestbetrag {minStake} TON.\nVerdienen Sie bis zu {maxApy}%.",
-            "staking_pool_desc": "APY ≈ {apy}%",
+            "staking_desc": "Mindestbetrag %{minStake} TON.\nVerdienen Sie bis zu %{maxApy}%.",
+            "staking_pool_desc": "APY ≈ %{apy}%",
             "title": "Staking",
             "title_large": "TON Staking",
             "top_up": "Einzahlung",
             "transaction": "Aktion bestätigen",
             "warning": {
-                "about": "Über {name}",
+                "about": "Über %{name}",
                 "beta_desc": "Wir sind nicht verantwortlich für die Stabilität und das Staking-Erlebnis. Nutzung auf eigene Gefahr.",
                 "desc": "Staking basiert auf Smart Contracts von Drittanbietern. Wir sind nicht für deren Arbeit verantwortlich.",
                 "title": "Warnung"
             },
-            "widget_desc": "APY bis zu {apy}%",
+            "widget_desc": "APY bis zu %{apy}%",
             "widget_staking_options": "Einsatzmöglichkeiten",
             "widget_title": "Einzahlung TON",
             "withdrawal_fee_warning": {
                 "continue": "Trotzdem fortfahren",
-                "message": "Bitte lassen Sie mindestens '{{'amount'}}' TON auf Ihrem Guthaben.",
+                "message": "Bitte lassen Sie mindestens {{amount}} TON auf Ihrem Guthaben.",
                 "title": "Sie haben nicht genügend Mittel für die Abhebung"
             },
             "withdrawal_request": "Unstake"
@@ -1371,11 +1368,11 @@
         "stop_watch": "Beobachtungsaccount löschen",
         "subscription_back_to_merchant_button": "Zurück",
         "subscription_back_to_merchant_caption": "Die Transaktion wird verarbeitet. Ihr Abonnement wird bald aktiv sein.",
-        "subscription_back_to_merchant_name": "Zurück zu {merchantName}",
+        "subscription_back_to_merchant_name": "Zurück zu %{merchantName}",
         "subscription_back_to_merchant_title": "Zurück zum Kanal?",
         "subscription_cancel": "Abonnement kündigen",
         "subscription_cancel_alert_cancel_btn": "Nicht jetzt",
-        "subscription_cancel_alert_caption": "Wenn Sie jetzt kündigen, können Sie Ihr Abonnement noch bis {nextBill} nutzen",
+        "subscription_cancel_alert_caption": "Wenn Sie jetzt kündigen, können Sie Ihr Abonnement noch bis %{nextBill} nutzen",
         "subscription_cancel_alert_submit_btn": "Ja, abbrechen",
         "subscription_cancel_alert_title": "Abonnement kündigen?",
         "subscription_expiring": "Ablaufend",
@@ -1383,20 +1380,20 @@
         "subscription_next_bill": "Nächste Rechnung",
         "subscription_open_merchant": "In Telegram öffnen",
         "subscription_period": "Intervall",
-        "subscription_period_custom": "Jede {period}",
+        "subscription_period_custom": "Jede %{period}",
         "subscription_period_day": "Täglich",
         "subscription_period_half_year": "Halbjährlich",
         "subscription_period_hour": "Stündlich",
         "subscription_period_month": "Monatlich",
         "subscription_period_quarter": "Vierteljährlich",
         "subscription_period_week": "Wöchentlich",
-        "subscription_period_weeks": "Alle {count} Wochen",
+        "subscription_period_weeks": "Alle %{count} Wochen",
         "subscription_period_year": "Jährlich",
         "subscription_price": "Preis",
         "subscription_sent": "Transaktion gesendet",
-        "subscriptions_item_caption": "{price} TON, nächste Rechnung am {nextBill}",
-        "subscriptions_item_caption_expired": "Abgelaufen {date}",
-        "subscriptions_item_caption_expiring": "{price} TON, läuft ab {date}",
+        "subscriptions_item_caption": "%{price} TON, nächste Rechnung am %{nextBill}",
+        "subscriptions_item_caption_expired": "Abgelaufen %{date}",
+        "subscriptions_item_caption_expiring": "%{price} TON, läuft ab %{date}",
         "subscriptions_section_active": "Aktiv",
         "subscriptions_section_expired": "Abgelaufen",
         "subscription_started": "Abonnement gestartet",
@@ -1420,17 +1417,17 @@
             "wrong_from": "Falscher 'from'-Parameter",
             "wrong_network": "Falsches Netzwerk"
         },
-        "ton_login_back_to_button": "Zurück zu {name}",
-        "ton_login_title": "Mit {0, number}omain verbinden?",
+        "ton_login_back_to_button": "Zurück zu %{name}",
+        "ton_login_title": "Mit %{0, number}omain verbinden?",
         "transaction_bid_collection_name": "Emittent",
-        "transaction_bid_date": "Gebot {date}",
-        "transaction_buy_date": "Gekauft am {date}",
+        "transaction_bid_date": "Gebot %{date}",
+        "transaction_buy_date": "Gekauft am %{date}",
         "transaction_buy_status_failed": "Fehlgeschlagen",
         "transaction_buy_status_pending": "Anhängig",
         "transaction_buy_status_success": "Erfolgreich",
         "transaction_confirmations": "Bestätigungen",
         "transaction_confirm_bid": "Gebot bestätigen",
-        "transaction_contract_deploy_date": "{date}",
+        "transaction_contract_deploy_date": "%{date}",
         "transaction_copy_caution": "Seien Sie vorsichtig mit externen Links. Geben Sie Ihre geheime Phrase niemals an Drittanbieter-Ressourcen weiter – Sie können Ihr gesamtes Geld verlieren.\n\n- - -\n\n",
         "transactionDetails": {
             "address": "Adresse",
@@ -1469,7 +1466,7 @@
         "transaction_show_subscription_button": "Abonnement anzeigen",
         "transaction_status": "Status",
         "transaction_subscription": "Abonnement",
-        "transaction_subscription_date": "Berechnet am {date}",
+        "transaction_subscription_date": "Berechnet am %{date}",
         "transaction_transfer_name": "Überweisungsname",
         "transaction_type_bounced": "Zurückgekommen",
         "transaction_type_buy": "Gekauft",
@@ -1478,9 +1475,9 @@
         "transaction_type_subscriber_lost": "Abonnent verloren",
         "transaction_type_to": "An",
         "transaction_unsubscription": "Kündigung",
-        "transaction_unsubscription_date": "{date}",
+        "transaction_unsubscription_date": "%{date}",
         "transaction_view_in_explorer": "Im Explorer anzeigen",
-        "transaction_wallet_initialized_date": "{date}",
+        "transaction_wallet_initialized_date": "%{date}",
         "transaction_your_bid": "Ihr Gebot",
         "transfer_deeplink_address_error": "Falsche Empfängersadresse",
         "transfer_deeplink_amount_error": "Falsche Betragsanfrage",
@@ -1490,7 +1487,7 @@
         "transfer_deeplink_unknown_token": "Unbekanntes Token",
         "transfer_deeplink_wrong_params": "Falsche Parameter",
         "transfer_from_old_wallet_btn": "Überweisung",
-        "transfer_from_old_wallet_caption": "Tonkeeper wird alle Coins von Ihrer alten Adresse auf Ihre aktuelle Adresse übertragen.",
+        "transfer_from_old_wallet_caption": "Keeper wird alle Coins von Ihrer alten Adresse auf Ihre aktuelle Adresse übertragen.",
         "transfer_from_old_wallet_in_progress": "Übertragung läuft",
         "transfer_from_old_wallet_title": "Übertragung an aktuelle Adresse",
         "transfer_pending_by_battery_error": "Eine andere Transaktion wird von der Batterie bearbeitet",
@@ -1501,7 +1498,7 @@
                         "close": "Abbrechen",
                         "description": "Wechseln Sie die Wallet, um die Aktion zu bestätigen.",
                         "switch": "Wechseln und fortfahren",
-                        "title": "Aktion für Ihre Wallet {value}"
+                        "title": "Aktion für Ihre Wallet %{value}"
                     },
                     "wrongVersion": {
                         "close": "Abbrechen",
@@ -1511,20 +1508,20 @@
                     },
                     "wrongWallet": {
                         "close": "OK",
-                        "description": "Melden Sie sich bei einer anderen Wallet {address} an und versuchen Sie es erneut.",
+                        "description": "Melden Sie sich bei einer anderen Wallet %{address} an und versuchen Sie es erneut.",
                         "title": "Aktion für ein anderes Wallet"
                     }
                 },
                 "insufficientFunds": {
                     "rechargeBattery": "Batterie aufladen",
-                    "rechargeWallet": "{currency} kaufen",
-                    "stakingDeposit": "Mindestguthaben für die Teilnahme:\n{amount} {currency}\n",
-                    "stakingFee": "{count} TON für die Transaktion benötigt. Geschätzte Gebühr {fee} TON wird abgezogen, der Rest wird zurückerstattet.",
+                    "rechargeWallet": "%{currency} kaufen",
+                    "stakingDeposit": "Mindestguthaben für die Teilnahme:\n%{amount} %{currency}\n",
+                    "stakingFee": "%{count} TON für die Transaktion benötigt. Geschätzte Gebühr %{fee} TON wird abgezogen, der Rest wird zurückerstattet.",
                     "title": "Unzureichende Mittel",
                     "title_multiwallet": "Unzureichende Mittel im Wallet",
-                    "toBePaid": "Zu zahlen: {amount} {currency}\n",
+                    "toBePaid": "Zu zahlen: %{amount} %{currency}\n",
                     "withFees": "+ Blockchain-Gebühren.\n",
-                    "yourBalance": "Ihr Guthaben: {balance} {currency}."
+                    "yourBalance": "Ihr Guthaben: %{balance} %{currency}."
                 },
                 "totalFee": "Gesamtgebühr",
                 "totalRefund": "Gesamtbetrag der Rückerstattung",
@@ -1533,7 +1530,7 @@
                     "subscribe": "Abonnement",
                     "unSubscribe": "Kündigung"
                 },
-                "warning_caption": "Tonkeeper kann das Ergebnis dieser Transaktion nicht vollständig überprüfen. Bitte stellen Sie sicher, dass Sie dem Empfänger vertrauen.",
+                "warning_caption": "Keeper kann das Ergebnis dieser Transaktion nicht vollständig überprüfen. Bitte stellen Sie sicher, dass Sie dem Empfänger vertrauen.",
                 "warning_title": "Warnung",
                 "wrongTime": {
                     "button": "Einstellungen öffnen",
@@ -1554,15 +1551,15 @@
             "title": "Unverifiziertes Token"
         },
         "update": {
-            "description": "Eine neue Version von Tonkeeper ist verfügbar. Sie können sie jetzt herunterladen.",
+            "description": "Eine neue Version von Keeper ist verfügbar. Sie können sie jetzt herunterladen.",
             "download": "Herunterladen",
             "downloading": "Wird heruntergeladen… {{'progress}}'%",
-            "mb": "'{{'size'}}' MB",
+            "mb": "{{size}} MB",
             "remindLater": "Erinnere mich später",
             "retry": "Download-Fehler. Tippen Sie, um es erneut zu versuchen.",
             "tap": "Tippen zum Aktualisieren",
-            "title": "Tonkeeper aktualisieren",
-            "version": "Version '{{'version'}}'"
+            "title": "Keeper aktualisieren",
+            "version": "Version {{version}}"
         },
         "upgrade_to_w5": {
             "about_button": "Über W5 Wallet",
@@ -1611,7 +1608,7 @@
             "stake_btn": "Einzahlung",
             "swap_btn": "Tauschen",
             "tonkens_tab_lable": "Tokens",
-            "updated_at": "Aktualisiert am {value}"
+            "updated_at": "Aktualisiert am %{value}"
         },
         "wallet_chat": "Chat",
         "wallet_community": "Gemeinschaft",
@@ -1632,21 +1629,22 @@
     "wallet_swap": "Tauschen",
     "wallet_title": "Wallet",
     "yesterday": "Gestern",
-    "staking_pool_liquid_desc": "Wenn Sie %{coinSymbolWithEx} in einem Tonstakers-Pool staken, erhalten Sie einen Token namens tsTON, der Ihren Anteil am Pool repräsentiert. Wenn der Pool Gewinne ansammelt, repräsentiert Ihr tsTON einen größeren %{coinSymbolWithEx}-Betrag.",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} werden am {date} ausgezahlt",
-    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} werden nach Ende des Zyklus ausgezahlt",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} werden in {value} ausgezahlt",
+    "staking_pool_liquid_desc": "Wenn Sie %{coinSymbol} in einem Tonstakers-Pool staken, erhalten Sie einen Token namens tsTON, der Ihren Anteil am Pool repräsentiert. Wenn der Pool Gewinne ansammelt, repräsentiert Ihr tsTON einen größeren %{coinSymbol}-Betrag.",
+    "staking_pool_withdraw_date": "%{amount} %{coinSymbol} werden am %{date} ausgezahlt",
+    "staking_portfolio_pending_withdraw": "%{amount} %{coinSymbol} werden nach Ende des Zyklus ausgezahlt",
+    "staking_portfolio_pending_withdraw_countdown": "%{amount} %{coinSymbol} werden in %{value} ausgezahlt",
     "staking_confirm_modal_provider": "Anbieter",
     "staking_confirm_modal_amount": "Betrag",
     "staking_confirm_modal_apy": "APY",
     "staking_confirm_modal_wallet": "Wallet",
-    "staking_unstake_cycle_info": "Die Anfrage wird nach Ende des Validierungszyklus in {value} bearbeitet",
-    "staking_tonstakers_notice": "Staking basiert auf Smart Contracts Dritter. Tonkeeper ist nicht verantwortlich für die Staking-Erfahrung.",
+    "staking_unstake_cycle_info": "Die Anfrage wird nach Ende des Validierungszyklus in %{value} bearbeitet",
+    "staking_tonstakers_notice": "Staking basiert auf Smart Contracts Dritter. Keeper ist nicht verantwortlich für die Staking-Erfahrung.",
     "staking_claim": "Einfordern",
     "staking_details_pool_address_label": "Pool-Adresse",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} warten auf Staking",
-    "staking_pools_min_deposit": "Min. Einzahlung {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "%{amount} %{coinSymbol} warten auf Staking",
+    "staking_pools_min_deposit": "Min. Einzahlung %{minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "Nur vollständige Auszahlung möglich",
+    "trc20_transfer_unavailable": "Das Senden von TRC20 ist vorübergehend nicht verfügbar",
     "twa_closed_title": "Mini-App geschlossen",
     "twa_closed_subtitle": "Mach auf iOS, Android oder im Web dort weiter, wo du aufgehört hast.",
     "twa_closed_subtitle_wallets": "Deine Wallets sind sicher. Bitte sichere deine Wiederherstellungsphrasen und mach auf iOS, Android oder im Web dort weiter, wo du aufgehört hast.",

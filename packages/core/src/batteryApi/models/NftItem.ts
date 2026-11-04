@@ -57,77 +57,61 @@ import {
 export interface NftItem {
     /**
      * 
-     * @type {string}
-     * @memberof NftItem
      */
     address: string;
     /**
      * 
-     * @type {number}
-     * @memberof NftItem
      */
     index: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof NftItem
      */
     owner?: AccountAddress;
     /**
      * 
-     * @type {NftItemCollection}
-     * @memberof NftItem
      */
     collection?: NftItemCollection;
     /**
      * Collection master contract confirmed that this item is part of collection
-     * @type {boolean}
-     * @memberof NftItem
      */
     verified: boolean;
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof NftItem
      */
     metadata: { [key: string]: any; };
     /**
      * 
-     * @type {Sale}
-     * @memberof NftItem
      */
     sale?: Sale;
     /**
      * 
-     * @type {Array<ImagePreview>}
-     * @memberof NftItem
      */
     previews?: Array<ImagePreview>;
     /**
      * 
-     * @type {string}
-     * @memberof NftItem
      */
     dns?: string;
     /**
      * Please use trust field
-     * @type {Array<string>}
-     * @memberof NftItem
      * @deprecated
      */
     approvedBy: Array<NftItemApprovedByEnum>;
     /**
      * 
-     * @type {boolean}
-     * @memberof NftItem
      */
     includeCnft?: boolean;
     /**
      * 
-     * @type {TrustType}
-     * @memberof NftItem
      */
     trust: TrustType;
+    /**
+     * Hash of the NFT item account code cell (hex)
+     */
+    codeHash?: string;
+    /**
+     * Hash of the NFT item account data cell (hex)
+     */
+    dataHash?: string;
 }
 
 
@@ -136,7 +120,7 @@ export interface NftItem {
  */
 export const NftItemApprovedByEnum = {
     Getgems: 'getgems',
-    Tonkeeper: 'tonkeeper'
+    Tonkeeper: 'tonkeeper',
 } as const;
 export type NftItemApprovedByEnum = typeof NftItemApprovedByEnum[keyof typeof NftItemApprovedByEnum];
 
@@ -149,7 +133,7 @@ export function instanceOfNftItem(value: object): value is NftItem {
     if (!('index' in value) || value['index'] === undefined) return false;
     if (!('verified' in value) || value['verified'] === undefined) return false;
     if (!('metadata' in value) || value['metadata'] === undefined) return false;
-    if (!('approvedBy' in value) || value['approvedBy'] === undefined) return false;
+    if ((!('approvedBy' in (value as Record<string, any>)) && !('approved_by' in (value as Record<string, any>))) || ((value as Record<string, any>)['approvedBy'] === undefined && (value as Record<string, any>)['approved_by'] === undefined)) return false;
     if (!('trust' in value) || value['trust'] === undefined) return false;
     return true;
 }
@@ -176,14 +160,16 @@ export function NftItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): N
         'approvedBy': json['approved_by'],
         'includeCnft': json['include_cnft'] == null ? undefined : json['include_cnft'],
         'trust': TrustTypeFromJSON(json['trust']),
+        'codeHash': json['code_hash'] == null ? undefined : json['code_hash'],
+        'dataHash': json['data_hash'] == null ? undefined : json['data_hash'],
     };
 }
 
-  export function NftItemToJSON(json: any): NftItem {
-      return NftItemToJSONTyped(json, false);
-  }
+export function NftItemToJSON(json: any): NftItem {
+    return NftItemToJSONTyped(json, false);
+}
 
-  export function NftItemToJSONTyped(value?: NftItem | null, ignoreDiscriminator: boolean = false): any {
+export function NftItemToJSONTyped(value?: NftItem | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -202,6 +188,8 @@ export function NftItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): N
         'approved_by': value['approvedBy'],
         'include_cnft': value['includeCnft'],
         'trust': TrustTypeToJSON(value['trust']),
+        'code_hash': value['codeHash'],
+        'data_hash': value['dataHash'],
     };
 }
 

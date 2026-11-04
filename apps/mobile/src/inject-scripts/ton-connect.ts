@@ -14,14 +14,13 @@ import {
     tonConnectTonkeeperProAppName,
     tonConnectTonkeeperProWalletInfo
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import packageJson from '../../package.json';
 import { bridgeEvents$, postBridgeMessage } from './native-bridge';
 import { NATIVE_BRIDGE_METHODS } from './native-bridge-methods';
 
 function currentDeviceInfo(options?: { maxMessages?: number }): DeviceInfo {
     return getDeviceInfo(
         getTonConnectPlatform('mobile'),
-        packageJson.version,
+        __APP_VERSION__,
         options?.maxMessages ?? 255,
         tonConnectTonkeeperProAppName
     );

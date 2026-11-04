@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { DesktopBackButton, DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body3, Label2 } from '../../components/Text';
 import { ListBlock, ListItem } from '../../components/List';
-import { ChevronRightIcon, CloseIcon, SpinnerIcon } from '../../components/Icon';
+import { ChevronRightIcon, CloseIcon } from '../../components/Icon';
+import { Loader } from '../../components/Loader';
 import { MultiSendList, useUserMultiSendLists } from '../../state/multiSend';
 import { useRate } from '../../state/rates';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -142,7 +143,7 @@ export const DesktopMultiSendPage: FC = () => {
     if (!lists) {
         return (
             <LoadingWrapper>
-                <SpinnerIcon />
+                <Loader size="small" />
             </LoadingWrapper>
         );
     }

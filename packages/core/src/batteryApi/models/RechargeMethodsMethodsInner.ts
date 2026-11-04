@@ -21,56 +21,38 @@ import { mapValues } from '../runtime';
 export interface RechargeMethodsMethodsInner {
     /**
      * 
-     * @type {string}
-     * @memberof RechargeMethodsMethodsInner
      */
     image?: string;
     /**
      * 
-     * @type {string}
-     * @memberof RechargeMethodsMethodsInner
      */
     jettonMaster?: string;
     /**
      * 
-     * @type {string}
-     * @memberof RechargeMethodsMethodsInner
      */
     minBootstrapValue?: string;
     /**
      * 
-     * @type {string}
-     * @memberof RechargeMethodsMethodsInner
      */
     type: RechargeMethodsMethodsInnerTypeEnum;
     /**
      * 
-     * @type {string}
-     * @memberof RechargeMethodsMethodsInner
      */
     rate: string;
     /**
      * 
-     * @type {string}
-     * @memberof RechargeMethodsMethodsInner
      */
     symbol: string;
     /**
      * 
-     * @type {number}
-     * @memberof RechargeMethodsMethodsInner
      */
     decimals: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof RechargeMethodsMethodsInner
      */
     supportGasless: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof RechargeMethodsMethodsInner
      */
     supportRecharge: boolean;
 }
@@ -81,7 +63,7 @@ export interface RechargeMethodsMethodsInner {
  */
 export const RechargeMethodsMethodsInnerTypeEnum = {
     Jetton: 'jetton',
-    Ton: 'ton'
+    Ton: 'ton',
 } as const;
 export type RechargeMethodsMethodsInnerTypeEnum = typeof RechargeMethodsMethodsInnerTypeEnum[keyof typeof RechargeMethodsMethodsInnerTypeEnum];
 
@@ -94,8 +76,8 @@ export function instanceOfRechargeMethodsMethodsInner(value: object): value is R
     if (!('rate' in value) || value['rate'] === undefined) return false;
     if (!('symbol' in value) || value['symbol'] === undefined) return false;
     if (!('decimals' in value) || value['decimals'] === undefined) return false;
-    if (!('supportGasless' in value) || value['supportGasless'] === undefined) return false;
-    if (!('supportRecharge' in value) || value['supportRecharge'] === undefined) return false;
+    if ((!('supportGasless' in (value as Record<string, any>)) && !('support_gasless' in (value as Record<string, any>))) || ((value as Record<string, any>)['supportGasless'] === undefined && (value as Record<string, any>)['support_gasless'] === undefined)) return false;
+    if ((!('supportRecharge' in (value as Record<string, any>)) && !('support_recharge' in (value as Record<string, any>))) || ((value as Record<string, any>)['supportRecharge'] === undefined && (value as Record<string, any>)['support_recharge'] === undefined)) return false;
     return true;
 }
 
@@ -121,11 +103,11 @@ export function RechargeMethodsMethodsInnerFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function RechargeMethodsMethodsInnerToJSON(json: any): RechargeMethodsMethodsInner {
-      return RechargeMethodsMethodsInnerToJSONTyped(json, false);
-  }
+export function RechargeMethodsMethodsInnerToJSON(json: any): RechargeMethodsMethodsInner {
+    return RechargeMethodsMethodsInnerToJSONTyped(json, false);
+}
 
-  export function RechargeMethodsMethodsInnerToJSONTyped(value?: RechargeMethodsMethodsInner | null, ignoreDiscriminator: boolean = false): any {
+export function RechargeMethodsMethodsInnerToJSONTyped(value?: RechargeMethodsMethodsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

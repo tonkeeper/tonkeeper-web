@@ -8,8 +8,11 @@ import {
     TronEstimation,
     TronRecipientData
 } from '@tonkeeper/core/dist/entries/send';
-import { useAnalyticsTrack } from '../analytics';
-import { useTrackTransactionSent } from '../analytics/events-hooks';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../analytics/events-hooks';
 import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
 import { BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE, useGetSender } from './useSender';
@@ -20,22 +23,32 @@ import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/const
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { TronSenderType, useGetTronSender } from './sender/useTronSender';
 import { AllChainsSenderType } from './sender/sender-type';
+import { TransferInitiatedBy } from '../analytics/events-hooks';
+import { SendFrom, useAssetAmountSendContext, useSendAnalytics } from '../analytics/send';
 
 export function useSendTransfer<T extends Asset>({
     recipient,
     amount,
     isMax,
     estimation,
-    senderType
+    senderType,
+    initiatedBy = 'user',
+    from
 }: {
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData;
     amount: AssetAmount<T>;
     isMax: boolean;
     estimation: Estimation<T>;
     senderType: AllChainsSenderType;
+    /** How the user got to this send screen; defaults to an in-wallet flow. */
+    initiatedBy?: TransferInitiatedBy;
+    /** Where the send funnel was opened; without it no `send_*` events are reported. */
+    from?: SendFrom;
 }) {
-    const track = useAnalyticsTrack();
+    const sendAnalyticsContext = useAssetAmountSendContext(from, amount);
+    const sendAnalytics = useSendAnalytics(sendAnalyticsContext);
     const trackTransactionSent = useTrackTransactionSent();
+    const assetId = useAnalyticsAssetId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
     const notifyError = useNotifyErrorHandle();
     const getSender = useGetSender();
@@ -43,6 +56,7 @@ export function useSendTransfer<T extends Asset>({
     const getTronSender = useGetTronSender();
 
     return useMutation<boolean, Error>(async () => {
+        sendAnalytics.confirm(toAnalyticsFeeAsset(senderType));
         try {
             if (isTonAsset(amount.asset)) {
                 if (!('toAccount' in recipient)) {
@@ -82,13 +96,16 @@ export function useSendTransfer<T extends Asset>({
                         payload: comment ? { type: 'comment', value: comment } : undefined
                     }
                 );
-                track('send_success', {
-                    from: 'send_confirm',
-                    token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
+                sendAnalytics.succeed();
+                trackTransactionSent({
+                    category: 'transfer',
+                    category_detail: isTon(amount.asset.address) ? 'coin' : 'token',
+                    asset: assetId.fromAsset(amount.asset),
+                    amount: amount.relativeAmount.toNumber(),
+                    fee_asset: toAnalyticsFeeAsset(senderType),
+                    is_max: isMax,
+                    initiated_by: initiatedBy
                 });
-                trackTransactionSent(
-                    isTon(amount.asset.address) ? 'TonTransfer' : 'JettonTransfer'
-                );
             } else if (amount.asset.id === TRON_USDT_ASSET.id) {
                 const tronSender = await getTronSender(senderType as TronSenderType);
                 await tronSender.send(
@@ -96,12 +113,21 @@ export function useSendTransfer<T extends Asset>({
                     amount as AssetAmount<TronAsset>,
                     estimation as TronEstimation
                 );
-                // We don't have a specific event type for Tron transfers, so we use Unknown.
-                trackTransactionSent('Unknown');
+                sendAnalytics.succeed();
+                trackTransactionSent({
+                    category: 'transfer',
+                    category_detail: 'token',
+                    asset: assetId.fromAsset(amount.asset),
+                    amount: amount.relativeAmount.toNumber(),
+                    fee_asset: toAnalyticsFeeAsset(senderType),
+                    is_max: isMax,
+                    initiated_by: initiatedBy
+                });
             } else {
                 throw new Error('Unexpected asset');
             }
         } catch (e) {
+            sendAnalytics.fail(e);
             await notifyError(e);
         }
 

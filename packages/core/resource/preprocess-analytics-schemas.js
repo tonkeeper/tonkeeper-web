@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /*
- * Workaround for broken local $refs in tonkeeper/analytics-schemas (openapi-client/).
+ * Workaround for broken local $refs in tonkeeper/analytics-schemas
+ * (openapi-client/).
  *
  * The upstream `analytics.yaml` aliases cross-file schemas at the top level
  * (e.g. `RampSource: $ref: ./ramps-common.yaml#/.../RampSourceSchema`), but
@@ -23,9 +24,7 @@ const path = require('path');
 const [, , SRC, DST] = process.argv;
 
 if (!SRC || !DST) {
-    console.error(
-        'usage: preprocess-analytics-schemas.js <src-openapi-dir> <dst-openapi-dir>'
-    );
+    console.error('usage: preprocess-analytics-schemas.js <src-openapi-dir> <dst-openapi-dir>');
     process.exit(1);
 }
 
@@ -92,6 +91,4 @@ for (const file of fs.readdirSync(SRC)) {
     patched += 1;
 }
 
-console.log(
-    `preprocess: injected up to ${aliases.length} aliases into ${patched} schema files`
-);
+console.log(`preprocess: injected up to ${aliases.length} aliases into ${patched} schema files`);

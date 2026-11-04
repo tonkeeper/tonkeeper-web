@@ -1,5 +1,12 @@
 .openapi-generator-ignore
+apis/AssetsApi.ts
+apis/CrosschainApi.ts
+apis/ExchangeApi.ts
+apis/OfframpApi.ts
+apis/OnrampApi.ts
+apis/P2pApi.ts
 apis/SwapApi.ts
+apis/SystemApi.ts
 apis/index.ts
 index.ts
 models/index.ts

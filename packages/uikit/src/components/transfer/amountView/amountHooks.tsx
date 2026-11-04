@@ -1,7 +1,7 @@
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useEffect } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
-import { getTextWidth } from '../../../hooks/textWidth';
+import { getTextWidth, getUiFontFamily } from '../../../hooks/textWidth';
 import { InputSize } from '../Sentence';
 
 export const useButtonPosition = (
@@ -60,10 +60,11 @@ export const defaultSize: InputSize = { size: 40, width: 30 };
 export const getInputSize = (value: string, parent: HTMLLabelElement) => {
     const max = parent.clientWidth;
     let size = defaultSize.size;
-    let width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
+    const fontFamily = getUiFontFamily();
+    let width = getTextWidth(value, `500 ${size}px ${fontFamily}`);
     while (Math.round(width) > max - 115) {
         size = Math.max(1, size - 1);
-        width = getTextWidth(value, `600 ${size}px 'Montserrat'`);
+        width = getTextWidth(value, `500 ${size}px ${fontFamily}`);
     }
 
     return {

@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { useSwapTokensFilter } from '../../../state/swap/useSwapAssets';
 import { useTranslation } from '../../../hooks/translation';
-import { Input } from '../../fields/Input';
+import { SearchField } from '../../fields/SearchField';
 
 export const SwapSearchInput = forwardRef<
     HTMLInputElement,
@@ -11,17 +11,18 @@ export const SwapSearchInput = forwardRef<
     const [value, setValue] = useSwapTokensFilter();
 
     return (
-        <Input
+        <SearchField
+            ref={ref}
             id="swap-search"
             value={value}
-            onChange={e => setValue(e)}
-            ref={ref}
+            onChange={setValue}
             disabled={isDisabled}
-            label={t('swap_search')}
-            clearButton
+            placeholder={t('swap_search')}
             className={className}
-            size="small"
-            autoFocus="notification"
+            autoFocus
+            // Notifications animate in over ~400ms; delay focus so the call
+            // doesn't compete with the open animation.
+            autoFocusDelay={400}
         />
     );
 });

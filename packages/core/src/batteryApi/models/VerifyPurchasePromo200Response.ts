@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface VerifyPurchasePromo200Response {
     /**
      * 
-     * @type {string}
-     * @memberof VerifyPurchasePromo200Response
      */
     bonusCharges: string;
 }
@@ -31,7 +29,7 @@ export interface VerifyPurchasePromo200Response {
  * Check if a given object implements the VerifyPurchasePromo200Response interface.
  */
 export function instanceOfVerifyPurchasePromo200Response(value: object): value is VerifyPurchasePromo200Response {
-    if (!('bonusCharges' in value) || value['bonusCharges'] === undefined) return false;
+    if ((!('bonusCharges' in (value as Record<string, any>)) && !('bonus_charges' in (value as Record<string, any>))) || ((value as Record<string, any>)['bonusCharges'] === undefined && (value as Record<string, any>)['bonus_charges'] === undefined)) return false;
     return true;
 }
 
@@ -49,11 +47,11 @@ export function VerifyPurchasePromo200ResponseFromJSONTyped(json: any, ignoreDis
     };
 }
 
-  export function VerifyPurchasePromo200ResponseToJSON(json: any): VerifyPurchasePromo200Response {
-      return VerifyPurchasePromo200ResponseToJSONTyped(json, false);
-  }
+export function VerifyPurchasePromo200ResponseToJSON(json: any): VerifyPurchasePromo200Response {
+    return VerifyPurchasePromo200ResponseToJSONTyped(json, false);
+}
 
-  export function VerifyPurchasePromo200ResponseToJSONTyped(value?: VerifyPurchasePromo200Response | null, ignoreDiscriminator: boolean = false): any {
+export function VerifyPurchasePromo200ResponseToJSONTyped(value?: VerifyPurchasePromo200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

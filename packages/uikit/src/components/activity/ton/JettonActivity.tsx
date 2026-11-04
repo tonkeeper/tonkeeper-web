@@ -1,5 +1,6 @@
 import { Action, JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { toScaledUIWeiAmount } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
@@ -39,11 +40,15 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
     }
 
     const isScam = jettonTransfer.jetton.verification === 'blacklist';
+    const amount = format(
+        toScaledUIWeiAmount(jettonTransfer.amount, jettonTransfer.jetton.scaledUi),
+        jettonTransfer.jetton.decimals
+    );
 
     if (jettonTransfer.sender?.address === wallet.rawAddress) {
         return (
             <SendActivityAction
-                amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
+                amount={amount}
                 symbol={sanitizeJetton(
                     jettonTransfer.jetton.symbol,
                     jettonTransfer.jetton.verification === JettonVerificationType.Blacklist
@@ -65,7 +70,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
 
     return (
         <ReceiveActivityAction
-            amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
+            amount={amount}
             symbol={sanitizeJetton(
                 jettonTransfer.jetton.symbol,
                 jettonTransfer.jetton.verification === JettonVerificationType.Blacklist
@@ -140,7 +145,15 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
             </ActivityIcon>
             <ColumnLayout
                 title={t('transactions_burned')}
-                amount={<>-&thinsp;{format(jettonBurn.amount, jettonBurn.jetton.decimals)}</>}
+                amount={
+                    <>
+                        -&thinsp;
+                        {format(
+                            toScaledUIWeiAmount(jettonBurn.amount, jettonBurn.jetton.scaledUi),
+                            jettonBurn.jetton.decimals
+                        )}
+                    </>
+                }
                 entry={jettonBurn.jetton.symbol}
                 address={formatAddress(jettonBurn.jetton.address, network, true)}
                 date={date}
@@ -169,7 +182,15 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
             </ActivityIcon>
             <ColumnLayout
                 title={t('transaction_type_mint')}
-                amount={<>+&thinsp;{format(jettonMint.amount, jettonMint.jetton.decimals)}</>}
+                amount={
+                    <>
+                        +&thinsp;
+                        {format(
+                            toScaledUIWeiAmount(jettonMint.amount, jettonMint.jetton.scaledUi),
+                            jettonMint.jetton.decimals
+                        )}
+                    </>
+                }
                 entry={sanitizeJetton(
                     jettonMint.jetton.symbol,
                     jettonMint.jetton.verification === JettonVerificationType.Blacklist

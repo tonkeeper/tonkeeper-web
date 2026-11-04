@@ -66,7 +66,7 @@ const QrScanner = () => {
     }, [isOpen, onScan, standalone, scanId, sdk.uiEvents]);
 
     return (
-        <Notification isOpen={isOpen} handleClose={onCancel} title={t('scan_qr_title')}>
+        <Notification isOpen={isOpen} handleClose={onCancel} title={t('scan_qr_title')} topMost>
             {Content}
         </Notification>
     );

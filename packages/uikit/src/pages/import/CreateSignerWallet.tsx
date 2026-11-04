@@ -6,10 +6,11 @@ import { useScanner } from '../../hooks/scanner';
 import { useTranslation } from '../../hooks/translation';
 import { WalletSignerIcon } from '../../components/create/WalletIcons';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
-import { useSetNotificationOnBack } from '../../components/Notification';
+import { useSetModalOnBack } from '../../primitives/Modal';
 import { useParseAndAddSigner } from '../../state/wallet';
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { useImportFlowAnalytics } from '../../hooks/analytics/wallet-flow';
 
 const IconBlock = styled.div`
     color: ${props => props.theme.accentBlue};
@@ -27,13 +28,20 @@ export const CreateSignerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     const { t } = useTranslation();
 
     const { mutateAsync, reset, isLoading } = useParseAndAddSigner();
+    const importAnalytics = useImportFlowAnalytics('signer');
     const onSubmit = useCallback(
         async (link: string) => {
             reset();
-            await mutateAsync({ link, source: 'qr' });
+            try {
+                await mutateAsync({ link, source: 'qr' });
+            } catch (e) {
+                importAnalytics.error(e);
+                throw e;
+            }
+            importAnalytics.success();
             afterCompleted();
         },
-        [reset, mutateAsync, afterCompleted]
+        [reset, mutateAsync, afterCompleted, importAnalytics]
     );
     const env = useAppTargetEnv();
 
@@ -43,7 +51,7 @@ export const CreateSignerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     );
 
     const { navigateHome } = useContext(AddWalletContext);
-    useSetNotificationOnBack(navigateHome);
+    useSetModalOnBack(navigateHome);
     const sdk = useAppSdk();
 
     return (

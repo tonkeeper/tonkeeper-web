@@ -2,9 +2,10 @@
     "name": "@tonkeeper/web",
     "version": "0.0.0",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
-    "description": "Your web wallet on The Open Network",
+    "description": "Secure multichain crypto wallet",
     "dependencies": {
         "@tanstack/react-query": "4.3.4",
+        "@tonkeeper/chainkit": "26.11.1",
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",
         "@tonkeeper/uikit": "0.1.0",
@@ -12,7 +13,7 @@
         "copy-to-clipboard": "^3.3.3",
         "i18next": "^22.1.4",
         "i18next-browser-languagedetector": "^7.0.2",
-        "i18next-http-backend": "^2.0.2",
+        "i18next-http-backend": "^3.0.5",
         "process": "^0.11.10",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
@@ -28,12 +29,16 @@
         "@types/react-router-dom": "^5.3.3",
         "@types/styled-components": "^5.1.26",
         "@vitejs/plugin-react": "^4.2.1",
+        "autoprefixer": "^10.4.20",
         "fs-extra": "^11.2.0",
+        "postcss": "^8.4.49",
         "react-is": "^18.2.0",
+        "tailwindcss": "^3.4.17",
         "ts-node": "^10.9.1",
         "typescript": "5.2.2",
-        "vite": "^6.4.2",
-        "vite-plugin-node-polyfills": "0.17.0"
+        "vite": "^6.4.3",
+        "vite-plugin-node-polyfills": "0.17.0",
+        "vitest": "^3.2.4"
     },
     "scripts": {
         "locales": "ts-node ./task/locales",
@@ -42,6 +47,7 @@
         "preview": "vite preview",
         "build": "tsc && vite build && yarn locales",
         "build:web": "yarn build",
+        "test": "vitest run",
         "typecheck": "tsc --noEmit"
     },
     "browserslist": {

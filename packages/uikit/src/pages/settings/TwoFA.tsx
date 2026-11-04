@@ -9,7 +9,8 @@ import {
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import styled from 'styled-components';
-import { ExclamationMarkTriangleIcon, SpinnerRing } from '../../components/Icon';
+import { ExclamationMarkTriangleIcon } from '../../components/Icon';
+import { Loader } from '../../components/Loader';
 import { useTranslation } from '../../hooks/translation';
 import { fallbackRenderOver } from '../../components/Error';
 import { AppRoute } from '../../libs/routes';
@@ -162,7 +163,7 @@ const TwoFAPageContent: FC = () => {
     if (config === undefined) {
         return (
             <SpinnerWrapper>
-                <SpinnerRing />
+                <Loader size="small" className="text-iconSecondary" />
             </SpinnerWrapper>
         );
     }

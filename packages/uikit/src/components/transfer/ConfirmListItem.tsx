@@ -131,14 +131,14 @@ export const FeeListItem: FC<{ feeAmount: string; fiatFeeAmount?: string }> = ({
                         right
                         text={
                             <>
-                                {feeAmount} {BRAND_CONFIG.coinSymbolWithEx}
+                                {feeAmount} {BRAND_CONFIG.coinSymbol}
                             </>
                         }
                         secondary={<>≈&thinsp;{fiatFeeAmount}</>}
                     />
                 ) : (
                     <Label1>
-                        {feeAmount} {BRAND_CONFIG.coinSymbolWithEx}
+                        {feeAmount} {BRAND_CONFIG.coinSymbol}
                     </Label1>
                 )}
             </ListItemPayload>

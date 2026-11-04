@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface NftItemCollection {
     /**
      * 
-     * @type {string}
-     * @memberof NftItemCollection
      */
     address: string;
     /**
      * 
-     * @type {string}
-     * @memberof NftItemCollection
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof NftItemCollection
      */
     description: string;
 }
@@ -65,11 +59,11 @@ export function NftItemCollectionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function NftItemCollectionToJSON(json: any): NftItemCollection {
-      return NftItemCollectionToJSONTyped(json, false);
-  }
+export function NftItemCollectionToJSON(json: any): NftItemCollection {
+    return NftItemCollectionToJSONTyped(json, false);
+}
 
-  export function NftItemCollectionToJSONTyped(value?: NftItemCollection | null, ignoreDiscriminator: boolean = false): any {
+export function NftItemCollectionToJSONTyped(value?: NftItemCollection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

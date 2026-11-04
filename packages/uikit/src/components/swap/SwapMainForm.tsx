@@ -2,11 +2,16 @@ import { FC, useState } from 'react';
 import { styled, useTheme } from 'styled-components';
 import { AppRoute } from '../../libs/routes';
 import { useSwapToTonConnectParams } from '../../state/swap/useSwapToTonConnectParams';
-import { useSwapFromAmount, useSwapFromAsset, useSwapToAsset } from '../../state/swap/useSwapForm';
+import {
+    useMaxSwapValue,
+    useSwapFromAmount,
+    useSwapFromAsset,
+    useSwapToAsset
+} from '../../state/swap/useSwapForm';
 import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
 import { swapConfirmation$ } from '../../state/swap/useSwapStreamEffect';
 import { SwapIcon } from '../Icon';
-import { IconButton } from '../fields/IconButton';
+import { LegacyIconButton } from '../fields/IconButton';
 import { SwapButton } from './SwapButton';
 import { SwapFromField } from './SwapFromField';
 import { SwapToField } from './SwapToField';
@@ -15,6 +20,8 @@ import { SwapConfirmationNotification, SwapConfirmData } from './SwapConfirmatio
 import { useNavigate } from '../../hooks/router/useNavigate';
 import BigNumber from 'bignumber.js';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useAnalyticsAssetId } from '../../hooks/analytics/events-hooks';
+import { useSwapAnalytics } from '../../hooks/analytics/swap';
 
 const MainFormWrapper = styled.div`
     display: flex;
@@ -22,7 +29,7 @@ const MainFormWrapper = styled.div`
     gap: 0.5rem;
 `;
 
-const ChangeIconStyled = styled(IconButton)`
+const ChangeIconStyled = styled(LegacyIconButton)`
     height: 32px;
     width: 32px;
     position: absolute;
@@ -50,9 +57,12 @@ export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
     const [confirmData, setConfirmData] = useState<SwapConfirmData | null>(null);
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const [toAsset, setToAsset] = useSwapToAsset();
-    const [_, setFromAmount] = useSwapFromAmount();
+    const [fromAmount, setFromAmount] = useSwapFromAmount();
+    const { data: maxSwapValue } = useMaxSwapValue();
     const navigate = useNavigate();
     const [__, setIsMobileSwapOpen] = useSwapMobileNotification();
+    const swapAnalytics = useSwapAnalytics();
+    const analyticsAssetId = useAnalyticsAssetId();
 
     const onConfirm = async () => {
         const confirmation = swapConfirmation$.value;
@@ -65,8 +75,18 @@ export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
             return;
         }
 
+        const isMax =
+            !!fromAmount &&
+            maxSwapValue !== undefined &&
+            fromAmount.eq(shiftedDecimals(maxSwapValue, fromAsset.decimals));
+        swapAnalytics.click({
+            asset_from: analyticsAssetId.fromAsset(fromAsset),
+            asset_to: analyticsAssetId.fromAsset(toAsset),
+            is_max: isMax
+        });
+
         const payload = await encode(confirmation);
-        setConfirmData({ confirmation, payload });
+        setConfirmData({ confirmation, payload, isMax });
     };
 
     const onChangeFields = () => {

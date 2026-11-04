@@ -6,6 +6,12 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { SenderChoice } from '../../../hooks/blockchain/useSender';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../../hooks/analytics/events-hooks';
 import { useTranslation } from '../../../hooks/translation';
 import { useDateFormat } from '../../../hooks/dateFormat';
 import { useNavigate } from '../../../hooks/router/useNavigate';
@@ -249,6 +255,8 @@ const DescriptionText = styled(Body3)`
 function useClaimAction(pool: PoolInfo | undefined, isLiquid: boolean, readyWithdraw: number) {
     const [params, setParams] = useState<TonConnectTransactionPayload | null>(null);
     const { mutateAsync: encodeClaim, isLoading } = useEncodeStakingUnstake();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     const canClaim = readyWithdraw > 0 && !isLiquid && !!pool;
 
@@ -262,12 +270,28 @@ function useClaimAction(pool: PoolInfo | undefined, isLiquid: boolean, readyWith
         }
     };
 
+    const closeClaim = (result?: { senderChoice: SenderChoice }) => {
+        if (result && pool) {
+            trackTransactionSent({
+                category: 'staking',
+                category_detail: 'claim',
+                asset: assetId.tonCoin(),
+                amount: shiftedDecimals(readyWithdraw).toNumber(),
+                fee_asset: toAnalyticsFeeAsset(result.senderChoice.type),
+                staking_provider: pool.address,
+                // Only non-liquid pools have a claimable withdrawal.
+                is_liquid: false
+            });
+        }
+        setParams(null);
+    };
+
     return {
         canClaim,
         handleClaim,
         claimDisabled: isLoading || !!params,
         claimParams: params,
-        closeClaim: () => setParams(null)
+        closeClaim
     };
 }
 
@@ -397,8 +421,8 @@ export const StakingPoolDetailContent = ({
     const { data: poolIconJettonInfo } = useJettonInfo(liquidJettonMaster ?? '');
     const { fiatAmount } = useFormatFiat(tonRate, stakedAmount);
     const displayAmount = stakedAmount
-        ? formatTokenDisplay(stakedAmount, BRAND_CONFIG.coinSymbolWithEx)
-        : `— ${BRAND_CONFIG.coinSymbolWithEx}`;
+        ? formatTokenDisplay(stakedAmount, BRAND_CONFIG.coinSymbol)
+        : `— ${BRAND_CONFIG.coinSymbol}`;
     const { pendingWithdraw = 0, pendingDeposit = 0, readyWithdraw = 0 } = position ?? {};
 
     const cycleEndDate = pool && pendingWithdraw > 0 ? pool.cycleEnd * 1000 : undefined;

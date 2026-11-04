@@ -43,38 +43,26 @@ import {
 export interface ExtraCurrencyTransferAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof ExtraCurrencyTransferAction
      */
     sender: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof ExtraCurrencyTransferAction
      */
     recipient: AccountAddress;
     /**
      * amount in quanta of tokens
-     * @type {string}
-     * @memberof ExtraCurrencyTransferAction
      */
     amount: string;
     /**
      * 
-     * @type {string}
-     * @memberof ExtraCurrencyTransferAction
      */
     comment?: string;
     /**
      * 
-     * @type {EncryptedComment}
-     * @memberof ExtraCurrencyTransferAction
      */
     encryptedComment?: EncryptedComment;
     /**
      * 
-     * @type {EcPreview}
-     * @memberof ExtraCurrencyTransferAction
      */
     currency: EcPreview;
 }
@@ -109,11 +97,11 @@ export function ExtraCurrencyTransferActionFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function ExtraCurrencyTransferActionToJSON(json: any): ExtraCurrencyTransferAction {
-      return ExtraCurrencyTransferActionToJSONTyped(json, false);
-  }
+export function ExtraCurrencyTransferActionToJSON(json: any): ExtraCurrencyTransferAction {
+    return ExtraCurrencyTransferActionToJSONTyped(json, false);
+}
 
-  export function ExtraCurrencyTransferActionToJSONTyped(value?: ExtraCurrencyTransferAction | null, ignoreDiscriminator: boolean = false): any {
+export function ExtraCurrencyTransferActionToJSONTyped(value?: ExtraCurrencyTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

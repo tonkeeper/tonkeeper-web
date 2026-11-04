@@ -34,9 +34,14 @@
     "approval": {
         "accepted": "نمایان",
         "declined": "پنهان",
+        "details_collection": "اطلاعات کلکسیون",
         "details_token": "اطلاعات توکن",
         "id_collection": "آی‌دی کلکسیون",
         "id_token": "آی‌دی توکن",
+        "move_to_accepted_collection": "نمایش کلکسیون در کیف پول",
+        "move_to_accepted_token": "نمایش توکن در کیف پول",
+        "move_to_declined_collection": "پنهان سازی کلکسیون از کیف پول",
+        "move_to_declined_token": "پنهان سازی توکن از کیف پول",
         "name": "نام",
         "not_spam": "هرزنامه نیست",
         "spam": "هرزنامه",
@@ -46,7 +51,7 @@
     "battery": {
         "other_ways": {
             "by_crypto": {
-                "title": "شارژ مجدد با {symbol}"
+                "title": "شارژ مجدد با %{symbol}"
             },
             "gift": {
                 "subtitle": "با دوستان به اشتراک بگذارید",
@@ -54,22 +59,30 @@
             }
         },
         "packages": {
-            "disclaimer": "یک بار شارژ هزینه متوسط تراکنش را پوشش می‌دهد. برخی تراکنش‌ها ممکن است هزینه بیشتری داشته باشند."
+            "disclaimer": "یک بار شارژ هزینه متوسط تراکنش را پوشش می‌دهد. برخی تراکنش‌ها ممکن است هزینه بیشتری داشته باشند.",
+            "title": {
+                "large": "بزرگ",
+                "medium": "متوسط",
+                "small": "کوچک"
+            }
         },
         "please_wait": "باتری در عرض چند دقیقه شارژ خواهد شد",
         "promocode": {
-            "title": "کد تخفیف"
+            "title": "کد تخفیف",
+            "apply": "اعمال",
+            "success": "باتری شما شارژ شد"
         },
         "recharge_by_crypto": {
             "other": {
                 "subtitle": "مقدار را به صورت دستی وارد کنید",
                 "title": "سایر"
             },
-            "title": "شارژ مجدد"
+            "title": "شارژ مجدد",
+            "title_gift": "هدیه"
         },
-        "title": "باتری Tonkeeper",
+        "title": "باتری Keeper",
         "transactions": {
-            "description": "تراکنش‌های انتخاب‌شده توسط باتری Tonkeeper پرداخت خواهند شد.",
+            "description": "تراکنش‌های انتخاب‌شده توسط باتری Keeper پرداخت خواهند شد.",
             "settings": "تنظیمات باتری",
             "title": "تراکنش‌ها",
             "types": {
@@ -131,14 +144,14 @@
     "dns_current_address": "نشانی فعلی شما",
     "dns_expiration_date": "تاریخ انقضا",
     "dns_renew_toast_success": "دامنه تمدید شد",
-    "dns_renew_until_btn": "تمدید تا {untilDate}",
+    "dns_renew_until_btn": "تمدید تا %{untilDate}",
     "exchange_method_dont_show_again": "دیگر نمایش نده",
-    "exchange_method_open_warning": "شما در حال باز کردن یک برنامه خارجی هستید که توسط Tonkeeper اداره نمی‌شود.",
+    "exchange_method_open_warning": "شما در حال باز کردن یک برنامه خارجی هستید که توسط Keeper اداره نمی‌شود.",
     "exchange_modal": {
         "other_ways_to_buy": "روش‌های دیگر برای خرید"
     },
-    "exchange_other_ways": "راه‌های دیگر خرید یا فروش %{coinSymbolWithEx}",
-    "exchange_title": "خرید %{coinSymbolWithEx}",
+    "exchange_other_ways": "راه‌های دیگر خرید یا فروش %{coinSymbol}",
+    "exchange_title": "خرید %{coinSymbol}",
     "import_add_wallet": "کیف پول اضافه کنید",
     "import_add_wallet_description": "یک کیف پول جدید بسازید یا یک کیف پول موجود را اضافه کنید.",
     "import_existing_wallet": "کیف پول موجود",
@@ -157,15 +170,13 @@
     "intro_item2_caption": "تون‌کیپر کلیدهای رمزنگاری شما را روی دستگاهتان ذخیره می‌کند. تمام معاملات از طریق پروتکل‌های غیرمتمرکز انجام می‌شوند تا رمزارز شما هرگز به دست صرافی‌های متمرکز نیافتد.",
     "intro_item2_title": "امنیت سراسری",
     "intro_title": "خوش آمدید\nبه ",
-    "jetton_id": "شناسه توکن: {jettonAddress}",
+    "jetton_id": "شناسه توکن: %{jettonAddress}",
     "jettons_list_title": "توکن‌ها",
     "later": "بعداً",
     "ledger": {
         "operation_not_supported": "این عملیات برای کیف پول‌های Ledger در دسترس نیست. کیف پول دیگری را انتخاب کنید و دوباره تلاش کنید."
     },
-    "legal_font_license": "فونت Montserrat",
     "legal_header_title": "حقوقی",
-    "legal_licenses_title": "مجوزها",
     "legal_privacy": "سیاست حفظ حریم خصوصی",
     "legal_terms": "شرایط خدمات",
     "loading": "در حال بارگذاری",
@@ -197,7 +208,7 @@
         "title": "انتقال NFT"
     },
     "nft_transfer_title": "انتقال NFT",
-    "nft_unlink_domain_button": "مرتبط با '{{'address'}}'",
+    "nft_unlink_domain_button": "مرتبط با {{address}}",
     "nft_view_in_explorer": "در مرورگر مشاهده کنید",
     "notifications": {
         "alert": {
@@ -217,7 +228,7 @@
     "recovery_phrase": {
         "copy_button": "کپی"
     },
-    "reminder_notifications_caption": "هنگامی که %{coinSymbolWithEx}، توکن‌ها و NFT دریافت می‌کنید، اعلان‌ها را دریافت کنید.",
+    "reminder_notifications_caption": "هنگامی که %{coinSymbol}، توکن‌ها و NFT دریافت می‌کنید، اعلان‌ها را دریافت کنید.",
     "reminder_notifications_enable_button": "اعلان‌ها را فعال کنید",
     "reminder_notifications_later_button": "بعداً",
     "reminder_notifications_title": "اعلان‌های فوری دریافت کنید",
@@ -230,7 +241,7 @@
     "send_publish_tx_error": "ارسال تراکنش ناموفق بود",
     "send_screen_steps": {
         "address": {
-            "delete_alert_text": "آیا مطمئن هستید که می‌خواهید «{name}» را از علاقه‌مندی‌های خود حذف کنید؟",
+            "delete_alert_text": "آیا مطمئن هستید که می‌خواهید «%{name}» را از علاقه‌مندی‌های خود حذف کنید؟",
             "suggest_actions": {
                 "add": "افزودن به علاقه‌مندی‌ها",
                 "delete": "حذف",
@@ -241,7 +252,7 @@
         "amount": {
             "insufficient_balance": "موجودی کافی نیست",
             "max": "حداکثر",
-            "remaining": "موجود: {amount}"
+            "remaining": "موجود: %{amount}"
         },
         "comfirm": {
             "comment_required_text": "هنگام ارسال، حتماً یادداشت یا برچسب مربوط به صرافی را وارد کنید. بدون آن، وجوه واریز نمی‌شود و ممکن است از دست برود.",
@@ -250,7 +261,7 @@
         },
         "done": {
             "done_label": "انجام شد",
-            "to": "به: {name}"
+            "to": "به: %{name}"
         }
     },
     "send_sending_wrong_time_description": "تنظیم خودکار زمان و تاریخ را در تنظیمات دستگاه خود روشن کنید. سپس دوباره انتقال خود را امتحان کنید.",
@@ -260,10 +271,10 @@
     "settings_jettons_list": "توکن‌ها",
     "settings_legal_documents": "اسناد حقوقی",
     "settings_network_alert_title": "شبکه را انتخاب کنید",
-    "settings_news": "اخبار Tonkeeper",
+    "settings_news": "اخبار Keeper",
     "settings_notifications": "اعلان‌ها",
     "settings_primary_currency": "ارز",
-    "settings_rate": "به Tonkeeper امتیاز دهید",
+    "settings_rate": "به Keeper امتیاز دهید",
     "settings_recovery_phrase": "عبارت بازیابی",
     "settings_reset": "خروج",
     "settings_reset_alert_title": "🚧 🚨 خروج از حساب؟ 🚨 🚧",
@@ -293,17 +304,17 @@
     "staking_earnings_section_title": "درآمد سالانه پیش‌بینی‌شده",
     "staking_enter_amount": "مقدار را وارد کنید",
     "staking_insufficient_balance": "موجودی کافی نیست",
-    "staking_insufficient_recommended_fee_reserve": "موجودی کافی نیست: موجودی کیف پول باید شامل 1 %{coinSymbolWithEx} ذخیره و 0.05 %{coinSymbolWithEx} کارمزد باشد.",
+    "staking_insufficient_recommended_fee_reserve": "موجودی کافی نیست: موجودی کیف پول باید شامل 1 %{coinSymbol} ذخیره و 0.05 %{coinSymbol} کارمزد باشد.",
     "staking_max": "حداکثر",
     "staking_min_deposit_label": "حداقل واریز",
     "staking_next_cycle_desc_liquid": "برداشت فوری موجود است",
-    "staking_next_cycle_message": "چرخه بعدی در {value}",
-    "staking_pool_detail": "APY ≈ {apy}% · حداقل واریز {minDeposit} %{coinSymbolWithEx}",
-    "staking_pools_apy": "APY ≈ {apy}%",
-    "staking_ready_withdraw": "{amount} %{coinSymbolWithEx} آماده برداشت",
+    "staking_next_cycle_message": "چرخه بعدی در %{value}",
+    "staking_pool_detail": "APY ≈ %{apy}% · حداقل واریز %{minDeposit} %{coinSymbol}",
+    "staking_pools_apy": "APY ≈ %{apy}%",
+    "staking_ready_withdraw": "%{amount} %{coinSymbol} آماده برداشت",
     "staking_rewards_after_stake": "پس از استیک",
     "staking_rewards_current": "فعلی",
-    "staking_rewards_value": "≈ {value} %{coinSymbolWithEx}",
+    "staking_rewards_value": "≈ %{value} %{coinSymbol}",
     "staking_staked": "استیک شده",
     "staking_title": "استیکینگ",
     "staking_top_up": "واریز",
@@ -346,10 +357,9 @@
         "subtitle": "NFT ممکن است به یکی از دلایل زیر امن نباشد.",
         "title": "NFT تاییدنشده"
     },
-    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbolWithEx} کافی برای کارمزد شبکه وجود ندارد ({required})",
+    "swap_confirm_not_enough_ton_for_fee": "%{coinSymbol} کافی برای کارمزد شبکه وجود ندارد (%{required})",
     "swap_exchange_in": "تبادل در",
     "swap_expired_refresh": "مبادله منقضی شد. قیمت را بروزرسانی کنید",
-    "swap_price_impact_description": "تفاوت بین قیمت بازار و قیمت تخمینی به دلیل حجم معامله.",
     "swap_price_impact_ignore_variant": "نادیده گرفتن",
     "swap_slippage_tolerance": "تلورانس لغزش",
     "swap_slippage_tolerance_description": "مقداری که قیمت می‌تواند قبل از لغو معامله به صورت نامطلوب تغییر کند.",
@@ -360,8 +370,8 @@
         "tonviewer_button": "مشاهده در Tonviewer"
     },
     "tonkeeper_pro": "تون‌کیپر پرو",
-    "tonkeeper_pro_description": "اشتراک Tonkeeper Pro با ویژگی کیف پول توسعه‌یافته ارائه می‌شود که مجموعه‌ای از ابزارها برای مدیریت رمزارز فراهم می‌کند.",
-    "ton_login_caption": "{name} در حال درخواست دسترسی به آدرس کیف پول شما است",
+    "tonkeeper_pro_description": "اشتراک Keeper Pro با ویژگی کیف پول توسعه‌یافته ارائه می‌شود که مجموعه‌ای از ابزارها برای مدیریت رمزارز فراهم می‌کند.",
+    "ton_login_caption": "%{name} در حال درخواست دسترسی به آدرس کیف پول شما است",
     "ton_login_connect_button": "اتصال کیف پول",
     "ton_login_notice": "قبل از اتصال کیف پول، حتماً آدرس سرویس را بررسی کنید.",
     "ton_login_success": "انجام شد",
@@ -375,7 +385,7 @@
     "transaction_fee": "هزینه",
     "transaction_hash": "تراکنش",
     "transaction_merchant": "تاجر",
-    "transaction_receive_date": "دریافت شده در {date}",
+    "transaction_receive_date": "دریافت شده در %{date}",
     "transaction_recipient": "گیرنده",
     "transaction_recipient_address": "آدرس گیرنده",
     "transactions": {
@@ -390,7 +400,7 @@
     },
     "transaction_sender": "فرستنده",
     "transaction_sender_address": "نشانی فرستنده",
-    "transaction_sent_date": "ارسال شده در {date}",
+    "transaction_sent_date": "ارسال شده در %{date}",
     "transaction_type_bid": "پیشنهاد",
     "transaction_type_contract_deploy": "استقرار قرارداد",
     "transaction_type_pending": "در انتظار",
@@ -410,7 +420,7 @@
             "types": {
                 "jettonTransfer": "انتقال توکن",
                 "nftItemTransfer": "انتقال NFT",
-                "tonTransfer": "انتقال %{coinSymbolWithEx}",
+                "tonTransfer": "انتقال %{coinSymbol}",
                 "unknownTransaction": "تراکنش ناشناخته"
             }
         }
@@ -437,7 +447,7 @@
             "received": "دریافت کرد",
             "sent": "ارسال",
             "swapped": "تعویض شد",
-            "time_on": "در {time}",
+            "time_on": "در %{time}",
             "withdraw": "لغو استیک"
         },
         "activity": {
@@ -493,40 +503,35 @@
         "appearance_confirm": "اعمال",
         "appearance_description": "TON Diamonds ان‌اف‌تی کیف پول شما را رنگارنگ تر و منحصر به فردتر می کند.",
         "appearance_title": "تم",
-        "app_name": "Tonkeeper",
+        "app_name": "Keeper",
         "approval": {
             "accept": "تایید",
-            "accepted_at_collection": "تایید شده در {date}",
-            "accepted_at_token": "تایید شده در {date}",
+            "accepted_at_collection": "تایید شده در %{date}",
+            "accepted_at_token": "تایید شده در %{date}",
             "accepted_collection": "کلکسیون تایید شده",
             "accepted_token": "توکن تایید شده",
             "approve_all": "تایید همه",
-            "approve_collection_many": "تایید توکن های ورودی از \"{collection}\" کلکسیون",
-            "approve_collection_one": "تایید توکن های وروری از \"{collection}\" کلکسیون",
-            "approve_many": "تایید {count} توکن های ورودی",
-            "approve_token": "تایید توکن ورودی \"{name}\"",
-            "approve_two_collections": "تایید توکن های ورودی از کلکسیون های\"{collection1}\" \"{collection2}\"",
-            "approve_two_tokens": "تایید توکن های ورودی \"{name1}\" و \"{name2}\"",
+            "approve_collection_many": "تایید توکن های ورودی از \"%{collection}\" کلکسیون",
+            "approve_collection_one": "تایید توکن های وروری از \"%{collection}\" کلکسیون",
+            "approve_many": "تایید %{count} توکن های ورودی",
+            "approve_token": "تایید توکن ورودی \"%{name}\"",
+            "approve_two_collections": "تایید توکن های ورودی از کلکسیون های\"%{collection1}\" \"%{collection2}\"",
+            "approve_two_tokens": "تایید توکن های ورودی \"%{name1}\" و \"%{name2}\"",
             "blacklisted_collection": "کلکسیون در لیست سیاه قرار گرفت",
             "blacklisted_token": "توکن در لیست سیاه قرار گرفت",
             "decline": "رد کردن",
-            "declined_at_collection": "رد شده در {date}",
-            "declined_at_token": "رد شده در {date}",
-            "details_collection": "اطلاعات کلکسیون",
+            "declined_at_collection": "رد شده در %{date}",
+            "declined_at_token": "رد شده در %{date}",
             "manage_tokens": "مدیریت توکن ها",
             "move_to_accepted": "انتقال به تایید شده ها",
-            "move_to_accepted_collection": "نمایش کلکسیون در کیف پول",
-            "move_to_accepted_token": "نمایش توکن در کیف پول",
             "move_to_declined": "انتقال به رد شده ها",
-            "move_to_declined_collection": "پنهان سازی کلکسیون از کیف پول",
-            "move_to_declined_token": "پنهان سازی توکن از کیف پول",
             "pending": "در انتظار",
             "show_all": "نمایش همه",
             "single_token": "توکن تکی",
             "token_copied": "آی‌دی توکن کپی شد",
             "token_count": {
-                "one": "{count} توکن",
-                "other": "{count} توکن"
+                "one": "%{count} توکن",
+                "other": "%{count} توکن"
             },
             "verify_collection": "تایید کلکسیون",
             "verify_description_collection": "این کلکسیون ها از صادرکننده ناشناس هستند. برای شناسایی تقلبی ها، آی‌دی کلکسیون را با منبع رسمی صادرکننده تأیید کنید. بعداً می‌توانید نمایان بودن نشانه را در تنظیمات تغییر دهید.",
@@ -537,13 +542,13 @@
         },
         "auth_failed": "احراز ناموفق",
         "backup_check": {
-            "caption": "بیایید ببینیم آیا همه چیز را درست انجام داده اید یا خیر. کلمات {one}، {two}، و {three} را وارد کنید.",
+            "caption": "بیایید ببینیم آیا همه چیز را درست انجام داده اید یا خیر. کلمات %{one}، %{two}، و %{three} را وارد کنید.",
             "done_button": "تمام",
             "title": "بررسی بکاپ"
         },
         "backup_screen": {
-            "backup_warning": "موجودی شما {totalFiat} است، و فقط با عبارت بازیابی که هنوز یادداشت نکرده اید محافظت می شود. از عبارت نسخه پشتیبان تهیه کنید تا در صورت بروز مشکل در دستگاه، از از‌دست دادن سرمایه خودداری کنید.",
-            "last_backup_time": "آخرین پشتیبانی گیری {time}",
+            "backup_warning": "موجودی شما %{totalFiat} است، و فقط با عبارت بازیابی که هنوز یادداشت نکرده اید محافظت می شود. از عبارت نسخه پشتیبان تهیه کنید تا در صورت بروز مشکل در دستگاه، از از‌دست دادن سرمایه خودداری کنید.",
+            "last_backup_time": "آخرین پشتیبانی گیری %{time}",
             "manual_backup_on": "پشتیبان گیری دستی روشن است",
             "manual_button": "پشتیبان گیری به صورت دستی",
             "manual_caption": "با نوشتن عبارت بازیابی، به صورت دستی از کیف پول خود نسخه پشتیبان تهیه کنید.",
@@ -573,21 +578,22 @@
     "wallet_swap": "مبادله",
     "wallet_title": "کیف پول",
     "yesterday": "دیروز",
-    "staking_pool_liquid_desc": "وقتی %{coinSymbolWithEx} را در استخر Tonstakers استیک می‌کنید، توکنی به نام tsTON دریافت می‌کنید که سهم شما در استخر را نشان می‌دهد. با انباشت سود استخر، tsTON شما مقدار بیشتری %{coinSymbolWithEx} را نشان می‌دهد.",
-    "staking_pool_withdraw_date": "{amount} %{coinSymbolWithEx} در {date} برداشت می‌شود",
-    "staking_portfolio_pending_withdraw": "{amount} %{coinSymbolWithEx} پس از پایان دوره برداشت می‌شود",
-    "staking_portfolio_pending_withdraw_countdown": "{amount} %{coinSymbolWithEx} در {value} برداشت می‌شود",
+    "staking_pool_liquid_desc": "وقتی %{coinSymbol} را در استخر Tonstakers استیک می‌کنید، توکنی به نام tsTON دریافت می‌کنید که سهم شما در استخر را نشان می‌دهد. با انباشت سود استخر، tsTON شما مقدار بیشتری %{coinSymbol} را نشان می‌دهد.",
+    "staking_pool_withdraw_date": "%{amount} %{coinSymbol} در %{date} برداشت می‌شود",
+    "staking_portfolio_pending_withdraw": "%{amount} %{coinSymbol} پس از پایان دوره برداشت می‌شود",
+    "staking_portfolio_pending_withdraw_countdown": "%{amount} %{coinSymbol} در %{value} برداشت می‌شود",
     "staking_confirm_modal_provider": "ارائه‌دهنده",
     "staking_confirm_modal_amount": "مبلغ",
     "staking_confirm_modal_apy": "APY",
     "staking_confirm_modal_wallet": "کیف پول",
-    "staking_unstake_cycle_info": "درخواست پس از پایان چرخه اعتبارسنجی در {value} پردازش می‌شود",
-    "staking_tonstakers_notice": "استیکینگ بر قراردادهای هوشمند اشخاص ثالث استوار است. Tonkeeper مسئول تجربه استیکینگ نیست.",
+    "staking_unstake_cycle_info": "درخواست پس از پایان چرخه اعتبارسنجی در %{value} پردازش می‌شود",
+    "staking_tonstakers_notice": "استیکینگ بر قراردادهای هوشمند اشخاص ثالث استوار است. Keeper مسئول تجربه استیکینگ نیست.",
     "staking_claim": "دریافت",
     "staking_details_pool_address_label": "آدرس استخر",
-    "staking_pending_deposit": "{amount} %{coinSymbolWithEx} در انتظار استیک",
-    "staking_pools_min_deposit": "حداقل واریز {minDeposit} %{coinSymbolWithEx}",
+    "staking_pending_deposit": "%{amount} %{coinSymbol} در انتظار استیک",
+    "staking_pools_min_deposit": "حداقل واریز %{minDeposit} %{coinSymbol}",
     "staking_tf_full_withdrawal_only": "فقط برداشت کامل ممکن است",
+    "trc20_transfer_unavailable": "ارسال TRC20 موقتاً در دسترس نیست",
     "twa_closed_title": "برنامک بسته شد",
     "twa_closed_subtitle": "از همان جایی که رها کردید در iOS، Android یا وب ادامه دهید.",
     "twa_closed_subtitle_wallets": "کیف‌پول‌های شما امن هستند. لطفاً عبارات بازیابی خود را ذخیره کنید و از همان جایی که رها کردید در iOS، Android یا وب ادامه دهید.",

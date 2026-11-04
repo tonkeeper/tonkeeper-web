@@ -3,7 +3,7 @@ import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
-import { FiatCurrencies } from '../entries/fiat';
+import { FiatCurrencies, normalizeFiatCode } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
     backwardCompatibilityOnlyWalletVersions,
@@ -262,13 +262,12 @@ export async function getDashboardData(
         lang = options?.lang as Lang;
     }
 
+    // The dashboard backend still names the native coin "TON".
+    const requested =
+        options?.currency === FiatCurrencies.GRAM ? CurrenciesGenerated.TON : options?.currency;
     let currency = CurrenciesGenerated.USD;
-    if (
-        Object.values(CurrenciesGenerated).includes(
-            options?.currency as unknown as CurrenciesGenerated
-        )
-    ) {
-        currency = options?.currency as unknown as CurrenciesGenerated;
+    if (Object.values(CurrenciesGenerated).includes(requested as unknown as CurrenciesGenerated)) {
+        currency = requested as unknown as CurrenciesGenerated;
     }
 
     const result = await DashboardsService.getDashboardData(lang, currency, authToken, query);
@@ -319,7 +318,7 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
                 columnId: cell.column_id,
                 type: 'numeric_fiat',
                 value: new BigNumber(cell.value),
-                fiat: cell.fiat as unknown as FiatCurrencies
+                fiat: normalizeFiatCode(cell.fiat as string) as FiatCurrencies
             };
         }
         default:

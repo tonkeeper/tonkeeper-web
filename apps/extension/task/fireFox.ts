@@ -8,6 +8,13 @@ const updateFireFoxManifest = (builder: ExtensionBuilder) => {
         scripts: ['background.js']
     };
 
+    // Firefox has no chrome.sidePanel — keep the classic toolbar popup entry there.
+    delete manifestFFData.side_panel;
+    manifestFFData.action = {
+        ...manifestFFData.action,
+        default_popup: 'index.html?source=default_popup'
+    };
+
     manifestFFData.permissions = ['storage', 'unlimitedStorage', 'clipboardWrite', 'activeTab'];
     manifestFFData.host_permissions = ['<all_urls>'];
 

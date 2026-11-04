@@ -62,30 +62,28 @@ export class TonRawTransactionService {
         return sender.estimate(transaction);
     }
 
+    /** Broadcasts and resolves with the signed external message. */
     async send(
         sender: Sender,
         estimation: TonEstimation,
         transaction: TonRawTransaction | OutActionWalletV5[]
-    ) {
+    ): Promise<Cell> {
         await this.checkTransactionPossibility(sender, transaction, estimation);
 
         if (!Array.isArray(transaction)) {
             if (sender instanceof LedgerMessageSender) {
-                await (
+                return (
                     await sender.tonRawTransfer({
                         sendMode: SendMode.IGNORE_ERRORS,
                         bounce: true,
                         ...transaction
                     })
                 ).send();
-            } else {
-                await sender.send({
-                    messages: [internal({ bounce: true, ...transaction })],
-                    sendMode: SendMode.IGNORE_ERRORS
-                });
             }
-
-            return;
+            return sender.send({
+                messages: [internal({ bounce: true, ...transaction })],
+                sendMode: SendMode.IGNORE_ERRORS
+            });
         }
 
         if (!(sender instanceof WalletMessageSender)) {
@@ -94,7 +92,7 @@ export class TonRawTransactionService {
             );
         }
 
-        await sender.send(transaction);
+        return sender.send(transaction);
     }
 
     private async checkTransactionPossibility(

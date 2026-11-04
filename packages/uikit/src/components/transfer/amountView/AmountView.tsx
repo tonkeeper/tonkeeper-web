@@ -183,7 +183,7 @@ export const AmountView: FC<{
                     <NotificationHeader>
                         <HeaderBlock onClose={onClose} onBack={handleBack}>
                             <SubTitle>
-                                {t('send_screen_steps_done_to').replace('%{name}', '')}
+                                {t('send_screen_steps_done_to', { name: '' })}
                                 <RecipientName recipient={recipient} />
                                 <RecipientAddress recipient={recipient} />
                             </SubTitle>

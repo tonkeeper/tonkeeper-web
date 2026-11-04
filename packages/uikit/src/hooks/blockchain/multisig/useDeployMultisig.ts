@@ -18,6 +18,7 @@ import {
     Sender
 } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { useNotifyErrorHandle } from '../../useNotification';
+import { useAnalyticsAssetId, useTrackTransactionSent } from '../../analytics/events-hooks';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { Address } from '@ton/core';
 import { useTonRawTransactionService } from '../useBlockchainService';
@@ -52,6 +53,8 @@ export const useDeployMultisig = (
     const sdk = useAppSdk();
     const notifyError = useNotifyErrorHandle();
     const rawTransactionService = useTonRawTransactionService();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     const accountAndWallet = wallets.find(w => w.wallet.id === params?.fromWallet);
     const { data: twoFaConfig } = useTwoFAWalletConfig({
@@ -132,6 +135,14 @@ export const useDeployMultisig = (
                 },
                 message
             );
+
+            trackTransactionSent({
+                category: 'call',
+                category_detail: 'deploy',
+                asset: assetId.tonCoin(),
+                amount: 0,
+                fee_asset: params.fee.type === 'battery' ? 'battery_charges' : 'coin'
+            });
 
             await client.invalidateQueries(
                 anyOfKeysParts(

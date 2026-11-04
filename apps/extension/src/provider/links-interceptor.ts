@@ -1,14 +1,24 @@
 import { TonProvider } from './index';
+import { ExtensionTonConnectInjectedBridge } from './tonconnect';
+import { parseInterceptableTransferLink } from '../libs/tonTransferLink';
 
 export class TonLinksInterceptor {
     private originalWindowOpen?: typeof window.open;
 
-    constructor(private provider: TonProvider) {}
+    private isConnected = false;
+
+    constructor(private provider: TonProvider, tonconnect: ExtensionTonConnectInjectedBridge) {
+        tonconnect.listen(event => {
+            if (event.event === 'connect') {
+                this.isConnected = true;
+            } else if (event.event === 'connect_error' || event.event === 'disconnect') {
+                this.isConnected = false;
+            }
+        });
+    }
 
     private shouldInterceptLink = (href: string | undefined): href is string => {
-        return Boolean(
-            href?.startsWith('https://app.tonkeeper.com/transfer/') || href?.startsWith('ton://')
-        );
+        return this.isConnected && parseInterceptableTransferLink(href) !== null;
     };
 
     private processInterception(href: string) {

@@ -2,30 +2,17 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { WalletInterfaceSchema } from './WalletInterfaceSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
+import type { WalletSourceSchema } from './WalletSourceSchema';
 /**
- * Triggered when the user opens a wallet main screen; send again if the user switches to another wallet.
+ * Triggered when the user opens a wallet main screen; send again if the user switches to another wallet. The main screen lists all assets across all chains — it is not token-specific — so it carries no `asset` and no aggregate `wallet_network`; only wallet-level identity (`wallet_mode`, `wallet_source`, and the optional `wallet_interface`).
+ *
  */
 export type WalletOpenSchema = {
     eventName: string;
-    /**
-     * Wallet / address interface variant for the account whose main screen is shown (e.g. TON contract versions, Bitcoin script types). Omit or null when unknown.
-     */
-    wallet_interface?: 'v3R1' | 'v3R2' | 'v4R1' | 'v4R2' | 'v5Beta' | 'v5R1' | 'sigwit' | 'taproot' | null;
-    /**
-     * Multichain vs single-chain wallet mode.
-     */
-    wallet_chain: 'multi' | 'single';
-    /**
-     * Chain identifier when needed (e.g. single-chain / signer-chain flows); null when not applicable.
-     */
-    wallet_chain_id?: string | null;
-    /**
-     * Whether the wallet targets testnet or mainnet (multichain or single-chain).
-     */
-    wallet_network: 'testnet' | 'mainnet';
-    /**
-     * How the account is backed (keys / watch-only).
-     */
-    wallet_source: 'ledger' | 'keystone' | 'signer' | 'mnemonic' | 'privatekey' | 'watchonly';
+    wallet_mode: WalletModeSchema;
+    wallet_source: WalletSourceSchema;
+    wallet_interface?: WalletInterfaceSchema;
 };
 

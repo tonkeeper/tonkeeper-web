@@ -8,7 +8,9 @@ on:
                 type: string
                 default: package
             release_tag:
-                description: 'Release tag to checkout and stamp into package.json (e.g. v1.2.3-beta.1). Omit on PR builds.'
+                description:
+                    'Release tag to checkout and stamp into package.json (e.g. v1.2.3-beta.1). Omit
+                    on PR builds.'
                 required: false
                 type: string
                 default: ''
@@ -35,12 +37,14 @@ on:
                 type: string
                 default: next-patch
             release_tag:
-                description: 'Release tag to checkout and stamp into package.json (e.g. v1.2.3-beta.1). Omit for branch builds.'
+                description:
+                    'Release tag to checkout and stamp into package.json (e.g. v1.2.3-beta.1). Omit
+                    for branch builds.'
                 required: false
                 type: string
                 default: ''
 env:
-    node-version: 20.18.1
+    node-version: 22.22.2
     ruby-version: 3.3.6
 
 jobs:
@@ -58,8 +62,8 @@ jobs:
 
             - name: Use Xcode 26
               run: |
-                sudo xcode-select --switch /Applications/Xcode_26.0.app
-                echo "DEVELOPER_DIR=/Applications/Xcode_26.0.app/Contents/Developer" >> $GITHUB_ENV
+                  sudo xcode-select --switch /Applications/Xcode_26.0.app
+                  echo "DEVELOPER_DIR=/Applications/Xcode_26.0.app/Contents/Developer" >> $GITHUB_ENV
 
             - name: Set up Node
               uses: actions/setup-node@v4
@@ -110,6 +114,8 @@ jobs:
 
             - name: Run build js and capacitor
               uses: borales/actions-yarn@v5
+              env:
+                  WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
               with:
                   cmd: build:ipad
 

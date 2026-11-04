@@ -35,7 +35,6 @@ import {
     tonInjectedReConnectRequest
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { originFromUrl } from '@tonkeeper/core/dist/utils/url';
-import packageJson from '../../../package.json';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';
 import { z } from 'zod';
@@ -154,7 +153,7 @@ class CapacitorTonConnectInjectedConnector {
                             items,
                             device: getDeviceInfo(
                                 getTonConnectPlatform('mobile'),
-                                packageJson.version,
+                                __APP_VERSION__,
                                 maxMessages,
                                 tonConnectTonkeeperProAppName
                             )
@@ -236,6 +235,7 @@ class CapacitorTonConnectInjectedConnector {
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
+                    walletId: wallet.id,
                     kind: 'sendTransaction',
                     payload
                 };
@@ -259,6 +259,7 @@ class CapacitorTonConnectInjectedConnector {
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
+                    walletId: wallet.id,
                     kind: 'signData',
                     payload
                 };

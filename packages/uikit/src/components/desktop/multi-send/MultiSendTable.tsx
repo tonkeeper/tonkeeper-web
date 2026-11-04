@@ -33,8 +33,8 @@ import { useProState } from '../../../state/pro';
 import { useRate } from '../../../state/rates';
 import { CloseIcon, DocIcon, ExportIcon } from '../../Icon';
 import { Body2, Body3 } from '../../Text';
-import { Button } from '../../fields/Button';
-import { IconButton } from '../../fields/IconButton';
+import { Button, useButtonClassName } from '../../fields/Button';
+import { LegacyIconButton } from '../../fields/IconButton';
 import { SkeletonText } from '../../shared/Skeleton';
 import { AmountInput } from './AmountInput';
 import { MultisendAssetSelect } from './MultisendAssetSelect';
@@ -139,7 +139,7 @@ const Spacer = styled.div`
     flex: 1;
 `;
 
-const IconButtonStyled = styled(IconButton)<{ hide?: boolean }>`
+const IconButtonStyled = styled(LegacyIconButton)<{ hide?: boolean }>`
     padding: 10px 12px;
     ${props =>
         props.hide &&
@@ -161,6 +161,7 @@ export const MultiSendTable: FC<{
     onBack: () => void;
 }> = ({ className, list, onBack }) => {
     const { t } = useTranslation();
+    const exportClassName = useButtonClassName({ secondary: true });
     const [asset, setAsset] = useState<TonAsset>(list.token);
     const methods = useForm<MultiSendForm>({
         defaultValues: {
@@ -228,15 +229,14 @@ export const MultiSendTable: FC<{
             <ImportListNotification isOpen={isImportOpen} onClose={onImportList} />
             <FormHeadingWrapper>
                 <MultisendAssetSelect asset={asset} onAssetChange={setAsset} />
-                <Button
-                    secondary
-                    as="a"
+                <a
+                    className={exportClassName}
                     href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent)}
                     download={list.name + '.csv'}
                 >
                     <ExportIcon />
                     {t('export_dot_csv')}
-                </Button>
+                </a>
                 {canImport && (
                     <Button secondary onClick={onImportOpen}>
                         <DocIcon color="buttonSecondaryForeground" />

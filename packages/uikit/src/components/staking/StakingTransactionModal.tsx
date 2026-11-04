@@ -1,5 +1,5 @@
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { PoolImplementationType, PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
@@ -40,7 +40,13 @@ import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
 import {
     useTonConnectTransactionEstimation,
     useTonConnectTransactionSendMutation
-} from '../connect/TonTransactionNotification';
+} from '../../state/tonConnectTransaction';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../hooks/analytics/events-hooks';
+import { useStakingSendOperation } from '../../hooks/analytics/staking';
 import { SelectSenderDropdown } from '../activity/NotificationCommon';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { SkeletonImage, SkeletonText } from '../shared/Skeleton';
@@ -369,6 +375,9 @@ const StakingModalContent: FC<{
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { name: walletName, emoji: walletEmoji } = useActiveWalletLabel();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
+    const sendOperation = useStakingSendOperation(pool, variant);
 
     const { data: availableSendersChoices, isLoading: isChoicesLoading } =
         useTonConnectAvailableSendersChoices(params);
@@ -440,11 +449,25 @@ const StakingModalContent: FC<{
     const stakeFiatFormatted = stakeFiatBN ? formatFiatCurrency(fiat, stakeFiatBN) : undefined;
 
     const onSubmit = async () => {
+        sendOperation.start(amountBN);
         try {
             const result = await mutateAsync();
+            sendOperation.succeed();
+            trackTransactionSent({
+                category: 'staking',
+                category_detail: variant,
+                // Staking is priced in TON on both legs — a liquid unstake burns
+                // the pool's jetton, but the amount the user acts on is TON.
+                asset: assetId.tonCoin(),
+                amount: amountBN.toNumber(),
+                fee_asset: toAnalyticsFeeAsset(senderChoice.type),
+                staking_provider: pool.address,
+                is_liquid: pool.implementation === PoolImplementationType.LiquidTf
+            });
             sdk.hapticNotification('success');
             setTimeout(() => handleClose({ boc: result, senderChoice }), 300);
         } catch (e) {
+            sendOperation.fail(e);
             sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
             console.error(e);

@@ -9,6 +9,11 @@ import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/
 import { useAppSdk } from '../../appSdk';
 import { useTranslation } from '../../translation';
 import { QueryKey } from '../../../libs/queryKey';
+import {
+    toAnalyticsFeeAsset,
+    useAnalyticsAssetId,
+    useTrackTransactionSent
+} from '../../analytics/events-hooks';
 
 export function useSendTwoFACancelRecovery() {
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
@@ -19,6 +24,8 @@ export function useSendTwoFACancelRecovery() {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const queryClient = useQueryClient();
+    const assetId = useAnalyticsAssetId();
+    const trackTransactionSent = useTrackTransactionSent();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -39,6 +46,14 @@ export function useSendTwoFACancelRecovery() {
             await sender.sendCancelRecovery();
 
             queryClient.setQueryData([QueryKey.twoFACancellRecoveryProcess, wallet.id], true);
+
+            trackTransactionSent({
+                category: 'call',
+                category_detail: 'unknown',
+                asset: assetId.tonCoin(),
+                amount: 0,
+                fee_asset: toAnalyticsFeeAsset(EXTERNAL_SENDER_CHOICE.type)
+            });
 
             sdk.topMessage(t('two_fa_recovery_cancelled_toast'));
         } catch (e) {

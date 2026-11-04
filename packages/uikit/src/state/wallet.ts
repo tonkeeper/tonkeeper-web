@@ -4,6 +4,7 @@ import {
     Account,
     AccountId,
     AccountMAM,
+    AccountMultichain,
     AccountSecretMnemonic,
     AccountSecretSK,
     AccountsState,
@@ -19,7 +20,7 @@ import {
     isAccountTonWalletStandard,
     isAccountTronCompatible,
     isAccountVersionEditable,
-    isMnemonicAndPassword,
+    isSecretBearingAccount,
     seeIfMainnnetAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -27,9 +28,7 @@ import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/passwor
 import {
     AccountWallet,
     getWalletsFromAccount,
-    IMetaEncryptionData,
     isStandardTonWallet,
-    MetaEncryptionSerializedMap,
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
@@ -45,6 +44,7 @@ import {
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
+import { ChainId, selectActiveWalletForChain } from '@tonkeeper/core/dist/chains';
 import {
     accountBySignerLink,
     checkMamAccountForDeprecatedTronAddress,
@@ -63,6 +63,10 @@ import {
     standardTonAccountToAccountWithTron,
     tronWalletByTonMnemonic
 } from '@tonkeeper/core/dist/service/walletService';
+import {
+    createAccountMultichainByMnemonic,
+    createMultichainAccountWithTonVersion
+} from '@tonkeeper/core/dist/service/multichainCreateService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useMemo } from 'react';
@@ -70,12 +74,7 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import {
-    createAndStoreMetaEncryptionKeys,
-    getAccountSecret,
-    getPasswordByNotification,
-    useGetActiveAccountSecret
-} from './mnemonic';
+import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
 import {
     encryptWalletSecret,
     seeIfMnemonicValid,
@@ -90,7 +89,6 @@ import { useIsTronEnabledGlobally, useTronApi } from './tron/tron';
 import { useNavigate } from '../hooks/router/useNavigate';
 import { AppRoute } from '../libs/routes';
 import { isSignerLink } from './signer';
-import { useSyncPubkeysBulk } from './pubkeysBulkSync';
 import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
 import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
@@ -99,8 +97,6 @@ import { subject } from '@tonkeeper/core/dist/entries/atom';
 import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { metaEncryptionMapSerializer } from '@tonkeeper/core/dist/utils/metadata';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -146,6 +142,20 @@ export const useActiveStandardTonWallet = () => {
         throw new Error('Wallet is not standard');
     }
     return wallet;
+};
+
+/**
+ * Returns the active wallet for the given chain on the current account.
+ * Multichain accounts dispatch through `getWalletByChain`; legacy
+ * account types return their TON wallet for `chain === 'ton'` and
+ * `undefined` for anything else.
+ *
+ * See `packages/core/src/chains/wallet-selector.ts` for the pure
+ * selector.
+ */
+export const useActiveWalletForChain = <C extends ChainId>(chain: C) => {
+    const account = useActiveAccount();
+    return selectActiveWalletForChain(account, chain);
 };
 
 export const useMutateActiveAccount = () => {
@@ -255,7 +265,6 @@ export const useCreateMAMAccountDerivation = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
-    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
     const tronApi = useTronApi();
     const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
@@ -309,12 +318,6 @@ export const useCreateMAMAccountDerivation = () => {
         authBattery({
             signer: tonProofSignerByTonMnemonic(tonAccount.mnemonics, 'ton'),
             wallet: tonWallets[0]
-        });
-
-        mutateMetaEncryptionKey({
-            wallet: account.activeTonWallet,
-            account,
-            mnemonic
         });
 
         await storage.updateAccountInState(account);
@@ -597,7 +600,6 @@ export const useCreateAccountMnemonic = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabled = useIsTronEnabledGlobally();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
-    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
 
     return useMutation<
         AccountTonMnemonic,
@@ -649,12 +651,6 @@ export const useCreateAccountMnemonic = () => {
                 wallet: account.activeTonWallet
             });
 
-            mutateMetaEncryptionKey({
-                wallet: account.activeTonWallet,
-                account,
-                mnemonic
-            });
-
             return account;
         }
 
@@ -687,10 +683,136 @@ export const useCreateAccountMnemonic = () => {
             wallet: account.activeTonWallet
         });
 
-        mutateMetaEncryptionKey({
-            wallet: account.activeTonWallet,
+        return account;
+    });
+};
+
+/**
+ * Wraps `createAccountMultichainByMnemonic` with the same keychain /
+ * password / battery-auth / meta-encryption-key plumbing
+ * `useCreateAccountMnemonic` uses, so a BIP39 import lands an
+ * `AccountMultichain` in storage with TON + per-chain wallets ready to
+ * render.
+ *
+ * Chains the chain-kit adapter can't derive yet (e.g. SOL today) are
+ * silently dropped inside the service — caller doesn't need to know.
+ */
+/**
+ * Adds a second account of the seed that holds another TON wallet version,
+ * as iOS' "Wallet W5" / "Wallet v4R2" settings rows do. The mnemonic comes
+ * out of the source account's own secret store, so the new account shares
+ * its keychain entry or encrypted secret; the meta encryption key is
+ * minted for the new TON address. The new account becomes active.
+ */
+export const useAddMultichainTonVersion = () => {
+    const sdk = useAppSdk();
+    const context = useAppContext();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+    const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+
+    return useMutation<
+        AccountMultichain,
+        Error,
+        { account: AccountMultichain; version: WalletVersion }
+    >(async ({ account, version }) => {
+        const secret = await getAccountSecret(sdk, account.id);
+        if (secret.type !== 'mnemonic') {
+            throw new Error('Only a mnemonic account can hold another TON wallet version');
+        }
+
+        const twin = await createMultichainAccountWithTonVersion(
+            context,
+            sdk.storage,
+            secret.mnemonic,
             account,
-            mnemonic
+            version
+        );
+
+        await addAccountToState(twin);
+        await selectAccountMutation(twin.id);
+
+        return twin;
+    });
+};
+
+export const useCreateAccountMultichain = () => {
+    const sdk = useAppSdk();
+    const context = useAppContext();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+    const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+    const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+
+    return useMutation<
+        AccountMultichain,
+        Error,
+        {
+            mnemonic: string[];
+            enabledChains: ChainId[];
+            password?: string;
+            selectAccount?: boolean;
+            /** TON wallet version to hold; the app default when omitted. */
+            tonVersion?: WalletVersion;
+        }
+    >(async ({ mnemonic, enabledChains, password, selectAccount, tonVersion }) => {
+        const accountSecret: AccountSecretMnemonic = { type: 'mnemonic', mnemonic };
+        const valid = await seeIfMnemonicValid(mnemonic);
+        if (!valid) {
+            throw new Error('Mnemonic is not valid.');
+        }
+
+        if (sdk.keychain) {
+            const account = await createAccountMultichainByMnemonic(
+                context,
+                sdk.storage,
+                mnemonic,
+                {
+                    enabledChains,
+                    auth: { kind: 'keychain' },
+                    tonVersion: tonVersion ?? context.defaultWalletVersion
+                }
+            );
+
+            await sdk.keychain.setData(
+                (account.auth as AuthKeychain).keychainStoreKey,
+                walletSecretToString(accountSecret)
+            );
+
+            await addAccountToState(account);
+            if (selectAccount) {
+                await selectAccountMutation(account.id);
+            }
+
+            authBattery({
+                // BIP39 is the only mnemonic shape multichain accepts (see
+                // service docstring); pin the signer accordingly.
+                signer: tonProofSignerByTonMnemonic(mnemonic, 'bip39'),
+                wallet: account.activeTonWallet
+            });
+
+            return account;
+        }
+
+        if (!password) {
+            password = await getPasswordByNotification(sdk);
+        }
+
+        const account = await createAccountMultichainByMnemonic(context, sdk.storage, mnemonic, {
+            enabledChains,
+            auth: {
+                kind: 'password',
+                encryptedSecret: await encryptWalletSecret(accountSecret, password)
+            },
+            tonVersion: tonVersion ?? context.defaultWalletVersion
+        });
+
+        await addAccountToState(account);
+        if (selectAccount) {
+            await selectAccountMutation(account.id);
+        }
+
+        authBattery({
+            signer: tonProofSignerByTonMnemonic(mnemonic, 'bip39'),
+            wallet: account.activeTonWallet
         });
 
         return account;
@@ -765,7 +887,6 @@ export const useCreateAccountMAM = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
-    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const tronApi = useTronApi();
     const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
@@ -837,12 +958,6 @@ export const useCreateAccountMAM = () => {
 
             authBatteryForAllChildren(account);
 
-            mutateMetaEncryptionKey({
-                wallet: account.activeTonWallet,
-                account,
-                mnemonic
-            });
-
             return { account, childrenMnemonics };
         }
 
@@ -865,12 +980,6 @@ export const useCreateAccountMAM = () => {
         }
 
         authBatteryForAllChildren(account);
-
-        mutateMetaEncryptionKey({
-            wallet: account.activeTonWallet,
-            account,
-            mnemonic
-        });
 
         return { account, childrenMnemonics };
     });
@@ -997,17 +1106,16 @@ export const useRemoveTonWalletVersionFromAccount = () => {
 export const useAddAccountToStateMutation = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
-    const syncPubkeys = useSyncPubkeysBulk();
     return useMutation<void, Error, Account>(async account => {
         await storage.addAccountToState(account);
         await client.invalidateQueries([QueryKey.account]);
-        syncPubkeys([account]).catch(console.warn);
     });
 };
 
 export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
     const storage = useAccountsStorage();
+    const navigate = useNavigate();
 
     return useMutation<void, Error, void>(async () => {
         try {
@@ -1020,10 +1128,13 @@ export const useMutateDeleteAll = () => {
                 }
             }
 
+            await sdk.keychain?.clearStorage();
             await storage.clearAccountFromState();
             await sdk.storage.clear();
-            await sdk.keychain?.clearStorage();
         } finally {
+            // The reload keeps the current URL, so onboarding would otherwise
+            // open on the page the user signed out from.
+            navigate(AppRoute.home, { replace: true });
             sdk.reloadApp();
         }
     });
@@ -1031,7 +1142,12 @@ export const useMutateDeleteAll = () => {
 
 export const useIsPasswordSet = () => {
     const wallets = useAccountsState();
-    return (wallets || []).some(acc => isMnemonicAndPassword(acc) && acc.auth.kind === 'password');
+    return (wallets || []).some(acc => isSecretBearingAccount(acc) && acc.auth.kind === 'password');
+};
+
+const keychainStoreKeyOf = (account: Account): string | undefined => {
+    const auth = (account as { auth?: { kind: string; keychainStoreKey?: string } }).auth;
+    return auth?.kind === 'keychain' ? auth.keychainStoreKey : undefined;
 };
 
 export const useMutateLogOut = () => {
@@ -1044,16 +1160,25 @@ export const useMutateLogOut = () => {
     const { mutateAsync: removeBatteryAuthToken } = useRemoveBatteryAuthToken();
     const sdk = useAppSdk();
     const { mutateAsync: securityCheck } = useSecurityCheck();
+    const navigate = useNavigate();
 
     return useMutation<void, Error, AccountId>(async accountId => {
-        await securityCheck();
+        const account = accounts.find(acc => acc.id === accountId)!;
+
+        // Accounts of one seed that differ only in TON wallet version
+        // share a keychain entry (keyed by the public key), so the
+        // secret leaves the keychain only with the last of them.
+        const keychainKey = keychainStoreKeyOf(account) ?? accountId;
+        const removesSecret = !accounts.some(
+            a => a.id !== accountId && keychainStoreKeyOf(a) === keychainKey
+        );
+
+        await securityCheck(removesSecret ? { operation: 'remove', key: keychainKey } : undefined);
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
 
         if (folder) {
             await deleteFolder(folder);
         }
-
-        const account = accounts.find(acc => acc.id === accountId)!;
 
         const multisigs = accounts
             .filter(
@@ -1068,12 +1193,15 @@ export const useMutateLogOut = () => {
 
         const newAccounts = await storage.removeAccountsFromState([accountId, ...multisigs]);
 
-        if (newAccounts.length === 0) {
-            await sdk.keychain?.resetSecuritySettings();
-        }
-
         try {
-            await sdk.keychain?.removeData(accountId);
+            if (removesSecret) {
+                await sdk.keychain?.removeData(keychainKey);
+            }
+            // Runs after the secret is gone: with nothing left to guard, the
+            // reset needs no further check.
+            if (newAccounts.length === 0) {
+                await sdk.keychain?.resetSecuritySettings();
+            }
             await removeAccountTwoFA(accountId);
             await removeBatteryAuthToken();
             await client.invalidateQueries([QueryKey.account]);
@@ -1083,6 +1211,7 @@ export const useMutateLogOut = () => {
             }
         } finally {
             if (newAccounts.length === 0) {
+                navigate(AppRoute.home, { replace: true });
                 sdk.reloadApp();
             }
         }
@@ -1400,75 +1529,3 @@ export function getAccountWalletNameAndEmoji(account: Account, walletId?: Wallet
         emoji
     };
 }
-
-export const useMetaEncryptionData = () => {
-    const sdk = useAppSdk();
-
-    return useQuery<Record<string, IMetaEncryptionData> | null, Error>(
-        [QueryKey.metaEncryptionData],
-        async () => {
-            return sdk.storage
-                .get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)
-                .then(metaEncryptionMapSerializer);
-        }
-    );
-};
-
-export const useMutateMetaKeyAndCertificates = () => {
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-
-    return useMutation<
-        void,
-        Error,
-        {
-            wallet: TonWalletStandard;
-            account: Account;
-            mnemonic?: string[];
-        }
-    >(async ({ wallet, account, mnemonic }) => {
-        let seedPrase = mnemonic;
-
-        if (!seedPrase) {
-            const secret = await getAccountSecret(sdk, account.id);
-
-            if (secret.type !== 'mnemonic') {
-                throw new Error('Unable to get a seed phrase!');
-            }
-
-            seedPrase = secret.mnemonic;
-        }
-
-        if (account.type === 'mam') {
-            const limitedDerivations = account.derivations.slice(0, 5);
-
-            const root = await TonKeychainRoot.fromMnemonic(seedPrase, {
-                allowLegacyMnemonic: true
-            });
-
-            await Promise.all(
-                limitedDerivations.map(async derivation => {
-                    const tonAccount = await root.getTonAccount(derivation.index);
-
-                    return createAndStoreMetaEncryptionKeys(sdk, {
-                        seedPrase: tonAccount.mnemonics,
-                        rawAddress: derivation.activeTonWalletId,
-                        mnemonicType: 'ton'
-                    });
-                })
-            );
-        } else {
-            if (account.type !== 'mnemonic') {
-                throw new Error('Incorrect mnemonic type!');
-            }
-
-            await createAndStoreMetaEncryptionKeys(sdk, {
-                seedPrase,
-                rawAddress: wallet.rawAddress,
-                mnemonicType: account.mnemonicType
-            });
-        }
-
-        await client.invalidateQueries({ queryKey: [QueryKey.metaEncryptionData] });
-    });
-};

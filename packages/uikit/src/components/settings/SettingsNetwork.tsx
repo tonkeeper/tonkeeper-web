@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative } from '../../libs/routes';
-import { TonkeeperIcon } from '../Icon';
+import IcLogo from '../../icons/components/IcLogo';
 import { Body3, Label2 } from '../Text';
 import { useNavigate } from '../../hooks/router/useNavigate';
 
@@ -56,9 +56,9 @@ export const SettingsNetwork: FC = () => {
     return (
         <Block>
             <Icon onClick={onChange}>
-                <TonkeeperIcon width="33" height="33" />
+                <IcLogo width="33" height="33" />
             </Icon>
-            <Label2>Tonkeeper Web</Label2>
+            <Label2>Keeper Web</Label2>
             <Version onClick={() => sdk.copyToClipboard(version, t('App_version_copied'))}>
                 {t('settings_version')} {version}
             </Version>

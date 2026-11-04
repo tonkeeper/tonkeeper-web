@@ -2,15 +2,17 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetChainSchema } from './AssetChainSchema';
+import type { LocationSchema } from './LocationSchema';
+import type { UrlSchema } from './UrlSchema';
 export type DappSharingCopySchema = {
     eventName: string;
-    /**
-     * URL domain only, without private information
-     */
-    url: string;
+    url: UrlSchema;
+    asset_chain: AssetChainSchema;
     /**
      * Source of the sharing action
      */
-    from: 'Share' | 'Copy link';
+    from: 'share' | 'copy_link';
+    location: LocationSchema;
 };
 

@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface EnterpriseGetStatus200Response {
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseGetStatus200Response
      */
     balance: string;
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseGetStatus200Response
      */
     wallet: string;
 }
@@ -57,11 +53,11 @@ export function EnterpriseGetStatus200ResponseFromJSONTyped(json: any, ignoreDis
     };
 }
 
-  export function EnterpriseGetStatus200ResponseToJSON(json: any): EnterpriseGetStatus200Response {
-      return EnterpriseGetStatus200ResponseToJSONTyped(json, false);
-  }
+export function EnterpriseGetStatus200ResponseToJSON(json: any): EnterpriseGetStatus200Response {
+    return EnterpriseGetStatus200ResponseToJSONTyped(json, false);
+}
 
-  export function EnterpriseGetStatus200ResponseToJSONTyped(value?: EnterpriseGetStatus200Response | null, ignoreDiscriminator: boolean = false): any {
+export function EnterpriseGetStatus200ResponseToJSONTyped(value?: EnterpriseGetStatus200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -29,14 +29,10 @@ import {
 export interface CreatePromoCampaignRequest {
     /**
      * 
-     * @type {string}
-     * @memberof CreatePromoCampaignRequest
      */
     name: string;
     /**
      * 
-     * @type {Array<CreatePromoCampaignRequestParticipantsInner>}
-     * @memberof CreatePromoCampaignRequest
      */
     participants: Array<CreatePromoCampaignRequestParticipantsInner>;
 }
@@ -65,11 +61,11 @@ export function CreatePromoCampaignRequestFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-  export function CreatePromoCampaignRequestToJSON(json: any): CreatePromoCampaignRequest {
-      return CreatePromoCampaignRequestToJSONTyped(json, false);
-  }
+export function CreatePromoCampaignRequestToJSON(json: any): CreatePromoCampaignRequest {
+    return CreatePromoCampaignRequestToJSONTyped(json, false);
+}
 
-  export function CreatePromoCampaignRequestToJSONTyped(value?: CreatePromoCampaignRequest | null, ignoreDiscriminator: boolean = false): any {
+export function CreatePromoCampaignRequestToJSONTyped(value?: CreatePromoCampaignRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

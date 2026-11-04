@@ -27,12 +27,17 @@ export interface IAppContext {
     hideSigner?: boolean;
     hideKeystone?: boolean;
     hideLedger?: boolean;
-    hideMam?: boolean;
     hideMultisig?: boolean;
     hideBrowser?: boolean;
     hideFireblocks?: boolean;
     browserLength?: number;
     defaultWalletVersion: WalletVersion;
+    /**
+     * Gates the BIP39 multichain create/import flow. Legacy TON-standard
+     * and MAM paths remain available regardless. See CLAUDE.md →
+     * "Scope of the flag" for the contract.
+     */
+    multichainEnabled: boolean;
     tracker: AnalyticsTracker | undefined;
 }
 
@@ -53,6 +58,7 @@ export const AppContext = React.createContext<IAppContext>({
     proFeatures: false,
     hideQrScanner: false,
     defaultWalletVersion: WalletVersion.V5R1,
+    multichainEnabled: false,
     tracker: undefined
 });
 

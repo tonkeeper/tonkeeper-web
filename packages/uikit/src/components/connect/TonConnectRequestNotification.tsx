@@ -5,7 +5,7 @@ import {
     TonConnectAppRequestPayload,
     WalletResponse
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { TonTransactionNotification } from './TonTransactionNotification';
 import { SignDataNotification } from './SignDataNotification';
 import {
@@ -13,9 +13,11 @@ import {
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import {
+    useTrackDappTransactionSent,
     useTrackerTonConnectSendSuccess,
     useTrackTonConnectActionRequest
 } from '../../hooks/analytics/events-hooks';
+import { TonConnectRequestAnalyticsProvider } from '../../hooks/analytics/ton-connect';
 
 export const TonConnectRequestNotification: FC<{
     request: TonConnectAppRequestPayload | undefined;
@@ -24,11 +26,20 @@ export const TonConnectRequestNotification: FC<{
 }> = ({ request, handleClose, waitInvalidation }) => {
     useTrackTonConnectActionRequest(request?.connection?.manifest.url);
     const trackSendSuccess = useTrackerTonConnectSendSuccess();
+    const trackTransactionSent = useTrackDappTransactionSent();
+    const connectionType = request?.connection.type;
+    const dappUrl = request?.connection.manifest.url;
+    const analyticsRequest = useMemo(
+        () => (connectionType ? { connectionType, dappUrl } : null),
+        [connectionType, dappUrl]
+    );
 
     return (
-        <>
+        <TonConnectRequestAnalyticsProvider value={analyticsRequest}>
             <TonTransactionNotification
                 params={request?.kind === 'sendTransaction' ? request.payload : null}
+                walletId={request?.walletId}
+                dappUrl={request?.connection.manifest.url}
                 handleClose={result => {
                     if (request) {
                         handleClose(
@@ -40,6 +51,11 @@ export const TonConnectRequestNotification: FC<{
                             trackSendSuccess({
                                 dappUrl: request.connection.manifest.url,
                                 sender: result.senderChoice
+                            });
+                            trackTransactionSent({
+                                dappUrl: request.connection.manifest.url,
+                                connectionType: request.connection.type,
+                                senderChoice: result.senderChoice
                             });
                         }
                     }
@@ -53,6 +69,7 @@ export const TonConnectRequestNotification: FC<{
                         : request?.connection.manifest.url
                 }
                 params={request?.kind === 'signData' ? request.payload : null}
+                walletId={request?.walletId}
                 handleClose={result => {
                     if (request) {
                         handleClose(
@@ -72,6 +89,6 @@ export const TonConnectRequestNotification: FC<{
                     }
                 }}
             />
-        </>
+        </TonConnectRequestAnalyticsProvider>
     );
 };

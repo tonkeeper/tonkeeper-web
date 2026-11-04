@@ -29,26 +29,18 @@ import {
 export interface AndroidBatteryPurchaseStatusPurchasesInner {
     /**
      * 
-     * @type {string}
-     * @memberof AndroidBatteryPurchaseStatusPurchasesInner
      */
     productId: string;
     /**
      * 
-     * @type {string}
-     * @memberof AndroidBatteryPurchaseStatusPurchasesInner
      */
     token: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof AndroidBatteryPurchaseStatusPurchasesInner
      */
     success: boolean;
     /**
      * 
-     * @type {AndroidBatteryPurchaseStatusPurchasesInnerError}
-     * @memberof AndroidBatteryPurchaseStatusPurchasesInner
      */
     error?: AndroidBatteryPurchaseStatusPurchasesInnerError;
 }
@@ -57,7 +49,7 @@ export interface AndroidBatteryPurchaseStatusPurchasesInner {
  * Check if a given object implements the AndroidBatteryPurchaseStatusPurchasesInner interface.
  */
 export function instanceOfAndroidBatteryPurchaseStatusPurchasesInner(value: object): value is AndroidBatteryPurchaseStatusPurchasesInner {
-    if (!('productId' in value) || value['productId'] === undefined) return false;
+    if ((!('productId' in (value as Record<string, any>)) && !('product_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['productId'] === undefined && (value as Record<string, any>)['product_id'] === undefined)) return false;
     if (!('token' in value) || value['token'] === undefined) return false;
     if (!('success' in value) || value['success'] === undefined) return false;
     return true;
@@ -80,11 +72,11 @@ export function AndroidBatteryPurchaseStatusPurchasesInnerFromJSONTyped(json: an
     };
 }
 
-  export function AndroidBatteryPurchaseStatusPurchasesInnerToJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInner {
-      return AndroidBatteryPurchaseStatusPurchasesInnerToJSONTyped(json, false);
-  }
+export function AndroidBatteryPurchaseStatusPurchasesInnerToJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInner {
+    return AndroidBatteryPurchaseStatusPurchasesInnerToJSONTyped(json, false);
+}
 
-  export function AndroidBatteryPurchaseStatusPurchasesInnerToJSONTyped(value?: AndroidBatteryPurchaseStatusPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
+export function AndroidBatteryPurchaseStatusPurchasesInnerToJSONTyped(value?: AndroidBatteryPurchaseStatusPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { useLocation } from 'react-router-dom';
 
+import { scrollPagePathname } from '../libs/routes';
+
 type ScrollProps = {
     location: ReturnType<typeof useLocation>;
 };
@@ -47,16 +49,14 @@ class ScrollMemory extends Component<ScrollProps> {
     shouldComponentUpdate(nextProps: ScrollProps): boolean {
         const { location } = this.props;
 
-        const actual = location;
-        const next = nextProps.location;
+        const actual = scrollPagePathname(location.pathname);
+        const next = scrollPagePathname(nextProps.location.pathname);
 
-        const locationChanged = next.pathname !== actual.pathname;
-
-        if (locationChanged) {
+        if (next !== actual) {
             const scroll = getScrollPage();
-            this.url.set(actual.pathname, scroll);
+            this.url.set(actual, scroll);
 
-            const nextScroll = this.url.get(next.pathname);
+            const nextScroll = this.url.get(next);
             scrollTo(nextScroll ?? 0);
         }
         return false;

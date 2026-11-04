@@ -29,26 +29,18 @@ import {
 export interface UnSubscriptionAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof UnSubscriptionAction
      */
     subscriber: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof UnSubscriptionAction
      */
     subscription: string;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof UnSubscriptionAction
      */
     beneficiary: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof UnSubscriptionAction
      */
     admin: AccountAddress;
 }
@@ -81,11 +73,11 @@ export function UnSubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function UnSubscriptionActionToJSON(json: any): UnSubscriptionAction {
-      return UnSubscriptionActionToJSONTyped(json, false);
-  }
+export function UnSubscriptionActionToJSON(json: any): UnSubscriptionAction {
+    return UnSubscriptionActionToJSONTyped(json, false);
+}
 
-  export function UnSubscriptionActionToJSONTyped(value?: UnSubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
+export function UnSubscriptionActionToJSONTyped(value?: UnSubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

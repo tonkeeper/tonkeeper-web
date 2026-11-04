@@ -122,6 +122,7 @@ export const tonConnectTransaction = async (
             network: account.network as TonConnectNetwork
         });
     }
+    await checkTonConnectFromAndNetwork(storage, connection.wallet, data);
 
     try {
         await accountsStorage(storage).setActiveAccountAndWalletByWalletId(connection.wallet.id);
@@ -142,7 +143,8 @@ export const tonConnectTransaction = async (
         logo: await ExtensionPlatform.getActiveTabLogo(),
         origin,
         data,
-        manifest: connection.connection.manifest
+        manifest: connection.connection.manifest,
+        walletId: connection.wallet.id
     });
 
     try {
@@ -166,15 +168,16 @@ export const tonConnectSignData = async (
         );
     }
 
-    const accounts = await accountsStorage(storage).getAccounts();
-    const accToActivate = accounts.find(a =>
-        a.allTonWallets.some(w => w.id === connection.wallet.rawAddress)
-    );
+    await checkTonConnectFromAndNetwork(storage, connection.wallet, data);
 
-    if (accToActivate) {
-        accToActivate.setActiveTonWallet(connection.wallet.rawAddress);
-        await accountsStorage(storage).updateAccountInState(accToActivate);
-        await accountsStorage(storage).setActiveAccountId(accToActivate.id);
+    try {
+        await accountsStorage(storage).setActiveAccountAndWalletByWalletId(connection.wallet.id);
+    } catch (e) {
+        console.error(e);
+        throw new TonConnectError(
+            'Requested wallet not found',
+            SIGN_DATA_ERROR_CODES.BAD_REQUEST_ERROR
+        );
     }
 
     await delay(200);
@@ -186,7 +189,8 @@ export const tonConnectSignData = async (
         logo: await ExtensionPlatform.getActiveTabLogo(),
         origin,
         data,
-        manifest: connection.connection.manifest
+        manifest: connection.connection.manifest,
+        walletId: connection.wallet.id
     });
 
     try {

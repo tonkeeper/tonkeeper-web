@@ -21,17 +21,19 @@ import { mapValues } from '../runtime';
 export interface EnterpriseSend200Response {
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseSend200Response
      */
     msgId: string;
+    /**
+     * base64 encoded external message (signed) that was sent to the network
+     */
+    external?: string;
 }
 
 /**
  * Check if a given object implements the EnterpriseSend200Response interface.
  */
 export function instanceOfEnterpriseSend200Response(value: object): value is EnterpriseSend200Response {
-    if (!('msgId' in value) || value['msgId'] === undefined) return false;
+    if ((!('msgId' in (value as Record<string, any>)) && !('msg_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['msgId'] === undefined && (value as Record<string, any>)['msg_id'] === undefined)) return false;
     return true;
 }
 
@@ -46,14 +48,15 @@ export function EnterpriseSend200ResponseFromJSONTyped(json: any, ignoreDiscrimi
     return {
         
         'msgId': json['msg_id'],
+        'external': json['external'] == null ? undefined : json['external'],
     };
 }
 
-  export function EnterpriseSend200ResponseToJSON(json: any): EnterpriseSend200Response {
-      return EnterpriseSend200ResponseToJSONTyped(json, false);
-  }
+export function EnterpriseSend200ResponseToJSON(json: any): EnterpriseSend200Response {
+    return EnterpriseSend200ResponseToJSONTyped(json, false);
+}
 
-  export function EnterpriseSend200ResponseToJSONTyped(value?: EnterpriseSend200Response | null, ignoreDiscriminator: boolean = false): any {
+export function EnterpriseSend200ResponseToJSONTyped(value?: EnterpriseSend200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -61,6 +64,7 @@ export function EnterpriseSend200ResponseFromJSONTyped(json: any, ignoreDiscrimi
     return {
         
         'msg_id': value['msgId'],
+        'external': value['external'],
     };
 }
 

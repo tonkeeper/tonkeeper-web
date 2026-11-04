@@ -38,7 +38,7 @@ export class BatteryMessageSender implements ISender {
 
         await new DefaultApi(this.api.batteryApi).sendMessage({
             xTonConnectAuth: this.batteryConfig.authToken,
-            emulateMessageToWalletRequest: {
+            sendMessageRequest: {
                 boc: external.toBoc().toString('base64')
             }
         });

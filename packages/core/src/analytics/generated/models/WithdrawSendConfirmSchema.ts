@@ -2,7 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FeePaidInSchema } from './FeePaidInSchema';
+import type { AssetSchema } from './AssetSchema';
+import type { FeeAssetSchema } from './FeeAssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
 import type { WithdrawOptionSchema } from './WithdrawOptionSchema';
 /**
@@ -13,22 +14,16 @@ export type WithdrawSendConfirmSchema = {
     eventName: string;
     from: RampSourceSchema;
     withdraw_option: WithdrawOptionSchema;
-    /**
-     * Carried from withdraw_click_asset
-     */
-    sell_asset: string;
+    sell_asset: AssetSchema;
     /**
      * Carried from withdraw_click_stablecoin
      */
     stablecoin_symbol: string;
-    /**
-     * Carried from withdraw_click_network
-     */
-    buy_asset: string;
+    buy_asset: AssetSchema;
     /**
      * Carried from withdraw_click_insert_amount_continue
      */
     amount: number;
-    fee_paid_in: FeePaidInSchema;
+    fee_asset: FeeAssetSchema;
 };
 

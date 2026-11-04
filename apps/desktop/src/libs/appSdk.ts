@@ -5,10 +5,10 @@ import {
     BiometryService,
     CookieService,
     AppCountryInfo,
-    ConfirmOptions
+    ConfirmOptions,
+    KeychainScope
 } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
-import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 import { KeychainDesktop } from './keychain';
@@ -25,7 +25,7 @@ export class BiometryServiceDesktop implements BiometryService {
         return sendBackground<boolean>({ king: 'can-prompt-touch-id' });
     };
 
-    prompt = async (reason: (lang: string) => string) => {
+    prompt = async (reason: (lang: string) => string, scope?: KeychainScope) => {
         const lagns = await sendBackground<string[]>({
             king: 'get-preferred-system-languages'
         });
@@ -33,7 +33,8 @@ export class BiometryServiceDesktop implements BiometryService {
         const lang = (lagns[0] || 'en').split('-')[0];
         await sendBackground<void>({
             king: 'prompt-touch-id',
-            reason: reason(lang)
+            reason: reason(lang),
+            scope
         });
     };
 }
@@ -84,7 +85,7 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
 
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
-    version = packageJson.version ?? 'Unknown';
+    version = __APP_VERSION__;
 
     targetEnv = 'desktop' as const;
 

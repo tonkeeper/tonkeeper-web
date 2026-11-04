@@ -20,7 +20,7 @@ import React, {
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
 import { ArrowLeftIcon, EllipsisIcon } from '../Icon';
-import { IconButton } from '../fields/IconButton';
+import { LegacyIconButton } from '../fields/IconButton';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import {
     IonBackButton,
@@ -146,7 +146,7 @@ export const DesktopViewHeaderStyled = styled.div<{
         `};
 `;
 
-const IconButtonStyled = styled(IconButton)`
+const IconButtonStyled = styled(LegacyIconButton)`
     transition: opacity 0.15s ease-in-out;
 
     &:hover {

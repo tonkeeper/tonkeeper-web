@@ -10,7 +10,8 @@ export const setDefaultProtocolClient = () => {
         'tonkeeper',
         'tonkeeper-tc',
         'tonkeeper-pro',
-        'tonkeeper-pro-tc'
+        'tonkeeper-pro-tc',
+        'wc'
     ];
     const isDefaultProtocolClient = protocols.every(protocol =>
         app.isDefaultProtocolClient(protocol)
@@ -35,7 +36,7 @@ export const setProtocolHandlerWindowsLinux = () => {
 
         log.info({ secondInsUrl: url });
         app.whenReady().then(() => {
-            window.webContents.send('tc', url);
+            window.webContents.send('tc', url, false);
         });
     });
 
@@ -60,12 +61,14 @@ export const setProtocolHandlerOSX = () => {
     app.on('open-url', (event: Electron.Event, url: string) => {
         event.preventDefault();
         log.info({ openUrl: url });
+        // macOS delivers the launching URL before the app is ready.
+        const isColdStart = !app.isReady();
 
         app.whenReady().then(async () => {
             const window = await MainWindow.openMainWindow();
 
             window.show();
-            window.webContents.send('tc', url);
+            window.webContents.send('tc', url, isColdStart);
         });
     });
 };
@@ -84,7 +87,7 @@ const initMainWindow = async () => {
         log.info({ initUrl: url });
 
         if (url != null) {
-            window.webContents.send('tc', url);
+            window.webContents.send('tc', url, true);
         }
     } catch (e) {
         log.error(e);

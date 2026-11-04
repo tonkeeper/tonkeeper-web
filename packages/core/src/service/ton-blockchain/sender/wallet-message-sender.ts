@@ -55,11 +55,26 @@ export class WalletMessageSender implements ISender {
         return external;
     }
 
-    public async estimate(outgoing: Outgoing) {
+    /**
+     * `emulationBalance` (nanotons) emulates as if the wallet held that much,
+     * so a wallet that can't afford the transfer still gets it priced.
+     */
+    public async estimate(outgoing: Outgoing, options?: { emulationBalance?: bigint }) {
         const external = await this.toExternal(outgoing);
 
         const result = await new EmulationApi(this.api.tonApiV2).emulateMessageToWallet({
-            emulateMessageToWalletRequest: { boc: external.toBoc().toString('base64') }
+            emulateMessageToWalletRequest: {
+                boc: external.toBoc().toString('base64'),
+                params:
+                    options?.emulationBalance === undefined
+                        ? undefined
+                        : [
+                              {
+                                  address: this.wallet.rawAddress,
+                                  balance: Number(options.emulationBalance)
+                              }
+                          ]
+            }
         });
 
         return {

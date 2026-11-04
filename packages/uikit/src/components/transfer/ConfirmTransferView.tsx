@@ -3,6 +3,12 @@ import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
+import { TransferInitiatedBy } from '../../hooks/analytics/events-hooks';
+import {
+    SendFrom,
+    useAssetAmountSendContext,
+    useSendEmulationAnalytics
+} from '../../hooks/analytics/send';
 import { ConfirmView, ConfirmViewButtonsSlot } from './ConfirmView';
 import {
     TonSenderChoiceUserAvailable,
@@ -73,8 +79,10 @@ export const ConfirmTransferView: FC<
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
+        initiatedBy?: TransferInitiatedBy;
+        sendFrom?: SendFrom;
     }>
-> = ({ isMax, assetAmount, ...rest }) => {
+> = ({ isMax, assetAmount, initiatedBy, sendFrom, ...rest }) => {
     const { t } = useTranslation();
     const { onOpen: openTopUpTronFeeBalanceNotification } = useTopUpTronFeeBalanceNotification();
 
@@ -141,7 +149,17 @@ export const ConfirmTransferView: FC<
         amount: assetAmountPatched,
         isMax,
         estimation: estimation.data!,
-        senderType: selectedSenderType!
+        senderType: selectedSenderType!,
+        initiatedBy,
+        from: sendFrom
+    });
+    const sendAnalyticsContext = useAssetAmountSendContext(sendFrom, assetAmountPatched);
+    useSendEmulationAnalytics({
+        context: sendAnalyticsContext,
+        active: true,
+        pending: estimation.isFetching,
+        failed: estimation.isError,
+        error: estimation.error
     });
 
     const availableTonSenderChoicesFilteredKey = JSON.stringify(availableTonSenderChoicesFiltered);

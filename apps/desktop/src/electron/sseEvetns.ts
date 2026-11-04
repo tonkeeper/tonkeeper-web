@@ -7,7 +7,6 @@ import {
     createBridgeEndpointFetcher,
     TonConnectSSE
 } from '@tonkeeper/core/dist/service/tonConnect/ton-connect-sse';
-import packageJson from '../../package.json';
 
 globalThis.Buffer = BufferPolyfill;
 globalThis.EventSource = EventSource;
@@ -20,7 +19,7 @@ export const tonConnectSSE = new TonConnectSSE({
     },
     bridgeEndpointFetcher: createBridgeEndpointFetcher({
         platform: 'desktop',
-        build: packageJson.version,
+        build: __APP_VERSION__,
         onError: e => log.error(e)
     }),
     system: {

@@ -50,9 +50,12 @@ export const useCheckMultisigsSigners = () => {
 
     return useQuery({
         queryKey: [QueryKey.multisigSigners, accounts],
+        // react-query v4 rejects `undefined` from queryFn — must return a
+        // non-undefined sentinel. Effect-only queries that don't expose
+        // data return `null`.
         queryFn: async () => {
             if (!accounts?.length) {
-                return;
+                return null;
             }
             const multisigs = accounts.filter(a => a.type === 'ton-multisig');
             const allAddedWallets = accounts.flatMap(a => a.allTonWallets).map(w => w.rawAddress);
@@ -98,6 +101,8 @@ export const useCheckMultisigsSigners = () => {
                     anyOfKeysParts(QueryKey.account, ...multisigs.map(m => m.id))
                 );
             }
+
+            return null;
         }
     });
 };

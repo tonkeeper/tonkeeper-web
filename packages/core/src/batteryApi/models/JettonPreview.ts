@@ -20,6 +20,13 @@ import {
     JettonVerificationTypeToJSON,
     JettonVerificationTypeToJSONTyped,
 } from './JettonVerificationType';
+import type { ScaledUI } from './ScaledUI';
+import {
+    ScaledUIFromJSON,
+    ScaledUIFromJSONTyped,
+    ScaledUIToJSON,
+    ScaledUIToJSONTyped,
+} from './ScaledUI';
 
 /**
  * 
@@ -29,52 +36,44 @@ import {
 export interface JettonPreview {
     /**
      * 
-     * @type {string}
-     * @memberof JettonPreview
      */
     address: string;
     /**
      * 
-     * @type {string}
-     * @memberof JettonPreview
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof JettonPreview
      */
     symbol: string;
     /**
      * 
-     * @type {number}
-     * @memberof JettonPreview
      */
     decimals: number;
     /**
      * 
-     * @type {string}
-     * @memberof JettonPreview
      */
     image: string;
     /**
      * 
-     * @type {JettonVerificationType}
-     * @memberof JettonPreview
      */
     verification: JettonVerificationType;
     /**
      * 
-     * @type {string}
-     * @memberof JettonPreview
      */
     customPayloadApiUri?: string;
     /**
      * 
-     * @type {number}
-     * @memberof JettonPreview
      */
     score: number;
+    /**
+     * 
+     */
+    scaledUi?: ScaledUI;
+    /**
+     * 
+     */
+    description?: string;
 }
 
 
@@ -111,14 +110,16 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'customPayloadApiUri': json['custom_payload_api_uri'] == null ? undefined : json['custom_payload_api_uri'],
         'score': json['score'],
+        'scaledUi': json['scaled_ui'] == null ? undefined : ScaledUIFromJSON(json['scaled_ui']),
+        'description': json['description'] == null ? undefined : json['description'],
     };
 }
 
-  export function JettonPreviewToJSON(json: any): JettonPreview {
-      return JettonPreviewToJSONTyped(json, false);
-  }
+export function JettonPreviewToJSON(json: any): JettonPreview {
+    return JettonPreviewToJSONTyped(json, false);
+}
 
-  export function JettonPreviewToJSONTyped(value?: JettonPreview | null, ignoreDiscriminator: boolean = false): any {
+export function JettonPreviewToJSONTyped(value?: JettonPreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -133,6 +134,8 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'custom_payload_api_uri': value['customPayloadApiUri'],
         'score': value['score'],
+        'scaled_ui': ScaledUIToJSON(value['scaledUi']),
+        'description': value['description'],
     };
 }
 

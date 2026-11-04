@@ -43,32 +43,22 @@ import {
 export interface PurchaseAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof PurchaseAction
      */
     source: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof PurchaseAction
      */
     destination: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof PurchaseAction
      */
     invoiceId: string;
     /**
      * 
-     * @type {Price}
-     * @memberof PurchaseAction
      */
     amount: Price;
     /**
      * 
-     * @type {Metadata}
-     * @memberof PurchaseAction
      */
     metadata: Metadata;
 }
@@ -79,7 +69,7 @@ export interface PurchaseAction {
 export function instanceOfPurchaseAction(value: object): value is PurchaseAction {
     if (!('source' in value) || value['source'] === undefined) return false;
     if (!('destination' in value) || value['destination'] === undefined) return false;
-    if (!('invoiceId' in value) || value['invoiceId'] === undefined) return false;
+    if ((!('invoiceId' in (value as Record<string, any>)) && !('invoice_id' in (value as Record<string, any>))) || ((value as Record<string, any>)['invoiceId'] === undefined && (value as Record<string, any>)['invoice_id'] === undefined)) return false;
     if (!('amount' in value) || value['amount'] === undefined) return false;
     if (!('metadata' in value) || value['metadata'] === undefined) return false;
     return true;
@@ -103,11 +93,11 @@ export function PurchaseActionFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function PurchaseActionToJSON(json: any): PurchaseAction {
-      return PurchaseActionToJSONTyped(json, false);
-  }
+export function PurchaseActionToJSON(json: any): PurchaseAction {
+    return PurchaseActionToJSONTyped(json, false);
+}
 
-  export function PurchaseActionToJSONTyped(value?: PurchaseAction | null, ignoreDiscriminator: boolean = false): any {
+export function PurchaseActionToJSONTyped(value?: PurchaseAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

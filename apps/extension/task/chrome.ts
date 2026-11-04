@@ -12,6 +12,7 @@ export async function buildChrome() {
     });
 
     builder.archive();
+    builder.pinUnpackedExtensionId();
 
     console.log('Chrome build successfully created');
 }

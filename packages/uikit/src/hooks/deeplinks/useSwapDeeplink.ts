@@ -2,7 +2,13 @@ import { SwapDeeplinkParams } from '@tonkeeper/core/dist/service/deeplinkingServ
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useCallback, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
+import {
+    AppRoute,
+    MULTICHAIN_ACTION_PARAM,
+    MULTICHAIN_ACTION_SWAP,
+    MultichainRoute
+} from '../../libs/routes';
+import { useActiveAccount } from '../../state/wallet';
 import { useNavigate } from '../router/useNavigate';
 import { useSwapAssetSearch } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset, useSwapToAsset } from '../../state/swap/useSwapForm';
@@ -34,16 +40,26 @@ const getSwapDeeplinkParamsFromSearch = (search: string): SwapDeeplinkParams | u
 
 export const useOpenSwapDeeplink = () => {
     const navigate = useNavigate();
+    const isMultichain = useActiveAccount().type === 'multichain';
 
     return useCallback(
         (params: SwapDeeplinkParams) => {
+            // The multichain swap flow lives in the home's local state and
+            // picks its pair interactively, so `ft` / `tt` are not applied.
+            if (isMultichain) {
+                navigate(
+                    `${MultichainRoute.home}?${MULTICHAIN_ACTION_PARAM}=${MULTICHAIN_ACTION_SWAP}`
+                );
+                return;
+            }
+
             pendingSwapDeeplinkParams$.next(params);
             const searchParams = toSearchParams(params);
             const search = searchParams.toString();
 
             navigate(`${AppRoute.swap}${search ? `?${search}` : ''}`);
         },
-        [navigate]
+        [navigate, isMultichain]
     );
 };
 

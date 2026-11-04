@@ -2,15 +2,10 @@ import { useCallback, useMemo } from 'react';
 import BigNumber from 'bignumber.js';
 
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { AmountFormatter } from '@tonkeeper/core/dist/utils/AmountFormatter';
 import { formatDecimals, shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
-export const formatter = new AmountFormatter({
-    getLocaleFormat: () => ({
-        decimalSeparator: getDecimalSeparator(),
-        groupingSeparator: getGroupSeparator()
-    })
-});
+import { amountFormatter, formatAmount } from '@tonkeeper/core/dist/utils/numberFormat';
+
+export const formatter = amountFormatter;
 
 export const toFormattedTonBalance = (weiBalance: number) => {
     return formatter.format(shiftedDecimals(weiBalance, 9));
@@ -46,9 +41,9 @@ export const useFormatCoinValue = () => {
 };
 
 export const formatFiatCurrency = (currency: FiatCurrencies, balance: BigNumber.Value) => {
-    return formatter.formatDisplay(balance, { currency });
+    return formatAmount(balance, { currency });
 };
 
 export const formatTokenDisplay = (amount: BigNumber.Value, unit: string) => {
-    return formatter.formatDisplay(amount, { unit });
+    return formatAmount(amount, { unit });
 };

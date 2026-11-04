@@ -43,20 +43,14 @@ import {
 export interface LiquidityDepositAction {
     /**
      * 
-     * @type {Protocol}
-     * @memberof LiquidityDepositAction
      */
     protocol: Protocol;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof LiquidityDepositAction
      */
     from: AccountAddress;
     /**
      * 
-     * @type {Array<VaultDepositInfo>}
-     * @memberof LiquidityDepositAction
      */
     tokens: Array<VaultDepositInfo>;
 }
@@ -87,11 +81,11 @@ export function LiquidityDepositActionFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-  export function LiquidityDepositActionToJSON(json: any): LiquidityDepositAction {
-      return LiquidityDepositActionToJSONTyped(json, false);
-  }
+export function LiquidityDepositActionToJSON(json: any): LiquidityDepositAction {
+    return LiquidityDepositActionToJSONTyped(json, false);
+}
 
-  export function LiquidityDepositActionToJSONTyped(value?: LiquidityDepositAction | null, ignoreDiscriminator: boolean = false): any {
+export function LiquidityDepositActionToJSONTyped(value?: LiquidityDepositAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

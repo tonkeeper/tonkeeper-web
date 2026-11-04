@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useState } from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
@@ -7,6 +7,7 @@ import { fallbackRenderOver } from '../../components/Error';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 import { StakingRoute } from '../../libs/routes';
 import { useStakingEntryPoint } from '../../state/staking/useStakingEntryPoint';
+import { consumeStakingOpenSource } from '../../hooks/analytics/staking';
 import { DesktopStakingFormPage } from './DesktopStakingFormPage';
 import { DesktopUnstakeFormPage } from './DesktopUnstakeFormPage';
 import { DesktopStakingPoolsPage } from './DesktopStakingPoolsPage';
@@ -14,12 +15,13 @@ import { DesktopStakingPoolDetailPage } from './DesktopStakingPoolDetailPage';
 
 const StakingDefaultView = () => {
     const entryPoint = useStakingEntryPoint();
+    const [from] = useState(consumeStakingOpenSource);
 
     if (!entryPoint) return null;
 
     switch (entryPoint.view) {
         case 'stake-form':
-            return <DesktopStakingFormPage poolAddress={entryPoint.poolAddress} />;
+            return <DesktopStakingFormPage poolAddress={entryPoint.poolAddress} from={from} />;
         case 'pool-detail':
             return <DesktopStakingPoolDetailPage poolAddress={entryPoint.poolAddress} />;
         case 'pools-list':

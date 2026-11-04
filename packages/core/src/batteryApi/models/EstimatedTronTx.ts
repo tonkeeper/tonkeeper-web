@@ -29,32 +29,22 @@ import {
 export interface EstimatedTronTx {
     /**
      * 
-     * @type {number}
-     * @memberof EstimatedTronTx
      */
     energyCharges: number;
     /**
      * 
-     * @type {number}
-     * @memberof EstimatedTronTx
      */
     bandwidthCharges: number;
     /**
      * 
-     * @type {number}
-     * @memberof EstimatedTronTx
      */
     activationCharges: number;
     /**
      * 
-     * @type {number}
-     * @memberof EstimatedTronTx
      */
     totalCharges: number;
     /**
      * 
-     * @type {EstimatedTronTxInstantFee}
-     * @memberof EstimatedTronTx
      */
     instantFee: EstimatedTronTxInstantFee;
 }
@@ -63,11 +53,11 @@ export interface EstimatedTronTx {
  * Check if a given object implements the EstimatedTronTx interface.
  */
 export function instanceOfEstimatedTronTx(value: object): value is EstimatedTronTx {
-    if (!('energyCharges' in value) || value['energyCharges'] === undefined) return false;
-    if (!('bandwidthCharges' in value) || value['bandwidthCharges'] === undefined) return false;
-    if (!('activationCharges' in value) || value['activationCharges'] === undefined) return false;
-    if (!('totalCharges' in value) || value['totalCharges'] === undefined) return false;
-    if (!('instantFee' in value) || value['instantFee'] === undefined) return false;
+    if ((!('energyCharges' in (value as Record<string, any>)) && !('energy_charges' in (value as Record<string, any>))) || ((value as Record<string, any>)['energyCharges'] === undefined && (value as Record<string, any>)['energy_charges'] === undefined)) return false;
+    if ((!('bandwidthCharges' in (value as Record<string, any>)) && !('bandwidth_charges' in (value as Record<string, any>))) || ((value as Record<string, any>)['bandwidthCharges'] === undefined && (value as Record<string, any>)['bandwidth_charges'] === undefined)) return false;
+    if ((!('activationCharges' in (value as Record<string, any>)) && !('activation_charges' in (value as Record<string, any>))) || ((value as Record<string, any>)['activationCharges'] === undefined && (value as Record<string, any>)['activation_charges'] === undefined)) return false;
+    if ((!('totalCharges' in (value as Record<string, any>)) && !('total_charges' in (value as Record<string, any>))) || ((value as Record<string, any>)['totalCharges'] === undefined && (value as Record<string, any>)['total_charges'] === undefined)) return false;
+    if ((!('instantFee' in (value as Record<string, any>)) && !('instant_fee' in (value as Record<string, any>))) || ((value as Record<string, any>)['instantFee'] === undefined && (value as Record<string, any>)['instant_fee'] === undefined)) return false;
     return true;
 }
 
@@ -89,11 +79,11 @@ export function EstimatedTronTxFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function EstimatedTronTxToJSON(json: any): EstimatedTronTx {
-      return EstimatedTronTxToJSONTyped(json, false);
-  }
+export function EstimatedTronTxToJSON(json: any): EstimatedTronTx {
+    return EstimatedTronTxToJSONTyped(json, false);
+}
 
-  export function EstimatedTronTxToJSONTyped(value?: EstimatedTronTx | null, ignoreDiscriminator: boolean = false): any {
+export function EstimatedTronTxToJSONTyped(value?: EstimatedTronTx | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

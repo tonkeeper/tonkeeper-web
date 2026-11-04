@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { css, styled } from 'styled-components';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { PoolInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Body2, Body3 } from '../Text';
 import { StakingPoolIcon } from './StakingPoolIcon';
@@ -54,6 +55,7 @@ export interface StakingPoolSelectorProps {
 
 export const StakingPoolSelector: FC<StakingPoolSelectorProps> = ({ pool }) => {
     const { t } = useTranslation();
+    const sdk = useAppSdk();
 
     if (!pool) {
         return null;
@@ -67,7 +69,7 @@ export const StakingPoolSelector: FC<StakingPoolSelectorProps> = ({ pool }) => {
         <PoolCard
             onClick={() => {
                 if (providerLinkUrl) {
-                    window.open(providerLinkUrl, '_blank');
+                    sdk.openPage(providerLinkUrl);
                 }
             }}
         >

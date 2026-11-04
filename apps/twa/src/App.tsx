@@ -235,7 +235,6 @@ const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
             hideSigner: true,
             hideKeystone: true,
             hideQrScanner: true,
-            hideMam: true,
             hideMultisig: true,
             hideFireblocks: true,
             defaultWalletVersion: WalletVersion.V5R1,

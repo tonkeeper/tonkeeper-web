@@ -135,14 +135,19 @@ export class TonAssetTransactionService {
         }
     }
 
+    /** Resolves to the broadcast external message, when the sender exposes it. */
     async send(sender: Sender, estimation: TonEstimation, params: TransferParams) {
+        if (sender instanceof GaslessMessageSender) {
+            sender = sender.withConfirmedCommission(estimation);
+        }
+
         if (this.isExtraCurrency(params)) {
             return this.sendExtraCurrency(sender, estimation, params);
         }
         if (this.isJettonTransfer(params)) {
-            await this.sendJetton(sender, estimation, params);
+            return this.sendJetton(sender, estimation, params);
         } else {
-            await this.sendTon(sender, estimation, params);
+            return this.sendTon(sender, estimation, params);
         }
     }
 

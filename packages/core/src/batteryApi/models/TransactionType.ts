@@ -24,7 +24,7 @@ export const TransactionType = {
     TransSplitInstall: 'TransSplitInstall',
     TransMergePrepare: 'TransMergePrepare',
     TransMergeInstall: 'TransMergeInstall',
-    TransStorage: 'TransStorage'
+    TransStorage: 'TransStorage',
 } as const;
 export type TransactionType = typeof TransactionType[keyof typeof TransactionType];
 

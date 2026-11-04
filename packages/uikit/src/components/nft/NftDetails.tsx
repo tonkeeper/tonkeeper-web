@@ -7,7 +7,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
-import { SpinnerIcon } from '../Icon';
+import { Loader } from '../Loader';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, H3, Label1 } from '../Text';
 import { NFTKind } from './NftAction';
@@ -79,7 +79,7 @@ export const NftDetails: FC<{ nftItem: NftItem; kind: NFTKind }> = React.memo(({
                             {expirationDate ? (
                                 <Label1>{expirationDateFormatted}</Label1>
                             ) : (
-                                <SpinnerIcon />
+                                <Loader size="small" />
                             )}
                         </ListItemPayload>
                     </ListItem>

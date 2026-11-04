@@ -18,6 +18,7 @@ import {
     useBatteryApi,
     useBatteryAuthToken,
     useBatteryBalance,
+    requireBatteryServiceConfig,
     useBatteryServiceConfig,
     useBatteryUnitTonRate,
     useRequestBatteryAuthToken,
@@ -112,7 +113,11 @@ export const useAvailableTonSendersChoices = (
             if (asset?.blockchain === BLOCKCHAIN_NAME.TRON) {
                 return [EXTERNAL_SENDER_CHOICE];
             }
-            if (account.type !== 'mnemonic' && account.type !== 'mam') {
+            if (
+                account.type !== 'mnemonic' &&
+                account.type !== 'mam' &&
+                account.type !== 'multichain'
+            ) {
                 return [EXTERNAL_SENDER_CHOICE];
             }
             if (operation.type === 'multisend-transfer') {
@@ -246,6 +251,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
 
             if (
                 batteryAuthTokenWithBalance &&
+                batteryConfig &&
                 isStandardTonWallet(account.activeTonWallet) &&
                 payload.messagesVariants?.battery
             ) {
@@ -454,10 +460,11 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
                     _authToken = await mutateAsync();
                 }
 
+                const { excessAccount, messageTtl } = requireBatteryServiceConfig(batteryConfig);
                 return new BatteryMessageSender(
                     {
-                        excessAddress: batteryConfig.excessAccount,
-                        messageTtl: batteryConfig.messageTtl,
+                        excessAddress: excessAccount,
+                        messageTtl,
                         authToken: _authToken!,
                         batteryUnitTonRate
                     },
@@ -687,10 +694,11 @@ export const useGetSender = () => {
                 if (!batteryToken) {
                     throw new Error('Auth token not found');
                 }
+                const { excessAccount, messageTtl } = requireBatteryServiceConfig(batteryConfig);
                 return new BatteryMessageSender(
                     {
-                        excessAddress: batteryConfig.excessAccount,
-                        messageTtl: batteryConfig.messageTtl,
+                        excessAddress: excessAccount,
+                        messageTtl,
                         authToken: batteryToken,
                         batteryUnitTonRate
                     },

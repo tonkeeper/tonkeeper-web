@@ -1,30 +1,36 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import React, { FC, useContext, useMemo, useState } from 'react';
 import { AddressInput } from '../../components/create/AddressInput';
-import { UpdateWalletName } from '../../components/create/WalletName';
+import { CustomizeWallet } from '../../components/create/CustomizeWallet';
 import {
     useAccountsState,
     useCreateAccountReadOnly,
     useMutateRenameAccount
 } from '../../state/wallet';
+import { useMutateWalletColor, useWalletColorResolver } from '../../state/walletColor';
 import { FinalView } from './Password';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import {
     OnCloseInterceptor,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../../components/Notification';
+    useSetModalOnBack,
+    useSetModalOnCloseInterceptor
+} from '../../primitives/Modal';
 import { AccountIsAlreadyAdded } from '../../components/create/AccountIsAlreadyAdded';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { Address } from '@ton/core';
+import { useImportFlowAnalytics } from '../../hooks/analytics/wallet-flow';
 
 export const CreateWatchOnlyWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
         useCreateAccountReadOnly();
     const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
+    const resolveWalletColor = useWalletColorResolver();
+    const { setWalletColor } = useMutateWalletColor();
 
     const [createdAccount, setCreatedAccount] = useState<Account | undefined>(undefined);
+
+    const importAnalytics = useImportFlowAnalytics('watchonly');
 
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
 
@@ -49,7 +55,7 @@ export const CreateWatchOnlyWallet: FC<{ afterCompleted: () => void }> = ({ afte
         }
         return undefined;
     }, [navigateHome, createdAccount, isDirty, openConfirmDiscard]);
-    useSetNotificationOnBack(onBack);
+    useSetModalOnBack(onBack);
 
     const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
         if (!isDirty) {
@@ -72,7 +78,7 @@ export const CreateWatchOnlyWallet: FC<{ afterCompleted: () => void }> = ({ afte
             });
         };
     }, [createdAccount, openConfirmDiscard, isDirty]);
-    useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+    useSetModalOnCloseInterceptor(onCloseInterceptor);
 
     const [existingAccountAndWallet, setExistingAccountAndWallet] = useState<
         | {
@@ -93,7 +99,10 @@ export const CreateWatchOnlyWallet: FC<{ afterCompleted: () => void }> = ({ afte
             });
             return;
         }
-        createWalletsAsync({ address }).then(setCreatedAccount);
+        createWalletsAsync({ address }).then(account => {
+            setCreatedAccount(account);
+            importAnalytics.success();
+        }, importAnalytics.error);
     };
 
     if (existingAccountAndWallet) {
@@ -114,18 +123,16 @@ export const CreateWatchOnlyWallet: FC<{ afterCompleted: () => void }> = ({ afte
 
     if (!editNamePagePassed) {
         return (
-            <UpdateWalletName
+            <CustomizeWallet
                 name={createdAccount.name}
-                submitHandler={val => {
-                    renameWallet({
-                        id: createdAccount.id,
-                        ...val
-                    }).then(newAcc => {
-                        setEditNamePagePassed(true);
-                        setCreatedAccount(newAcc);
-                    });
+                submitHandler={async ({ name, emoji, colorId }) => {
+                    await setWalletColor(createdAccount.id, colorId);
+                    const newAcc = await renameWallet({ id: createdAccount.id, name, emoji });
+                    setEditNamePagePassed(true);
+                    setCreatedAccount(newAcc);
                 }}
                 walletEmoji={createdAccount.emoji}
+                walletColorId={resolveWalletColor(createdAccount.id).id}
                 isLoading={renameLoading}
             />
         );

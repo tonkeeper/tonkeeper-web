@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface SentTronTx {
     /**
      * 
-     * @type {string}
-     * @memberof SentTronTx
      */
     status: string;
 }
@@ -49,11 +47,11 @@ export function SentTronTxFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-  export function SentTronTxToJSON(json: any): SentTronTx {
-      return SentTronTxToJSONTyped(json, false);
-  }
+export function SentTronTxToJSON(json: any): SentTronTx {
+    return SentTronTxToJSONTyped(json, false);
+}
 
-  export function SentTronTxToJSONTyped(value?: SentTronTx | null, ignoreDiscriminator: boolean = false): any {
+export function SentTronTxToJSONTyped(value?: SentTronTx | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

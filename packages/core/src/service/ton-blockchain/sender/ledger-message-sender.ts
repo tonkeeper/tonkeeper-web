@@ -30,6 +30,7 @@ import { WalletMessageSender } from './wallet-message-sender';
 import { TonConnectEncoder } from '../encoder/ton-connect-encoder';
 import { ISender } from './ISender';
 import { UserCancelledError } from '../../../errors/UserCancelledError';
+import { ledgerKnownJetton } from '../../ledger/known-jettons';
 
 export class LedgerMessageSender implements ISender {
     constructor(
@@ -210,9 +211,10 @@ export class LedgerMessageSender implements ISender {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
         const jettonEncoder = new JettonEncoder(this.api, this.wallet.rawAddress);
+        const jettonMasterAddress = tonAssetAddressToString(amount.asset.address);
 
         const { customPayload, stateInit, jettonWalletAddress } =
-            await jettonEncoder.jettonCustomPayload(tonAssetAddressToString(amount.asset.address));
+            await jettonEncoder.jettonCustomPayload(jettonMasterAddress);
 
         const transfer = await this.sign({
             to: Address.parse(jettonWalletAddress),
@@ -222,7 +224,10 @@ export class LedgerMessageSender implements ISender {
             timeout: getTTL(timestamp),
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             payload: {
-                knownJetton: null,
+                knownJetton: ledgerKnownJetton(
+                    Address.parse(jettonMasterAddress),
+                    Address.parse(this.wallet.rawAddress).workChain
+                ),
                 type: 'jetton-transfer',
                 // temporary set to 0 because of ledger app 2.7.0 issue
                 queryId: BigInt(0), // getTonkeeperQueryId(),

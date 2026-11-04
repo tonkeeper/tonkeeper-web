@@ -1,15 +1,15 @@
 import BigNumber from 'bignumber.js';
+import { decodeBase58, toBeHex } from 'ethers';
 import { TON_ASSET, TRON_TRX_ASSET, TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
 import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
 import { Configuration, DefaultApi } from '../batteryApi';
 import { TronTransactionFee } from '../entries/crypto/transaction-fee';
-import { cachedAsync, withRetry } from '../utils/common';
-import { TronApiHttpError } from '../errors/TronApiHttpError';
+import { cachedAsync } from '../utils/common';
+import { tronFetch } from './tronGridTransport';
 import type { SignedTransaction } from 'tronweb/src/types/Transaction';
-
-const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
+import { joinUrl } from '../utils/url';
 
 type TronTokenDTO = {
     transaction_id: string; // no 0x
@@ -54,51 +54,38 @@ export type EstimateResourcesRequest = {
     data: string;
 };
 
-const defaultRetryConfig = {
-    maxRetries: 2,
-    delayMs: 1000,
-    shouldRetry: (error: unknown) => error instanceof TronApiHttpError && error.isRateLimit
-};
-
 const defaultCacheTime = 5000;
 
-async function tronFetch(url: string | URL, init?: RequestInit): Promise<Response> {
-    let response: Response;
-    try {
-        response = await fetch(url, init);
-    } catch (e) {
-        if (e instanceof TypeError) {
-            throw new TronApiHttpError(0, e.message);
-        }
-        throw e;
-    }
+const USDT_BALANCE_OF_SELECTOR = '70a08231';
 
-    if (!response.ok) {
-        const body = await response.text().catch(() => '');
-        throw new TronApiHttpError(
-            response.status,
-            body ? `TronGrid HTTP error ${response.status}: ${body.slice(0, 200)}` : undefined
-        );
-    }
+/** The 20-byte account id: base58check minus the 0x41 network prefix and the checksum. */
+const tronAddressBody = (address: string) => toBeHex(decodeBase58(address), 25).slice(4, 44);
 
-    return response;
-}
+const parseQuantity = (value: unknown): string | undefined => {
+    if (typeof value !== 'string' || !/^0x[0-9a-f]+$/i.test(value)) {
+        return undefined;
+    }
+    return BigInt(value).toString();
+};
+
+export type TronAccountBalances = { trx: string; usdt: string };
+
+/** TronGrid returns the broadcast `message` bytes hex-encoded for non-`visible` transactions. */
+export const decodeBroadcastMessage = (message: unknown): string | undefined => {
+    if (typeof message !== 'string' || !message) {
+        return undefined;
+    }
+    if (message.length % 2 !== 0 || !/^[0-9a-f]+$/i.test(message)) {
+        return message;
+    }
+    return Buffer.from(message, 'hex').toString('utf8');
+};
 
 function decorateApi<TArgs extends unknown[], TResult>(
     fn: (...args: TArgs) => Promise<TResult>,
-    overrideConfig?: {
-        cacheTime?: number;
-        maxRetries?: number;
-        shouldRetry?: (error: unknown) => boolean;
-        delayMs?: number;
-    }
+    overrideConfig?: { cacheTime?: number }
 ) {
-    const { cacheTime, ...retryConfig } = overrideConfig ?? {};
-
-    return cachedAsync(
-        cacheTime ?? defaultCacheTime,
-        withRetry(fn, { ...defaultRetryConfig, ...retryConfig })
-    );
+    return cachedAsync(overrideConfig?.cacheTime ?? defaultCacheTime, fn);
 }
 
 export class TronApi {
@@ -116,12 +103,78 @@ export class TronApi {
         trongrid: { baseURL: string; readonly apiKey?: string },
         batteryConfig: Configuration
     ) {
-        this.tronGridBaseUrl = removeTrailingSlash(trongrid.baseURL);
+        this.tronGridBaseUrl = trongrid.baseURL;
         this.batteryApi = new DefaultApi(batteryConfig);
     }
 
-    public getBalances = decorateApi(async (address: string) => {
-        const httpRes = await tronFetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
+    /**
+     * One JSON-RPC batch with eth_getBalance + eth_call(balanceOf) per owner: TronGrid counts
+     * the whole batch as a single request, so N addresses cost one slot of the per-method budget
+     * instead of 2N. Owners with a failed or unparsable entry are left out, not zeroed — an
+     * unanswered entry is not a zero balance.
+     */
+    public async getBalancesBatch(addresses: string[]): Promise<Map<string, TronAccountBalances>> {
+        const result = new Map<string, TronAccountBalances>();
+        if (addresses.length === 0) {
+            return result;
+        }
+
+        const usdtContract = tronAddressBody(TRON_USDT_ASSET.address);
+        const payload = addresses.flatMap((address, index) => {
+            const owner = tronAddressBody(address);
+            return [
+                {
+                    jsonrpc: '2.0',
+                    method: 'eth_getBalance',
+                    params: [owner, 'latest'],
+                    id: `trx-${index}`
+                },
+                {
+                    jsonrpc: '2.0',
+                    method: 'eth_call',
+                    params: [
+                        {
+                            to: usdtContract,
+                            data: USDT_BALANCE_OF_SELECTOR + owner.padStart(64, '0')
+                        },
+                        'latest'
+                    ],
+                    id: `usdt-${index}`
+                }
+            ];
+        });
+
+        const httpRes = await tronFetch(joinUrl(this.tronGridBaseUrl, '/jsonrpc'), {
+            method: 'POST',
+            headers: this.headers,
+            body: JSON.stringify(payload)
+        });
+        const items: unknown = await httpRes.json();
+        if (!Array.isArray(items)) {
+            throw new Error('Invalid tron balances batch response');
+        }
+
+        const quantityById = new Map<string, string>();
+        for (const item of items) {
+            const quantity = parseQuantity(item?.result);
+            if (typeof item?.id === 'string' && quantity !== undefined) {
+                quantityById.set(item.id, quantity);
+            }
+        }
+
+        addresses.forEach((address, index) => {
+            const trx = quantityById.get(`trx-${index}`);
+            const usdt = quantityById.get(`usdt-${index}`);
+            if (trx !== undefined && usdt !== undefined) {
+                result.set(address, { trx, usdt });
+            }
+        });
+
+        return result;
+    }
+
+    public getBalances = decorateApi(async (address: string): Promise<TronAccountBalances> => {
+        const httpRes = await tronFetch(joinUrl(this.tronGridBaseUrl, `/v1/accounts/${address}`), {
             headers: this.headers
         });
 
@@ -171,16 +224,30 @@ export class TronApi {
         };
     });
 
+    /** TronGrid answers `{}` for an account that never received TRX. */
+    public isAccountActivated = decorateApi(async (address: string): Promise<boolean> => {
+        const httpRes = await tronFetch(joinUrl(this.tronGridBaseUrl, '/wallet/getaccount'), {
+            method: 'POST',
+            headers: this.headers,
+            body: JSON.stringify({ address, visible: true })
+        });
+        const account = await httpRes.json();
+        return !!account?.address || account?.create_time !== undefined;
+    });
+
     public getAccountBandwidth = decorateApi(
         async (address: string): Promise<number> => {
-            const httpRes = await tronFetch(`${this.tronGridBaseUrl}/wallet/getaccountnet`, {
-                headers: this.headers,
-                method: 'post',
-                body: JSON.stringify({
-                    address,
-                    visible: true
-                })
-            });
+            const httpRes = await tronFetch(
+                joinUrl(this.tronGridBaseUrl, '/wallet/getaccountnet'),
+                {
+                    headers: this.headers,
+                    method: 'post',
+                    body: JSON.stringify({
+                        address,
+                        visible: true
+                    })
+                }
+            );
             const res = await httpRes.json();
 
             if (!res.freeNetLimit) {
@@ -202,7 +269,7 @@ export class TronApi {
         async (params: EstimateResourcesRequest): Promise<TronResources> => {
             try {
                 const httpRes = await tronFetch(
-                    `${this.tronGridBaseUrl}/wallet/triggerconstantcontract`,
+                    joinUrl(this.tronGridBaseUrl, '/wallet/triggerconstantcontract'),
                     {
                         method: 'POST',
                         headers: this.headers,
@@ -263,27 +330,37 @@ export class TronApi {
 
     public broadcastSignedTransaction = decorateApi(
         async (signedTx: SignedTransaction) => {
-            const res = await tronFetch(`${this.tronGridBaseUrl}/wallet/broadcasttransaction`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(signedTx)
-            });
+            const res = await tronFetch(
+                joinUrl(this.tronGridBaseUrl, '/wallet/broadcasttransaction'),
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(signedTx)
+                }
+            );
             const json = await res.json();
 
             if (!json.result) {
-                console.error('Broadcast failed:', json);
-                throw new Error(json.message || 'Broadcast failed');
+                console.error(
+                    `Broadcast failed: ${json.code ?? 'unknown code'}: ${
+                        decodeBroadcastMessage(json.message) ?? 'no message'
+                    }`
+                );
+                throw new Error(decodeBroadcastMessage(json.message) || 'Broadcast failed');
             }
         },
-        { cacheTime: 0, maxRetries: 3, shouldRetry: () => true }
+        { cacheTime: 0 }
     );
 
-    public getResourcePrices = decorateApi(
-        async (): Promise<TronResourcePrices> => {
-            const res = await tronFetch(`${this.tronGridBaseUrl}/wallet/getchainparameters`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
+    private getChainParameters = decorateApi(
+        async (): Promise<(key: string) => number | undefined> => {
+            const res = await tronFetch(
+                joinUrl(this.tronGridBaseUrl, '/wallet/getchainparameters'),
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
             const data = await res.json();
             const params: { key: string; value: string | number }[] = Array.isArray(
                 data.chainParameter
@@ -291,10 +368,29 @@ export class TronApi {
                 ? data.chainParameter
                 : [];
 
-            const getValue = (key: string): number | undefined => {
+            return (key: string): number | undefined => {
                 const param = params.find(p => p.key === key);
                 return param && typeof param.value === 'number' ? param.value : undefined;
             };
+        },
+        { cacheTime: Infinity }
+    );
+
+    /**
+     * What a TRX transfer to a never-activated address burns: the account
+     * creation fee plus the creation bandwidth fee, which free bandwidth
+     * cannot cover.
+     */
+    public getAccountCreationFeeSun = async (): Promise<BigNumber> => {
+        const getValue = await this.getChainParameters();
+        const creationFee = getValue('getCreateNewAccountFeeInSystemContract') ?? 1_000_000;
+        const creationBandwidthFee = getValue('getCreateAccountFee') ?? 100_000;
+        return new BigNumber(creationFee).plus(creationBandwidthFee);
+    };
+
+    public getResourcePrices = decorateApi(
+        async (): Promise<TronResourcePrices> => {
+            const getValue = await this.getChainParameters();
 
             const energySun = getValue('getEnergyFee');
             const bandwidthSun = getValue('getTransactionFee');
@@ -359,7 +455,7 @@ export class TronApi {
             }
         ): Promise<TronHistoryItem[]> => {
             const url = new URL(
-                `${this.tronGridBaseUrl}/v1/accounts/${address}/transactions/trc20`
+                joinUrl(this.tronGridBaseUrl, `/v1/accounts/${address}/transactions/trc20`)
             );
 
             if (options?.limit !== undefined) {

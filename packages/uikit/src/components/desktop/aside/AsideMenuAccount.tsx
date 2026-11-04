@@ -12,6 +12,7 @@ import {
     AccountKeystone,
     AccountLedger,
     AccountMAM,
+    AccountMultichain,
     AccountTonMnemonic,
     AccountTonMultisig,
     AccountTonOnly,
@@ -353,6 +354,30 @@ export const AsideMenuAccountKeystone: FC<{
     );
 };
 
+/**
+ * Multichain accounts have one TON wallet and no version / derivation
+ * sub-items, so the row is flat. Selecting it swaps the whole shell over
+ * to the multichain portfolio — the aside is the only way back to a
+ * multichain account once a legacy one is active.
+ */
+export const AsideMenuAccountMultichain: FC<{
+    account: AccountMultichain;
+    mightBeHighlighted: boolean;
+    selectedWalletId: WalletId;
+    onClickWallet: (walletId: WalletId) => void;
+}> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
+    return (
+        <AsideMenuItem
+            isSelected={mightBeHighlighted && selectedWalletId === account.activeTonWallet.id}
+            onClick={() => onClickWallet(account.activeTonWallet.id)}
+        >
+            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
+            <Label2>{account.name}</Label2>
+            <AccountBadgeStyled accountType={account.type} size="s" />
+        </AsideMenuItem>
+    );
+};
+
 export const AsideMenuAccountWatchOnly: FC<{
     account: AccountTonWatchOnly;
     mightBeHighlighted: boolean;
@@ -480,6 +505,8 @@ export const AsideMenuAccount: FC<{
             return <AsideMenuAccountMAM account={account} {...rest} />;
         case 'ton-multisig':
             return <AsideMenuAccountMultisig />;
+        case 'multichain':
+            return <AsideMenuAccountMultichain account={account} {...rest} />;
         default:
             assertUnreachable(account);
     }

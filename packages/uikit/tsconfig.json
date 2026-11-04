@@ -18,6 +18,11 @@
         "outDir": "dist",
         "declaration": true
     },
-    "include": ["src", "../core/src/service/wallet/mnemonic.ts"],
+    "include": [
+        "src",
+        "playwright",
+        "playwright-ct.config.ts",
+        "../core/src/service/wallet/mnemonic.ts"
+    ],
     "exclude": ["node_modules", "**/stories"]
 }

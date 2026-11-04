@@ -1,5 +1,6 @@
 import { Action, JettonSwapAction } from '@tonkeeper/core/dist/tonApiV2';
 import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
+import { toScaledUIWeiAmount } from '@tonkeeper/core/dist/entries/crypto/asset/scaled-ui';
 import React, { FC } from 'react';
 
 import {
@@ -34,12 +35,12 @@ export const swapValue = (
     if (jettonSwap.tonIn !== undefined) {
         assetIn = {
             amount: jettonSwap.tonIn,
-            symbol: BRAND_CONFIG.coinSymbolWithEx,
+            symbol: BRAND_CONFIG.coinSymbol,
             decimals: 9
         };
     } else {
         assetIn = {
-            amount: jettonSwap.amountIn,
+            amount: toScaledUIWeiAmount(jettonSwap.amountIn, jettonSwap.jettonMasterIn!.scaledUi),
             symbol: jettonSwap.jettonMasterIn!.symbol,
             decimals: jettonSwap.jettonMasterIn!.decimals
         };
@@ -48,12 +49,12 @@ export const swapValue = (
     if (jettonSwap.tonOut !== undefined) {
         assetOut = {
             amount: jettonSwap.tonOut,
-            symbol: BRAND_CONFIG.coinSymbolWithEx,
+            symbol: BRAND_CONFIG.coinSymbol,
             decimals: 9
         };
     } else {
         assetOut = {
-            amount: jettonSwap.amountOut,
+            amount: toScaledUIWeiAmount(jettonSwap.amountOut, jettonSwap.jettonMasterOut!.scaledUi),
             symbol: jettonSwap.jettonMasterOut!.symbol,
             decimals: jettonSwap.jettonMasterOut!.decimals
         };
@@ -73,6 +74,8 @@ export const JettonTransferDesktopAction: FC<{
         return <ErrorRow />;
     }
 
+    const amount = toScaledUIWeiAmount(jettonTransfer.amount, jettonTransfer.jetton.scaledUi);
+
     if (eqAddresses(wallet.rawAddress, jettonTransfer.sender?.address)) {
         return (
             <>
@@ -84,7 +87,7 @@ export const JettonTransferDesktopAction: FC<{
                 <ActionRow>
                     <HistoryCellComment comment={jettonTransfer.comment} />
                     <HistoryCellAmount
-                        amount={jettonTransfer.amount}
+                        amount={amount}
                         symbol={jettonTransfer.jetton.symbol}
                         decimals={jettonTransfer.jetton.decimals}
                         isFailed={action.status === 'failed'}
@@ -106,7 +109,7 @@ export const JettonTransferDesktopAction: FC<{
             <ActionRow>
                 <HistoryCellComment comment={jettonTransfer.comment} isScam={isScam} />
                 <HistoryCellAmount
-                    amount={jettonTransfer.amount}
+                    amount={amount}
                     symbol={jettonTransfer.jetton.symbol}
                     decimals={jettonTransfer.jetton.decimals}
                     isFailed={action.status === 'failed'}
@@ -186,7 +189,7 @@ export const JettonBurnDesktopAction: FC<{ action: Action }> = ({ action }) => {
             <ActionRow>
                 <HistoryCellComment />
                 <HistoryCellAmount
-                    amount={jettonBurn.amount}
+                    amount={toScaledUIWeiAmount(jettonBurn.amount, jettonBurn.jetton.scaledUi)}
                     symbol={jettonBurn.jetton.symbol}
                     decimals={jettonBurn.jetton.decimals}
                     isFailed={isFailed}
@@ -218,7 +221,7 @@ export const JettonMintDesktopAction: FC<{ action: Action; isScam: boolean }> = 
             <ActionRow>
                 <HistoryCellComment />
                 <HistoryCellAmount
-                    amount={jettonMint.amount}
+                    amount={toScaledUIWeiAmount(jettonMint.amount, jettonMint.jetton.scaledUi)}
                     symbol={jettonMint.jetton.symbol}
                     decimals={jettonMint.jetton.decimals}
                     isFailed={isFailed}

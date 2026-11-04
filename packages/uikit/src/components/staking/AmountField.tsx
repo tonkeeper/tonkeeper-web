@@ -264,7 +264,7 @@ export const AmountField: FC<AmountFieldProps> = ({
                         $widthPx={inputWidthPx}
                         disabled={disabled}
                     />
-                    <TokenLabel>{BRAND_CONFIG.coinSymbolWithEx}</TokenLabel>
+                    <TokenLabel>{BRAND_CONFIG.coinSymbol}</TokenLabel>
                 </InputLeft>
                 <FiatAmount>{fiatDisplay}</FiatAmount>
             </InputBorderedBox>

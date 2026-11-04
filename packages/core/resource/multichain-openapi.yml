@@ -1,0 +1,3065 @@
+openapi: 3.0.3
+info:
+    title: Keeper Multichain Backend
+    version: 0.1.0
+
+servers: []
+
+security:
+    - {}
+    - deviceJWT: []
+
+tags:
+    - name: system
+      description: 'System endpoints'
+    - name: nodes
+      description: 'Chain node manifest'
+    - name: assets
+      description: 'Asset catalog search'
+    - name: broadcast
+      description: 'Transaction broadcasting'
+    - name: fees
+      description: 'Fee estimation'
+    - name: tron
+      description:
+          'TRON RPC proxy: the whitelisted java-tron HTTP methods the mobile client uses (reads plus
+          signed-tx broadcast), forwarded to the GetBlock node'
+    - name: wallets
+      description: 'Wallet registry (register, balances, activities)'
+    - name: auth
+      description: 'Device + wallet authorization: device tokens, wallet bindings'
+    - name: internal
+      description: 'Service-to-service only, signed with X-Internal-Auth. Not for clients.'
+    - name: raffles
+      description: 'Promo raffles: backend-driven content + per-wallet progress'
+    - name: accounts
+      description: 'Accounts utilities'
+    - name: stonfi
+      description: 'STON.fi related lookups'
+
+components:
+    securitySchemes:
+        deviceJWT:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: Device access token issued by /api/v2/devices/register. ES256, 15 min.
+        walletAuth:
+            type: apiKey
+            in: header
+            name: X-Wallet-Authorization
+            x-wallet-auth: true
+            description: >-
+                Wallet-scoped token, signed by the wallet's app key over the device access token,
+                naming the one wallet this request may act on.
+        xWalletId:
+            type: apiKey
+            in: header
+            name: X-Wallet-ID
+            x-client-parameter: true
+            x-wallet-id: true
+            description: >-
+                Names the wallet `walletAuth` is asserting, and is checked rather than trusted: the
+                verifier reads the format and kind bytes from here, recomputes the id from the key
+                recovered out of the signature, and rejects on mismatch.
+        internalAuth:
+            type: apiKey
+            in: header
+            name: X-Internal-Auth
+            description: >-
+                Service-to-service signature, `<unix_ts>.<hex hmac-sha256>` over `ts \n METHOD \n
+                path \n hex(sha256(body))`.
+    parameters:
+        LimitQuery:
+            name: limit
+            in: query
+            description: 'Pagination limit'
+            schema:
+                type: integer
+                default: 25
+                example: 50
+                minimum: 0
+                maximum: 50
+        CursorQuery:
+            name: cursor
+            in: query
+            description: 'Cursor for pagination'
+            schema:
+                type: string
+        AssetIdsQuery:
+            name: asset_ids
+            in: query
+            required: false
+            description: 'Filter by asset IDs'
+            explode: false
+            schema:
+                type: array
+                maxItems: 20
+                items:
+                    type: string
+                example:
+                    [
+                        'ton/mainnet/coin',
+                        'eth/mainnet/erc20/0xdAC17F958D2ee523a2206206994597C13D831ec7'
+                    ]
+        CapabilitiesQuery:
+            name: capabilities
+            in: query
+            required: false
+            description: >-
+                Filter by asset capabilities. An asset is returned only when it carries **every**
+                capability listed here, so passing more values narrows the list.
+            explode: false
+            schema:
+                type: array
+                maxItems: 20
+                items:
+                    type: string
+                    enum: ['swap', 'onramp', 'offramp', 'p2p', 'perp_deposit']
+                example: ['swap']
+        AssetIdQuery:
+            name: asset_id
+            in: query
+            required: true
+            description: 'Asset identifier in chain/network/type[/address] format'
+            schema:
+                type: string
+                example: 'eth/mainnet/erc20/0xdAC17F958D2ee523a2206206994597C13D831ec7'
+        AssetIdPath:
+            name: asset_id
+            in: path
+            required: true
+            description: >-
+                Asset identifier in chain/network/type[/address] format. The id itself contains
+                slashes, so it has to be percent-encoded into a single path segment:
+                `ton/mainnet/coin` is requested as `ton%2Fmainnet%2Fcoin`, and
+                `eth/mainnet/erc20/0xdAC1...` as `eth%2Fmainnet%2Ferc20%2F0xdAC1...`.
+            schema:
+                type: string
+                minLength: 3
+                maxLength: 128
+                example: 'eth/mainnet/erc20/0xdAC17F958D2ee523a2206206994597C13D831ec7'
+        AssetIdOptQuery:
+            name: asset_id
+            in: query
+            required: false
+            description:
+                'Filter activities by asset id (matched against the in or out token). Format
+                chain/network/type[/address].'
+            schema:
+                type: string
+                example: 'eth/mainnet/erc20/0xdAC17F958D2ee523a2206206994597C13D831ec7'
+        IsSpamOptQuery:
+            name: is_spam
+            in: query
+            required: false
+            description:
+                'Filter activities by spam classification. When true, only spam activities are
+                returned; when false, only non-spam. When omitted, no spam filter is applied and
+                both are returned.'
+            schema:
+                type: boolean
+                example: false
+        SortQuery:
+            name: sort
+            in: query
+            required: true
+            description:
+                'Sort tokens by. price_diff_* sort by the 24h price change in USD
+                (ascending/descending).'
+            schema:
+                type: string
+                enum: [market_cap, volume, price_diff_asc, price_diff_desc]
+        CurrenciesQuery:
+            name: currencies
+            in: query
+            required: true
+            description: 'Base currencies'
+            explode: false
+            schema:
+                type: array
+                maxItems: 50
+                items:
+                    type: string
+                example: ['ton', 'usd', 'rub']
+        CurrenciesOptQuery:
+            name: currencies
+            in: query
+            required: false
+            description: 'Base currencies'
+            explode: false
+            schema:
+                type: array
+                maxItems: 50
+                items:
+                    type: string
+                example: ['ton', 'usd', 'rub']
+        CatalogLimitQuery:
+            name: limit
+            in: query
+            description: 'Pagination limit'
+            schema:
+                type: integer
+                default: 1000
+                example: 1000
+                minimum: 0
+                maximum: 10000
+        FromDateQuery:
+            name: from_date
+            in: query
+            required: false
+            description:
+                'Unix timestamp in seconds. Return only assets created strictly after this moment'
+            schema:
+                type: integer
+                format: int64
+                minimum: 0
+                example: 1767225600
+        SearchQuery:
+            name: search
+            in: query
+            required: false
+            description: 'Prefix of the token name or symbol, case-insensitive'
+            schema:
+                type: string
+        AvailableOnlyQuery:
+            name: available_only
+            in: query
+            required: false
+            description: 'Shows assets with 0 balances or not'
+            schema:
+                type: boolean
+                default: false
+        VerifiedOnlyQuery:
+            name: verified_only
+            in: query
+            required: false
+            description: >-
+                Filter results to verified assets only. On the asset search that means main-list
+                core coins + the Trust / ton-blockchain jetton list; on wallet assets it keeps
+                assets whose `verification` is `whitelist` or `trusted`.
+            schema:
+                type: boolean
+                default: false
+        ShowPerpsQuery:
+            name: show_perps
+            in: query
+            required: false
+            description: >-
+                Mix Lighter perpetual markets into the unfiltered catalog. Ignored when `chain` is
+                set.
+            schema:
+                type: boolean
+                default: false
+        ShowPerpsActivitiesQuery:
+            name: show_perps
+            in: query
+            required: false
+            description: >-
+                Include Lighter perps activities (`perps.*` types) in the history. They are hidden
+                when the parameter is absent or false.
+            schema:
+                type: boolean
+                default: false
+        PerpsMarketQuery:
+            name: market
+            in: query
+            required: false
+            description: >-
+                Restrict the history to perps activities of one Lighter market index. Implies
+                `show_perps`.
+            schema:
+                type: integer
+                minimum: 0
+                maximum: 32767
+                example: 1
+        OmitSwappableQuery:
+            name: omit_swappable
+            in: query
+            required: false
+            description: >-
+                Skip the `swap` capability filter and search the whole catalog.
+            schema:
+                type: boolean
+                default: false
+        ShowAllQuery:
+            name: show_all
+            in: query
+            required: false
+            description: 'Shows all possible assets'
+            schema:
+                type: boolean
+                default: false
+        ShowHiddenQuery:
+            name: show_hidden
+            in: query
+            required: false
+            description: 'Flag to show hidden tokens'
+            schema:
+                type: boolean
+                default: false
+        HideDustQuery:
+            name: hide_dust
+            in: query
+            required: false
+            description: >-
+                Hide dust entries. When true entries worth 0.01 USD or less are dropped: on wallet
+                assets that is the fiat value of the held balance, on activities the larger of the
+                incoming and outgoing amount value. Only send and receive activities are filtered.
+            schema:
+                type: boolean
+                default: false
+        ChainPath:
+            name: chain
+            in: path
+            required: true
+            description: 'Blockchain identifier'
+            schema:
+                $ref: '#/components/schemas/Chain'
+        WalletIdPath:
+            name: wallet_id
+            in: path
+            required: true
+            description: 'Stable wallet identifier'
+            schema:
+                type: string
+                minLength: 36
+                maxLength: 36
+                pattern: '^[a-z2-7]{36}$'
+        ChainQuery:
+            name: chain
+            in: query
+            required: false
+            description: 'Filter by chain'
+            schema:
+                $ref: '#/components/schemas/Chain'
+        SearchChainQuery:
+            name: chain
+            in: query
+            required: false
+            description:
+                'Filter by chain. `perps` selects Lighter perpetual markets (`lighter/...` assets)
+                and nothing else.'
+            schema:
+                type: string
+                enum: [ton, eth, base, btc, tron, arb, bsc, sol, avax, polygon, robinhood, perps]
+        NetworkQuery:
+            name: network
+            in: query
+            required: false
+            description:
+                'Network to read. A wallet is network-agnostic — the network lives on its accounts.
+                Defaults to mainnet.'
+            schema:
+                $ref: '#/components/schemas/Network'
+        ActivityTypeQuery:
+            name: activity_type
+            in: query
+            required: false
+            description: 'Filter by activity type. `perps` selects every `perps.*` kind.'
+            schema:
+                $ref: '#/components/schemas/ActivityTypeFilter'
+        IfNoneMatch:
+            name: If-None-Match
+            in: header
+            required: false
+            description: 'ETag value from previous response'
+            schema:
+                type: string
+        FirebaseUserHeader:
+            name: F
+            in: header
+            required: false
+            description:
+                'Firebase user id supplied by the mobile client (opaque string). Sent with wallet
+                registration it links the wallet to the install; analytics has no other way to
+                resolve it.'
+            schema:
+                type: string
+                maxLength: 256
+        LangQuery:
+            name: lang
+            in: query
+            required: false
+            description: 'Language code; falls back to en'
+            schema:
+                type: string
+                default: en
+        RaffleIdsQuery:
+            name: ids
+            in: query
+            required: false
+            description: 'Filter by raffle ids'
+            explode: false
+            schema:
+                type: array
+                maxItems: 20
+                items:
+                    type: string
+        IsNewUserQuery:
+            name: is_new
+            in: query
+            required: false
+            schema:
+                type: boolean
+                default: false
+
+    schemas:
+        Ok:
+            type: object
+            required:
+                - ok
+            properties:
+                ok:
+                    type: boolean
+        Chain:
+            type: string
+            enum: [ton, eth, base, btc, tron, arb, bsc, sol, avax, polygon, robinhood]
+        Network:
+            type: string
+            enum: [mainnet, testnet]
+            default: mainnet
+        Node:
+            type: object
+            description:
+                "Connection info for a chain RPC node the client may call directly. Within a chain's
+                list, nodes are ordered best-first by measured health so the client can fall back
+                down the list."
+            required: [url, rate_limit, type]
+            properties:
+                url:
+                    type: string
+                    description: 'RPC endpoint URL the client calls directly.'
+                    example: 'https://cloudflare-eth.com'
+                rate_limit:
+                    type: integer
+                    default: 0
+                    description:
+                        'Suggested client-side request budget in requests per second. 0 means
+                        unlimited/unknown.'
+                    example: 5
+                token:
+                    type: string
+                    description:
+                        'Auth token to present to the node when it requires one (currently only
+                        TON). Empty string for public nodes.'
+                type:
+                    type: string
+                    enum: [main, fallback]
+                    description: 'Node type, either main or fallback'
+                is_device_token_required:
+                    type: boolean
+                    description:
+                        'True when the client must present its device JWT in the Authorization
+                        header to call this node. Set for nodes proxied through this backend; absent
+                        or false for nodes the client may call anonymously.'
+                    example: false
+        SummaryAsset:
+            type: object
+            description: 'Balance envelope — token metadata + price + amount'
+            required: [asset, price, market_cap]
+            properties:
+                asset:
+                    $ref: '#/components/schemas/AssetInfo'
+                price:
+                    $ref: '#/components/schemas/AssetPrice'
+                market_cap:
+                    $ref: '#/components/schemas/AssetMarketCap'
+                reference_id:
+                    $ref: '#/components/schemas/AssetReferenceID'
+        Asset:
+            type: object
+            description: 'Balance envelope — token metadata + price + amount'
+            required: [asset, address, price, is_hidden, balance]
+            properties:
+                asset:
+                    $ref: '#/components/schemas/AssetInfo'
+                address:
+                    type: string
+                    minLength: 1
+                    maxLength: 128
+                    description:
+                        'Account address this balance belongs to. Lets clients distinguish multiple
+                        accounts on the same chain (e.g. TON v4R2 + v5R1).'
+                type:
+                    type: string
+                    maxLength: 16
+                    pattern: '^[A-Za-z0-9-]{1,16}$'
+                    description:
+                        'Account sub-type, mirrors WalletAccount.type (TON v4R2/v5R1, BTC
+                        p2wpkh/p2tr). Omitted for EVM/TRON.'
+                price:
+                    $ref: '#/components/schemas/AssetPrice'
+                is_hidden:
+                    type: boolean
+                    description:
+                        'True when the user has hidden this asset from their balances; the row is
+                        still returned so the client can offer it back.'
+                balance:
+                    type: string
+                    description: 'Balance in minimal units (wei, nanoton, satoshi, sun)'
+                reference_id:
+                    $ref: '#/components/schemas/AssetReferenceID'
+        AssetReferenceID:
+            type: string
+            description:
+                'asset_id of the spot asset this one is linked to, e.g. the market a Lighter perp
+                tracks. Omitted when there is no link.'
+            example: btc/mainnet/coin
+        AssetMarketCap:
+            type: object
+            additionalProperties:
+                type: string
+            description: 'Current price per currency, e.g. {"USD": "0.999", "TON": "0.789"}'
+        AssetPrice:
+            type: object
+            description: 'Price info with diffs, keyed by currency (e.g. USD, TON, RUB)'
+            properties:
+                prices:
+                    type: object
+                    additionalProperties:
+                        type: number
+                        format: double
+                    description: 'Current price per currency, e.g. {"USD": "0.999", "TON": "0.789"}'
+                diff_24h:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Price change over 24h per currency, e.g. {"USD": "-0.06%"}'
+                diff_7d:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Price change over 7d per currency, e.g. {"USD": "-0.05%"}'
+                diff_14d:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Price change over 14d per currency, e.g. {"USD": "-0.06%"}'
+        AssetInfo:
+            type: object
+            description: 'Token metadata (used in both balances and activities)'
+            required: [asset_id, decimals, name, symbol, image, verification]
+            properties:
+                asset_id:
+                    type: string
+                    description:
+                        'Universal asset ID in format chain/network/type/address (e.g.
+                        eth/mainnet/coin, ton/mainnet/jetton/EQC...)'
+                chain:
+                    type: string
+                    description:
+                        "Chain slug parsed from asset_id (ton, eth, base, arb, bsc, avax, polygon,
+                        robinhood, btc, tron, sol). Exposed explicitly so clients don't need to
+                        parse asset_id for chain badge rendering."
+                name:
+                    type: string
+                    description: 'Asset name'
+                symbol:
+                    type: string
+                    description: 'Asset symbol (ticker)'
+                decimals:
+                    type: integer
+                    description: 'Decimals of coin or token'
+                image:
+                    type: string
+                    description: 'Asset image URL'
+                verified:
+                    deprecated: true
+                    type: boolean
+                    description:
+                        "True when the asset appears on a curated list (main core coins, Trust
+                        Wallet assets, ton-blockchain jettons). Clients can use this for a verified
+                        badge and/or a 'show unverified' toggle."
+                is_scam:
+                    deprecated: true
+                    type: boolean
+                    description:
+                        'Backend-classified scam flag on the token itself (global, not per-wallet).
+                        Clients may render a warning badge or hide by default in balances and
+                        activities.'
+                verification:
+                    type: string
+                    enum: [blacklist, none, whitelist, trusted]
+                    description: Union of verify and is_scam
+                capabilities:
+                    $ref: '#/components/schemas/AssetCapabilities'
+        AssetCapability:
+            type: string
+            description: Capability flag. Clients must tolerate unknown values added later
+            enum:
+                - onramp
+                - offramp
+                - swap
+                - p2p
+        AssetCapabilityMerchants:
+            type: object
+            properties:
+                merchants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExchangeMerchantSlug'
+        ExchangeMerchantSlug:
+            type: string
+            enum:
+                - mercuryo
+                - transak
+                - moonpay
+                - avanchange
+                - changelly
+                - wallet
+        AssetCapabilityAggregators:
+            type: object
+            properties:
+                aggregators:
+                    type: array
+                    items:
+                        type: string
+        AssetCapabilityP2PInfo:
+            type: object
+            properties:
+                symbol:
+                    type: string
+                    description: P2P symbol matched against this asset (e.g. `TON`, `USDT`)
+        AssetCapabilityDetails:
+            type: object
+            description:
+                Per-capability extra info. Keys appear only when meaningful for the listed
+                capability
+            properties:
+                onramp:
+                    $ref: '#/components/schemas/AssetCapabilityMerchants'
+                offramp:
+                    $ref: '#/components/schemas/AssetCapabilityMerchants'
+                swap:
+                    $ref: '#/components/schemas/AssetCapabilityAggregators'
+                p2p:
+                    $ref: '#/components/schemas/AssetCapabilityP2PInfo'
+        AssetCapabilities:
+            type: object
+            description: >-
+                What the asset can be used for, as reported by the swap API and refreshed
+                periodically by the indexer.
+            required: [capabilities]
+            properties:
+                capabilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AssetCapability'
+                details:
+                    $ref: '#/components/schemas/AssetCapabilityDetails'
+        FeeEstimate:
+            type: object
+            required: [slow, normal, fast]
+            properties:
+                slow:
+                    type: string
+                    description: 'Fee estimate for slow confirmation'
+                normal:
+                    type: string
+                    description: 'Fee estimate for normal confirmation'
+                fast:
+                    type: string
+                    description: 'Fee estimate for fast confirmation'
+        DnsResolution:
+            type: object
+            required: [address, is_scam]
+            properties:
+                address:
+                    type: string
+                    description: 'Resolved on-chain address the DNS name points to'
+                is_scam:
+                    type: boolean
+                    description:
+                        'True when the resolved account is flagged as part of scam activity by the
+                        upstream source'
+        StonfiSwapStatus:
+            type: object
+            required: [has_swap]
+            properties:
+                has_swap:
+                    type: boolean
+                    description: 'True when the account has made a swap on STON.fi'
+        WalletAccount:
+            type: object
+            required: [chain, address]
+            properties:
+                chain:
+                    $ref: '#/components/schemas/Chain'
+                network:
+                    $ref: '#/components/schemas/Network'
+                address:
+                    type: string
+                    minLength: 1
+                    maxLength: 128
+                type:
+                    type: string
+                    minLength: 1
+                    maxLength: 16
+                    pattern: '^[A-Za-z0-9-]{1,16}$'
+                    description: >-
+                        Wallet sub-type. Optional — omit for chains with a single canonical form
+                        (EVM/TRON).
+        WalletChallenge:
+            type: object
+            required: [challenge, expires_at]
+            properties:
+                challenge:
+                    type: string
+                    minLength: 98
+                    maxLength: 98
+                    pattern: '^[A-Za-z0-9_-]{98}$'
+                    description: Stateless HMAC challenge to bind into the next wallet_proof
+                expires_at:
+                    type: string
+                    format: date-time
+        RealtimeToken:
+            type: object
+            required: [token, expires_at]
+            properties:
+                token:
+                    type: string
+                    description: JWT for the realtime transport
+                expires_at:
+                    type: string
+                    format: date-time
+        Wallet:
+            type: object
+            required: [wallet_id, accounts, created_at, sync_status]
+            properties:
+                wallet_id:
+                    type: string
+                    minLength: 36
+                    maxLength: 36
+                    pattern: '^[a-z2-7]{36}$'
+                    description: 'Stable wallet identifier'
+                accounts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WalletAccount'
+                created_at:
+                    type: string
+                    format: date-time
+                sync_status:
+                    $ref: '#/components/schemas/SyncStatus'
+        SyncStatus:
+            type: object
+            description: >-
+                Wallet sync freshness, returned inline on `GET /wallets/{wallet_id}` and on its own
+                from `GET /wallets/{wallet_id}/sync_status`, which the client polls until backfill
+                completes.
+            required: [status, chains]
+            properties:
+                status:
+                    type: string
+                    enum: [ready, in_progress, failed]
+                    description: >-
+                        Top-level rollup over per-chain `chains[<chain>].status`. Same enum as
+                        per-chain so clients can render one shape.
+                chains:
+                    type: object
+                    description:
+                        'Per-chain freshness, keyed by Chain enum value (e.g. "ton", "eth").'
+                    additionalProperties:
+                        $ref: '#/components/schemas/ChainSyncStatus'
+        ChainSyncStatus:
+            type: object
+            required: [status, backfill]
+            properties:
+                status:
+                    type: string
+                    enum: [ready, in_progress, failed]
+                    description:
+                        Whether this chain has a renderable snapshot, is still fetching, or failed.
+                balances_at:
+                    type: string
+                    format: date-time
+                    description: 'When balances for this chain were last successfully snapshotted.'
+                activity_at:
+                    type: string
+                    format: date-time
+                    description:
+                        'When the first activity page for this chain was last successfully fetched.'
+                reason:
+                    type: string
+                    enum:
+                        [
+                            provider_timeout,
+                            provider_5xx,
+                            rate_limited,
+                            circuit_open,
+                            capability_not_supported
+                        ]
+                    description:
+                        Present when the most recent fetch failed, regardless of the top-level
+                        `status`.
+                retry_after_ms:
+                    type: integer
+                    minimum: 0
+                    description:
+                        'Server-suggested backoff for the client when this chain is rate-limited.'
+                backfill:
+                    type: string
+                    enum: [complete, in_progress, queued]
+                    description: 'Deep-history catch-up state; clients poll until `complete`.'
+        ActivityType:
+            type: string
+            description:
+                'Classified activity kind emitted by the indexer. Kept as a closed enum so clients
+                can build exhaustive rendering / filters; new values require a coordinated backend
+                release. The `perps.*` kinds only appear with `show_perps=true` or
+                `activity_type=perps`.'
+            enum:
+                - send
+                - receive
+                - swap
+                - approve
+                - revoke
+                - bridge
+                - stake
+                - unstake
+                - claim
+                - wrap
+                - unwrap
+                - deploy
+                - contract_call
+                - nft_purchase
+                - auction_bid
+                - mint
+                - burn
+                - dns_renew
+                - subscribe
+                - unsubscribe
+                - freeze
+                - unfreeze
+                - delegate
+                - undelegate
+                - vote
+                - supply
+                - withdraw
+                - borrow
+                - repay
+                - airdrop
+                - perps.position_opened
+                - perps.position_closed
+                - perps.balance_deposit
+                - perps.balance_withdrawal
+        ActivityTypeFilter:
+            type: string
+            description:
+                'Same as `ActivityType` plus the `perps` umbrella, which selects every `perps.*`
+                kind. Filter only: no activity is returned with that value.'
+            enum:
+                - send
+                - receive
+                - swap
+                - approve
+                - revoke
+                - bridge
+                - stake
+                - unstake
+                - claim
+                - wrap
+                - unwrap
+                - deploy
+                - contract_call
+                - nft_purchase
+                - auction_bid
+                - mint
+                - burn
+                - dns_renew
+                - subscribe
+                - unsubscribe
+                - freeze
+                - unfreeze
+                - delegate
+                - undelegate
+                - vote
+                - supply
+                - withdraw
+                - borrow
+                - repay
+                - airdrop
+                - perps.position_opened
+                - perps.position_closed
+                - perps.balance_deposit
+                - perps.balance_withdrawal
+                - perps
+        ActivityStatus:
+            type: string
+            enum: [pending, confirmed, failed, dropped]
+        ActivityDirection:
+            type: string
+            enum: [in, out, self]
+        ActivityFeeType:
+            type: string
+            description:
+                "How the fee was paid: the chain's native coin, a gasless relayer, or Keeper
+                Battery. Defaults to native."
+            enum: [gasless, native, battery]
+        ActivityFee:
+            type: object
+            description:
+                'The fee in one place. The flat fee_token / fee_type / fee_amount fields carry the
+                same values for older clients.'
+            properties:
+                type:
+                    $ref: '#/components/schemas/ActivityFeeType'
+                token:
+                    $ref: '#/components/schemas/AssetInfo'
+                amount:
+                    type: string
+        ActivityParty:
+            type: object
+            description:
+                'One side of an activity. The flat from_address / to_address fields carry the same
+                address for older clients.'
+            required: [address]
+            properties:
+                address:
+                    type: string
+                name:
+                    type: string
+                    description: Current DNS name of the address (TON mainnet only), e.g. alice.ton
+        Activity:
+            type: object
+            required: [activity_type, status, block_time, from_chain, to_chain, direction, tx_ids]
+            properties:
+                activity_type:
+                    $ref: '#/components/schemas/ActivityType'
+                status:
+                    $ref: '#/components/schemas/ActivityStatus'
+                block_time:
+                    type: string
+                    format: date-time
+                block_number:
+                    type: integer
+                    format: int64
+                from_chain:
+                    $ref: '#/components/schemas/Chain'
+                to_chain:
+                    $ref: '#/components/schemas/Chain'
+                wallet_address:
+                    type: string
+                direction:
+                    $ref: '#/components/schemas/ActivityDirection'
+                from_address:
+                    type: string
+                to_address:
+                    type: string
+                from:
+                    $ref: '#/components/schemas/ActivityParty'
+                to:
+                    $ref: '#/components/schemas/ActivityParty'
+                out_token:
+                    $ref: '#/components/schemas/AssetInfo'
+                out_amount:
+                    type: string
+                out_amount_usd:
+                    deprecated: true
+                    type: number
+                    format: double
+                out_fiat_price:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Current price per currency, e.g. {"USD": "0.999", "TON": "0.789"}'
+                in_token:
+                    $ref: '#/components/schemas/AssetInfo'
+                in_amount:
+                    type: string
+                in_amount_usd:
+                    deprecated: true
+                    type: number
+                    format: double
+                in_fiat_price:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Current price per currency, e.g. {"USD": "0.999", "TON": "0.789"}'
+                fee_type:
+                    $ref: '#/components/schemas/ActivityFeeType'
+                fee_token:
+                    $ref: '#/components/schemas/AssetInfo'
+                fee_amount:
+                    type: string
+                fee_amount_usd:
+                    deprecated: true
+                    type: number
+                    format: double
+                fee_fiat_price:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Current price per currency, e.g. {"USD": "0.999", "TON": "0.789"}'
+                fee:
+                    $ref: '#/components/schemas/ActivityFee'
+                protocol:
+                    type: string
+                    description:
+                        'Bridge/DeFi protocol name (stargate, etc.). Always empty for swap
+                        activities.'
+                tx_ids:
+                    type: array
+                    items:
+                        type: string
+                    description: 'On-chain tx identifiers, format: chain:txhash'
+                explorer_url:
+                    type: string
+                    description:
+                        'Ready-to-open explorer URL for the primary tx (source chain for cross-chain
+                        bridges). Omitted when the chain has no known explorer template — clients
+                        should hide the link in that case.'
+                is_read:
+                    type: boolean
+                    description:
+                        'Has the wallet owner acknowledged this activity in the app. Client-driven
+                        flag.'
+                is_spam:
+                    type: boolean
+                    description:
+                        'Backend-classified spam flag on this specific activity. Clients may hide by
+                        default or show a warning badge.'
+                meta:
+                    type: object
+                    additionalProperties: true
+                    description: >-
+                        Chain-specific extras (memo, input data, etc.). Known fields: `comment` —
+                        plaintext memo attached to the transfer; `encrypted_comment` —
+                        `{encryption_type, cipher_text}` of a memo only the recipient can read;
+                        `tron_resource` — `{energy, bandwidth}`, what a TRON transaction cost its
+                        sender in resources. Energy and bandwidth are resource units, the two fees
+                        are sun of the TRX fee spent on each. A sender with staked energy or free
+                        bandwidth burns no TRX at all, so `fee_amount` of 0 is the normal case there
+                        and this object is the real cost; `perps` — on a Lighter perps row (chain
+                        `lighter`, activity types `perps.*`): `{symbol, asset_id, side, reason,
+                        account_index, settled_at}`, plus the position figures a detail screen draws
+                        from, all decimal strings and absent when unknown: `size` (base units),
+                        `size_usd`, `entry_price` (the position's average entry), `leverage` (e.g.
+                        `"40"`), and on `perps.position_opened` `margin_usd`, what the open put up;
+                        on `perps.position_closed` `close_price`, `result_pct` (the result against
+                        the margin behind the closed part, in percent) and `funding_usd` (funding
+                        already inside the result, signed). `side` is the side of the position,
+                        `long` or `short`, not the direction of the trade. `reason` is set on
+                        `perps.position_closed` only: `manual`, `take_profit`, `stop_loss` or
+                        `liquidation`. `asset_id` is the market's catalog asset
+                        (`lighter/<network>/<market_id>`); `account_index` is the Lighter account;
+                        `settled_at` is when a deposit arrived.
+        PendingTransaction:
+            type: object
+            description:
+                'A locally-broadcast transaction, recorded as pending until the indexer observes it
+                on-chain'
+            required: [chain, network, tx_hash, activity_type]
+            properties:
+                chain:
+                    $ref: '#/components/schemas/Chain'
+                network:
+                    $ref: '#/components/schemas/Network'
+                tx_hash:
+                    type: string
+                activity_type:
+                    $ref: '#/components/schemas/ActivityType'
+                payload:
+                    type: object
+                    additionalProperties: true
+                    description: >-
+                        Activity-type-specific extras the client knows at broadcast time but that
+                        are not derivable from the transaction itself. Read on a swap only. Known
+                        fields: `from_asset_id` and `to_asset_id` — catalog ids of the asset sold
+                        and the asset bought; `from_amount` and `to_amount` — their amounts in base
+                        units, as an integer string; `from_address` — the sending address, which is
+                        what attributes the swap to a wallet before it is indexed; `aggregator` —
+                        who routed the swap, of which only `swapsxyz` is registered with swaps.xyz;
+                        `provider_route_id` — the aggregator's own route id, for swaps.xyz its
+                        `txId`, which registers the broadcast hash and keys the pending swap so the
+                        webhook and this row converge; `route_id` — the swap backend's own id for
+                        the route, stored as sent and not interpreted here.
+        TronRpcMethod:
+            type: string
+            description: >-
+                Whitelisted java-tron HTTP methods the proxy forwards via POST — the set the mobile
+                TronRpcClient uses.
+            enum:
+                - getaccount
+                - getaccountresource
+                - getchainparameters
+                - getReward
+                - getnowblock
+                - gettransactionbyid
+                - getcontract
+                - getcontractinfo
+                - triggerconstantcontract
+                - broadcasttransaction
+        TronRpcGetMethod:
+            type: string
+            description: >-
+                java-tron methods the proxy also serves over GET — the no-arg reads (getnowblock,
+                getchainparameters) plus listwitnesses, which takes only query params.
+            enum: [listwitnesses, getnowblock, getchainparameters]
+        TronRpcCall:
+            type: object
+            additionalProperties: true
+            description:
+                'java-tron request body, forwarded to the node as-is (e.g. { address, visible } for
+                getaccount, {} for getchainparameters)'
+        TronRpcResult:
+            type: object
+            additionalProperties: true
+            description:
+                "java-tron response body, passed through verbatim; node-level failures are the
+                node's own { Error: ... } shape"
+        RaffleStatus:
+            type: string
+            description: 'Per-wallet relationship to the raffle'
+            enum: [not_joined, joined, ended_pending, won, lost]
+        RaffleHero:
+            type: object
+            required: [image]
+            properties:
+                image:
+                    type: string
+                badge_icon_id:
+                    type: string
+                    description: 'Client-rendered icon id'
+        RaffleCompactBanner:
+            type: object
+            description: 'Entry rendered in the wallet list'
+            required: [default_title, active_title, icon_id]
+            properties:
+                default_title:
+                    type: string
+                    description: 'Title when user has no tickets'
+                active_title:
+                    type: string
+                    description: 'Title when user has tickets'
+                icon_id:
+                    type: string
+        RafflePrize:
+            type: object
+            required: [id, image, title]
+            properties:
+                id:
+                    type: string
+                image:
+                    type: string
+                title:
+                    type: string
+                subtitle:
+                    type: string
+        RaffleTask:
+            type: object
+            required: [id, icon_id, title, reward_tickets]
+            properties:
+                id:
+                    type: string
+                icon_id:
+                    type: string
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                reward_tickets:
+                    type: integer
+                    minimum: 0
+                deeplink:
+                    type: string
+                done:
+                    type: boolean
+                    description: 'Per-wallet endpoint only'
+        RaffleMilestone:
+            type: object
+            required: [id, icon_id, title, reward_tickets]
+            properties:
+                id:
+                    type: string
+                icon_id:
+                    type: string
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                reward_tickets:
+                    type: integer
+                    minimum: 0
+                done:
+                    type: boolean
+                    description: 'Per-wallet endpoint only'
+        RaffleCTA:
+            type: object
+            description: 'Bottom button, picked by backend by user state'
+            required: [title, action, payload]
+            properties:
+                title:
+                    type: string
+                action:
+                    type: string
+                    enum: [deeplink, link]
+                payload:
+                    type: string
+        RaffleBanner:
+            type: object
+            description:
+                'Standalone banner card (e.g. for opening a story), separate from
+                hero/compact_banner'
+            required: [title, image_url, button]
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                image_url:
+                    type: string
+                    description: 'Own thumbnail for the banner card, separate from hero.image'
+                button:
+                    $ref: '#/components/schemas/RaffleCTA'
+        RaffleHistoryItem:
+            type: object
+            required: [id, awarded_at, icon_id, title, tickets]
+            properties:
+                id:
+                    type: string
+                    description: 'raffle:{reason_kind}:{reason_id}'
+                awarded_at:
+                    type: string
+                    format: date-time
+                icon_id:
+                    type: string
+                title:
+                    type: string
+                tickets:
+                    type: integer
+                    minimum: 1
+        RaffleWinningPrize:
+            type: object
+            description: 'The actual prize awarded — may differ from the advertised prizes[] entry'
+            required: [title, image]
+            properties:
+                title:
+                    type: string
+                image:
+                    type: string
+        RaffleBenefitCard:
+            type: object
+            description: 'Static promo card shown alongside the raffle'
+            required: [id, icon_id, label, title]
+            properties:
+                id:
+                    type: string
+                icon_id:
+                    type: string
+                    description: 'Client-rendered icon id'
+                image_url:
+                    type: string
+                    description: 'Optional artwork rendered on the card'
+                label:
+                    type: string
+                title:
+                    type: string
+                subtitle:
+                    type: string
+        RaffleStory:
+            type: object
+            description: 'Onboarding-style story attached to a raffle. Phase can override.'
+            required: [id, pages]
+            properties:
+                id:
+                    type: string
+                pages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RaffleStoryPage'
+        RaffleStoryPage:
+            type: object
+            required: [title, description, image]
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                image:
+                    type: string
+                buttons:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RaffleCTA'
+        RaffleProgress:
+            type: object
+            description: 'Per-wallet aggregate'
+            required: [tickets_total, history]
+            properties:
+                tickets_total:
+                    type: integer
+                    minimum: 0
+                history:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RaffleHistoryItem'
+                winning_prize:
+                    $ref: '#/components/schemas/RaffleWinningPrize'
+                prize_delivery_days:
+                    description: 'Optional, defaults client-side if absent'
+                    type: integer
+                    minimum: 0
+                zero_fee_ends_at:
+                    type: string
+                    format: date-time
+                    description:
+                        'Zero-fee perk expiry; set for every wallet while the perk window is open'
+        Raffle:
+            type: object
+            required:
+                - id
+                - status
+                - hero
+                - title
+                - subtitle
+                - starts_at
+                - ends_at
+                - compact_banner
+                - prizes_header
+                - prizes
+                - tasks
+                - milestones
+                - cta
+            properties:
+                id:
+                    type: string
+                status:
+                    $ref: '#/components/schemas/RaffleStatus'
+                hero:
+                    $ref: '#/components/schemas/RaffleHero'
+                title:
+                    type: string
+                subtitle:
+                    type: string
+                starts_at:
+                    type: string
+                    format: date-time
+                ends_at:
+                    type: string
+                    format: date-time
+                prizes_reveal_at:
+                    type: string
+                    format: date-time
+                    description: 'When prizes are revealed; a campaign may serve another date here'
+                compact_banner:
+                    $ref: '#/components/schemas/RaffleCompactBanner'
+                prizes_header:
+                    type: string
+                status_badge:
+                    type: string
+                    description:
+                        "Short state-dependent label shown above the hero (e.g. 'Active', 'You won')"
+                benefit_cards:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RaffleBenefitCard'
+                prizes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RafflePrize'
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RaffleTask'
+                milestones:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RaffleMilestone'
+                cta:
+                    $ref: '#/components/schemas/RaffleCTA'
+                banner:
+                    $ref: '#/components/schemas/RaffleBanner'
+                stories:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RaffleStory'
+                progress:
+                    $ref: '#/components/schemas/RaffleProgress'
+        AuthChallenge:
+            type: object
+            required: [challenge, expires_at]
+            properties:
+                challenge:
+                    type: string
+                    minLength: 98
+                    maxLength: 98
+                    pattern: '^[A-Za-z0-9_-]{98}$'
+                    description: 'base64url of 73 bytes: `[ver:1][nonce:32][exp_be64:8][hmac:32]`.'
+                expires_at:
+                    type: string
+                    format: date-time
+        ProofType:
+            type: string
+            enum: [es256_raw]
+            default: es256_raw
+            description:
+                '`es256_raw` — ECDSA P-256 over SHA-256(M), signature as raw r‖s. Attested schemes
+                are added later as new values.'
+        DevicePlatform:
+            type: string
+            enum: [ios, android, ios_pro, web, extension, desktop]
+        DeviceTokens:
+            type: object
+            required: [device_id, device_jwt, refresh_token, expires_in]
+            properties:
+                device_id:
+                    type: string
+                    format: uuid
+                device_jwt:
+                    type: string
+                    description: 'Access token (JWT, ES256). Keep in memory only.'
+                refresh_token:
+                    type: string
+                    minLength: 43
+                    maxLength: 43
+                    pattern: '^[A-Za-z0-9_-]{43}$'
+                    description:
+                        'Opaque single-use token, base64url of 32 random bytes. Never sent in
+                        `Authorization` — only in the /api/v2/devices/refresh body with a proof over
+                        it.'
+                expires_in:
+                    type: integer
+                    description: 'device_jwt lifetime in seconds'
+                    example: 900
+        WalletRegisterItem:
+            description: >-
+                A wallet to bind, named by a format 2 `wallet_id` and proved by `wallet_proof`, from
+                which the root key is recovered — nothing else identifies it.
+            type: object
+            required: [accounts]
+            properties:
+                wallet_id:
+                    type: string
+                    minLength: 36
+                    maxLength: 36
+                    pattern: '^[a-z2-7]{36}$'
+                    description: >-
+                        Format 2 wallet_id: `base32(format ‖ kind_byte ‖
+                        blake2b160(LP("keeper.wallet.id.v2") ‖ LP(kind) ‖ LP(rootPub)))`, where
+                        `format` = 2 and `kind_byte` = 1 for multichain.
+                wallet_proof:
+                    type: string
+                    minLength: 130
+                    maxLength: 130
+                    pattern: '^[a-f0-9]{130}$'
+                    description: >-
+                        Signature by the wallet root key: 65 bytes (130 hex) secp256k1 recoverable,
+                        laid out `R ‖ S ‖ V` as on EVM. Message layout is in BACKEND.md.
+                accounts:
+                    type: array
+                    minItems: 1
+                    maxItems: 32
+                    description: >-
+                        `accounts_digest` = blake2b-256 over the compact JSON array of `{address,
+                        chain, network, type?}` objects, sorted by (address, chain, network, type).
+                    items:
+                        $ref: '#/components/schemas/WalletAccount'
+        WalletRegisterResult:
+            type: object
+            required: [index, status]
+            properties:
+                index:
+                    type: integer
+                    description: 'Position of this item in the request array'
+                status:
+                    type: string
+                    enum: [ok, failed]
+                wallet_id:
+                    type: string
+                    minLength: 36
+                    maxLength: 36
+                    pattern: '^[a-z2-7]{36}$'
+                    description: 'The id the wallet is filed under, present when status=ok.'
+                error:
+                    type: string
+                    description: >-
+                        Machine-readable reason when status=failed: invalid_proof, invalid_accounts,
+                        invalid_wallet_id, missing_wallet_id, missing_wallet_proof,
+                        invalid_wallet_proof, storage_error, wallet_limit_reached,
+                        device_limit_reached.
+        IntrospectResult:
+            type: object
+            required: [active, rv]
+            properties:
+                active:
+                    type: boolean
+                    description:
+                        'False for a revoked device and for one we have never seen — the two are
+                        deliberately indistinguishable.'
+                rv:
+                    type: integer
+                    description:
+                        "Current refresh_version. Compare with the token's `rv` to spot a token
+                        issued before a rotation."
+                member:
+                    type: boolean
+                    description: 'Present only when wallet_id was supplied.'
+                wallets:
+                    type: array
+                    description:
+                        'Every wallet bound to the device. Returned only when no wallet_id was
+                        supplied, since the set can run to a couple of hundred.'
+                    items:
+                        type: string
+                        minLength: 36
+                        maxLength: 36
+                        pattern: '^[a-z2-7]{36}$'
+        Jwk:
+            type: object
+            required: [kty, crv, x, y, kid, alg, use]
+            properties:
+                kty:
+                    type: string
+                    enum: [EC]
+                crv:
+                    type: string
+                    enum: [P-256]
+                x:
+                    type: string
+                    description: 'base64url of the 32-byte X coordinate'
+                y:
+                    type: string
+                    description: 'base64url of the 32-byte Y coordinate'
+                kid:
+                    type: string
+                alg:
+                    type: string
+                    enum: [ES256]
+                use:
+                    type: string
+                    enum: [sig]
+        Jwks:
+            type: object
+            required: [keys]
+            properties:
+                keys:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Jwk'
+
+    requestBodies:
+        WalletReindex:
+            description:
+                'Optional list of chains to soft-reindex; empty/omitted means all chains registered
+                for the wallet.'
+            required: false
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            chains:
+                                type: array
+                                maxItems: 32
+                                items:
+                                    $ref: '#/components/schemas/Chain'
+                                description:
+                                    'Chains to reindex. Omit or leave empty to reindex all chains on
+                                    which the wallet has accounts.'
+        BroadcastTx:
+            description: 'Signed transaction to broadcast'
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [chain, tx]
+                        properties:
+                            chain:
+                                $ref: '#/components/schemas/Chain'
+                            tx:
+                                type: string
+                                format: byte
+                                description: 'Signed transaction bytes, base64-encoded'
+        AddPendingTransaction:
+            description:
+                'A locally-broadcast transaction to record as pending until the indexer picks it up'
+            required: true
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/PendingTransaction'
+        SetAssetFilters:
+            description: 'Set asset hidden/shown filter'
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [changes]
+                        properties:
+                            changes:
+                                type: array
+                                minItems: 1
+                                maxItems: 500
+                                description:
+                                    'One entry per asset the user toggled. Capped so a single call
+                                    cannot rewrite a whole catalogue.'
+                                items:
+                                    type: object
+                                    required: [asset_id, action]
+                                    properties:
+                                        asset_id:
+                                            type: string
+                                        action:
+                                            type: string
+                                            enum: [show, hide]
+        RaffleImport:
+            description:
+                The wallet that was imported after tapping the task on `wallet_id`. Must already be
+                bound to this device.
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [imported_wallet_id]
+                        properties:
+                            imported_wallet_id:
+                                type: string
+                                minLength: 36
+                                maxLength: 36
+                                pattern: '^[a-z2-7]{36}$'
+        DeviceRegister:
+            description:
+                'Register a device. Idempotent on `device_pub` — a retry returns the same device_id
+                and a fresh token pair.'
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [device_pub, device_proof, challenge, platform, client_version]
+                        properties:
+                            proof_type:
+                                $ref: '#/components/schemas/ProofType'
+                            device_pub:
+                                type: string
+                                minLength: 66
+                                maxLength: 66
+                                pattern: '^[a-f0-9]{66}$'
+                                description:
+                                    'Device public key, hex. ECDSA P-256 compressed point, 33 bytes.'
+                            device_proof:
+                                type: string
+                                minLength: 128
+                                maxLength: 128
+                                pattern: '^[a-f0-9]{128}$'
+                                description:
+                                    'raw r‖s over `LP("keeper.device.register.v1") ‖ LP(device_pub)
+                                    ‖ LP(platform) ‖ LP(be64(app_id)) ‖ LP(client_version) ‖
+                                    LP(challenge)`. `LP(x)` = one length byte + x.'
+                            challenge:
+                                type: string
+                                minLength: 98
+                                maxLength: 98
+                                pattern: '^[A-Za-z0-9_-]{98}$'
+                                description: 'Challenge from GET /api/v2/devices/challenge'
+                            platform:
+                                $ref: '#/components/schemas/DevicePlatform'
+                            app_id:
+                                type: integer
+                                format: int64
+                                description:
+                                    'Push application id. Immutable after the first registration.'
+                            client_version:
+                                type: string
+                                minLength: 1
+                                maxLength: 32
+                                description: >-
+                                    Never affects token issuance or scope, but it does decide
+                                    whether this device is held to a wallet proof: from 26.08.0 on
+                                    `ios` and `android`, a wallet-scoped call needs one.
+        DeviceRefresh:
+            description: >-
+                Exchange a refresh token for a new pair. No challenge — the refresh token is
+                server-issued, random and single-use.
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [device_id, refresh_token, device_proof]
+                        properties:
+                            device_id:
+                                type: string
+                                format: uuid
+                            refresh_token:
+                                type: string
+                                minLength: 43
+                                maxLength: 43
+                                pattern: '^[A-Za-z0-9_-]{43}$'
+                            device_proof:
+                                type: string
+                                minLength: 128
+                                maxLength: 128
+                                pattern: '^[a-f0-9]{128}$'
+                                description:
+                                    'raw r‖s over `LP("keeper.device.refresh.v1") ‖ LP(device_id) ‖
+                                    LP(blake2b256(refresh_token))`.'
+        WalletRegisterBatch:
+            description: >-
+                Bind wallets to the calling device. One challenge covers the whole array and is
+                consumed once.
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [challenge, wallets]
+                        properties:
+                            challenge:
+                                type: string
+                                minLength: 98
+                                maxLength: 98
+                                pattern: '^[A-Za-z0-9_-]{98}$'
+                                description: 'Challenge from GET /api/v2/wallets/challenge'
+                            wallets:
+                                type: array
+                                minItems: 1
+                                maxItems: 32
+                                items:
+                                    $ref: '#/components/schemas/WalletRegisterItem'
+        WalletUnregisterBatch:
+            description: >-
+                Detach wallets from the calling device. Idempotent and needs no wallet proof, so it
+                works after the wallet keys are gone.
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [wallet_ids]
+                        properties:
+                            wallet_ids:
+                                type: array
+                                minItems: 1
+                                maxItems: 32
+                                items:
+                                    type: string
+                                    minLength: 36
+                                    maxLength: 36
+                                    pattern: '^[a-z2-7]{36}$'
+        DeviceBindingsRequest:
+            description: Reconcile the client's wallet list with the device's bindings.
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [wallets]
+                        properties:
+                            wallets:
+                                type: array
+                                minItems: 0
+                                maxItems: 200
+                                items:
+                                    type: string
+                                    minLength: 36
+                                    maxLength: 36
+                                    pattern: '^[a-z2-7]{36}$'
+        AuthIntrospect:
+            description:
+                'Ask whether a device is active and, optionally, whether it may act on one wallet.'
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [device_id]
+                        properties:
+                            device_id:
+                                type: string
+                                format: uuid
+                            wallet_id:
+                                type: string
+                                minLength: 36
+                                maxLength: 36
+                                pattern: '^[a-z2-7]{36}$'
+        WalletPushSubscribe:
+            description: >-
+                Register the device's push token. There is no challenge and no per-wallet proof: the
+                device token already says who is asking, so the wallets come from the device's
+                bindings and the platform from the device row.
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [push_token]
+                        properties:
+                            push_token:
+                                type: string
+                                minLength: 1
+                                maxLength: 4096
+                            locale:
+                                type: string
+                                minLength: 2
+                                maxLength: 16
+                            wallet_ids:
+                                type: array
+                                maxItems: 200
+                                items:
+                                    type: string
+                                    minLength: 36
+                                    maxLength: 36
+                                    pattern: '^[a-z2-7]{36}$'
+
+    responses:
+        BadRequest:
+            description: 'Invalid request'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        Unauthorized:
+            description: 'Authentication failed'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        Forbidden:
+            description: 'Authenticated, but this device may not act on this wallet'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        NotFound:
+            description: 'Resource not found'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        InternalError:
+            description: 'Internal server error'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        Conflict:
+            description:
+                'Conflict — the device row was revoked, so this keypair cannot be re-registered'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        BadGateway:
+            description: 'Downstream service unreachable'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        TooManyRequests:
+            description: 'Rate limit exceeded — retry later'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [error]
+                        properties:
+                            error:
+                                type: string
+        Ok:
+            description: 'OK'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Ok'
+        NotModified:
+            description: 'Content not modified (ETag match)'
+        Wallets:
+            description: 'Wallet details'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Wallet'
+        WalletChallenge:
+            description: 'Stateless HMAC challenge for /api/v2/wallets/register'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/WalletChallenge'
+        RealtimeToken:
+            description: 'Short-lived token for the realtime transport.'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/RealtimeToken'
+        WalletSyncStatus:
+            description:
+                'Wallet data freshness snapshot used by the client to track loader progress and
+                backfill completion.'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/SyncStatus'
+        ChainNodes:
+            description: 'Supported-chains manifest plus per-chain node connection sets'
+            headers:
+                ETag:
+                    schema:
+                        type: string
+                    description: 'Entity tag for cache validation'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [data, timestamp]
+                        properties:
+                            data:
+                                type: object
+                                description:
+                                    'Per-chain node lists the client can call directly, keyed by
+                                    chain id (e.g. "eth"). Each list is ordered best-first by
+                                    measured health.'
+                                additionalProperties:
+                                    type: array
+                                    items:
+                                        $ref: '#/components/schemas/Node'
+                            timestamp:
+                                type: integer
+                                format: int64
+                                description:
+                                    'Unix time (seconds) at which this node set was computed.'
+        AssetCatalog:
+            description: 'Asset catalog entries'
+            headers:
+                ETag:
+                    schema:
+                        type: string
+                    description: 'Entity tag for cache validation'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [assets, next_cursor]
+                        properties:
+                            assets:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/AssetInfo'
+                            next_cursor:
+                                type: string
+        Assets:
+            description: 'Assets for the address'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [assets, next_cursor]
+                        properties:
+                            assets:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/SummaryAsset'
+                            next_cursor:
+                                type: string
+        AssetDetails:
+            description: 'Single catalog asset'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/SummaryAsset'
+        WalletAssets:
+            description: 'All assets for the wallet'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [assets, fiat_price, next_cursor]
+                        properties:
+                            assets:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Asset'
+                            fiat_price:
+                                type: object
+                                additionalProperties:
+                                    type: string
+                                description:
+                                    'Current price per currency, e.g. {"USD": "0.999", "TON":
+                                    "0.789"}'
+                            next_cursor:
+                                type: string
+        WalletAsset:
+            description: 'Single asset of the wallet'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Asset'
+        BroadcastResult:
+            description: 'Transaction broadcast result'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [txHash]
+                        properties:
+                            txHash:
+                                type: string
+        FeeEstimates:
+            description: 'Fee estimates'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/FeeEstimate'
+        DnsResolved:
+            description: 'Resolved DNS name'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/DnsResolution'
+        SwapStatus:
+            description: 'Swap status'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/StonfiSwapStatus'
+        Activities:
+            description: 'Activity history'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [activities]
+                        properties:
+                            activities:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Activity'
+                            next_cursor:
+                                type: string
+                                description: 'Cursor for next page, empty if no more data'
+        Raffles:
+            description: 'List of raffles'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [raffles]
+                        properties:
+                            raffles:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Raffle'
+        AuthChallenge:
+            description: 'Stateless HMAC challenge for the requested context'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/AuthChallenge'
+        DeviceTokens:
+            description: 'Device id and a fresh token pair'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/DeviceTokens'
+        WalletRegisterResults:
+            description: 'Per-wallet registration outcome'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [results]
+                        properties:
+                            results:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/WalletRegisterResult'
+        WalletUnregisterResult:
+            description: 'Wallets detached by this call'
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [detached]
+                        properties:
+                            detached:
+                                type: array
+                                items:
+                                    type: string
+                                    minLength: 36
+                                    maxLength: 36
+                                    pattern: '^[a-z2-7]{36}$'
+        DeviceBindingsResult:
+            description: "Diff between the client's wallet list and the device's bindings"
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required: [known, unknown, extra]
+                        properties:
+                            known:
+                                type: array
+                                description:
+                                    'Sent by the client and bound to this device. Echoed in the form
+                                    the client sent: a wallet stored under the id of an earlier
+                                    derivation is matched through it, not renamed.'
+                                items:
+                                    type: string
+                                    minLength: 36
+                                    maxLength: 36
+                                    pattern: '^[a-z2-7]{36}$'
+                            unknown:
+                                type: array
+                                description:
+                                    'Sent by the client but not bound here. Does not distinguish
+                                    "absent from the registry" from "exists but not bound" — the
+                                    action is the same: /api/v2/wallets/register.'
+                                items:
+                                    type: string
+                                    minLength: 36
+                                    maxLength: 36
+                                    pattern: '^[a-z2-7]{36}$'
+                            extra:
+                                type: array
+                                description:
+                                    'Bound to this device but not sent by the client, in the id the
+                                    backend stores. A wallet the client did send under another
+                                    derivation of its id is not listed here. The server never
+                                    detaches these on its own — the client calls
+                                    /api/v2/wallets/unregister explicitly.'
+                                items:
+                                    type: string
+                                    minLength: 36
+                                    maxLength: 36
+                                    pattern: '^[a-z2-7]{36}$'
+        IntrospectResult:
+            description: 'Device state and, optionally, wallet membership'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/IntrospectResult'
+        Jwks:
+            description: 'Public keys for verifying device access tokens'
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/Jwks'
+
+paths:
+    /api/v1/healthcheck:
+        get:
+            summary: Check server readiness
+            operationId: healthcheck
+            tags:
+                - system
+            security: []
+            responses:
+                '200':
+                    description: 'Server is ready'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Ok'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/liveness:
+        get:
+            summary: Check the process is alive
+            operationId: liveness
+            tags:
+                - system
+            security: []
+            responses:
+                '200':
+                    description: 'Process is alive'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Ok'
+
+    /api/v1/nodes:
+        get:
+            operationId: getNodes
+            summary: Get manifest of supported chains
+            tags:
+                - nodes
+            parameters:
+                - $ref: '#/components/parameters/IfNoneMatch'
+            responses:
+                '200':
+                    $ref: '#/components/responses/ChainNodes'
+                '304':
+                    $ref: '#/components/responses/NotModified'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/assets:
+        get:
+            operationId: getAssets
+            summary: List the asset catalog
+            tags:
+                - assets
+            parameters:
+                - $ref: '#/components/parameters/FromDateQuery'
+                - $ref: '#/components/parameters/CatalogLimitQuery'
+                - $ref: '#/components/parameters/CursorQuery'
+                - $ref: '#/components/parameters/IfNoneMatch'
+            responses:
+                '200':
+                    $ref: '#/components/responses/AssetCatalog'
+                '304':
+                    $ref: '#/components/responses/NotModified'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/assets/search:
+        get:
+            operationId: searchAssets
+            summary: Search the swappable asset catalog
+            description:
+                Only assets with the `swap` capability are returned unless `omit_swappable=true`.
+                Lighter perps are exempt.
+            tags:
+                - assets
+            parameters:
+                - $ref: '#/components/parameters/SearchChainQuery'
+                - $ref: '#/components/parameters/CurrenciesQuery'
+                - $ref: '#/components/parameters/SearchQuery'
+                - $ref: '#/components/parameters/SortQuery'
+                - $ref: '#/components/parameters/LimitQuery'
+                - $ref: '#/components/parameters/CursorQuery'
+                - $ref: '#/components/parameters/VerifiedOnlyQuery'
+                - $ref: '#/components/parameters/ShowPerpsQuery'
+                - $ref: '#/components/parameters/OmitSwappableQuery'
+                - $ref: '#/components/parameters/FirebaseUserHeader'
+            responses:
+                '200':
+                    $ref: '#/components/responses/Assets'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/assets/{asset_id}:
+        get:
+            operationId: getAsset
+            summary: Get a single catalog asset by asset_id
+            description: >-
+                Catalog metadata for one asset, independent of any wallet: use it for a token screen
+                opened from an activity or a deep link, where the client holds an asset_id and
+                nothing else.
+            tags:
+                - assets
+            parameters:
+                - $ref: '#/components/parameters/AssetIdPath'
+                - $ref: '#/components/parameters/CurrenciesOptQuery'
+            responses:
+                '200':
+                    $ref: '#/components/responses/AssetDetails'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/broadcast:
+        post:
+            operationId: broadcastTx
+            summary: Broadcast a signed transaction
+            tags:
+                - broadcast
+            requestBody:
+                $ref: '#/components/requestBodies/BroadcastTx'
+            responses:
+                '200':
+                    $ref: '#/components/responses/BroadcastResult'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/fees/{chain}:
+        get:
+            operationId: getFees
+            summary: Get fee estimates for a chain
+            tags:
+                - fees
+            parameters:
+                - $ref: '#/components/parameters/ChainPath'
+            responses:
+                '200':
+                    $ref: '#/components/responses/FeeEstimates'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /tron/rpc/wallet/{method}:
+        post:
+            operationId: callTronRpc
+            summary: Proxy a whitelisted java-tron HTTP method to the TRON RPC node
+            description: >-
+                Drop-in analog of the TronGrid FullNode HTTP API for a fixed set of methods: the
+                same request body, the node's response verbatim.
+            tags:
+                - tron
+            security:
+                - deviceJWT: []
+            parameters:
+                - name: method
+                  in: path
+                  required: true
+                  description: 'java-tron HTTP method name (case-sensitive)'
+                  schema:
+                      $ref: '#/components/schemas/TronRpcMethod'
+            requestBody:
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TronRpcCall'
+            responses:
+                '200':
+                    description: 'Upstream node response, passed through verbatim'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TronRpcResult'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+                '502':
+                    $ref: '#/components/responses/BadGateway'
+        get:
+            operationId: getTronRpc
+            summary: Proxy a whitelisted GET-style java-tron HTTP method to the TRON RPC node
+            description: >-
+                GET counterpart of callTronRpc for the java-tron methods the mobile client calls
+                without a JSON body: listwitnesses and the no-arg reads getnowblock and
+                getchainparameters, which java-tron serves over GET as well as POST.
+            tags:
+                - tron
+            security:
+                - deviceJWT: []
+            parameters:
+                - name: method
+                  in: path
+                  required: true
+                  description: 'java-tron HTTP method name (case-sensitive)'
+                  schema:
+                      $ref: '#/components/schemas/TronRpcGetMethod'
+                - name: visible
+                  in: query
+                  required: false
+                  description: 'Return addresses in base58 instead of hex'
+                  schema:
+                      type: boolean
+            responses:
+                '200':
+                    description: 'Upstream node response, passed through verbatim'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TronRpcResult'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+                '502':
+                    $ref: '#/components/responses/BadGateway'
+
+    /api/v1/account/{account}:
+        get:
+            operationId: resolveAccountAddress
+            summary: Resolve an account to an on-chain address
+            tags:
+                - account
+            parameters:
+                - name: account
+                  in: path
+                  required: true
+                  description: 'DNS name to resolve or address'
+                  schema:
+                      type: string
+                      minLength: 1
+                - name: chain
+                  in: query
+                  required: true
+                  description: 'Blockchain to resolve the name on'
+                  schema:
+                      $ref: '#/components/schemas/Chain'
+            responses:
+                '200':
+                    $ref: '#/components/responses/DnsResolved'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /v1/stonfi/swap/{address}/status:
+        get:
+            operationId: getStonfiSwapStatus
+            summary: Check if the account has a swap on STON.fi
+            tags:
+                - stonfi
+            parameters:
+                - name: address
+                  in: path
+                  required: true
+                  description: 'Account address: TON (raw or user-friendly), EVM, Tron or BTC'
+                  schema:
+                      type: string
+                      minLength: 1
+            responses:
+                '200':
+                    $ref: '#/components/responses/SwapStatus'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}:
+        get:
+            operationId: getWallet
+            summary: Get wallet by id
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+                - $ref: '#/components/parameters/NetworkQuery'
+            responses:
+                '200':
+                    $ref: '#/components/responses/Wallets'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/sync_status:
+        get:
+            operationId: getWalletSyncStatus
+            summary: Poll per-chain freshness and backfill progress for a wallet
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+                - $ref: '#/components/parameters/NetworkQuery'
+            responses:
+                '200':
+                    $ref: '#/components/responses/WalletSyncStatus'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/realtime/connection-token:
+        get:
+            operationId: getRealtimeConnectionToken
+            summary: Mint a realtime connection token for the calling device
+            tags:
+                - wallets
+            security:
+                - deviceJWT: []
+            responses:
+                '200':
+                    $ref: '#/components/responses/RealtimeToken'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/realtime-token:
+        get:
+            operationId: getWalletRealtimeToken
+            summary: Mint a realtime subscription token for one wallet's channel
+            tags:
+                - wallets
+            security:
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+            responses:
+                '200':
+                    $ref: '#/components/responses/RealtimeToken'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/reindex:
+        post:
+            operationId: reindexWallet
+            summary: Wipe and refetch a wallet's activity history
+            deprecated: true
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+            requestBody:
+                $ref: '#/components/requestBodies/WalletReindex'
+            responses:
+                '202':
+                    description: 'Reindex accepted'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/assets:
+        get:
+            operationId: getWalletAssets
+            summary: Get assets for all accounts of a registered wallet
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+                - $ref: '#/components/parameters/AssetIdsQuery'
+                - $ref: '#/components/parameters/CapabilitiesQuery'
+                - $ref: '#/components/parameters/ChainQuery'
+                - $ref: '#/components/parameters/NetworkQuery'
+                - $ref: '#/components/parameters/SearchQuery'
+                - $ref: '#/components/parameters/AvailableOnlyQuery'
+                - $ref: '#/components/parameters/ShowHiddenQuery'
+                - $ref: '#/components/parameters/ShowAllQuery'
+                - $ref: '#/components/parameters/CurrenciesQuery'
+                - $ref: '#/components/parameters/VerifiedOnlyQuery'
+                - $ref: '#/components/parameters/HideDustQuery'
+                - $ref: '#/components/parameters/LimitQuery'
+                - $ref: '#/components/parameters/CursorQuery'
+            responses:
+                '200':
+                    $ref: '#/components/responses/WalletAssets'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+        post:
+            operationId: saveWalletAssetsFilters
+            summary: Set wallet's assets hidden/shown settings
+            description: >-
+                Writes the caller's own show/hide choices. Auth is **optional for now and becomes
+                mandatory at release**: clients have not shipped the token on this call yet.
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+            requestBody:
+                $ref: '#/components/requestBodies/SetAssetFilters'
+            responses:
+                '200':
+                    description: OK (no content)
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/asset:
+        get:
+            operationId: getWalletAsset
+            summary: Get a single asset of a registered wallet by asset_id
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+                - $ref: '#/components/parameters/AssetIdQuery'
+                - $ref: '#/components/parameters/NetworkQuery'
+                - $ref: '#/components/parameters/CurrenciesQuery'
+            responses:
+                '200':
+                    $ref: '#/components/responses/WalletAsset'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/activities:
+        get:
+            operationId: getWalletActivities
+            summary: Get activity history for a registered wallet
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+                - $ref: '#/components/parameters/LimitQuery'
+                - $ref: '#/components/parameters/CursorQuery'
+                - $ref: '#/components/parameters/ChainQuery'
+                - $ref: '#/components/parameters/NetworkQuery'
+                - $ref: '#/components/parameters/ActivityTypeQuery'
+                - $ref: '#/components/parameters/AssetIdOptQuery'
+                - $ref: '#/components/parameters/IsSpamOptQuery'
+                - $ref: '#/components/parameters/CurrenciesOptQuery'
+                - $ref: '#/components/parameters/HideDustQuery'
+                - $ref: '#/components/parameters/ShowPerpsActivitiesQuery'
+                - $ref: '#/components/parameters/PerpsMarketQuery'
+            responses:
+                '200':
+                    $ref: '#/components/responses/Activities'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/transactions/pending:
+        post:
+            operationId: addPendingTransactions
+            summary: Record a locally-broadcast transaction as a pending activity for this wallet
+            description: >-
+                The wallet must already be registered. `activity_type` is a hint, used only while
+                the transaction is unknown to the chain — once the chain's own feed describes it,
+                the feed wins.
+            tags:
+                - wallets
+            security:
+                - {}
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+            requestBody:
+                $ref: '#/components/requestBodies/AddPendingTransaction'
+            responses:
+                '200':
+                    $ref: '#/components/responses/Ok'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/wallets/challenge:
+        get:
+            operationId: getWalletChallenge
+            summary: Mint a stateless HMAC challenge for wallet registration
+            tags:
+                - wallets
+            responses:
+                '200':
+                    $ref: '#/components/responses/WalletChallenge'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+    /api/v1/wallets/{wallet_id}/raffles:
+        get:
+            operationId: getWalletRaffles
+            summary: List raffles with per-wallet progress
+            tags:
+                - raffles
+            security:
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+                - $ref: '#/components/parameters/LangQuery'
+                - $ref: '#/components/parameters/RaffleIdsQuery'
+                - $ref: '#/components/parameters/IsNewUserQuery'
+            responses:
+                '200':
+                    $ref: '#/components/responses/Raffles'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/raffles/migration:
+        post:
+            operationId: completeWalletRaffleMigration
+            summary: Mark wallet as migrated for raffle purposes; idempotent
+            tags:
+                - raffles
+            security:
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+            responses:
+                '204':
+                    description: Migration recorded (or already recorded)
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v1/wallets/{wallet_id}/raffles/import:
+        post:
+            operationId: markWalletRaffleImport
+            summary:
+                Record that another wallet was imported from this one, for raffle tasks; idempotent
+            tags:
+                - raffles
+            security:
+                - deviceJWT: []
+                - deviceJWT: []
+                  walletAuth: []
+                  xWalletId: []
+            parameters:
+                - $ref: '#/components/parameters/WalletIdPath'
+            requestBody:
+                $ref: '#/components/requestBodies/RaffleImport'
+            responses:
+                '204':
+                    description: Import recorded (or already recorded)
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '403':
+                    $ref: '#/components/responses/Forbidden'
+                '404':
+                    $ref: '#/components/responses/NotFound'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /internal/auth/introspect:
+        post:
+            operationId: introspectAuth
+            summary: Resolve device state and wallet membership for another service
+            tags:
+                - internal
+            security:
+                - internalAuth: []
+            requestBody:
+                $ref: '#/components/requestBodies/AuthIntrospect'
+            responses:
+                '200':
+                    $ref: '#/components/responses/IntrospectResult'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /auth/.well-known/jwks.json:
+        get:
+            operationId: getJwks
+            summary: Get public keys for verifying device access tokens
+            tags:
+                - auth
+            security: []
+            responses:
+                '200':
+                    $ref: '#/components/responses/Jwks'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/devices/challenge:
+        get:
+            operationId: getDeviceChallenge
+            summary: Mint a stateless HMAC challenge for device registration
+            tags:
+                - auth
+            security: []
+            responses:
+                '200':
+                    $ref: '#/components/responses/AuthChallenge'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/devices/register:
+        post:
+            operationId: registerDevice
+            summary: Register a device and issue its first token pair
+            tags:
+                - auth
+            security: []
+            parameters:
+                - $ref: '#/components/parameters/FirebaseUserHeader'
+            requestBody:
+                $ref: '#/components/requestBodies/DeviceRegister'
+            responses:
+                '200':
+                    $ref: '#/components/responses/DeviceTokens'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '409':
+                    $ref: '#/components/responses/Conflict'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/devices/refresh:
+        post:
+            operationId: refreshDevice
+            summary: Rotate a device token pair
+            tags:
+                - auth
+            security: []
+            requestBody:
+                $ref: '#/components/requestBodies/DeviceRefresh'
+            responses:
+                '200':
+                    $ref: '#/components/responses/DeviceTokens'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/devices/logout:
+        post:
+            operationId: logoutDevice
+            summary: Revoke a device and detach all its wallets
+            tags:
+                - auth
+            security:
+                - deviceJWT: []
+            responses:
+                '200':
+                    $ref: '#/components/responses/Ok'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/devices/bindings:
+        post:
+            operationId: getDeviceBindings
+            summary: Reconcile a client's wallet list with the device's bindings
+            tags:
+                - auth
+            security:
+                - deviceJWT: []
+            parameters:
+                - $ref: '#/components/parameters/FirebaseUserHeader'
+            requestBody:
+                $ref: '#/components/requestBodies/DeviceBindingsRequest'
+            responses:
+                '200':
+                    $ref: '#/components/responses/DeviceBindingsResult'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/wallets/register:
+        post:
+            operationId: registerWallets
+            summary: Bind wallets to the calling device
+            tags:
+                - auth
+            security:
+                - deviceJWT: []
+            parameters:
+                - $ref: '#/components/parameters/FirebaseUserHeader'
+            requestBody:
+                $ref: '#/components/requestBodies/WalletRegisterBatch'
+            responses:
+                '200':
+                    $ref: '#/components/responses/WalletRegisterResults'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '429':
+                    $ref: '#/components/responses/TooManyRequests'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/wallets/unregister:
+        post:
+            operationId: unregisterWallets
+            summary: Detach wallets from the calling device
+            tags:
+                - auth
+            security:
+                - deviceJWT: []
+            requestBody:
+                $ref: '#/components/requestBodies/WalletUnregisterBatch'
+            responses:
+                '200':
+                    $ref: '#/components/responses/WalletUnregisterResult'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+
+    /api/v2/wallets/push/subscribe:
+        post:
+            operationId: subscribeDevicePush
+            summary: Attach a device to its wallets' push notifications
+            tags:
+                - auth
+            security:
+                - deviceJWT: []
+            parameters:
+                - $ref: '#/components/parameters/FirebaseUserHeader'
+            requestBody:
+                $ref: '#/components/requestBodies/WalletPushSubscribe'
+            responses:
+                '200':
+                    $ref: '#/components/responses/Ok'
+                '400':
+                    $ref: '#/components/responses/BadRequest'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+                '502':
+                    $ref: '#/components/responses/BadGateway'
+
+    /api/v2/wallets/push/unsubscribe:
+        post:
+            operationId: unsubscribeDevicePush
+            summary: Detach a device from all push notifications
+            tags:
+                - auth
+            security:
+                - deviceJWT: []
+            responses:
+                '200':
+                    $ref: '#/components/responses/Ok'
+                '401':
+                    $ref: '#/components/responses/Unauthorized'
+                '500':
+                    $ref: '#/components/responses/InternalError'
+                '502':
+                    $ref: '#/components/responses/BadGateway'

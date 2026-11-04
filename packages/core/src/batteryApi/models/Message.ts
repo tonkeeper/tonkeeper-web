@@ -43,116 +43,78 @@ import {
 export interface Message {
     /**
      * 
-     * @type {string}
-     * @memberof Message
      */
     msgType: MessageMsgTypeEnum;
     /**
      * 
-     * @type {number}
-     * @memberof Message
      */
     createdLt: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof Message
      */
     ihrDisabled: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof Message
      */
     bounce: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof Message
      */
     bounced: boolean;
     /**
      * 
-     * @type {number}
-     * @memberof Message
      */
     value: number;
     /**
      * 
-     * @type {Array<ExtraCurrency>}
-     * @memberof Message
      */
     valueExtra?: Array<ExtraCurrency>;
     /**
      * 
-     * @type {number}
-     * @memberof Message
      */
     fwdFee: number;
     /**
      * 
-     * @type {number}
-     * @memberof Message
      */
     ihrFee: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof Message
      */
     destination?: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof Message
      */
     source?: AccountAddress;
     /**
      * 
-     * @type {number}
-     * @memberof Message
      */
     importFee: number;
     /**
      * 
-     * @type {number}
-     * @memberof Message
      */
     createdAt: number;
     /**
      * 
-     * @type {string}
-     * @memberof Message
      */
     opCode?: string;
     /**
      * 
-     * @type {StateInit}
-     * @memberof Message
      */
     init?: StateInit;
     /**
      * 
-     * @type {string}
-     * @memberof Message
      */
     hash: string;
     /**
      * hex-encoded BoC with raw message body
-     * @type {string}
-     * @memberof Message
      */
     rawBody?: string;
     /**
      * 
-     * @type {string}
-     * @memberof Message
      */
     decodedOpName?: string;
     /**
      * 
-     * @type {any}
-     * @memberof Message
      */
     decodedBody?: any | null;
 }
@@ -164,7 +126,7 @@ export interface Message {
 export const MessageMsgTypeEnum = {
     IntMsg: 'int_msg',
     ExtInMsg: 'ext_in_msg',
-    ExtOutMsg: 'ext_out_msg'
+    ExtOutMsg: 'ext_out_msg',
 } as const;
 export type MessageMsgTypeEnum = typeof MessageMsgTypeEnum[keyof typeof MessageMsgTypeEnum];
 
@@ -173,16 +135,16 @@ export type MessageMsgTypeEnum = typeof MessageMsgTypeEnum[keyof typeof MessageM
  * Check if a given object implements the Message interface.
  */
 export function instanceOfMessage(value: object): value is Message {
-    if (!('msgType' in value) || value['msgType'] === undefined) return false;
-    if (!('createdLt' in value) || value['createdLt'] === undefined) return false;
-    if (!('ihrDisabled' in value) || value['ihrDisabled'] === undefined) return false;
+    if ((!('msgType' in (value as Record<string, any>)) && !('msg_type' in (value as Record<string, any>))) || ((value as Record<string, any>)['msgType'] === undefined && (value as Record<string, any>)['msg_type'] === undefined)) return false;
+    if ((!('createdLt' in (value as Record<string, any>)) && !('created_lt' in (value as Record<string, any>))) || ((value as Record<string, any>)['createdLt'] === undefined && (value as Record<string, any>)['created_lt'] === undefined)) return false;
+    if ((!('ihrDisabled' in (value as Record<string, any>)) && !('ihr_disabled' in (value as Record<string, any>))) || ((value as Record<string, any>)['ihrDisabled'] === undefined && (value as Record<string, any>)['ihr_disabled'] === undefined)) return false;
     if (!('bounce' in value) || value['bounce'] === undefined) return false;
     if (!('bounced' in value) || value['bounced'] === undefined) return false;
     if (!('value' in value) || value['value'] === undefined) return false;
-    if (!('fwdFee' in value) || value['fwdFee'] === undefined) return false;
-    if (!('ihrFee' in value) || value['ihrFee'] === undefined) return false;
-    if (!('importFee' in value) || value['importFee'] === undefined) return false;
-    if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
+    if ((!('fwdFee' in (value as Record<string, any>)) && !('fwd_fee' in (value as Record<string, any>))) || ((value as Record<string, any>)['fwdFee'] === undefined && (value as Record<string, any>)['fwd_fee'] === undefined)) return false;
+    if ((!('ihrFee' in (value as Record<string, any>)) && !('ihr_fee' in (value as Record<string, any>))) || ((value as Record<string, any>)['ihrFee'] === undefined && (value as Record<string, any>)['ihr_fee'] === undefined)) return false;
+    if ((!('importFee' in (value as Record<string, any>)) && !('import_fee' in (value as Record<string, any>))) || ((value as Record<string, any>)['importFee'] === undefined && (value as Record<string, any>)['import_fee'] === undefined)) return false;
+    if ((!('createdAt' in (value as Record<string, any>)) && !('created_at' in (value as Record<string, any>))) || ((value as Record<string, any>)['createdAt'] === undefined && (value as Record<string, any>)['created_at'] === undefined)) return false;
     if (!('hash' in value) || value['hash'] === undefined) return false;
     return true;
 }
@@ -215,15 +177,15 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
         'hash': json['hash'],
         'rawBody': json['raw_body'] == null ? undefined : json['raw_body'],
         'decodedOpName': json['decoded_op_name'] == null ? undefined : json['decoded_op_name'],
-        'decodedBody': json['decoded_body'] == null ? undefined : json['decoded_body'],
+        'decodedBody': json['decoded_body'] === undefined ? undefined : json['decoded_body'] === null ? null : json['decoded_body'],
     };
 }
 
-  export function MessageToJSON(json: any): Message {
-      return MessageToJSONTyped(json, false);
-  }
+export function MessageToJSON(json: any): Message {
+    return MessageToJSONTyped(json, false);
+}
 
-  export function MessageToJSONTyped(value?: Message | null, ignoreDiscriminator: boolean = false): any {
+export function MessageToJSONTyped(value?: Message | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

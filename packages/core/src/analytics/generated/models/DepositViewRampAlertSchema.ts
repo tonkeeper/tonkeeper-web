@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddFundsOptionSchema } from './AddFundsOptionSchema';
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
 /**
  * User sees the external app alert modal (e.g. "Mercuryo — You are opening an external app not operated by Tonkeeper") before being sent to the onramp provider
@@ -12,10 +13,7 @@ export type DepositViewRampAlertSchema = {
     eventName: string;
     from: RampSourceSchema;
     add_funds_option: AddFundsOptionSchema;
-    /**
-     * Carried from deposit_click_asset
-     */
-    buy_asset: string;
+    buy_asset: AssetSchema;
     /**
      * Carried from deposit_view_fiat_payment_method
      */
@@ -25,7 +23,7 @@ export type DepositViewRampAlertSchema = {
      */
     payment_method: string;
     /**
-     * Carried from deposit_view_ramp_amount
+     * Carried from deposit_view_ramp_insert_amount
      */
     provider_name: string;
     /**

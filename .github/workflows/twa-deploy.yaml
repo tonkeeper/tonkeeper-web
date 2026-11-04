@@ -4,7 +4,8 @@ on:
     workflow_call:
         inputs:
             branch:
-                description: 'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
+                description:
+                    'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
                 required: true
                 type: string
         secrets:
@@ -15,13 +16,14 @@ on:
     workflow_dispatch:
         inputs:
             branch:
-                description: 'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
+                description:
+                    'Cloudflare Pages branch name to deploy to (under the tonkeeper-web project)'
                 required: true
                 type: string
                 default: 'twa-recovery'
 
 env:
-    node-version: 20.11.1
+    node-version: 22.22.2
 
 jobs:
     twa-build:

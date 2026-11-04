@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface IOSBatteryPurchaseStatusTransactionsInnerError {
     /**
      * 
-     * @type {string}
-     * @memberof IOSBatteryPurchaseStatusTransactionsInnerError
      */
     msg: string;
     /**
      * 
-     * @type {string}
-     * @memberof IOSBatteryPurchaseStatusTransactionsInnerError
      */
     code: IOSBatteryPurchaseStatusTransactionsInnerErrorCodeEnum;
 }
@@ -43,7 +39,7 @@ export const IOSBatteryPurchaseStatusTransactionsInnerErrorCodeEnum = {
     UserNotFound: 'user-not-found',
     PurchaseIsAlreadyUsed: 'purchase-is-already-used',
     TemporaryError: 'temporary-error',
-    Unknown: 'unknown'
+    Unknown: 'unknown',
 } as const;
 export type IOSBatteryPurchaseStatusTransactionsInnerErrorCodeEnum = typeof IOSBatteryPurchaseStatusTransactionsInnerErrorCodeEnum[keyof typeof IOSBatteryPurchaseStatusTransactionsInnerErrorCodeEnum];
 
@@ -72,11 +68,11 @@ export function IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSONTyped(json
     };
 }
 
-  export function IOSBatteryPurchaseStatusTransactionsInnerErrorToJSON(json: any): IOSBatteryPurchaseStatusTransactionsInnerError {
-      return IOSBatteryPurchaseStatusTransactionsInnerErrorToJSONTyped(json, false);
-  }
+export function IOSBatteryPurchaseStatusTransactionsInnerErrorToJSON(json: any): IOSBatteryPurchaseStatusTransactionsInnerError {
+    return IOSBatteryPurchaseStatusTransactionsInnerErrorToJSONTyped(json, false);
+}
 
-  export function IOSBatteryPurchaseStatusTransactionsInnerErrorToJSONTyped(value?: IOSBatteryPurchaseStatusTransactionsInnerError | null, ignoreDiscriminator: boolean = false): any {
+export function IOSBatteryPurchaseStatusTransactionsInnerErrorToJSONTyped(value?: IOSBatteryPurchaseStatusTransactionsInnerError | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

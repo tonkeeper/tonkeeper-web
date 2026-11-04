@@ -3,7 +3,7 @@ import { LedgerIndexesSettingsNotification } from './modals/LedgerIndexesSetting
 import { MAMIndexesSettingsNotification } from './modals/MAMIndexesSettingsNotification';
 import { RenameNotificationControlled } from './modals/RenameNotificationControlled';
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
-import { AddWalletNotificationControlled } from './modals/AddWalletNotificationControlled';
+import { AddWalletFlow } from './modals/AddWalletFlow';
 import { ConfirmDiscardNotificationControlled } from './modals/ConfirmDiscardNotificationControlled';
 import { MultisigOrderNotificationControlled } from './modals/MultisigOrderNotificationControlled';
 import { DeleteAccountNotificationControlled } from './modals/DeleteAccountNotificationControlled';
@@ -32,7 +32,7 @@ export const ModalsRoot = () => {
             <MAMIndexesSettingsNotification />
             <RenameNotificationControlled />
             <RecoveryNotificationControlled />
-            <AddWalletNotificationControlled />
+            <AddWalletFlow />
             <ConfirmDiscardNotificationControlled />
             <MultisigOrderNotificationControlled />
             <DeleteAccountNotificationControlled />

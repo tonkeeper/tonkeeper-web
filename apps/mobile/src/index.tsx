@@ -1,3 +1,4 @@
+import './wallet-core-wasm-path';
 import { migrateCapacitorStorage } from './libs/storage';
 import { capacitorFileLogger } from './libs/logger';
 

@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface EnterpriseEstimate200Response {
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseEstimate200Response
      */
     estimatedUpfrontPayment: string;
     /**
      * base64 encoded emulation results. The exact type can be taken from /v2/wallet/emulate (TONAPI).
-     * @type {string}
-     * @memberof EnterpriseEstimate200Response
      */
     emulation?: string;
 }
@@ -37,7 +33,7 @@ export interface EnterpriseEstimate200Response {
  * Check if a given object implements the EnterpriseEstimate200Response interface.
  */
 export function instanceOfEnterpriseEstimate200Response(value: object): value is EnterpriseEstimate200Response {
-    if (!('estimatedUpfrontPayment' in value) || value['estimatedUpfrontPayment'] === undefined) return false;
+    if ((!('estimatedUpfrontPayment' in (value as Record<string, any>)) && !('estimated_upfront_payment' in (value as Record<string, any>))) || ((value as Record<string, any>)['estimatedUpfrontPayment'] === undefined && (value as Record<string, any>)['estimated_upfront_payment'] === undefined)) return false;
     return true;
 }
 
@@ -56,11 +52,11 @@ export function EnterpriseEstimate200ResponseFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function EnterpriseEstimate200ResponseToJSON(json: any): EnterpriseEstimate200Response {
-      return EnterpriseEstimate200ResponseToJSONTyped(json, false);
-  }
+export function EnterpriseEstimate200ResponseToJSON(json: any): EnterpriseEstimate200Response {
+    return EnterpriseEstimate200ResponseToJSONTyped(json, false);
+}
 
-  export function EnterpriseEstimate200ResponseToJSONTyped(value?: EnterpriseEstimate200Response | null, ignoreDiscriminator: boolean = false): any {
+export function EnterpriseEstimate200ResponseToJSONTyped(value?: EnterpriseEstimate200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

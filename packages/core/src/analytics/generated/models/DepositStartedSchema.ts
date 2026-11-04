@@ -3,12 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { RampSourceSchema } from './RampSourceSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
  * User entered the Add Funds screen
  */
 export type DepositStartedSchema = {
     eventName: string;
     from: RampSourceSchema;
+    wallet_mode: WalletModeSchema;
     /**
      * Slugs of the options shown to the user on this screen. Use standard identifier slugs from the backend response.
      *

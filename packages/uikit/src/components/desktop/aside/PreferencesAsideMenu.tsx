@@ -132,7 +132,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const wallets = useAccountsState();
     const { data: isDevMenuVisible } = useDevMenuVisibility();
     const { mutate: setIsDevMenuVisible } = useMutateDevMenuVisibility();
-    const fiatDisplay = fiat === FiatCurrencies.TON ? BRAND_CONFIG.coinSymbol : fiat;
+    const fiatDisplay = fiat === FiatCurrencies.GRAM ? BRAND_CONFIG.coinSymbol : fiat;
 
     const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
 
@@ -327,13 +327,13 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                     onClick={() => {
                         onFiveTaps();
                         sdk.copyToClipboard(
-                            `Tonkeeper Pro for ${sdk.targetEnv} v${sdk.version}`,
+                            `Keeper Pro for ${sdk.targetEnv} v${sdk.version}`,
                             t('copied')
                         );
                     }}
                 >
                     <TonkeeperProOutlineIcon />
-                    <Body2>Tonkeeper Pro {sdk.version}</Body2>
+                    <Body2>Keeper Pro {sdk.version}</Body2>
                 </AsideMenuItemVersion>
             </AsideMenuItemsBlock>
         </PreferencesAsideContainer>

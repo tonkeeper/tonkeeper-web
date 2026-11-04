@@ -25,12 +25,11 @@ import {
 } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { FolderIconOutline, GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
-import { ScrollContainer } from '../../ScrollContainer';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { AsideHeader } from './AsideHeader';
 import { SubscriptionInfoBlock } from './SubscriptionInfoBlock';
-import { useAddWalletNotification } from '../../modals/AddWalletNotificationControlled';
+import { useAddWalletFlow } from '../../modals/AddWalletFlow';
 import { closestCenter, DndContext, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
@@ -47,6 +46,7 @@ import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 import { useManageFolderNotification } from '../../modals/ManageFolderNotificationControlled';
 import { useSortableDndSensors } from '../../../hooks/useSortableDndSensors';
+import { AddMultichainWalletTooltip } from './AddMultichainWalletTooltip';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -308,7 +308,7 @@ const AccountDNDBlock: FC<{
 
 const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { onOpen: addWallet } = useAddWalletNotification();
+    const { onOpen: addWallet } = useAddWalletFlow();
     const { proFeatures } = useAppContext();
     const items = useSideBarItems();
     const navigate = useNavigate();
@@ -318,6 +318,12 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const activeRoute = useAsideActiveRoute();
     const menuController = useMenuController('aside-nav');
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
+
+    const openAddWallet = () => {
+        menuController.close();
+        hideBrowser();
+        addWallet();
+    };
 
     const handleNavigateClick = useCallback(
         (route: string) => {
@@ -379,7 +385,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                 <AsideHeader width={asideWidth} />
             </NotForTargetEnv>
             <AsideContentContainer className={className}>
-                <ScrollContainer ref={ref}>
+                <div ref={ref} className="overflow-auto">
                     <NotForTargetEnv env="mobile">
                         {proFeatures && (
                             <AsideMenuItem
@@ -403,25 +409,20 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         </HideOnReview>
                     </NotForTargetEnv>
                     <AccountDNDBlock items={items} />
-                </ScrollContainer>
+                </div>
                 <AsideMenuBottom>
                     <NotForTargetEnv env="mobile">
                         <DividerStyled isHidden={!closeBottom} />
                     </NotForTargetEnv>
                     <AsideMenuBottomContent>
-                        <AsideMenuItem
-                            isSelected={false}
-                            onClick={() => {
-                                menuController.close();
-                                hideBrowser();
-                                addWallet();
-                            }}
-                        >
-                            <IconWrapper>
-                                <PlusIcon />
-                            </IconWrapper>
-                            <Label2>{t('aside_add_wallet')}</Label2>
-                        </AsideMenuItem>
+                        <AddMultichainWalletTooltip onOpenAddWallet={openAddWallet}>
+                            <AsideMenuItem isSelected={false} onClick={openAddWallet}>
+                                <IconWrapper>
+                                    <PlusIcon />
+                                </IconWrapper>
+                                <Label2>{t('aside_add_wallet')}</Label2>
+                            </AsideMenuItem>
+                        </AddMultichainWalletTooltip>
                         <AsideMenuItem
                             isSelected={false}
                             onClick={() => {

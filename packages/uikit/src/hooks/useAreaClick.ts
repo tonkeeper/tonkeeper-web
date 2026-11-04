@@ -1,8 +1,9 @@
+import { PromotedApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { DAppSource, formatBrowserUrl, DAppTrack } from '@tonkeeper/core/dist/service/urlService';
 import { useCallback, useRef } from 'react';
 import { useAppSdk } from './appSdk';
 import { useEventListener } from './useEventListener';
-import { useCountryContextTracker } from './analytics/events-hooks';
+import { catalogDappIdentity, useTrackDappAppClick } from './analytics/dapp-browser';
 import { useActiveConfig } from '../state/wallet';
 
 export function useAreaClick<T extends HTMLElement = HTMLDivElement>({
@@ -47,20 +48,23 @@ export function useAreaClick<T extends HTMLElement = HTMLDivElement>({
     return ref;
 }
 
-export function useOpenPromotedAppInExternalBrowser(url: string, source: DAppSource) {
+/**
+ * Opens a catalog dApp of the legacy Browser pages in the external browser.
+ * Takes the whole catalog entry, not just its URL — `dapp_app_click` reports
+ * the backend app and campaign ids alongside it.
+ */
+export function useOpenPromotedAppInExternalBrowser(app: PromotedApp, source: DAppSource) {
     const sdk = useAppSdk();
-    const track = useCountryContextTracker();
+    const trackDappAppClick = useTrackDappAppClick();
     const config = useActiveConfig();
 
     return useCallback(() => {
-        track((country: string) => ({
-            eventName: 'dapp_click',
-            from: source === 'featured' ? 'banner' : 'browser',
-            url,
-            location: country
-        }));
-        sdk.openPage(formatBrowserUrl(url, source, config.tonkeeper_utm_track as DAppTrack), {
+        trackDappAppClick({
+            ...catalogDappIdentity(app),
+            from: source === 'featured' ? 'banner' : 'browser'
+        });
+        sdk.openPage(formatBrowserUrl(app.url, source, config.tonkeeper_utm_track as DAppTrack), {
             forceExternalBrowser: true
         });
-    }, [url, sdk, track, config.tonkeeper_utm_track, source]);
+    }, [app, sdk, trackDappAppClick, config.tonkeeper_utm_track, source]);
 }

@@ -1,5 +1,19 @@
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { Account, AccountMultichain } from '@tonkeeper/core/dist/entries/account';
+import { MultichainPromo } from '@tonkeeper/uikit/dist/components/modals/MultichainPromoModal';
+import { HomeMultichain } from '@tonkeeper/uikit/dist/pages/home/multichain/HomeMultichain';
+import { MultichainBackgroundElements } from '@tonkeeper/uikit/dist/pages/home/multichain/MultichainBackgroundElements';
+import { MultichainAssetPage } from '@tonkeeper/uikit/dist/pages/home/multichain/asset/MultichainAssetPage';
+import { MultichainDesktopShell } from '@tonkeeper/uikit/dist/pages/home/multichain/desktop/MultichainDesktopShell';
+import { MultichainHistory } from '@tonkeeper/uikit/dist/pages/home/multichain/history/MultichainHistory';
+import { MultichainCollectiblesPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesPage';
+import { MultichainCollectiblesSettingsPage } from '@tonkeeper/uikit/dist/pages/home/multichain/collectibles/MultichainCollectiblesSettingsPage';
+import { MultichainTradePage } from '@tonkeeper/uikit/dist/pages/home/multichain/trade/MultichainTradePage';
+import { MultichainStakingPositionPage } from '@tonkeeper/uikit/dist/pages/home/multichain/staking/MultichainStakingPositionPage';
+import { MultichainBrowserPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/MultichainBrowserPage';
+import { MultichainSettingsRouting } from '@tonkeeper/uikit/dist/pages/home/multichain/settings/MultichainSettingsRouting';
+import { BrowserCategoryPage } from '@tonkeeper/uikit/dist/pages/home/multichain/browser/BrowserCategoryPage';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
+import { AppLayout } from '@tonkeeper/uikit/dist/components/layout/AppLayout';
 import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
@@ -24,14 +38,16 @@ import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopStakingPage } from '@tonkeeper/uikit/dist/desktop-pages/staking';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { useTrackLaunchApp } from '@tonkeeper/uikit/dist/hooks/analytics/launch-app';
+import { useTrackWalletOpen } from '@tonkeeper/uikit/dist/hooks/analytics/wallet-open';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppProRoute, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppProRoute, AppRoute, MultichainRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import Initialize from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, PropsWithChildren, Suspense, useLayoutEffect, useMemo } from 'react';
-import { Route, Switch, useLocation } from 'react-router-dom';
+import StartScreen from '@tonkeeper/uikit/dist/pages/import/StartScreen';
+import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import React, { FC, Suspense, useMemo } from 'react';
+import { Route, Switch, useLocation, useParams } from 'react-router-dom';
 import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
@@ -46,6 +62,10 @@ const DesktopAccountSettingsPage = React.lazy(
 
 const WebTonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
+);
+const MultichainConnectSubscription = React.lazy(
+    () =>
+        import('@tonkeeper/uikit/dist/pages/home/multichain/connect/MultichainConnectSubscription')
 );
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
@@ -73,11 +93,7 @@ const ConnectLedgerNotification = React.lazy(
 
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
-    
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, sans-serif;
-    }
-    
+
     html, body, #root {
         height: 100%;
         overflow: hidden;
@@ -104,10 +120,6 @@ const GlobalStyle = createGlobalStyle`
     }
 `;
 
-const FullSizeWrapper = styled(Container)`
-    max-width: 800px;
-`;
-
 const Wrapper = styled.div`
     box-sizing: border-box;
     height: 100%;
@@ -115,18 +127,6 @@ const Wrapper = styled.div`
     flex-direction: column;
     background-color: ${props => props.theme.backgroundPage};
     white-space: pre-wrap;
-`;
-
-const WideLayout = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-`;
-
-const WideContent = styled.div`
-    flex: 1;
-    min-width: 0;
-    min-height: 0;
 `;
 
 const WalletLayout = styled.div`
@@ -169,6 +169,8 @@ const DesktopView: FC<{
     useAppWidth(false);
     useRecommendations();
     useTrackLocation();
+    useTrackLaunchApp();
+    useTrackWalletOpen();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
 
@@ -185,25 +187,6 @@ const DesktopView: FC<{
     );
 };
 
-const InitializeContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    min-height: var(--app-height);
-    padding: 1rem;
-    box-sizing: border-box;
-    position: relative;
-    justify-content: center;
-`;
-
-const FullScreen: FC<PropsWithChildren> = ({ children }) => {
-    useLayoutEffect(() => {
-        document.documentElement.classList.add('scroll');
-        return () => {
-            document.documentElement.classList.remove('scroll');
-        };
-    }, []);
-    return <FullSizeWrapper>{children}</FullSizeWrapper>;
-};
 export const DesktopContent: FC<{
     activeAccount?: Account | null;
     lock: boolean;
@@ -214,31 +197,94 @@ export const DesktopContent: FC<{
         return <Unlock />;
     }
 
-    if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
+    const isOnboarding = !activeAccount || location.pathname.startsWith(AppRoute.import);
+
+    if (isOnboarding) {
         return (
-            <FullScreen>
-                <InitializeContainer>
-                    <Initialize />
-                </InitializeContainer>
-            </FullScreen>
+            <AppLayout bare>
+                <StartScreen />
+            </AppLayout>
+        );
+    }
+
+    // Multichain portfolio runs in its own desktop shell — sidebar
+    // (balance + active wallet) + centered 520px content column. The
+    // legacy AppLayout / DesktopTokens chrome is not used.
+    if (activeAccount.type === 'multichain') {
+        const account = activeAccount as AccountMultichain;
+        return (
+            <>
+                <MultichainDesktopShell account={account}>
+                    <Switch>
+                        <Route path={`${MultichainRoute.asset}/:assetId`}>
+                            <MultichainAssetRoute compact />
+                        </Route>
+                        <Route path={MultichainRoute.history}>
+                            <MultichainHistory compact />
+                        </Route>
+                        <Route path={MultichainRoute.collectiblesSettings}>
+                            <MultichainCollectiblesSettingsPage compact />
+                        </Route>
+                        <Route path={MultichainRoute.collectibles}>
+                            <MultichainCollectiblesPage compact />
+                        </Route>
+                        <Route path={MultichainRoute.trade}>
+                            <MultichainTradePage compact />
+                        </Route>
+                        <Route path={`${MultichainRoute.staking}/:poolAddress`}>
+                            <MultichainStakingPositionRoute compact />
+                        </Route>
+                        <Route path={`${MultichainRoute.browserCategory}/:id`}>
+                            <BrowserCategoryPage compact />
+                        </Route>
+                        <Route path={MultichainRoute.browser}>
+                            <MultichainBrowserPage compact />
+                        </Route>
+                        <Route path={MultichainRoute.settings}>
+                            <MultichainSettingsRouting compact />
+                        </Route>
+                        <Route path="*">
+                            <HomeMultichain compact />
+                        </Route>
+                    </Switch>
+                </MultichainDesktopShell>
+                <MultichainBackgroundElements />
+                <Suspense>
+                    <WebTonConnectSubscription />
+                    <UrlTonConnectSubscription />
+                    <MultichainConnectSubscription />
+                </Suspense>
+            </>
         );
     }
 
     return (
-        <WideLayout>
-            <AsideMenu />
-            <WideContent>
-                <Switch>
-                    <Route path={AppProRoute.dashboard} component={DashboardPage} />
-                    <Route path={AppRoute.browser} component={DesktopBrowser} />
-                    <Route path={AppRoute.settings} component={PreferencesContent} />
-                    <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
-                    <Route path={AppRoute.accountSettings} component={DesktopAccountSettingsPage} />
-                    <Route path="*" component={WalletContent} />
-                </Switch>
-            </WideContent>
+        <AppLayout sidebar={<AsideMenu />}>
+            <Switch>
+                <Route path={AppProRoute.dashboard} component={DashboardPage} />
+                <Route path={AppRoute.browser} component={DesktopBrowser} />
+                <Route path={AppRoute.settings} component={PreferencesContent} />
+                <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
+                <Route path={AppRoute.accountSettings} component={DesktopAccountSettingsPage} />
+                <Route path="*" component={WalletContent} />
+            </Switch>
             <BackgroundElements />
-        </WideLayout>
+        </AppLayout>
+    );
+};
+
+const MultichainAssetRoute: FC<{ compact?: boolean }> = ({ compact }) => {
+    const { assetId } = useParams<{ assetId: string }>();
+    return <MultichainAssetPage assetId={decodeURIComponent(assetId)} compact={compact} />;
+};
+
+const MultichainStakingPositionRoute: FC<{ compact?: boolean }> = ({ compact }) => {
+    const { poolAddress } = useParams<{ poolAddress: string }>();
+    return (
+        <MultichainStakingPositionPage
+            poolAddress={decodeURIComponent(poolAddress)}
+            compact={compact}
+        />
     );
 };
 
@@ -309,6 +355,8 @@ const BackgroundElements = () => {
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
             <UrlTonConnectSubscription />
+            <MultichainConnectSubscription />
+            <MultichainPromo />
         </Suspense>
     );
 };

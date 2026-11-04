@@ -1,9 +1,23 @@
 import { IStorage } from '../Storage';
-import { AccountTonMnemonic, isMnemonicAndPassword } from '../entries/account';
+import {
+    AccountMAM,
+    AccountMultichain,
+    AccountTonMnemonic,
+    AccountTonSK,
+    AccountTonTestnet,
+    isSecretBearingAccount
+} from '../entries/account';
 import { AuthPassword } from '../entries/password';
 import { AccountsStorage } from './accountsStorage';
 import { isLegacyEncryptedSecret } from './cryptoService';
 import { decryptWalletSecret, encryptWalletSecret } from './mnemonicService';
+
+type PasswordAuthAccount =
+    | AccountTonMnemonic
+    | AccountTonTestnet
+    | AccountTonSK
+    | AccountMAM
+    | AccountMultichain;
 
 export class PasswordStorage {
     private readonly accountsStorage: AccountsStorage;
@@ -92,11 +106,11 @@ export class PasswordStorage {
         await this.accountsStorage.updateAccountsInState(updatedAccounts);
     }
 
-    private async getPasswordAuthAccounts(): Promise<AccountTonMnemonic[]> {
+    private async getPasswordAuthAccounts(): Promise<PasswordAuthAccount[]> {
         const accounts = await this.accountsStorage.getAccounts();
         return accounts.filter(
-            a => isMnemonicAndPassword(a) && a.auth.kind === 'password'
-        ) as AccountTonMnemonic[];
+            a => isSecretBearingAccount(a) && a.auth.kind === 'password'
+        ) as PasswordAuthAccount[];
     }
 }
 

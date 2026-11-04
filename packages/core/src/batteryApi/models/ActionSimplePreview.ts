@@ -29,38 +29,30 @@ import {
 export interface ActionSimplePreview {
     /**
      * 
-     * @type {string}
-     * @memberof ActionSimplePreview
      */
     name: string;
     /**
      * 
-     * @type {string}
-     * @memberof ActionSimplePreview
      */
     description: string;
     /**
      * a link to an image for this particular action.
-     * @type {string}
-     * @memberof ActionSimplePreview
      */
     actionImage?: string;
     /**
      * 
-     * @type {string}
-     * @memberof ActionSimplePreview
      */
     value?: string;
     /**
+     * the value of this action expressed in the requested fiat currency.
+     */
+    fiatValue?: string;
+    /**
      * a link to an image that depicts this action's asset.
-     * @type {string}
-     * @memberof ActionSimplePreview
      */
     valueImage?: string;
     /**
      * 
-     * @type {Array<AccountAddress>}
-     * @memberof ActionSimplePreview
      */
     accounts: Array<AccountAddress>;
 }
@@ -89,16 +81,17 @@ export function ActionSimplePreviewFromJSONTyped(json: any, ignoreDiscriminator:
         'description': json['description'],
         'actionImage': json['action_image'] == null ? undefined : json['action_image'],
         'value': json['value'] == null ? undefined : json['value'],
+        'fiatValue': json['fiat_value'] == null ? undefined : json['fiat_value'],
         'valueImage': json['value_image'] == null ? undefined : json['value_image'],
         'accounts': ((json['accounts'] as Array<any>).map(AccountAddressFromJSON)),
     };
 }
 
-  export function ActionSimplePreviewToJSON(json: any): ActionSimplePreview {
-      return ActionSimplePreviewToJSONTyped(json, false);
-  }
+export function ActionSimplePreviewToJSON(json: any): ActionSimplePreview {
+    return ActionSimplePreviewToJSONTyped(json, false);
+}
 
-  export function ActionSimplePreviewToJSONTyped(value?: ActionSimplePreview | null, ignoreDiscriminator: boolean = false): any {
+export function ActionSimplePreviewToJSONTyped(value?: ActionSimplePreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -109,6 +102,7 @@ export function ActionSimplePreviewFromJSONTyped(json: any, ignoreDiscriminator:
         'description': value['description'],
         'action_image': value['actionImage'],
         'value': value['value'],
+        'fiat_value': value['fiatValue'],
         'value_image': value['valueImage'],
         'accounts': ((value['accounts'] as Array<any>).map(AccountAddressToJSON)),
     };

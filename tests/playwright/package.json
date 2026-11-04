@@ -11,7 +11,7 @@
         "test": "npx playwright test"
     },
     "devDependencies": {
-        "@playwright/test": "^1.48.1",
+        "@playwright/test": "^1.62.1",
         "@types/node": "^22.7.9",
         "dotenv": "^16.4.5"
     }

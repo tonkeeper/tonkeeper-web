@@ -2,7 +2,13 @@ import { Network } from '../entries/network';
 import { removeLastSlash } from '../utils/url';
 import { trimBuildVersion } from '../utils/appVersion';
 import { intlLocale } from '../entries/language';
-import { Configuration, Middleware, SystemApi } from '../tonkeeperApiGenerated';
+import {
+    Configuration,
+    GetAllKeys200Response,
+    GetPopularApps200ResponseFromJSON,
+    Middleware,
+    SystemApi
+} from '../tonkeeperApiGenerated';
 import type {
     Currency,
     FiatCategory,
@@ -30,6 +36,30 @@ export interface BootParams {
     device_country_code?: string;
 }
 
+/**
+ * Boot-config block explorer for one chain. The URL fields are templates the
+ * app fills in: `url` carries `{tx_hash}`, `token_url` `{token_address}` and
+ * `account_url` `{account_address}`. Token and account templates are absent
+ * on chains that have no such page.
+ */
+export interface TonendpointChainExplorer {
+    chain: string;
+    name: string;
+    url: string;
+    token_url?: string;
+    account_url?: string;
+}
+
+/**
+ * Regional backend host block. `domain` is the HTTP base the client appends
+ * its route paths to; `realtime` is the websocket URL where the backend has
+ * one. Absent blocks mean the host compiled into the app stands.
+ */
+export interface TonendpointEndpoint {
+    domain: string;
+    realtime?: string;
+}
+
 export interface TonendpointConfig {
     flags: {
         disable_staking: boolean;
@@ -44,6 +74,8 @@ export interface TonendpointConfig {
         disable_usde: boolean;
         disable_nfts: boolean;
         disable_crypto_subscription: boolean;
+        /** Default safe-mode state for accounts without their own choice. */
+        safe_mode_enabled: boolean;
     };
 
     ton_connect_bridge: string;
@@ -71,10 +103,18 @@ export interface TonendpointConfig {
     tonkeeperNewsUrl?: string;
     scam_api_url?: string;
     faq_tron_fee_url?: string;
+    stakingInfoUrl?: string;
 
     accountExplorer: string;
     transactionExplorer: string;
     NFTOnExplorerUrl: string;
+    /** Per-chain explorers for multichain assets. Empty when the backend sends none. */
+    explorers: TonendpointChainExplorer[];
+
+    /** Multichain wallet/activity/auth backend; see {@link TonendpointEndpoint}. */
+    multichain?: TonendpointEndpoint;
+    /** Trading (asset catalog / market data) backend; see {@link TonendpointEndpoint}. */
+    trading?: TonendpointEndpoint;
 
     web_swaps_url?: string;
     web_swaps_referral_address?: string;
@@ -90,10 +130,6 @@ export interface TonendpointConfig {
     batteryRefundEndpoint?: string;
     batteryReservedAmount: string;
     disable_battery: boolean;
-    battery_packages: {
-        value: number;
-        image: string;
-    }[];
 
     /**
      * "secret" flag name to determine if the app is on ios review
@@ -133,7 +169,8 @@ export const defaultTonendpointConfig: TonendpointConfig = {
         disable_dapps: false,
         disable_usde: false,
         disable_nfts: false,
-        disable_crypto_subscription: false
+        disable_crypto_subscription: false,
+        safe_mode_enabled: false
     },
     ton_connect_bridge: 'https://bridge.tonapi.io',
     tonapiV2Endpoint: 'https://keeper.tonapi.io',
@@ -146,27 +183,10 @@ export const defaultTonendpointConfig: TonendpointConfig = {
     batteryMeanFees: '0.0026',
     batteryReservedAmount: '0.065',
     disable_battery: false,
-    battery_packages: [
-        {
-            value: 1000,
-            image: 'https://wallet.tonkeeper.com/img/battery/battery-max.png'
-        },
-        {
-            value: 400,
-            image: 'https://wallet.tonkeeper.com/img/battery/battery-100.png'
-        },
-        {
-            value: 250,
-            image: 'https://wallet.tonkeeper.com/img/battery/battery-75.png'
-        },
-        {
-            value: 150,
-            image: 'https://wallet.tonkeeper.com/img/battery/battery-25.png'
-        }
-    ],
     accountExplorer: 'https://tonviewer.com/%s',
     transactionExplorer: 'https://tonviewer.com/transaction/%s',
     NFTOnExplorerUrl: 'https://tonviewer.com/nft/%s',
+    explorers: [],
     featured_play_interval: 1000 * 10,
     mam_max_wallets_without_pro: 3,
     '2fa_tg_confirm_send_message_ttl_seconds': 600,
@@ -196,15 +216,81 @@ export type TonendpoinFiatButton =
     | FiatCategoryItemsInnerInfoButtonsInner;
 export type LayoutByCountry = GetFiatMethods200ResponseDataLayoutByCountryInner;
 
+export interface HomeBannerButton {
+    type: 'link' | 'deeplink';
+    payload: string;
+    title: string;
+}
+
+export interface HomeBanner {
+    id: string;
+    title: string;
+    description: string;
+    image?: string;
+    textColor?: string;
+    backgroundColor?: string;
+    chains?: string[];
+    button?: HomeBannerButton;
+}
+
 /**
- * Raw popular-apps response exactly as the backend declares it in the
- * OpenAPI spec. `url`, `icon` and `poster` are optional here, so this type
- * is useful when you want to inspect every entry the API returned without
- * discarding malformed ones.
+ * Raw popular-apps response as the backend serves it. `url`, `icon` and
+ * `poster` are optional here, so this type is useful when you want to
+ * inspect every entry the API returned without discarding malformed ones.
+ *
+ * The published OpenAPI spec omits the per-app `chains` array the backend
+ * sends and the native clients read, so the generated model is widened with
+ * it here and {@link Tonendpoint.appsPopular} lifts it off the raw body.
  */
-export type RawRecommendations = GetPopularApps200ResponseData;
-export type RawPromotedApp = PopularApp;
-export type RawPromotionCategory = PopularCategory;
+export type RawPromotedApp = PopularApp & {
+    /** Network codes the app targets (`'ton'`, `'eth'`, …); empty = chain-agnostic. */
+    chains: string[];
+};
+export type RawPromotionCategory = Omit<PopularCategory, 'apps'> & { apps: RawPromotedApp[] };
+export type RawRecommendations = Omit<GetPopularApps200ResponseData, 'categories' | 'apps'> & {
+    categories: RawPromotionCategory[];
+    apps: RawPromotedApp[];
+};
+
+const readAppChains = (rawApp: unknown): string[] => {
+    if (typeof rawApp !== 'object' || rawApp === null) {
+        return [];
+    }
+    const { chains, chain } = rawApp as { chains?: unknown; chain?: unknown };
+    if (Array.isArray(chains)) {
+        return chains.filter((code): code is string => typeof code === 'string' && code !== '');
+    }
+    // Older backends tagged an app with a single `chain` string.
+    return typeof chain === 'string' && chain !== '' ? [chain] : [];
+};
+
+const withAppChains = (apps: PopularApp[], rawApps: unknown): RawPromotedApp[] =>
+    apps.map((app, index) => ({
+        ...app,
+        chains: readAppChains(Array.isArray(rawApps) ? rawApps[index] : undefined)
+    }));
+
+const toRawRecommendations = (
+    data: GetPopularApps200ResponseData,
+    rawData: unknown
+): RawRecommendations => {
+    const raw = (typeof rawData === 'object' && rawData !== null ? rawData : {}) as {
+        apps?: unknown;
+        categories?: unknown;
+    };
+    const rawCategories = Array.isArray(raw.categories) ? raw.categories : [];
+    return {
+        ...data,
+        apps: withAppChains(data.apps, raw.apps),
+        categories: data.categories.map((category, index) => ({
+            ...category,
+            apps: withAppChains(
+                category.apps,
+                (rawCategories[index] as { apps?: unknown } | undefined)?.apps
+            )
+        }))
+    };
+};
 
 /**
  * Narrowed views used by the browser UI. They only add the fields that the
@@ -212,18 +298,18 @@ export type RawPromotionCategory = PopularCategory;
  * for the carousel). Use the type guards below to promote raw entries to
  * these narrowed shapes after runtime validation.
  */
-export type PromotedApp = PopularApp & { url: string; icon: string };
+export type PromotedApp = RawPromotedApp & { url: string; icon: string };
 export type CarouselApp = PromotedApp & { poster: string };
-export type PromotionCategory = Omit<PopularCategory, 'apps'> & { apps: PromotedApp[] };
-export type Recommendations = Omit<GetPopularApps200ResponseData, 'categories' | 'apps'> & {
+export type PromotionCategory = Omit<RawPromotionCategory, 'apps'> & { apps: PromotedApp[] };
+export type Recommendations = Omit<RawRecommendations, 'categories' | 'apps'> & {
     categories: PromotionCategory[];
     apps: CarouselApp[];
 };
 
-export const isPromotedApp = (app: PopularApp): app is PromotedApp =>
+export const isPromotedApp = (app: RawPromotedApp): app is PromotedApp =>
     typeof app.url === 'string' && typeof app.icon === 'string';
 
-export const isCarouselApp = (app: PopularApp): app is CarouselApp =>
+export const isCarouselApp = (app: RawPromotedApp): app is CarouselApp =>
     isPromotedApp(app) && typeof app.poster === 'string';
 
 const PRIMARY_BOOT_PATH = 'https://boot.tonkeeper.com';
@@ -312,24 +398,31 @@ export class Tonendpoint {
 
     boot = async (network: Network): Promise<TonendpointConfig> => {
         /**
-         * NOTE: the OpenAPI spec marks `GET /keys` as deprecated and points
-         * to `GET /v2/keys` as the successor, but per the backend team that
-         * flag is incorrect — `/v2/keys` does not actually work in production
-         * and `/keys` is the real, supported endpoint. There is no plan to
-         * migrate; we just call `/keys` and wait for the spec to be corrected.
+         * `/keys/all` returns every network's block in one payload. Its
+         * per-network blocks are the `/keys` payload plus `explorers`, which
+         * the backend ships only on the combined endpoint (the one iOS reads).
+         * `/v2/keys` is marked as the successor in the spec but does not work
+         * in production, so it is not an option.
          */
-        const attempt = () => this.systemApi(this.bootPath, { network }).getKeys({});
+        const attempt = () => this.systemApi(this.bootPath, { network }).getAllKeys({});
 
-        let result: TonendpointConfig;
+        let all: GetAllKeys200Response;
         try {
-            result = (await attempt()) as TonendpointConfig;
+            all = await attempt();
         } catch (e) {
             if (this.switchToFallbackBootPath) {
                 throw e;
             }
             console.error(e);
             this.switchToFallbackBootPath = true;
-            result = (await attempt()) as TonendpointConfig;
+            all = await attempt();
+        }
+
+        const result = (network === Network.TESTNET ? all.testnet : all.mainnet) as
+            | TonendpointConfig
+            | undefined;
+        if (!result) {
+            throw new Error(`Boot config has no "${network}" block`);
         }
 
         if (result.tonkeeper_api_url) {
@@ -350,12 +443,38 @@ export class Tonendpoint {
         return response.data;
     };
 
-    appsPopular = async (): Promise<RawRecommendations> => {
-        const response = await this.systemApi(this.tonkeeperApiUrl).getPopularApps({});
-        if (!response.success || !response.data) {
+    /**
+     * `walletId` is the multichain wallet's stable id. With it the backend
+     * serves the wallet-scoped multichain catalog; without it, the TON-only
+     * one the legacy Browser renders. Same contract as the native apps.
+     */
+    appsPopular = async (walletId?: string): Promise<RawRecommendations> => {
+        // The typed parser drops fields the spec doesn't declare, so the body
+        // is read once as JSON and the per-app `chains` are taken from it.
+        const response = await this.systemApi(
+            this.tonkeeperApiUrl,
+            undefined,
+            walletId ? { wallet_id: walletId } : undefined
+        ).getPopularAppsRaw({});
+        const json: unknown = await response.raw.json();
+        const parsed = GetPopularApps200ResponseFromJSON(json);
+        if (!parsed.success || !parsed.data) {
             throw new Error('Failed to get "/apps/popular" data');
         }
-        return response.data;
+        return toRawRecommendations(parsed.data, (json as { data?: unknown }).data);
+    };
+
+    banners = async (walletId?: string): Promise<HomeBanner[]> => {
+        const url = new URL(`${this.tonkeeperApiUrl}/banners`);
+        Object.entries(this.getCommonQueryParams()).forEach(([key, value]) =>
+            url.searchParams.set(key, value)
+        );
+        if (walletId) url.searchParams.set('wallet_id', walletId);
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to get "/banners" data (${response.status})`);
+        const data = (await response.json()) as { banners?: HomeBanner[] };
+        return Array.isArray(data.banners) ? data.banners : [];
     };
 
     public supportedCurrencies = async (): Promise<Currency[]> => {
@@ -363,11 +482,17 @@ export class Tonendpoint {
         return response.currencies;
     };
 
-    private systemApi(basePath: string, rewrite?: Partial<BootParams>): SystemApi {
+    private systemApi(
+        basePath: string,
+        rewrite?: Partial<BootParams>,
+        extraQuery?: Record<string, string>
+    ): SystemApi {
         return new SystemApi(
             new Configuration({
                 basePath,
-                middleware: [extraQueryMiddleware(toCommonQuery(this.params, rewrite))]
+                middleware: [
+                    extraQueryMiddleware({ ...toCommonQuery(this.params, rewrite), ...extraQuery })
+                ]
             })
         );
     }

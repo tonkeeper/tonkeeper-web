@@ -25,6 +25,7 @@ import {
 } from './dApp/tonConnectService';
 import { createTonapiRequest } from './backgroundTonapiService';
 import { processInterceptTonLink } from './backgroundTonLinkService';
+import { evmNotifyDisconnected, handleEvmRequest, isEvmMethod } from './dApp/evmService';
 
 const contentScriptPorts = new Set<browser.Runtime.Port>();
 
@@ -137,9 +138,25 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
             );
         }
         case 'tonLink_intercept': {
-            return processInterceptTonLink(origin, message.params[0] as string);
+            const isConnected = await isDappConnectedToExtension(origin);
+            if (!isConnected) {
+                throw new TonConnectError(
+                    "dApp don't have an access to wallet",
+                    CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+                );
+            }
+            return processInterceptTonLink(origin, message.params[0]);
         }
         default:
+            if (isEvmMethod(message.method)) {
+                return handleEvmRequest(
+                    message.id,
+                    origin,
+                    message.method,
+                    message.params,
+                    message.pageMeta
+                );
+            }
             throw new TonConnectError(
                 `Method "${message.method}" not implemented`,
                 CONNECT_EVENT_ERROR_CODES.METHOD_NOT_SUPPORTED
@@ -148,6 +165,23 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
 };
 
 export const subscriptionDAppNotifications = () => {
+    backgroundEventsEmitter.on('evmEvent', message => {
+        const { origins, name, data } = message.params;
+        [...contentScriptPorts.values()]
+            .filter(p => p.sender?.url && origins.includes(new URL(p.sender.url).origin))
+            .forEach(port => {
+                try {
+                    port.postMessage({ type: 'TonkeeperEvmEvent', event: { name, data } });
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+    });
+
+    backgroundEventsEmitter.on('evmDisconnect', message => {
+        evmNotifyDisconnected(message.params);
+    });
+
     backgroundEventsEmitter.on('tonConnectDisconnect', async message => {
         const dappHosts = message.params.map(parap => new URL(parap).host);
         const ports = [...contentScriptPorts.values()].filter(

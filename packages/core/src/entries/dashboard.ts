@@ -156,6 +156,11 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             return baseInfo;
         case 'ton-multisig':
             return baseInfo + ' ' + 'multisig';
+        case 'multichain':
+            if (account.allTonWallets.length === 1) {
+                return baseInfo;
+            }
+            return baseInfo + ' ' + walletVersionText(account.getTonWallet(walletId)?.version ?? 0);
         default:
             return assertUnreachable(account);
     }

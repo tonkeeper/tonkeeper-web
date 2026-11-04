@@ -1,0 +1,8 @@
+# This origin still holds wallet vaults and hands them over on consent, so it
+# is never framed, loads nothing but itself, and talks to no server at all.
+# No Cross-Origin-Opener-Policy: the handoff popup has to reach its opener.
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff

@@ -19,7 +19,7 @@ export const SendAction: FC<{ asset?: string; chain?: BLOCKCHAIN_NAME }> = ({ as
                     params: {
                         jetton: asset,
                         chain: chain,
-                        from: asset === 'TON' ? 'wallet' : 'token'
+                        from: !asset || asset === 'TON' ? 'wallet' : 'token'
                     } as TransferInitParams
                 })
             }

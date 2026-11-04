@@ -8,13 +8,15 @@ import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonCon
 import { atom, replaySubject } from '@tonkeeper/core/dist/entries/atom';
 import type { UpdateInfo } from './electron/updateCheck';
 
-const tcRequests$ = atom<string>(undefined);
+const tcRequests$ = atom<{ url: string; isColdStart: boolean }>(undefined);
 const tonConnectRequests$ = replaySubject<TonConnectAppRequestPayload>('all');
 const tonConnectDisconnects$ = replaySubject<AccountConnection>('all');
 const refreshes$ = replaySubject<void>('all');
 const updateAvailable$ = atom<UpdateInfo>(undefined);
 
-ipcRenderer.on('tc', (_event, value) => tcRequests$.next(value));
+ipcRenderer.on('tc', (_event, url: string, isColdStart?: boolean) =>
+    tcRequests$.next({ url, isColdStart: isColdStart === true })
+);
 ipcRenderer.on('tonConnectRequest', (_event, value: TonConnectAppRequestPayload) =>
     tonConnectRequests$.next(value)
 );
@@ -31,10 +33,10 @@ contextBridge.exposeInMainWorld('backgroundApi', {
     chrome: () => process.versions.chrome,
     electron: () => process.versions.electron,
     message: (message: Message) => ipcRenderer.invoke('message', message),
-    onTonConnect: (callback: (url: string) => void) => {
-        tcRequests$.subscribe(callback);
+    onTonConnect: (callback: (url: string, isColdStart: boolean) => void) => {
+        tcRequests$.subscribe(value => callback(value.url, value.isColdStart));
         if (tcRequests$.value !== undefined) {
-            callback(tcRequests$.value);
+            callback(tcRequests$.value.url, tcRequests$.value.isColdStart);
         }
     },
     onTonConnectRequest: (callback: (value: TonConnectAppRequestPayload) => void) => {

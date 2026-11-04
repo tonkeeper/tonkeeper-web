@@ -12,23 +12,27 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  GetTonConnectPayloadDefaultResponse,
-  TonConnectProof200Response,
-  TonConnectProofRequest,
-} from '../models/index';
 import {
+    type GetTonConnectPayloadDefaultResponse,
     GetTonConnectPayloadDefaultResponseFromJSON,
     GetTonConnectPayloadDefaultResponseToJSON,
+} from '../models/GetTonConnectPayloadDefaultResponse';
+import {
+    type TonConnectProof200Response,
     TonConnectProof200ResponseFromJSON,
     TonConnectProof200ResponseToJSON,
+} from '../models/TonConnectProof200Response';
+import {
+    type TonConnectProofRequest,
     TonConnectProofRequestFromJSON,
     TonConnectProofRequestToJSON,
-} from '../models/index';
+} from '../models/TonConnectProofRequest';
 
 export interface TonConnectProofOperationRequest {
+    /**
+     * 
+     */
     tonConnectProofRequest: TonConnectProofRequest;
 }
 
@@ -39,6 +43,14 @@ export interface TonConnectProofOperationRequest {
  * @interface WalletApiInterface
  */
 export interface WalletApiInterface {
+    /**
+     * Creates request options for tonConnectProof without sending the request
+     * @param {TonConnectProofRequest} tonConnectProofRequest Data that is expected from TON Connect
+     * @throws {RequiredError}
+     * @memberof WalletApiInterface
+     */
+    tonConnectProofRequestOpts(requestParameters: TonConnectProofOperationRequest): Promise<runtime.RequestOpts>;
+
     /**
      * Account verification and token issuance
      * @param {TonConnectProofRequest} tonConnectProofRequest Data that is expected from TON Connect
@@ -61,9 +73,9 @@ export interface WalletApiInterface {
 export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
 
     /**
-     * Account verification and token issuance
+     * Creates request options for tonConnectProof without sending the request
      */
-    async tonConnectProofRaw(requestParameters: TonConnectProofOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TonConnectProof200Response>> {
+    async tonConnectProofRequestOpts(requestParameters: TonConnectProofOperationRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['tonConnectProofRequest'] == null) {
             throw new runtime.RequiredError(
                 'tonConnectProofRequest',
@@ -77,13 +89,24 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        const response = await this.request({
-            path: `/tonconnect/proof`,
+
+        let urlPath = `/tonconnect/proof`;
+
+        return {
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: TonConnectProofRequestToJSON(requestParameters['tonConnectProofRequest']),
-        }, initOverrides);
+        };
+    }
+
+    /**
+     * Account verification and token issuance
+     */
+    async tonConnectProofRaw(requestParameters: TonConnectProofOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TonConnectProof200Response>> {
+        const requestOptions = await this.tonConnectProofRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TonConnectProof200ResponseFromJSON(jsonValue));
     }

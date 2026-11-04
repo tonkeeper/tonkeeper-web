@@ -1,45 +1,16 @@
-import { Notification } from '@tonkeeper/uikit/dist/components/Notification';
 import { FC, useState } from 'react';
-import styled from 'styled-components';
-import { Body1, Button, H2 } from '@tonkeeper/uikit';
+import { Button } from '@tonkeeper/uikit/dist/primitives/Button';
+import { Checkbox } from '@tonkeeper/uikit/dist/primitives/Checkbox';
+import { Modal } from '@tonkeeper/uikit/dist/primitives/Modal';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
-import { Checkbox } from '@tonkeeper/uikit/dist/components/fields/Checkbox';
 import { useMutateGlobalPreferences } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useDeeplinkHandlers } from '@tonkeeper/uikit/dist/hooks/deeplinks/useDeeplinkHandlers';
-
-const ContentWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    text-wrap: balance;
-
-    > svg {
-        margin-bottom: 12px;
-        color: ${p => p.theme.accentBlue};
-    }
-
-    > ${H2} {
-        margin-bottom: 4px;
-        display: block;
-        padding: 0 16px;
-    }
-
-    > ${Body1} {
-        color: ${p => p.theme.textSecondary};
-        margin-bottom: 16px;
-        display: block;
-        padding: 0 32px;
-    }
-`;
-
-const CheckboxStyled = styled(Checkbox)`
-    margin-top: 26px;
-`;
+import { TonLinkOpenTarget } from '../libs/tonTransferLink';
 
 const LinkIcon = () => {
     return (
         <svg
+            className="mb-3 text-accentBlue"
             xmlns="http://www.w3.org/2000/svg"
             width="84"
             height="84"
@@ -54,66 +25,78 @@ const LinkIcon = () => {
     );
 };
 
-type TonLinkForm = { rememberChoice: boolean; processInExtension: boolean };
-
 export const InterceptTonLinkNotification: FC<{
-    handleClose: (processInExtension?: boolean) => void;
+    handleClose: (target?: TonLinkOpenTarget) => void;
+    origin?: string;
     url: string | null;
-}> = ({ url, handleClose }) => {
+}> = ({ origin, url, handleClose }) => {
     const { mutateAsync: saveGlobalPreferences } = useMutateGlobalPreferences();
     const { mutateAsync: processOpenedLink } = useDeeplinkHandlers();
 
-    const onSubmit = async ({ rememberChoice, processInExtension }: TonLinkForm) => {
+    const onSubmit = async (target: TonLinkOpenTarget, rememberChoice: boolean) => {
         if (!url) return;
         if (rememberChoice) {
             await saveGlobalPreferences({
-                interceptTonLinks: processInExtension ? 'always' : 'never'
+                interceptTonLinks: target === 'extension' ? 'always' : 'never'
             });
         }
 
-        handleClose(processInExtension);
+        handleClose(target);
 
-        if (processInExtension) {
+        if (target === 'extension') {
             await processOpenedLink(url);
         }
     };
 
     return (
-        <Notification isOpen={!!url} handleClose={handleClose}>
-            {() => <Content onSubmit={onSubmit} />}
-        </Notification>
+        <Modal isOpen={!!url} onClose={() => handleClose()}>
+            {url && <Content origin={origin} url={url} onSubmit={onSubmit} />}
+        </Modal>
     );
 };
 
-const Content: FC<{ onSubmit: (form: TonLinkForm) => void }> = ({ onSubmit }) => {
+const Content: FC<{
+    origin?: string;
+    url: string;
+    onSubmit: (target: TonLinkOpenTarget, rememberChoice: boolean) => void;
+}> = ({ origin, url, onSubmit }) => {
     const { t } = useTranslation();
     const [rememberChoice, setRememberChoice] = useState(false);
 
     return (
-        <ContentWrapper>
+        <div className="flex flex-col items-center px-6 pb-4 text-center [text-wrap:balance]">
             <LinkIcon />
-            <H2>{t('links_interceptor_modal_title')}</H2>
-            <Body1>{t('links_interceptor_modal_description')}</Body1>
-            <Button
-                primary
-                size="large"
-                fullWidth
-                onClick={() => onSubmit({ rememberChoice, processInExtension: true })}
-            >
-                {t('links_interceptor_modal_continue_button')}
-            </Button>
-            <Button
-                secondary
-                size="large"
-                fullWidth
-                marginTop
-                onClick={() => onSubmit({ rememberChoice, processInExtension: false })}
-            >
-                {t('links_interceptor_modal_browser_button')}
-            </Button>
-            <CheckboxStyled checked={rememberChoice} onChange={setRememberChoice}>
+            <h2 className="mb-1 px-4 text-h2 text-textPrimary">
+                {t('links_interceptor_modal_title')}
+            </h2>
+            <span className="mb-4 px-8 text-body1 text-textSecondary">
+                {t('links_interceptor_modal_description')}
+            </span>
+            <div className="mb-4 flex w-full flex-col gap-1 rounded-cornerMedium bg-backgroundContent px-4 py-3 text-left">
+                {origin && <span className="break-all text-label1 text-textPrimary">{origin}</span>}
+                <span className="break-all text-body2 text-textSecondary">{url}</span>
+            </div>
+            <div className="flex w-full flex-col gap-2">
+                <Button
+                    variant="primaryBlue"
+                    size="large"
+                    fullWidth
+                    onClick={() => onSubmit('extension', rememberChoice)}
+                >
+                    {t('links_interceptor_modal_continue_button')}
+                </Button>
+                <Button
+                    variant="secondary"
+                    size="large"
+                    fullWidth
+                    onClick={() => onSubmit('browser', rememberChoice)}
+                >
+                    {t('links_interceptor_modal_browser_button')}
+                </Button>
+            </div>
+            <Checkbox className="mt-6" checked={rememberChoice} onChange={setRememberChoice}>
                 {t('links_interceptor_modal_checkbox_label')}
-            </CheckboxStyled>
-        </ContentWrapper>
+            </Checkbox>
+        </div>
     );
 };

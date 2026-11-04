@@ -50,56 +50,38 @@ import {
 export interface JettonTransferAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof JettonTransferAction
      */
     sender?: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof JettonTransferAction
      */
     recipient?: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof JettonTransferAction
      */
     sendersWallet: string;
     /**
      * 
-     * @type {string}
-     * @memberof JettonTransferAction
      */
     recipientsWallet: string;
     /**
      * amount in quanta of tokens
-     * @type {string}
-     * @memberof JettonTransferAction
      */
     amount: string;
     /**
      * 
-     * @type {string}
-     * @memberof JettonTransferAction
      */
     comment?: string;
     /**
      * 
-     * @type {EncryptedComment}
-     * @memberof JettonTransferAction
      */
     encryptedComment?: EncryptedComment;
     /**
      * 
-     * @type {Refund}
-     * @memberof JettonTransferAction
      */
     refund?: Refund;
     /**
      * 
-     * @type {JettonPreview}
-     * @memberof JettonTransferAction
      */
     jetton: JettonPreview;
 }
@@ -108,8 +90,8 @@ export interface JettonTransferAction {
  * Check if a given object implements the JettonTransferAction interface.
  */
 export function instanceOfJettonTransferAction(value: object): value is JettonTransferAction {
-    if (!('sendersWallet' in value) || value['sendersWallet'] === undefined) return false;
-    if (!('recipientsWallet' in value) || value['recipientsWallet'] === undefined) return false;
+    if ((!('sendersWallet' in (value as Record<string, any>)) && !('senders_wallet' in (value as Record<string, any>))) || ((value as Record<string, any>)['sendersWallet'] === undefined && (value as Record<string, any>)['senders_wallet'] === undefined)) return false;
+    if ((!('recipientsWallet' in (value as Record<string, any>)) && !('recipients_wallet' in (value as Record<string, any>))) || ((value as Record<string, any>)['recipientsWallet'] === undefined && (value as Record<string, any>)['recipients_wallet'] === undefined)) return false;
     if (!('amount' in value) || value['amount'] === undefined) return false;
     if (!('jetton' in value) || value['jetton'] === undefined) return false;
     return true;
@@ -137,11 +119,11 @@ export function JettonTransferActionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function JettonTransferActionToJSON(json: any): JettonTransferAction {
-      return JettonTransferActionToJSONTyped(json, false);
-  }
+export function JettonTransferActionToJSON(json: any): JettonTransferAction {
+    return JettonTransferActionToJSONTyped(json, false);
+}
 
-  export function JettonTransferActionToJSONTyped(value?: JettonTransferAction | null, ignoreDiscriminator: boolean = false): any {
+export function JettonTransferActionToJSONTyped(value?: JettonTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

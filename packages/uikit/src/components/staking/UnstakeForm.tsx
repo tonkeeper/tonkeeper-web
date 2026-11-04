@@ -14,6 +14,7 @@ import { useEncodeStakingUnstake } from '../../state/staking/useEncodeStaking';
 import { useStakingCycleCountdown } from '../../state/staking/useStakingCycleCountdown';
 import { usePoolStakedBalance } from '../../state/staking/usePoolStakedBalance';
 import { convertTonToPoolTokenNano } from '../../state/staking/poolStakeState';
+import { useStakingAnalyticsProps, useTrackStakingConfirm } from '../../hooks/analytics/staking';
 import { Body3 } from '../Text';
 import { StakingTransactionModal } from './StakingTransactionModal';
 import { UnstakeAmountInput } from './UnstakeAmountInput';
@@ -71,6 +72,8 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
 
     const { tonAmount, isLiquid, liquidTokenBalance, tonPrice } = usePoolStakedBalance(pool);
     const countdown = useStakingCycleCountdown(pool);
+    const analyticsProps = useStakingAnalyticsProps(pool);
+    const trackConfirm = useTrackStakingConfirm('unstake', analyticsProps);
 
     useEffect(() => {
         if (isTfPool && tonAmount !== undefined) {
@@ -99,6 +102,7 @@ export const UnstakeForm: FC<{ className?: string }> = ({ className }) => {
 
     const onConfirm = async () => {
         if (!pool || !tonAmount || !amountBN || amountBN.isZero() || amountBN.isNegative()) return;
+        trackConfirm();
 
         let encoderAmount: bigint;
         let isSendAll = false;

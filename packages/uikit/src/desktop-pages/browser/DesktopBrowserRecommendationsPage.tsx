@@ -12,7 +12,7 @@ import {
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { useTranslation } from '../../hooks/translation';
-import { useTrackDappBrowserOpened } from '../../hooks/analytics/events-hooks';
+import { useTrackDappBrowserOpen } from '../../hooks/analytics/dapp-browser';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 import { Navigate } from '../../components/shared/Navigate';
 import { AppRoute } from '../../libs/routes';
@@ -47,7 +47,7 @@ export const DesktopBrowserRecommendationsPage: FC = () => {
     const targetEnv = useAppTargetEnv();
     const dappsListEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.DAPPS_LIST);
 
-    useTrackDappBrowserOpened();
+    useTrackDappBrowserOpen();
 
     if (!dappsListEnabled) {
         return <Navigate to={AppRoute.home} />;

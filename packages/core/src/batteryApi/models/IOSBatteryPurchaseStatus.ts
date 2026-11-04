@@ -29,8 +29,6 @@ import {
 export interface IOSBatteryPurchaseStatus {
     /**
      * 
-     * @type {Array<IOSBatteryPurchaseStatusTransactionsInner>}
-     * @memberof IOSBatteryPurchaseStatus
      */
     transactions: Array<IOSBatteryPurchaseStatusTransactionsInner>;
 }
@@ -57,11 +55,11 @@ export function IOSBatteryPurchaseStatusFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function IOSBatteryPurchaseStatusToJSON(json: any): IOSBatteryPurchaseStatus {
-      return IOSBatteryPurchaseStatusToJSONTyped(json, false);
-  }
+export function IOSBatteryPurchaseStatusToJSON(json: any): IOSBatteryPurchaseStatus {
+    return IOSBatteryPurchaseStatusToJSONTyped(json, false);
+}
 
-  export function IOSBatteryPurchaseStatusToJSONTyped(value?: IOSBatteryPurchaseStatus | null, ignoreDiscriminator: boolean = false): any {
+export function IOSBatteryPurchaseStatusToJSONTyped(value?: IOSBatteryPurchaseStatus | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

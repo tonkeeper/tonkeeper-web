@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface TronSendRequest {
     /**
      * 
-     * @type {string}
-     * @memberof TronSendRequest
      */
     tx?: string;
     /**
      * 
-     * @type {number}
-     * @memberof TronSendRequest
      */
     energy?: number;
     /**
      * 
-     * @type {number}
-     * @memberof TronSendRequest
      */
     bandwidth?: number;
     /**
      * 
-     * @type {string}
-     * @memberof TronSendRequest
      */
     wallet: string;
     /**
      * base64 encoded payment transaction in the TON network
-     * @type {string}
-     * @memberof TronSendRequest
      */
     instantFeeTx?: string;
 }
@@ -77,11 +67,11 @@ export function TronSendRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function TronSendRequestToJSON(json: any): TronSendRequest {
-      return TronSendRequestToJSONTyped(json, false);
-  }
+export function TronSendRequestToJSON(json: any): TronSendRequest {
+    return TronSendRequestToJSONTyped(json, false);
+}
 
-  export function TronSendRequestToJSONTyped(value?: TronSendRequest | null, ignoreDiscriminator: boolean = false): any {
+export function TronSendRequestToJSONTyped(value?: TronSendRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -34,7 +34,7 @@ export const TonTransferDesktopAction: FC<{
                     <HistoryCellComment comment={tonTransfer.comment} isScam={isScam} />
                     <HistoryCellAmount
                         amount={tonTransfer.amount}
-                        symbol={BRAND_CONFIG.coinSymbolWithEx}
+                        symbol={BRAND_CONFIG.coinSymbol}
                         decimals={9}
                         isFailed={action.status === 'failed'}
                         isSpam={isScam}
@@ -51,7 +51,7 @@ export const TonTransferDesktopAction: FC<{
                 <HistoryCellComment comment={tonTransfer.comment} />
                 <HistoryCellAmount
                     amount={tonTransfer.amount}
-                    symbol={BRAND_CONFIG.coinSymbolWithEx}
+                    symbol={BRAND_CONFIG.coinSymbol}
                     decimals={9}
                     isFailed={action.status === 'failed'}
                     isNegative

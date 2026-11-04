@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface AndroidBatteryPurchaseStatusPurchasesInnerError {
     /**
      * 
-     * @type {string}
-     * @memberof AndroidBatteryPurchaseStatusPurchasesInnerError
      */
     msg: string;
     /**
      * 
-     * @type {string}
-     * @memberof AndroidBatteryPurchaseStatusPurchasesInnerError
      */
     code: AndroidBatteryPurchaseStatusPurchasesInnerErrorCodeEnum;
 }
@@ -42,7 +38,7 @@ export const AndroidBatteryPurchaseStatusPurchasesInnerErrorCodeEnum = {
     UserNotFound: 'user-not-found',
     PurchaseIsAlreadyUsed: 'purchase-is-already-used',
     TemporaryError: 'temporary-error',
-    Unknown: 'unknown'
+    Unknown: 'unknown',
 } as const;
 export type AndroidBatteryPurchaseStatusPurchasesInnerErrorCodeEnum = typeof AndroidBatteryPurchaseStatusPurchasesInnerErrorCodeEnum[keyof typeof AndroidBatteryPurchaseStatusPurchasesInnerErrorCodeEnum];
 
@@ -71,11 +67,11 @@ export function AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSONTyped(jso
     };
 }
 
-  export function AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInnerError {
-      return AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSONTyped(json, false);
-  }
+export function AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInnerError {
+    return AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSONTyped(json, false);
+}
 
-  export function AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSONTyped(value?: AndroidBatteryPurchaseStatusPurchasesInnerError | null, ignoreDiscriminator: boolean = false): any {
+export function AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSONTyped(value?: AndroidBatteryPurchaseStatusPurchasesInnerError | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

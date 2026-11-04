@@ -21,7 +21,7 @@ export const AccountStatus = {
     Nonexist: 'nonexist',
     Uninit: 'uninit',
     Active: 'active',
-    Frozen: 'frozen'
+    Frozen: 'frozen',
 } as const;
 export type AccountStatus = typeof AccountStatus[keyof typeof AccountStatus];
 

@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface GetTronConfig200Response {
     /**
      * 
-     * @type {string}
-     * @memberof GetTronConfig200Response
      */
     safetyMarginPercent: string;
 }
@@ -31,7 +29,7 @@ export interface GetTronConfig200Response {
  * Check if a given object implements the GetTronConfig200Response interface.
  */
 export function instanceOfGetTronConfig200Response(value: object): value is GetTronConfig200Response {
-    if (!('safetyMarginPercent' in value) || value['safetyMarginPercent'] === undefined) return false;
+    if ((!('safetyMarginPercent' in (value as Record<string, any>)) && !('safety_margin_percent' in (value as Record<string, any>))) || ((value as Record<string, any>)['safetyMarginPercent'] === undefined && (value as Record<string, any>)['safety_margin_percent'] === undefined)) return false;
     return true;
 }
 
@@ -49,11 +47,11 @@ export function GetTronConfig200ResponseFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function GetTronConfig200ResponseToJSON(json: any): GetTronConfig200Response {
-      return GetTronConfig200ResponseToJSONTyped(json, false);
-  }
+export function GetTronConfig200ResponseToJSON(json: any): GetTronConfig200Response {
+    return GetTronConfig200ResponseToJSONTyped(json, false);
+}
 
-  export function GetTronConfig200ResponseToJSONTyped(value?: GetTronConfig200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetTronConfig200ResponseToJSONTyped(value?: GetTronConfig200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

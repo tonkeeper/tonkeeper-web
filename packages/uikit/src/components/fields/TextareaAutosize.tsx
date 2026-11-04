@@ -97,9 +97,9 @@ const Textarea = styled.textarea`
     flex-grow: 1;
     box-sizing: border-box;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 450;
     font-size: 16px;
-    font-family: Montserrat, sans-serif;
+    font-family: var(--tk-font-sans, sans-serif);
     -webkit-font-smoothing: antialiased;
     color: ${props => props.theme.textPrimary};
     padding: 30px 0 10px;

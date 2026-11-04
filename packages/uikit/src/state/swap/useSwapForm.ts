@@ -1,17 +1,12 @@
 import { TON_ASSET, TON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import {
-    TonAsset,
-    tonAssetAddressToString
-} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import BigNumber from 'bignumber.js';
 import { useAtom } from '../../libs/useAtom';
 import { useAssetWeiBalance } from '../home';
-import { useRate } from '../rates';
 import { useCallback, useMemo } from 'react';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { swapConfirmation$ } from './useSwapStreamEffect';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 export const swapFromAsset$ = atom<TonAsset>(TON_ASSET);
 export const swapToAsset$ = atom<TonAsset>(TON_USDT_ASSET);
@@ -81,46 +76,20 @@ export const useMaxSwapValue = () => {
     }, [fromAsset.id, balance]);
 };
 
-export const useSwapPriceImpact = () => {
-    const [fromAsset] = useSwapFromAsset();
-    const [toAsset] = useSwapToAsset();
+/** Signed basis points (-300 = the user receives 3% less USD than they pay); absent when |bps| < 300 or prices are unknown. */
+export const useSwapValueDifferenceBps = () => {
     const [confirmation] = useAtom(swapConfirmation$);
-
-    const { data: fromAssetRate, isLoading: fromAssetRateLoading } = useRate(
-        tonAssetAddressToString(fromAsset.address)
-    );
-    const { data: toAssetRate, isLoading: toAssetRateLoading } = useRate(
-        tonAssetAddressToString(toAsset.address)
-    );
-
-    if (!confirmation || toAssetRateLoading || fromAssetRateLoading) {
-        return undefined;
-    }
-
-    if (!fromAssetRate?.prices || !toAssetRate?.prices) {
-        return null;
-    }
-
-    const fromRelative = shiftedDecimals(new BigNumber(confirmation.bidUnits), fromAsset.decimals);
-    const toRelative = shiftedDecimals(new BigNumber(confirmation.askUnits), toAsset.decimals);
-
-    const fromFiat = fromRelative.multipliedBy(fromAssetRate.prices);
-    const toFiat = toRelative.multipliedBy(toAssetRate.prices);
-
-    if (fromFiat.isEqualTo(toFiat)) {
-        return new BigNumber(0);
-    }
-
-    return fromFiat.minus(toFiat).dividedBy(fromFiat);
+    return confirmation?.valueDifferenceBps;
 };
 
 export { useMaxPriceImpact } from './useSwapOptions';
 
-export const priceImpactStatus = (priceImpact: BigNumber | null) => {
-    if (!priceImpact) return 'unknown';
-    if (priceImpact.isGreaterThan(0.05)) return 'high';
-    if (priceImpact.isGreaterThan(0.01)) return 'medium';
-    return 'low';
+export type ValueDifferenceStatus = 'normal' | 'warning' | 'danger';
+
+export const valueDifferenceStatus = (bps: number | undefined): ValueDifferenceStatus => {
+    if (bps === undefined || bps >= -300) return 'normal';
+    if (bps < -500) return 'danger';
+    return 'warning';
 };
 
 export const useIsSwapFormNotCompleted = () => {

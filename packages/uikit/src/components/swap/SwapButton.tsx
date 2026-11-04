@@ -7,7 +7,7 @@ import {
     useMaxSwapValue,
     useSwapFromAmount,
     useSwapFromAsset,
-    useSwapPriceImpact,
+    useSwapValueDifferenceBps,
     useMaxPriceImpact
 } from '../../state/swap/useSwapForm';
 import { Button } from '../fields/Button';
@@ -23,7 +23,7 @@ export const SwapButton: FC<{
     const { data: max } = useMaxSwapValue();
     const { confirmation, isFetching, error } = useSwapConfirmation();
 
-    const priceImpact = useSwapPriceImpact();
+    const valueDifferenceBps = useSwapValueDifferenceBps();
     const maxPriceImpact = useMaxPriceImpact();
 
     const isNotCompleted = useIsSwapFormNotCompleted();
@@ -44,7 +44,7 @@ export const SwapButton: FC<{
         );
     }
 
-    if ((isFetching && !confirmation) || !max || priceImpact === undefined) {
+    if ((isFetching && !confirmation) || !max) {
         return (
             <Button size={size} secondary loading={true}>
                 {t('continue')}
@@ -83,11 +83,14 @@ export const SwapButton: FC<{
         );
     }
 
-    const priceImpactTooHigh = maxPriceImpact !== Infinity && priceImpact?.gt(maxPriceImpact);
+    const priceImpactTooHigh =
+        maxPriceImpact !== Infinity &&
+        valueDifferenceBps !== undefined &&
+        -valueDifferenceBps / 10000 > maxPriceImpact;
     if (priceImpactTooHigh) {
         return (
             <Button size={size} secondary disabled>
-                {t('swap_price_impact_too_high')}
+                {t('multichain_swap_value_difference_high_title')}
             </Button>
         );
     }

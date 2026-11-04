@@ -2,13 +2,19 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Tonkeeper Pro</title>
+    <title>Keeper Pro</title>
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;display=swap"
-      rel="stylesheet"
-    />
   </head>
+    <!--
+      The RPC origins below mirror chain-kit's static endpoint registry
+      (`cspConnectSrc()` in @tonkeeper/chainkit) — its built-in fallback
+      nodes. The live node manifest (GET multi.tonkeeper.com/api/v1/nodes,
+      see core's nodesManifestService) can hand out arbitrary node URLs at
+      runtime; a meta CSP is fixed for the page lifetime, so an origin the
+      manifest adds only starts working here after this list is updated.
+      chain-kit falls back down each chain's node list, so a blocked
+      origin degrades to the next node rather than failing the chain.
+    -->
     <meta http-equiv="Content-Security-Policy" content="
     default-src 'none';
     object-src 'none';
@@ -17,11 +23,11 @@
     frame-src 'none';
     worker-src 'none';
     media-src 'none';
-    script-src 'self';
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/;
+    script-src 'self' 'wasm-unsafe-eval';
+    style-src 'self' 'unsafe-inline';
     img-src 'self' data: https:;
-    font-src 'self' https://fonts.gstatic.com;
-    connect-src 'self' https://tonkeeper.com https://*.tonkeeper.com https://tonapi.io https://*.tonapi.io https://tonconsole.com https://*.tonconsole.com https://api.trongrid.io/ https://oauth.telegram.org;
+    font-src 'self' data:;
+    connect-src 'self' https://tonkeeper.com https://*.tonkeeper.com https://tonapi.io https://*.tonapi.io https://tonconsole.com https://*.tonconsole.com https://api.trongrid.io/ https://oauth.telegram.org https://ethereum-rpc.publicnode.com https://cloudflare-eth.com https://eth.llamarpc.com https://1rpc.io https://arbitrum-one-rpc.publicnode.com https://arb1.arbitrum.io https://base-rpc.publicnode.com https://mainnet.base.org https://base.llamarpc.com https://bsc-rpc.publicnode.com https://bsc-dataseed.bnbchain.org https://binance.llamarpc.com https://btc1.trezor.io https://btc2.trezor.io https://btc3.trezor.io https://btc4.trezor.io https://btc5.trezor.io https://tron-rpc.publicnode.com;
     manifest-src 'self';
   ">
 

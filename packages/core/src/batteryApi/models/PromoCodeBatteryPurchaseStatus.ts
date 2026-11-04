@@ -29,20 +29,14 @@ import {
 export interface PromoCodeBatteryPurchaseStatus {
     /**
      * 
-     * @type {string}
-     * @memberof PromoCodeBatteryPurchaseStatus
      */
     balanceChange: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof PromoCodeBatteryPurchaseStatus
      */
     success: boolean;
     /**
      * 
-     * @type {PromoCodeBatteryPurchaseStatusError}
-     * @memberof PromoCodeBatteryPurchaseStatus
      */
     error?: PromoCodeBatteryPurchaseStatusError;
 }
@@ -51,7 +45,7 @@ export interface PromoCodeBatteryPurchaseStatus {
  * Check if a given object implements the PromoCodeBatteryPurchaseStatus interface.
  */
 export function instanceOfPromoCodeBatteryPurchaseStatus(value: object): value is PromoCodeBatteryPurchaseStatus {
-    if (!('balanceChange' in value) || value['balanceChange'] === undefined) return false;
+    if ((!('balanceChange' in (value as Record<string, any>)) && !('balance_change' in (value as Record<string, any>))) || ((value as Record<string, any>)['balanceChange'] === undefined && (value as Record<string, any>)['balance_change'] === undefined)) return false;
     if (!('success' in value) || value['success'] === undefined) return false;
     return true;
 }
@@ -72,11 +66,11 @@ export function PromoCodeBatteryPurchaseStatusFromJSONTyped(json: any, ignoreDis
     };
 }
 
-  export function PromoCodeBatteryPurchaseStatusToJSON(json: any): PromoCodeBatteryPurchaseStatus {
-      return PromoCodeBatteryPurchaseStatusToJSONTyped(json, false);
-  }
+export function PromoCodeBatteryPurchaseStatusToJSON(json: any): PromoCodeBatteryPurchaseStatus {
+    return PromoCodeBatteryPurchaseStatusToJSONTyped(json, false);
+}
 
-  export function PromoCodeBatteryPurchaseStatusToJSONTyped(value?: PromoCodeBatteryPurchaseStatus | null, ignoreDiscriminator: boolean = false): any {
+export function PromoCodeBatteryPurchaseStatusToJSONTyped(value?: PromoCodeBatteryPurchaseStatus | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

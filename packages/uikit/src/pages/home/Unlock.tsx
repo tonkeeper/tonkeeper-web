@@ -148,7 +148,7 @@ const PasswordUnlock: FC<{ logOutConfirmed?: () => void }> = ({ logOutConfirmed 
         <PageWrapper>
             <Block ref={contentRef} onSubmit={onSubmit}>
                 <Heading>
-                    <H3>{theme.displayType === 'compact' ? 'Tonkeeper' : 'Tonkeeper Pro'}</H3>
+                    <H3>{theme.displayType === 'compact' ? 'Keeper' : 'Keeper Pro'}</H3>
                     <SubTitle>{t('lockscreen_subtitle')}</SubTitle>
                 </Heading>
 

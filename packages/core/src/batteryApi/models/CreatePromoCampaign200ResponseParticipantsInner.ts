@@ -21,20 +21,14 @@ import { mapValues } from '../runtime';
 export interface CreatePromoCampaign200ResponseParticipantsInner {
     /**
      * 
-     * @type {string}
-     * @memberof CreatePromoCampaign200ResponseParticipantsInner
      */
     address: string;
     /**
      * 
-     * @type {string}
-     * @memberof CreatePromoCampaign200ResponseParticipantsInner
      */
     balanceIncreased?: string;
     /**
      * 
-     * @type {string}
-     * @memberof CreatePromoCampaign200ResponseParticipantsInner
      */
     error?: string;
 }
@@ -63,11 +57,11 @@ export function CreatePromoCampaign200ResponseParticipantsInnerFromJSONTyped(jso
     };
 }
 
-  export function CreatePromoCampaign200ResponseParticipantsInnerToJSON(json: any): CreatePromoCampaign200ResponseParticipantsInner {
-      return CreatePromoCampaign200ResponseParticipantsInnerToJSONTyped(json, false);
-  }
+export function CreatePromoCampaign200ResponseParticipantsInnerToJSON(json: any): CreatePromoCampaign200ResponseParticipantsInner {
+    return CreatePromoCampaign200ResponseParticipantsInnerToJSONTyped(json, false);
+}
 
-  export function CreatePromoCampaign200ResponseParticipantsInnerToJSONTyped(value?: CreatePromoCampaign200ResponseParticipantsInner | null, ignoreDiscriminator: boolean = false): any {
+export function CreatePromoCampaign200ResponseParticipantsInnerToJSONTyped(value?: CreatePromoCampaign200ResponseParticipantsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

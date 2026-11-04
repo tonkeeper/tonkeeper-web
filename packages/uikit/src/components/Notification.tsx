@@ -149,7 +149,7 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
     }
 );
 
-const Splash = styled.div`
+const Splash = styled.div<{ $topMost?: boolean }>`
     position: fixed;
     inset: 0;
     background-color: ${p => p.theme.backgroundOverlayStrong};
@@ -160,7 +160,7 @@ const Splash = styled.div`
     transition: all 0.3s ease-in-out;
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
-    z-index: 10;
+    z-index: ${p => (p.$topMost ? 100 : 10)};
     padding: 0;
     opacity: 0;
     pointer-events: none;
@@ -191,6 +191,8 @@ const Content = styled.div<{ standalone: boolean }>`
     padding: 1rem;
     flex-shrink: 0;
     box-sizing: border-box;
+    interpolate-size: allow-keywords;
+    transition: height 0.2s ease;
 
     ${props =>
         props.standalone &&
@@ -516,6 +518,14 @@ export const Notification: FC<{
     afterClose?: () => void;
     tag?: string;
     onTopOfBrowser?: boolean;
+    /**
+     * Stack this notification above any other open sheet — both legacy
+     * notifications and the `primitives/Modal` layer, which sits between
+     * the two levels. Required for anything opened *from inside* another
+     * sheet (the password prompt, the QR scanner, confirm-discard, a
+     * transfer confirmation), otherwise it renders behind its opener.
+     */
+    topMost?: boolean;
 }> = props => {
     const targetEnv = useAppTargetEnv();
 
@@ -727,6 +737,7 @@ export const NotificationDesktopAndWeb: FC<{
     className?: string;
     afterClose?: () => void;
     tag?: string;
+    topMost?: boolean;
 }> = ({
     children,
     isOpen,
@@ -737,7 +748,8 @@ export const NotificationDesktopAndWeb: FC<{
     footer,
     className,
     afterClose,
-    tag
+    tag,
+    topMost
 }) => {
     const animationTime = 200;
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
@@ -788,8 +800,11 @@ export const NotificationDesktopAndWeb: FC<{
         const handler = () => {
             const container = document.getElementById('react-portal-modal-container');
 
+            // Count only legacy sheets: primitive `Modal`s portal into the same
+            // container but release their own scroll lock, so counting them
+            // here would leave the page locked once they close.
             if (container) {
-                if (container.childElementCount) {
+                if (container.querySelector(':scope > [data-legacy-notification]')) {
                     sdk.disableScroll();
                 } else {
                     sdk.enableScroll();
@@ -872,7 +887,12 @@ export const NotificationDesktopAndWeb: FC<{
                     }}
                     onExit={() => setEntered(false)}
                 >
-                    <Splash ref={nodeRef} className="scrollable">
+                    <Splash
+                        ref={nodeRef}
+                        className="scrollable"
+                        $topMost={topMost}
+                        data-legacy-notification
+                    >
                         <NotificationOverlay handleClose={onClose} entered={entered}>
                             <NotificationWrapper entered={entered} className={className}>
                                 <Wrapper $moveToTop={!!isKeyboardOpen}>
@@ -883,27 +903,25 @@ export const NotificationDesktopAndWeb: FC<{
                                         ref={containerRef}
                                         className="dialog-content"
                                     >
-                                        <AnimateHeightChange>
-                                            <HeaderWrapper ref={headerRef}>
-                                                {(title || !hideButton) && (
-                                                    <NotificationHeader
-                                                        className="dialog-header"
-                                                        noPaddingBottom={!title}
+                                        <HeaderWrapper ref={headerRef}>
+                                            {(title || !hideButton) && (
+                                                <NotificationHeader
+                                                    className="dialog-header"
+                                                    noPaddingBottom={!title}
+                                                >
+                                                    <NotificationTitleRow
+                                                        onBack={onBack}
+                                                        handleClose={
+                                                            hideButton ? undefined : onClose
+                                                        }
                                                     >
-                                                        <NotificationTitleRow
-                                                            onBack={onBack}
-                                                            handleClose={
-                                                                hideButton ? undefined : onClose
-                                                            }
-                                                        >
-                                                            {title}
-                                                        </NotificationTitleRow>
-                                                    </NotificationHeader>
-                                                )}
-                                            </HeaderWrapper>
-                                            {Child}
-                                            <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
-                                        </AnimateHeightChange>
+                                                        {title}
+                                                    </NotificationTitleRow>
+                                                </NotificationHeader>
+                                            )}
+                                        </HeaderWrapper>
+                                        {Child}
+                                        <FooterWrapper ref={footerRef}>{footer}</FooterWrapper>
                                     </Content>
                                     <PaddingAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                 </Wrapper>

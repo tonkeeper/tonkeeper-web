@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
 import type { WithdrawOptionSchema } from './WithdrawOptionSchema';
 /**
@@ -11,10 +12,6 @@ export type WithdrawClickFiatAssetSchema = {
     eventName: string;
     from: RampSourceSchema;
     withdraw_option: WithdrawOptionSchema;
-    /**
-     * Asset the user wants to sell, in chain/network/type format: ton/mainnet/coin, ton/mainnet/jetton/{addr}
-     *
-     */
-    sell_asset: string;
+    sell_asset: AssetSchema;
 };
 

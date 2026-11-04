@@ -126,13 +126,13 @@ export const BuyNotification: FC<{
 };
 
 export const BuyAction: FC = () => {
-    const { data: buy } = useTonendpointBuyMethods();
-
     const [searchParams, setSearchParams] = useSearchParams();
 
     const open = useMemo(() => {
         return new URLSearchParams(searchParams).get('buy') === 'open';
     }, [searchParams]);
+
+    const { data: buy } = useTonendpointBuyMethods(open);
 
     const toggle = useCallback(() => {
         if (!searchParams.has('buy')) {

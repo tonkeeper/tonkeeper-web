@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
 import type { WithdrawOptionSchema } from './WithdrawOptionSchema';
 /**
@@ -12,10 +13,7 @@ export type WithdrawViewChooseStablecoinSchema = {
     eventName: string;
     from: RampSourceSchema;
     withdraw_option: WithdrawOptionSchema;
-    /**
-     * Carried from withdraw_click_asset
-     */
-    sell_asset: string;
+    sell_asset: AssetSchema;
     /**
      * Slugs of the options shown to the user on this screen. Use standard identifier slugs from the backend response.
      *

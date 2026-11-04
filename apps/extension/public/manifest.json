@@ -5,9 +5,14 @@
     "default_locale": "en",
     "version": "3.0.0",
     "manifest_version": 3,
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+    },
     "action": {
-        "default_title": "__MSG_actionTitle__",
-        "default_popup": "index.html?source=default_popup"
+        "default_title": "__MSG_actionTitle__"
+    },
+    "side_panel": {
+        "default_path": "index.html?source=side_panel"
     },
     "icons": {
         "16": "logo-16x16.png",
@@ -15,7 +20,7 @@
         "64": "logo-64x64.png",
         "128": "logo-128x128.png"
     },
-    "permissions": ["proxy", "storage", "unlimitedStorage", "clipboardWrite"],
+    "permissions": ["proxy", "storage", "unlimitedStorage", "clipboardWrite", "sidePanel"],
     "background": {
         "service_worker": "background.js"
     },

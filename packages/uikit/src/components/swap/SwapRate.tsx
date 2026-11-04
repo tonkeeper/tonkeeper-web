@@ -4,23 +4,24 @@ import { Skeleton } from '../shared/Skeleton';
 import { Body3 } from '../Text';
 import { css, styled } from 'styled-components';
 import {
-    priceImpactStatus,
     useSwapFromAsset,
-    useSwapPriceImpact,
-    useSwapToAsset
+    useSwapToAsset,
+    useSwapValueDifferenceBps,
+    ValueDifferenceStatus,
+    valueDifferenceStatus
 } from '../../state/swap/useSwapForm';
 import { useSwapConfirmation } from '../../state/swap/useSwapStreamEffect';
 import BigNumber from 'bignumber.js';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
-const Body3Styled = styled(Body3)<{ impact: 'unknown' | 'low' | 'medium' | 'high' }>`
+const Body3Styled = styled(Body3)<{ impact: ValueDifferenceStatus }>`
     display: flex;
     align-items: center;
     gap: 4px;
     color: ${p =>
-        p.impact === 'medium'
+        p.impact === 'warning'
             ? p.theme.accentOrange
-            : p.impact === 'high'
+            : p.impact === 'danger'
             ? p.theme.accentRed
             : p.theme.textSecondary};
     cursor: pointer;
@@ -28,8 +29,7 @@ const Body3Styled = styled(Body3)<{ impact: 'unknown' | 'low' | 'medium' | 'high
 
     &:hover {
         ${p =>
-            p.impact !== 'medium' &&
-            p.impact !== 'high' &&
+            p.impact === 'normal' &&
             css`
                 color: ${p.theme.textPrimary};
             `};
@@ -60,9 +60,9 @@ export const SwapRate: FC = () => {
     const { confirmation, isFetching } = useSwapConfirmation();
     const [fromAsset] = useSwapFromAsset();
     const [toAsset] = useSwapToAsset();
-    const priceImpact = useSwapPriceImpact();
+    const valueDifferenceBps = useSwapValueDifferenceBps();
 
-    const isLoading = (isFetching && !confirmation) || priceImpact === undefined;
+    const isLoading = isFetching && !confirmation;
     const isHidden = !isFetching && !confirmation;
 
     if (isHidden) {
@@ -84,7 +84,7 @@ export const SwapRate: FC = () => {
         return null;
     }
 
-    const impact = priceImpactStatus(priceImpact);
+    const impact = valueDifferenceStatus(valueDifferenceBps);
 
     let rateText: string;
     if (measureUnit === 'from') {
@@ -101,7 +101,7 @@ export const SwapRate: FC = () => {
             onClick={() => setMeasureUnit(s => (s === 'from' ? 'to' : 'from'))}
         >
             {rateText}
-            {(impact === 'medium' || impact === 'high') && <WarnIcon />}
+            {impact !== 'normal' && <WarnIcon />}
         </Body3Styled>
     );
 };

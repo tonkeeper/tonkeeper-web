@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetSchema } from './AssetSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
 import type { WithdrawOptionSchema } from './WithdrawOptionSchema';
 /**
@@ -12,10 +13,7 @@ export type WithdrawContinueToRampProviderSchema = {
     eventName: string;
     from: RampSourceSchema;
     withdraw_option: WithdrawOptionSchema;
-    /**
-     * Carried from withdraw_click_fiat_asset
-     */
-    sell_asset: string;
+    sell_asset: AssetSchema;
     /**
      * Carried from withdraw_view_fiat_payment_method
      */

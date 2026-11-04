@@ -364,10 +364,9 @@ const LinkNftLinked: FC<{
                 loading={estimation.isFetching || isRecipientLoading || isLoading}
                 onClick={onOpen}
             >
-                {t('nft_unlink_domain_button').replace(
-                    '{{address}}',
-                    toShortValue(formatAddress(linkedAddress, network))
-                )}
+                {t('nft_unlink_domain_button', {
+                    address: toShortValue(formatAddress(linkedAddress, network))
+                })}
             </Button>
             {isLinkedWithAnotherWallet && !isLoading && (
                 <WarnTextStyled>

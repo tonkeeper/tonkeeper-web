@@ -4,10 +4,9 @@ import {
     formatTransferUrl,
     seeIfValidTonAddress
 } from '@tonkeeper/core/dist/utils/common';
-import { FC, useRef, useState } from 'react';
+import { FC, MouseEventHandler, PropsWithChildren, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styled, { css } from 'styled-components';
 import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -20,16 +19,13 @@ import {
     NotificationHeaderPortal,
     NotificationTitleRow
 } from '../Notification';
-import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
 import { childFactoryCreator, duration, Wrapper } from '../transfer/common';
 import { QrWrapper } from './qrCodeView';
-import {
-    useActiveTonNetwork,
-    useActiveWallet,
-    useIsActiveWalletWatchOnly
-} from '../../state/wallet';
-import { AccountBadge } from '../account/AccountBadge';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { cn } from '../../libs/css';
+import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import { AccountBadge, NetworkBadge } from '../account/AccountBadge';
 import {
     TRON_TRX_ASSET,
     TRON_USDT_ASSET
@@ -37,92 +33,36 @@ import {
 import { Tabs } from '../Tabs';
 import { useActiveTronWallet, useCanReceiveTron } from '../../state/tron/tron';
 
-const CopyBlock = styled.div`
-    display: flex;
-    align-items: center;
-`;
+export const Background: FC<
+    PropsWithChildren<{
+        extension?: boolean;
+        margin?: boolean;
+        onClick?: MouseEventHandler<HTMLDivElement>;
+    }>
+> = ({ extension, margin, onClick, children }) => (
+    <div
+        onClick={onClick}
+        className={cn(
+            'box-border w-full max-w-[300px] rounded-[20px] bg-constantWhite p-5',
+            '[&_canvas]:absolute [&_canvas]:!h-full [&_canvas]:!w-full',
+            margin && 'mb-4',
+            extension && 'max-[768px]:max-w-[217px] max-[768px]:p-4'
+        )}
+    >
+        {children}
+    </div>
+);
 
-export const Background = styled.div<{ extension?: boolean; margin?: boolean }>`
-    padding: 20px;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 20px;
-    background: white;
-    max-width: 300px;
-
-    ${props =>
-        props.margin &&
-        css`
-            margin-bottom: 16px;
-        `}
-
-    ${props =>
-        props.extension &&
-        css`
-            @media (width <= 768px) {
-                max-width: 217px;
-                padding: 16px;
-            }
-        `}
-
-    canvas {
-        width: 100% !important;
-        height: 100% !important;
-        position: absolute;
-    }
-`;
-
-export const AddressText = styled(Body1)<{ extension?: boolean }>`
-    display: inline-block;
-    word-break: break-all;
-    color: black;
-    margin: 16px 4px 0;
-    text-align: center;
-    font-family: ${p => p.theme.fontMono};
-
-    ${props =>
-        props.extension &&
-        css`
-            @media (width <= 768px) {
-                margin-top: 8px;
-            }
-        `}
-`;
-
-const TextBlock = styled.div<{ extension?: boolean }>`
-    display: flex;
-    padding-bottom: 16px;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-
-    ${props =>
-        props.extension &&
-        css`
-            @media (width <= 768px) {
-                padding-bottom: 0;
-            }
-        `}
-`;
-
-const Title = styled(H3)`
-    text-align: center;
-`;
-
-const Description = styled(Body1)`
-    text-align: center;
-    color: ${props => props.theme.textSecondary};
-`;
-
-const WatchOnlyBadge = styled(AccountBadge)`
-    width: fit-content;
-    margin: 0 auto 10px;
-`;
-
-/*const values = [
-    { name: BLOCKCHAIN_NAME.TON, id: BLOCKCHAIN_NAME.TON },
-    { name: 'TRC20', id: BLOCKCHAIN_NAME.TRON }
-];*/
+const AddressText: FC<PropsWithChildren<{ extension?: boolean }>> = ({ extension, children }) => (
+    <span
+        className={cn(
+            'mx-1 mb-0 mt-4 inline-block break-all text-center font-mono text-body1 text-constantBlack',
+            extension && 'max-[768px]:mt-2'
+        )}
+    >
+        {children}
+    </span>
+);
 
 export const HeaderBlock: FC<{ title?: string; description: string }> = ({
     title,
@@ -130,11 +70,39 @@ export const HeaderBlock: FC<{ title?: string; description: string }> = ({
 }) => {
     const { extension } = useAppContext();
     return (
-        <TextBlock extension={extension}>
-            {title && <Title>{title}</Title>}
-            <Description>{description}</Description>
-        </TextBlock>
+        <div
+            className={cn(
+                'flex w-full flex-col items-center pb-4',
+                extension && 'max-[768px]:pb-0'
+            )}
+        >
+            {title && <h3 className="mb-1 select-none text-center text-h3">{title}</h3>}
+            <span className="text-center text-body1 text-textSecondary">{description}</span>
+        </div>
     );
+};
+
+/**
+ * Names the kind of wallet the QR belongs to, so a payer isn't misled into
+ * sending to a testnet, hardware or watch-only address by mistake.
+ */
+const ReceiveWalletTypeBadge: FC = () => {
+    const account = useActiveAccount();
+    const network = useActiveTonNetwork();
+    const className = 'mx-auto mb-[10px] w-fit';
+
+    if (network === Network.TESTNET) {
+        return <NetworkBadge network={network} className={className} />;
+    }
+    switch (account.type) {
+        case 'watch-only':
+        case 'ton-only':
+        case 'ledger':
+        case 'keystone':
+            return <AccountBadge accountType={account.type} className={className} />;
+        default:
+            return null;
+    }
 };
 
 const CopyButton: FC<{ address: string }> = ({ address }) => {
@@ -142,7 +110,7 @@ const CopyButton: FC<{ address: string }> = ({ address }) => {
     const { t } = useTranslation();
 
     return (
-        <CopyBlock>
+        <div className="flex items-center">
             <Button
                 secondary
                 onClick={e => {
@@ -153,7 +121,7 @@ const CopyButton: FC<{ address: string }> = ({ address }) => {
                 <CopyIcon />
                 <span>{t('Copy_address')}</span>
             </Button>
-        </CopyBlock>
+        </div>
     );
 };
 
@@ -161,7 +129,6 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const sdk = useAppSdk();
     const { extension } = useAppContext();
     const wallet = useActiveWallet();
-    const isWatchOnly = useIsActiveWalletWatchOnly();
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
 
@@ -176,7 +143,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                     sdk.copyToClipboard(address, t('copied'));
                 }}
             >
-                {isWatchOnly && <WatchOnlyBadge accountType="watch-only" />}
+                <ReceiveWalletTypeBadge />
                 <QrWrapper>
                     <QRCode
                         size={400}
@@ -255,17 +222,6 @@ const ReceiveTron: FC<{ token: string }> = ({ token }) => {
     );
 };
 
-const TabsStyled = styled(Tabs)`
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
-`;
-
-const NotificationTitleRowStyled = styled(NotificationTitleRow)`
-    position: relative;
-`;
-
 const tabsValues = [
     { id: BLOCKCHAIN_NAME.TON, name: 'Ton' },
     { id: BLOCKCHAIN_NAME.TRON, name: 'Tron' }
@@ -290,11 +246,16 @@ export const ReceiveContent: FC<{
         <FullHeightBlockResponsive standalone={standalone}>
             <NotificationHeaderPortal>
                 <NotificationHeader>
-                    <NotificationTitleRowStyled handleClose={handleClose} center>
+                    <NotificationTitleRow handleClose={handleClose} center className="relative">
                         {!jetton && isTronEnabled && (
-                            <TabsStyled active={active} setActive={setActive} values={tabsValues} />
+                            <Tabs
+                                active={active}
+                                setActive={setActive}
+                                values={tabsValues}
+                                className="!absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                            />
                         )}
-                    </NotificationTitleRowStyled>
+                    </NotificationTitleRow>
                 </NotificationHeader>
             </NotificationHeaderPortal>
             <Wrapper standalone={false} extension fullWidth>

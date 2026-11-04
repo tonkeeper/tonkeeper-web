@@ -4,13 +4,15 @@ import {
     DesktopViewHeaderContent
 } from '../../components/desktop/DesktopViewLayout';
 import { StakingOperationFormContent } from '../../components/staking/pages/StakingOperationFormContent';
+import { StakingSource } from '../../hooks/analytics/staking';
 import { StakingPageWrapper, ContentWrapper } from './StakingLayout';
 
 interface DesktopStakingFormPageProps {
     poolAddress?: string;
+    from?: StakingSource;
 }
 
-export const DesktopStakingFormPage = ({ poolAddress }: DesktopStakingFormPageProps) => {
+export const DesktopStakingFormPage = ({ poolAddress, from }: DesktopStakingFormPageProps) => {
     const { t } = useTranslation();
 
     return (
@@ -19,7 +21,7 @@ export const DesktopStakingFormPage = ({ poolAddress }: DesktopStakingFormPagePr
                 <DesktopViewHeaderContent title={t('staking_title')} />
             </DesktopViewHeader>
             <ContentWrapper>
-                <StakingOperationFormContent mode="stake" poolAddress={poolAddress} />
+                <StakingOperationFormContent mode="stake" poolAddress={poolAddress} from={from} />
             </ContentWrapper>
         </StakingPageWrapper>
     );

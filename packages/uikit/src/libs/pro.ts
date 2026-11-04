@@ -1,6 +1,7 @@
 import { IDisplayPlan, ProPriceTypes } from '@tonkeeper/core/dist/entries/pro';
 import { useProCarouselMetaData } from '../components/pro/PromoNotificationCarousel';
 import { useMemo } from 'react';
+import { joinUrl } from '@tonkeeper/core/dist/utils/url';
 
 export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
     Array.from({ length: skeletonSize }, (_, index) => ({
@@ -20,7 +21,7 @@ export const useAllCarouselImages = (baseSlideUrl: string | undefined): string[]
         () =>
             baseSlideUrl
                 ? metaData.flatMap(({ src }) =>
-                      Object.values(src).map((path: string) => `${baseSlideUrl}${path}`)
+                      Object.values(src).map((path: string) => joinUrl(baseSlideUrl, path))
                   )
                 : [],
         [baseSlideUrl, metaData]

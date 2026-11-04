@@ -21,38 +21,26 @@ import { mapValues } from '../runtime';
 export interface CreateCustomRefundRequest {
     /**
      * 
-     * @type {number}
-     * @memberof CreateCustomRefundRequest
      */
     relayerEventId?: number;
     /**
      * 
-     * @type {string}
-     * @memberof CreateCustomRefundRequest
      */
     amount: string;
     /**
      * 
-     * @type {string}
-     * @memberof CreateCustomRefundRequest
      */
     currency: string;
     /**
      * 
-     * @type {string}
-     * @memberof CreateCustomRefundRequest
      */
     comment: string;
     /**
      * 
-     * @type {string}
-     * @memberof CreateCustomRefundRequest
      */
     reason: string;
     /**
      * 
-     * @type {string}
-     * @memberof CreateCustomRefundRequest
      */
     destination: string;
 }
@@ -88,11 +76,11 @@ export function CreateCustomRefundRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-  export function CreateCustomRefundRequestToJSON(json: any): CreateCustomRefundRequest {
-      return CreateCustomRefundRequestToJSONTyped(json, false);
-  }
+export function CreateCustomRefundRequestToJSON(json: any): CreateCustomRefundRequest {
+    return CreateCustomRefundRequestToJSONTyped(json, false);
+}
 
-  export function CreateCustomRefundRequestToJSONTyped(value?: CreateCustomRefundRequest | null, ignoreDiscriminator: boolean = false): any {
+export function CreateCustomRefundRequestToJSONTyped(value?: CreateCustomRefundRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

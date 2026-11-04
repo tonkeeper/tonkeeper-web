@@ -20,6 +20,13 @@ import {
     PoolImplementationTypeToJSON,
     PoolImplementationTypeToJSONTyped,
 } from './PoolImplementationType';
+import type { Price } from './Price';
+import {
+    PriceFromJSON,
+    PriceFromJSONTyped,
+    PriceToJSON,
+    PriceToJSONTyped,
+} from './Price';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -36,28 +43,24 @@ import {
 export interface DepositStakeAction {
     /**
      * 
-     * @type {number}
-     * @memberof DepositStakeAction
      */
     amount: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof DepositStakeAction
      */
     staker: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof DepositStakeAction
      */
     pool: AccountAddress;
     /**
      * 
-     * @type {PoolImplementationType}
-     * @memberof DepositStakeAction
      */
     implementation: PoolImplementationType;
+    /**
+     * 
+     */
+    stakeMeta?: Price;
 }
 
 
@@ -87,14 +90,15 @@ export function DepositStakeActionFromJSONTyped(json: any, ignoreDiscriminator: 
         'staker': AccountAddressFromJSON(json['staker']),
         'pool': AccountAddressFromJSON(json['pool']),
         'implementation': PoolImplementationTypeFromJSON(json['implementation']),
+        'stakeMeta': json['stake_meta'] == null ? undefined : PriceFromJSON(json['stake_meta']),
     };
 }
 
-  export function DepositStakeActionToJSON(json: any): DepositStakeAction {
-      return DepositStakeActionToJSONTyped(json, false);
-  }
+export function DepositStakeActionToJSON(json: any): DepositStakeAction {
+    return DepositStakeActionToJSONTyped(json, false);
+}
 
-  export function DepositStakeActionToJSONTyped(value?: DepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
+export function DepositStakeActionToJSONTyped(value?: DepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -105,6 +109,7 @@ export function DepositStakeActionFromJSONTyped(json: any, ignoreDiscriminator: 
         'staker': AccountAddressToJSON(value['staker']),
         'pool': AccountAddressToJSON(value['pool']),
         'implementation': PoolImplementationTypeToJSON(value['implementation']),
+        'stake_meta': PriceToJSON(value['stakeMeta']),
     };
 }
 

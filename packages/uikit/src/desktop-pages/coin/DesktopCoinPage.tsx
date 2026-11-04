@@ -28,7 +28,11 @@ import { toTokenRate, useFormatFiat, useRate, useUSDTRate } from '../../state/ra
 import { useSwapAssetSearch } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import {
+    useActiveConfig,
+    useActiveTonNetwork,
+    useIsActiveWalletWatchOnly
+} from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import {
@@ -44,6 +48,7 @@ import {
 import { useCanReceiveTron, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
+import { useTrackCoinRouteAssetView } from '../../hooks/analytics/asset-view';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
 import { useParams } from '../../hooks/router/useParams';
@@ -61,6 +66,8 @@ import { TronFeeBanner } from '../../components/jettons/TronFeeBanner';
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
     const { name } = useParams();
+
+    useTrackCoinRouteAssetView(name);
 
     useEffect(() => {
         if (!name) {
@@ -166,8 +173,8 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const network = useActiveTonNetwork();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
-    const { data: buy } = useTonendpointBuyMethods();
     const canBuy = token === CryptoCurrency.TON && network !== Network.TESTNET;
+    const { data: buy } = useTonendpointBuyMethods(isOpen && canBuy);
     const currentAssetAddress = tonAssetAddressFromString(token);
     const swapAsset = useSwapAssetSearch(
         isReadOnly || network === Network.TESTNET
@@ -307,7 +314,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
             const amount = assets.ton.info.balance;
             return {
                 image: TON_ASSET.image!,
-                symbol: BRAND_CONFIG.coinSymbolWithEx,
+                symbol: BRAND_CONFIG.coinSymbol,
                 amount: format(amount),
                 fiatAmount: formatFiatCurrency(
                     fiat,
@@ -437,8 +444,8 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         }
     }, [assets, token]);
 
-    const { mainnetConfig } = useAppContext();
-    const tonviewer = new URL(mainnetConfig.accountExplorer).origin;
+    const config = useActiveConfig();
+    const tonviewer = new URL(config.accountExplorer).origin;
 
     if (asset === undefined) {
         return <Redirect to={AppRoute.home} />;
@@ -465,7 +472,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
                                     href={
                                         token === CryptoCurrency.TON
                                             ? tonviewer + '/price'
-                                            : mainnetConfig.accountExplorer?.replace('%s', token) ??
+                                            : config.accountExplorer?.replace('%s', token) ??
                                               tonviewer
                                     }
                                 >
@@ -562,7 +569,7 @@ export const TronUSDTPage = () => {
                     title={
                         <LabelWithBadge>
                             {asset.symbol}
-                            <AssetBlockchainBadge size="m" marginLeft="6px">
+                            <AssetBlockchainBadge size="m" className="ml-1.5">
                                 TRC20
                             </AssetBlockchainBadge>
                         </LabelWithBadge>

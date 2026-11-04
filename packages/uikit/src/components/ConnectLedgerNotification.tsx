@@ -8,32 +8,14 @@ import {
     LedgerTonProofResponse,
     LedgerTransaction
 } from '@tonkeeper/core/dist/service/ledger/connector';
+import {
+    readLedgerDeviceInfo,
+    signLedgerTransaction
+} from '@tonkeeper/core/dist/service/ledger/known-jettons';
 import { useConnectLedgerMutation, useEffectOnLedgerConnectionPageClosed } from '../state/ledger';
-import styled from 'styled-components';
 import { Cell } from '@ton/core';
 import { LedgerConnectionSteps } from './ledger/LedgerConnectionSteps';
 import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
-
-const ConnectLedgerWrapper = styled.div`
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-`;
-
-const LedgerConnectionStepsStyled = styled(LedgerConnectionSteps)`
-    margin: 1rem 0;
-`;
-
-const ButtonsBlock = styled.div`
-    margin-top: 1rem;
-    display: flex;
-    gap: 8px;
-    width: 100%;
-
-    > * {
-        flex: 1;
-    }
-`;
 
 type LedgerContentLedgerParams =
     | { path: number[]; transactions: LedgerTransaction[]; onSubmit: (result: Cell[]) => void }
@@ -74,9 +56,15 @@ export const LedgerContent: FC<{
                     return;
                 }
 
+                const device = await readLedgerDeviceInfo(transport);
                 const result: Cell[] = [];
                 for (const transaction of ledgerParams.transactions) {
-                    const val = await transport.signTransaction(ledgerParams.path, transaction);
+                    const val = await signLedgerTransaction(
+                        transport,
+                        ledgerParams.path,
+                        transaction,
+                        device
+                    );
                     result.push(val);
                     setCurrentTxToConfirmIndex(i => i + 1);
                 }
@@ -149,15 +137,16 @@ export const LedgerContent: FC<{
               };
 
     return (
-        <ConnectLedgerWrapper>
-            <LedgerConnectionStepsStyled
+        <div className="flex flex-col items-center">
+            <LedgerConnectionSteps
+                className="my-4"
                 {...connectionStepsProps}
                 currentStep={currentStep}
                 isErrored={isLedgerConnectingError}
             />
             <NotificationFooterPortal>
                 <NotificationFooter>
-                    <ButtonsBlock>
+                    <div className="mt-4 flex w-full gap-2 [&>*]:flex-1">
                         <ButtonResponsiveSize
                             secondary
                             onClick={() => onClose(new UserCancelledError('Cancel auth request'))}
@@ -171,10 +160,10 @@ export const LedgerContent: FC<{
                         >
                             {t('try_again')}
                         </ButtonResponsiveSize>
-                    </ButtonsBlock>
+                    </div>
                 </NotificationFooter>
             </NotificationFooterPortal>
-        </ConnectLedgerWrapper>
+        </div>
     );
 };
 

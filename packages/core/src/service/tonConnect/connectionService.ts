@@ -1,5 +1,5 @@
 import { ConnectItem, ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
-import { TonContract, TonWalletStandard } from '../../entries/wallet';
+import { isStandardTonWallet, TonContract, TonWalletStandard } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { getDevSettings } from '../devStorage';
@@ -90,7 +90,10 @@ export const getTonWalletConnections = async (
     if (!result) {
         const publicKey = wallet.publicKey;
         if (publicKey !== undefined) {
-            result = await migrateAccountConnectionsStorageKey(storage, { publicKey });
+            result = await migrateAccountConnectionsStorageKey(storage, {
+                id: wallet.id,
+                publicKey
+            });
         }
         await setAccountConnection(storage, wallet, mapDeprecatedAccountConnections(result ?? []));
     }
@@ -109,7 +112,8 @@ export const setAccountConnection = async (
 };
 
 /**
- * Save new account connection. In case of duplicate connection, the old one will be replaced
+ * Save new account connection. A dApp may hold several http sessions at once (one per browser);
+ * only a connection with the same session is replaced
  * @param options
  */
 export const saveAccountConnection = async (options: {
@@ -144,7 +148,7 @@ export const saveAccountConnection = async (options: {
                 return true;
             }
 
-            return item.manifest.url !== options.manifest.url;
+            return item.clientSessionId !== params.clientSessionId;
         });
     }
 
@@ -201,7 +205,7 @@ export const disconnectInjectedAccountConnection = async (options: {
     }
 
     connections = connections.filter(
-        item => item.type === 'injected' && !eqOrigins(item.webViewOrigin, options.webViewUrl)
+        item => item.type !== 'injected' || !eqOrigins(item.webViewOrigin, options.webViewUrl)
     );
 
     await setAccountConnection(options.storage, options.wallet, connections);
@@ -228,28 +232,46 @@ const disconnectInjectedDappFromAllWallets = async (storage: IStorage, webViewOr
  */
 export const disconnectHttpAccountConnection = async (options: {
     storage: IStorage;
-    wallet: Pick<TonWalletStandard, 'id' | 'publicKey'>;
+    wallet: TonContract;
     clientSessionId: string;
 }) => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
 
     connections = connections.filter(
-        item => item.type === 'http' && item.clientSessionId !== options.clientSessionId
+        item => item.type !== 'http' || item.clientSessionId !== options.clientSessionId
     );
 
     await setAccountConnection(options.storage, options.wallet, connections);
 };
 
+/**
+ * Connections stored under a public key move to the wallet id only when
+ * exactly one wallet has that key; otherwise the dApp has to connect again.
+ * The public-key entry is read once and removed.
+ */
 async function migrateAccountConnectionsStorageKey(
     storage: IStorage,
-    wallet: Pick<TonWalletStandard, 'publicKey'>
+    wallet: Pick<TonWalletStandard, 'id' | 'publicKey'>
 ) {
     const network = (await getDevSettings(storage)).tonNetwork;
+    const key = `${AppKey.CONNECTIONS}_${wallet.publicKey}_${network}`;
     const oldConnections = await storage.get<(DeprecatedAccountConnection | AccountConnection)[]>(
-        `${AppKey.CONNECTIONS}_${wallet.publicKey}_${network}`
+        key
     );
+    if (!oldConnections) {
+        return [];
+    }
+    await storage.delete(key);
 
-    return oldConnections ?? [];
+    const walletsWithKey = (await accountsStorage(storage).getAccounts())
+        .flatMap(a => a.allTonWallets)
+        .filter(isStandardTonWallet)
+        .filter(w => w.publicKey === wallet.publicKey);
+    if (walletsWithKey.length !== 1 || walletsWithKey[0].id !== wallet.id) {
+        return [];
+    }
+
+    return oldConnections;
 }
 
 function mapDeprecatedAccountConnections(

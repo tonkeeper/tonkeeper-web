@@ -43,20 +43,14 @@ import {
 export interface WithdrawTokenStakeRequestAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof WithdrawTokenStakeRequestAction
      */
     staker: AccountAddress;
     /**
      * 
-     * @type {Protocol}
-     * @memberof WithdrawTokenStakeRequestAction
      */
     protocol: Protocol;
     /**
      * 
-     * @type {Price}
-     * @memberof WithdrawTokenStakeRequestAction
      */
     stakeMeta?: Price;
 }
@@ -86,11 +80,11 @@ export function WithdrawTokenStakeRequestActionFromJSONTyped(json: any, ignoreDi
     };
 }
 
-  export function WithdrawTokenStakeRequestActionToJSON(json: any): WithdrawTokenStakeRequestAction {
-      return WithdrawTokenStakeRequestActionToJSONTyped(json, false);
-  }
+export function WithdrawTokenStakeRequestActionToJSON(json: any): WithdrawTokenStakeRequestAction {
+    return WithdrawTokenStakeRequestActionToJSONTyped(json, false);
+}
 
-  export function WithdrawTokenStakeRequestActionToJSONTyped(value?: WithdrawTokenStakeRequestAction | null, ignoreDiscriminator: boolean = false): any {
+export function WithdrawTokenStakeRequestActionToJSONTyped(value?: WithdrawTokenStakeRequestAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

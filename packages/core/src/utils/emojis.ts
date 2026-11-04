@@ -1,3 +1,9 @@
+/**
+ * Avatar shown for a wallet until the user picks one. Rendered by uikit's
+ * `WalletEmoji` as the wallet SVG icon rather than a unicode emoji.
+ */
+export const DEFAULT_WALLET_EMOJI = 'custom:wallet';
+
 export const emojis = [
     '😀',
     '😃',

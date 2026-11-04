@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface GaslessEstimation {
     /**
      * 
-     * @type {string}
-     * @memberof GaslessEstimation
      */
     commission: string;
 }
@@ -49,11 +47,11 @@ export function GaslessEstimationFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function GaslessEstimationToJSON(json: any): GaslessEstimation {
-      return GaslessEstimationToJSONTyped(json, false);
-  }
+export function GaslessEstimationToJSON(json: any): GaslessEstimation {
+    return GaslessEstimationToJSONTyped(json, false);
+}
 
-  export function GaslessEstimationToJSONTyped(value?: GaslessEstimation | null, ignoreDiscriminator: boolean = false): any {
+export function GaslessEstimationToJSONTyped(value?: GaslessEstimation | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

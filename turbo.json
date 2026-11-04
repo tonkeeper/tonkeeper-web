@@ -1,5 +1,6 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "globalEnv": ["WALLETCONNECT_PROJECT_ID", "MIGRATION_OLD_ORIGIN", "MIGRATION_NEW_ORIGIN"],
     "tasks": {
         "build": {
             "dependsOn": ["^build"],
@@ -26,6 +27,11 @@
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]
         },
+        "build:migration": {
+            "dependsOn": ["^build:pkg"],
+            "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/locales/src/migration/**"],
+            "outputs": ["dist/**"]
+        },
         "build:extension": {
             "cache": false,
             "dependsOn": ["^build:pkg"],
@@ -44,6 +50,9 @@
             "outputs": []
         },
         "lint": {
+            "outputs": []
+        },
+        "test": {
             "outputs": []
         }
     }

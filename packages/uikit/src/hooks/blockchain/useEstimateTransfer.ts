@@ -81,7 +81,7 @@ export function useEstimateTransfer({
             transferService,
             notifyError
         ],
-        async () => {
+        async (): Promise<Estimation> => {
             const comment = (recipient as TonRecipientData).comment;
             try {
                 if (isTonAsset(amount.asset)) {

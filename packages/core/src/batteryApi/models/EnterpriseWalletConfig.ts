@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface EnterpriseWalletConfig {
     /**
      * when building a message to transfer an NFT or Jetton, use this address to send excess funds back to Battery Service.
-     * @type {string}
-     * @memberof EnterpriseWalletConfig
      */
     excessAccount: string;
 }
@@ -31,7 +29,7 @@ export interface EnterpriseWalletConfig {
  * Check if a given object implements the EnterpriseWalletConfig interface.
  */
 export function instanceOfEnterpriseWalletConfig(value: object): value is EnterpriseWalletConfig {
-    if (!('excessAccount' in value) || value['excessAccount'] === undefined) return false;
+    if ((!('excessAccount' in (value as Record<string, any>)) && !('excess_account' in (value as Record<string, any>))) || ((value as Record<string, any>)['excessAccount'] === undefined && (value as Record<string, any>)['excess_account'] === undefined)) return false;
     return true;
 }
 
@@ -49,11 +47,11 @@ export function EnterpriseWalletConfigFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-  export function EnterpriseWalletConfigToJSON(json: any): EnterpriseWalletConfig {
-      return EnterpriseWalletConfigToJSONTyped(json, false);
-  }
+export function EnterpriseWalletConfigToJSON(json: any): EnterpriseWalletConfig {
+    return EnterpriseWalletConfigToJSONTyped(json, false);
+}
 
-  export function EnterpriseWalletConfigToJSONTyped(value?: EnterpriseWalletConfig | null, ignoreDiscriminator: boolean = false): any {
+export function EnterpriseWalletConfigToJSONTyped(value?: EnterpriseWalletConfig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

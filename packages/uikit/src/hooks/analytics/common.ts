@@ -13,14 +13,7 @@ import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
  * tonkeeper/analytics-schemas.
  * @deprecated
  */
-export type LegacyAnalyticsEvent =
-    | { eventName: 'page_view'; location: string }
-    | {
-          eventName: 'dapp_click';
-          url: string;
-          location: string;
-          from: 'banner' | 'browser' | 'browser_search' | 'browser_connected' | 'push' | 'sidebar';
-      };
+export type LegacyAnalyticsEvent = { eventName: 'page_view'; location: string };
 
 export type TrackableEvent = AnalyticsEvent | LegacyAnalyticsEvent;
 

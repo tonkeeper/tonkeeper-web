@@ -85,152 +85,102 @@ import {
 export interface Transaction {
     /**
      * 
-     * @type {string}
-     * @memberof Transaction
      */
     hash: string;
     /**
      * 
-     * @type {number}
-     * @memberof Transaction
      */
     lt: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof Transaction
      */
     account: AccountAddress;
     /**
      * 
-     * @type {boolean}
-     * @memberof Transaction
      */
     success: boolean;
     /**
      * 
-     * @type {number}
-     * @memberof Transaction
      */
     utime: number;
     /**
      * 
-     * @type {AccountStatus}
-     * @memberof Transaction
      */
     origStatus: AccountStatus;
     /**
      * 
-     * @type {AccountStatus}
-     * @memberof Transaction
      */
     endStatus: AccountStatus;
     /**
      * 
-     * @type {number}
-     * @memberof Transaction
      */
     totalFees: number;
     /**
      * 
-     * @type {number}
-     * @memberof Transaction
      */
     endBalance: number;
     /**
      * 
-     * @type {TransactionType}
-     * @memberof Transaction
      */
     transactionType: TransactionType;
     /**
      * 
-     * @type {string}
-     * @memberof Transaction
      */
     stateUpdateOld: string;
     /**
      * 
-     * @type {string}
-     * @memberof Transaction
      */
     stateUpdateNew: string;
     /**
      * 
-     * @type {Message}
-     * @memberof Transaction
      */
     inMsg?: Message;
     /**
      * 
-     * @type {Array<Message>}
-     * @memberof Transaction
      */
     outMsgs: Array<Message>;
     /**
      * 
-     * @type {string}
-     * @memberof Transaction
      */
     block: string;
     /**
      * 
-     * @type {string}
-     * @memberof Transaction
      */
     prevTransHash?: string;
     /**
      * 
-     * @type {number}
-     * @memberof Transaction
      */
     prevTransLt?: number;
     /**
      * 
-     * @type {ComputePhase}
-     * @memberof Transaction
      */
     computePhase?: ComputePhase;
     /**
      * 
-     * @type {StoragePhase}
-     * @memberof Transaction
      */
     storagePhase?: StoragePhase;
     /**
      * 
-     * @type {CreditPhase}
-     * @memberof Transaction
      */
     creditPhase?: CreditPhase;
     /**
      * 
-     * @type {ActionPhase}
-     * @memberof Transaction
      */
     actionPhase?: ActionPhase;
     /**
      * 
-     * @type {BouncePhaseType}
-     * @memberof Transaction
      */
     bouncePhase?: BouncePhaseType;
     /**
      * 
-     * @type {boolean}
-     * @memberof Transaction
      */
     aborted: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof Transaction
      */
     destroyed: boolean;
     /**
      * hex encoded boc with raw transaction
-     * @type {string}
-     * @memberof Transaction
      */
     raw: string;
 }
@@ -246,14 +196,14 @@ export function instanceOfTransaction(value: object): value is Transaction {
     if (!('account' in value) || value['account'] === undefined) return false;
     if (!('success' in value) || value['success'] === undefined) return false;
     if (!('utime' in value) || value['utime'] === undefined) return false;
-    if (!('origStatus' in value) || value['origStatus'] === undefined) return false;
-    if (!('endStatus' in value) || value['endStatus'] === undefined) return false;
-    if (!('totalFees' in value) || value['totalFees'] === undefined) return false;
-    if (!('endBalance' in value) || value['endBalance'] === undefined) return false;
-    if (!('transactionType' in value) || value['transactionType'] === undefined) return false;
-    if (!('stateUpdateOld' in value) || value['stateUpdateOld'] === undefined) return false;
-    if (!('stateUpdateNew' in value) || value['stateUpdateNew'] === undefined) return false;
-    if (!('outMsgs' in value) || value['outMsgs'] === undefined) return false;
+    if ((!('origStatus' in (value as Record<string, any>)) && !('orig_status' in (value as Record<string, any>))) || ((value as Record<string, any>)['origStatus'] === undefined && (value as Record<string, any>)['orig_status'] === undefined)) return false;
+    if ((!('endStatus' in (value as Record<string, any>)) && !('end_status' in (value as Record<string, any>))) || ((value as Record<string, any>)['endStatus'] === undefined && (value as Record<string, any>)['end_status'] === undefined)) return false;
+    if ((!('totalFees' in (value as Record<string, any>)) && !('total_fees' in (value as Record<string, any>))) || ((value as Record<string, any>)['totalFees'] === undefined && (value as Record<string, any>)['total_fees'] === undefined)) return false;
+    if ((!('endBalance' in (value as Record<string, any>)) && !('end_balance' in (value as Record<string, any>))) || ((value as Record<string, any>)['endBalance'] === undefined && (value as Record<string, any>)['end_balance'] === undefined)) return false;
+    if ((!('transactionType' in (value as Record<string, any>)) && !('transaction_type' in (value as Record<string, any>))) || ((value as Record<string, any>)['transactionType'] === undefined && (value as Record<string, any>)['transaction_type'] === undefined)) return false;
+    if ((!('stateUpdateOld' in (value as Record<string, any>)) && !('state_update_old' in (value as Record<string, any>))) || ((value as Record<string, any>)['stateUpdateOld'] === undefined && (value as Record<string, any>)['state_update_old'] === undefined)) return false;
+    if ((!('stateUpdateNew' in (value as Record<string, any>)) && !('state_update_new' in (value as Record<string, any>))) || ((value as Record<string, any>)['stateUpdateNew'] === undefined && (value as Record<string, any>)['state_update_new'] === undefined)) return false;
+    if ((!('outMsgs' in (value as Record<string, any>)) && !('out_msgs' in (value as Record<string, any>))) || ((value as Record<string, any>)['outMsgs'] === undefined && (value as Record<string, any>)['out_msgs'] === undefined)) return false;
     if (!('block' in value) || value['block'] === undefined) return false;
     if (!('aborted' in value) || value['aborted'] === undefined) return false;
     if (!('destroyed' in value) || value['destroyed'] === undefined) return false;
@@ -299,11 +249,11 @@ export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function TransactionToJSON(json: any): Transaction {
-      return TransactionToJSONTyped(json, false);
-  }
+export function TransactionToJSON(json: any): Transaction {
+    return TransactionToJSONTyped(json, false);
+}
 
-  export function TransactionToJSONTyped(value?: Transaction | null, ignoreDiscriminator: boolean = false): any {
+export function TransactionToJSONTyped(value?: Transaction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

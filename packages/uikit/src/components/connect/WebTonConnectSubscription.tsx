@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import {
     RpcMethod,
+    SignDataRequestPayload,
     WalletResponse,
     TonConnectAppRequest,
-    TonConnectAppRequestPayload
+    TonConnectAppRequestPayload,
+    TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import {
@@ -12,7 +14,9 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
 import { checkTonConnectFromAndNetwork } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
-import { useCallback, useEffect, useState } from 'react';
+import { walletIdOfClientSession } from '@tonkeeper/core/dist/service/tonConnect/sessionOwner';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import {
     tonConnectAppManuallyDisconnected$,
@@ -36,6 +40,8 @@ const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';
 
 const WebTonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
+    /** Id of the request being confirmed, set before the sheet opens. */
+    const pendingRequestId = useRef<string | undefined>(undefined);
 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
@@ -51,51 +57,54 @@ const WebTonConnectSubscription = () => {
     const { mainnetConfig } = useAppContext();
 
     useEffect(() => {
-        const openNotification = (clientSessionId: string, value: TonConnectAppRequestPayload) => {
-            const walletToActivate = appConnections?.find(i =>
-                i.connections.some(c => c.clientSessionId === clientSessionId)
-            );
+        const replyBadRequest = (params: TonConnectAppRequest<'http'>, message: string) =>
+            replyHttpBadRequestResponse({
+                ...params,
+                message,
+                bridgeEndpoint: mainnetConfig.ton_connect_bridge
+            });
 
-            if (walletToActivate) {
-                setActiveWallet(walletToActivate.wallet.id).then(() =>
-                    setTimeout(() => {
-                        setRequest(value);
-                    }, 100)
-                );
-            } else {
-                setTimeout(() => {
-                    setRequest(value);
-                }, 100);
-            }
-        };
-        const isValidRequest = async (
+        /**
+         * Binds the request to the wallet its session belongs to and opens
+         * the confirmation for it. One request is confirmed at a time.
+         */
+        const openRequest = async (
             params: TonConnectAppRequest<'http'>,
-            payload: TonConnectAppRequestPayload['payload']
-        ): Promise<boolean> => {
-            const walletToActivate = appConnections?.find(i =>
-                i.connections.some(c => c.clientSessionId === params.connection.clientSessionId)
-            )?.wallet;
+            rawPayload: string,
+            toValue: (
+                walletId: WalletId,
+                payload: TonConnectAppRequestPayload['payload']
+            ) => TonConnectAppRequestPayload
+        ) => {
+            const payload = JSON.parse(rawPayload);
 
-            if (!walletToActivate) {
-                await replyHttpBadRequestResponse({
-                    ...params,
-                    message: 'Unknown session',
-                    bridgeEndpoint: mainnetConfig.ton_connect_bridge
-                });
-                return false;
+            if (pendingRequestId.current !== undefined) {
+                return replyBadRequest(params, 'Another request is in progress');
+            }
+            pendingRequestId.current = params.request.id;
+
+            const fail = (message: string) => {
+                pendingRequestId.current = undefined;
+                return replyBadRequest(params, message);
+            };
+
+            const walletId = walletIdOfClientSession(
+                appConnections ?? [],
+                params.connection.clientSessionId
+            );
+            const requestWallet = appConnections?.find(i => i.wallet.id === walletId)?.wallet;
+            if (!requestWallet) {
+                return fail('Unknown session');
             }
 
             try {
-                await checkTonConnectFromAndNetwork(sdk.storage, walletToActivate, payload);
-                return true;
+                await checkTonConnectFromAndNetwork(sdk.storage, requestWallet, payload);
+                await setActiveWallet(requestWallet.id);
             } catch (e) {
-                await replyHttpBadRequestResponse({
-                    ...params,
-                    message: e instanceof TonConnectError ? e.message : 'Bad request',
-                    bridgeEndpoint: mainnetConfig.ton_connect_bridge
-                });
-                return false;
+                return fail(e instanceof TonConnectError ? e.message : 'Bad request');
             }
+
+            setTimeout(() => setRequest(toValue(requestWallet.id, payload)), 100);
         };
 
         const handleMessage = async (params: TonConnectAppRequest<'http'>) => {
@@ -109,30 +118,22 @@ const WebTonConnectSubscription = () => {
                     );
                 }
                 case 'sendTransaction': {
-                    const value: TonConnectAppRequestPayload = {
+                    return openRequest(params, params.request.params[0], (walletId, payload) => ({
                         connection: params.connection,
                         id: params.request.id,
+                        walletId,
                         kind: 'sendTransaction',
-                        payload: JSON.parse(params.request.params[0])
-                    };
-                    if (!(await isValidRequest(params, value.payload))) {
-                        return;
-                    }
-                    setRequest(undefined);
-                    return openNotification(params.connection.clientSessionId, value);
+                        payload: payload as TonConnectTransactionPayload
+                    }));
                 }
                 case 'signData': {
-                    const value: TonConnectAppRequestPayload = {
+                    return openRequest(params, params.request.params[0], (walletId, payload) => ({
                         connection: params.connection,
                         id: params.request.id,
+                        walletId,
                         kind: 'signData',
-                        payload: JSON.parse(params.request.params[0])
-                    };
-                    if (!(await isValidRequest(params, value.payload))) {
-                        return;
-                    }
-                    setRequest(undefined);
-                    return openNotification(params.connection.clientSessionId, value);
+                        payload: payload as SignDataRequestPayload
+                    }));
                 }
                 default: {
                     return badRequestResponse({
@@ -166,7 +167,7 @@ const WebTonConnectSubscription = () => {
             storage: sdk.storage,
             handleMessage,
             connections: appConnections?.flatMap(i => i.connections),
-            lastEventId,
+            lastEventId: lastEventId ?? undefined,
             bridgeEndpoint: mainnetConfig.ton_connect_bridge
         });
 
@@ -189,6 +190,7 @@ const WebTonConnectSubscription = () => {
         async (result: WalletResponse<RpcMethod>) => {
             if (!request) return;
             setRequest(undefined);
+            pendingRequestId.current = undefined;
 
             if (request.connection.type === 'http') {
                 await sendResponse({
@@ -217,6 +219,7 @@ const WebTonConnectSubscription = () => {
 
             if (val.event === 'close-tx-confirmation') {
                 setRequest(undefined);
+                pendingRequestId.current = undefined;
             }
         });
     }, [request]);

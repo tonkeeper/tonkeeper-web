@@ -29,8 +29,6 @@ import {
 export interface CreatePromoCampaign200Response {
     /**
      * 
-     * @type {Array<CreatePromoCampaign200ResponseParticipantsInner>}
-     * @memberof CreatePromoCampaign200Response
      */
     participants: Array<CreatePromoCampaign200ResponseParticipantsInner>;
 }
@@ -57,11 +55,11 @@ export function CreatePromoCampaign200ResponseFromJSONTyped(json: any, ignoreDis
     };
 }
 
-  export function CreatePromoCampaign200ResponseToJSON(json: any): CreatePromoCampaign200Response {
-      return CreatePromoCampaign200ResponseToJSONTyped(json, false);
-  }
+export function CreatePromoCampaign200ResponseToJSON(json: any): CreatePromoCampaign200Response {
+    return CreatePromoCampaign200ResponseToJSONTyped(json, false);
+}
 
-  export function CreatePromoCampaign200ResponseToJSONTyped(value?: CreatePromoCampaign200Response | null, ignoreDiscriminator: boolean = false): any {
+export function CreatePromoCampaign200ResponseToJSONTyped(value?: CreatePromoCampaign200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

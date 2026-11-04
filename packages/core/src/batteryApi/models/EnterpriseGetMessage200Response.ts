@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface EnterpriseGetMessage200Response {
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseGetMessage200Response
      */
     paymentTxHash?: string;
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseGetMessage200Response
      */
     committedTxHash?: string;
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseGetMessage200Response
      */
     status: EnterpriseGetMessage200ResponseStatusEnum;
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseGetMessage200Response
      */
     finalCost?: string;
     /**
      * 
-     * @type {string}
-     * @memberof EnterpriseGetMessage200Response
      */
     failedReason?: string;
 }
@@ -58,7 +48,7 @@ export interface EnterpriseGetMessage200Response {
 export const EnterpriseGetMessage200ResponseStatusEnum = {
     Pending: 'pending',
     Completed: 'completed',
-    Failed: 'failed'
+    Failed: 'failed',
 } as const;
 export type EnterpriseGetMessage200ResponseStatusEnum = typeof EnterpriseGetMessage200ResponseStatusEnum[keyof typeof EnterpriseGetMessage200ResponseStatusEnum];
 
@@ -89,11 +79,11 @@ export function EnterpriseGetMessage200ResponseFromJSONTyped(json: any, ignoreDi
     };
 }
 
-  export function EnterpriseGetMessage200ResponseToJSON(json: any): EnterpriseGetMessage200Response {
-      return EnterpriseGetMessage200ResponseToJSONTyped(json, false);
-  }
+export function EnterpriseGetMessage200ResponseToJSON(json: any): EnterpriseGetMessage200Response {
+    return EnterpriseGetMessage200ResponseToJSONTyped(json, false);
+}
 
-  export function EnterpriseGetMessage200ResponseToJSONTyped(value?: EnterpriseGetMessage200Response | null, ignoreDiscriminator: boolean = false): any {
+export function EnterpriseGetMessage200ResponseToJSONTyped(value?: EnterpriseGetMessage200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

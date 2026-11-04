@@ -1,0 +1,20 @@
+# Never framed: the handoff lands on /migrate and every screen here can sign.
+# `frame-ancestors` only works as a header, which is why it isn't in the meta
+# CSP; X-Frame-Options covers browsers that predate it. The opener policy cuts
+# off any site that opens the wallet in a window, while keeping the popups the
+# wallet opens itself — /migrate talks to the handoff popup it opens.
+/*
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+
+# A payload's fragment never reaches a server, but nothing about the landing
+# should be cached or leak onward either.
+/migrate
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer
+
+# Trust Wallet Core's wasm lives under a path scoped by the package version
+# (see vite.config.mts), so a cached copy can never go stale.
+/wallet-core/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -29,14 +29,10 @@ import {
 export interface ExtraCurrency {
     /**
      * 
-     * @type {string}
-     * @memberof ExtraCurrency
      */
     amount: string;
     /**
      * 
-     * @type {EcPreview}
-     * @memberof ExtraCurrency
      */
     preview: EcPreview;
 }
@@ -65,11 +61,11 @@ export function ExtraCurrencyFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function ExtraCurrencyToJSON(json: any): ExtraCurrency {
-      return ExtraCurrencyToJSONTyped(json, false);
-  }
+export function ExtraCurrencyToJSON(json: any): ExtraCurrency {
+    return ExtraCurrencyToJSONTyped(json, false);
+}
 
-  export function ExtraCurrencyToJSONTyped(value?: ExtraCurrency | null, ignoreDiscriminator: boolean = false): any {
+export function ExtraCurrencyToJSONTyped(value?: ExtraCurrency | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

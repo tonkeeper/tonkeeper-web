@@ -29,20 +29,14 @@ import {
 export interface DomainRenewAction {
     /**
      * 
-     * @type {string}
-     * @memberof DomainRenewAction
      */
     domain: string;
     /**
      * 
-     * @type {string}
-     * @memberof DomainRenewAction
      */
     contractAddress: string;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof DomainRenewAction
      */
     renewer: AccountAddress;
 }
@@ -52,7 +46,7 @@ export interface DomainRenewAction {
  */
 export function instanceOfDomainRenewAction(value: object): value is DomainRenewAction {
     if (!('domain' in value) || value['domain'] === undefined) return false;
-    if (!('contractAddress' in value) || value['contractAddress'] === undefined) return false;
+    if ((!('contractAddress' in (value as Record<string, any>)) && !('contract_address' in (value as Record<string, any>))) || ((value as Record<string, any>)['contractAddress'] === undefined && (value as Record<string, any>)['contract_address'] === undefined)) return false;
     if (!('renewer' in value) || value['renewer'] === undefined) return false;
     return true;
 }
@@ -73,11 +67,11 @@ export function DomainRenewActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function DomainRenewActionToJSON(json: any): DomainRenewAction {
-      return DomainRenewActionToJSONTyped(json, false);
-  }
+export function DomainRenewActionToJSON(json: any): DomainRenewAction {
+    return DomainRenewActionToJSONTyped(json, false);
+}
 
-  export function DomainRenewActionToJSONTyped(value?: DomainRenewAction | null, ignoreDiscriminator: boolean = false): any {
+export function DomainRenewActionToJSONTyped(value?: DomainRenewAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

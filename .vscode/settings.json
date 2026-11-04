@@ -6,5 +6,5 @@
     },
     "javascript.format.enable": true,
     "editor.formatOnSave": true,
-    "cSpell.words": ["Tonendpoint"]
+    "cSpell.words": ["Multichain", "Tonendpoint", "wordlist"]
 }

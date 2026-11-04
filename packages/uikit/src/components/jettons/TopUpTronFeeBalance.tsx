@@ -305,7 +305,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                         <MethodImage src={TON_ASSET.image} />
                         <MobileBlockWrapper>
                             <MethodInfo>
-                                <CardTitle>{BRAND_CONFIG.coinSymbolWithEx}</CardTitle>
+                                <CardTitle>{BRAND_CONFIG.coinSymbol}</CardTitle>
                                 <CardSubtitle>{t('topup_tron_fee_ton_description')}</CardSubtitle>
                             </MethodInfo>
                             {tonSenderFee.fiatAmount ? (

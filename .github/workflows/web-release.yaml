@@ -1,0 +1,41 @@
+name: Web Release
+# Ships the website alone: no desktop, iPad or extension build and no GitHub Release,
+# so the Release workflow does not fire. Deploy a tag to `rc`, check it, then deploy
+# the same tag to `main`.
+on:
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Existing tag to deploy (e.g. v26.7.0)'
+                required: true
+                type: string
+            environment:
+                type: choice
+                description: 'rc is the preview; main is Pages production'
+                required: true
+                default: 'rc'
+                options:
+                    - rc
+                    - main
+
+concurrency:
+    group: web-release-${{ inputs.environment }}
+    cancel-in-progress: false
+
+jobs:
+    check-tag:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check the tag exists
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  TAG: ${{ inputs.tag }}
+              run: gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --silent
+
+    web-build:
+        needs: check-tag
+        uses: ./.github/workflows/web-build.yaml
+        with:
+            environment: ${{ inputs.environment }}
+            release_tag: ${{ inputs.tag }}
+        secrets: inherit

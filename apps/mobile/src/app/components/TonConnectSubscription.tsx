@@ -103,7 +103,7 @@ export const TonConnectSubscription = () => {
     useEffect(() => subscribeToHttpTonConnectRequest(onTransaction), [onTransaction]);
 
     useEffect(
-        () => subscribeToHttpTonConnectDisconnect(c => disconnectHttp({ connectionId: c.id })),
+        () => subscribeToHttpTonConnectDisconnect(c => disconnectHttp({ connection: c })),
         [disconnectHttp]
     );
 

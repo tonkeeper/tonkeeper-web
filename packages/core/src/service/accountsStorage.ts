@@ -1,5 +1,6 @@
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
+import { suggestWalletName } from './defaultWalletName';
 import {
     DeprecatedWalletState,
     TonWalletStandard,
@@ -23,7 +24,7 @@ import {
 import { DeprecatedAccountState } from '../entries/account';
 import { AuthPassword, AuthState, DeprecatedAuthState } from '../entries/password';
 import { assertUnreachable, notNullish } from '../utils/types';
-import { getFallbackAccountEmoji } from './walletService';
+import { DEFAULT_WALLET_EMOJI } from '../utils/emojis';
 
 export class AccountsStorage {
     constructor(private storage: IStorage) {}
@@ -41,6 +42,7 @@ export class AccountsStorage {
 
         await this.migrateAccountSecret(state);
         await this.migrateResetWrongMamTronAccounts(state);
+        await this.dropMetaEncryptionMap();
         return state ?? defaultAccountState;
     };
 
@@ -176,8 +178,13 @@ export class AccountsStorage {
     async getNewAccountNameAndEmoji(accountId: AccountId) {
         const existingAccounts = await this.getAccounts();
         const existingAccount = existingAccounts.find(a => a.id === accountId);
-        const name = existingAccount?.name || 'Account ' + (existingAccounts.length + 1);
-        const emoji = existingAccount?.emoji || getFallbackAccountEmoji(accountId);
+        const name =
+            existingAccount?.name ||
+            suggestWalletName(
+                'Wallet',
+                existingAccounts.map(a => a.name)
+            );
+        const emoji = existingAccount?.emoji || DEFAULT_WALLET_EMOJI;
         return { name, emoji };
     }
 
@@ -186,8 +193,11 @@ export class AccountsStorage {
         const existingAccount = existingAccounts.find(a => a.id === accountId);
         const name =
             existingAccount?.name ||
-            'Multisig ' + (existingAccounts.filter(a => a.type === 'ton-multisig').length + 1);
-        const emoji = existingAccount?.emoji || getFallbackAccountEmoji(accountId);
+            suggestWalletName(
+                'Multisig',
+                existingAccounts.map(a => a.name)
+            );
+        const emoji = existingAccount?.emoji || DEFAULT_WALLET_EMOJI;
         return { name, emoji };
     }
 
@@ -258,6 +268,13 @@ export class AccountsStorage {
         }
 
         await this.storage.set(TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY, true);
+    }
+
+    /** `META_ENCRYPTION_MAP` is retired; nothing reads it. */
+    private async dropMetaEncryptionMap(): Promise<void> {
+        if (await this.storage.get(AppKey.META_ENCRYPTION_MAP)) {
+            await this.storage.delete(AppKey.META_ENCRYPTION_MAP);
+        }
     }
 
     public setActiveAccountAndWalletByWalletId = async (walletId: WalletId) => {
@@ -336,7 +353,7 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
             }
 
             const name = w.name || 'Account ' + (index + 1);
-            const emoji = w.emoji || getFallbackAccountEmoji(pk);
+            const emoji = w.emoji || DEFAULT_WALLET_EMOJI;
 
             const tonWallet: TonWalletStandard = {
                 id: w.active.rawAddress,

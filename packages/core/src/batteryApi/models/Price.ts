@@ -36,44 +36,30 @@ import {
 export interface Price {
     /**
      * 
-     * @type {CurrencyType}
-     * @memberof Price
      */
     currencyType: CurrencyType;
     /**
      * 
-     * @type {string}
-     * @memberof Price
      */
     value: string;
     /**
      * 
-     * @type {number}
-     * @memberof Price
      */
     decimals: number;
     /**
      * 
-     * @type {string}
-     * @memberof Price
      */
     tokenName: string;
     /**
      * 
-     * @type {TrustType}
-     * @memberof Price
      */
     verification: TrustType;
     /**
      * 
-     * @type {string}
-     * @memberof Price
      */
     image: string;
     /**
      * 
-     * @type {string}
-     * @memberof Price
      */
     jetton?: string;
 }
@@ -84,10 +70,10 @@ export interface Price {
  * Check if a given object implements the Price interface.
  */
 export function instanceOfPrice(value: object): value is Price {
-    if (!('currencyType' in value) || value['currencyType'] === undefined) return false;
+    if ((!('currencyType' in (value as Record<string, any>)) && !('currency_type' in (value as Record<string, any>))) || ((value as Record<string, any>)['currencyType'] === undefined && (value as Record<string, any>)['currency_type'] === undefined)) return false;
     if (!('value' in value) || value['value'] === undefined) return false;
     if (!('decimals' in value) || value['decimals'] === undefined) return false;
-    if (!('tokenName' in value) || value['tokenName'] === undefined) return false;
+    if ((!('tokenName' in (value as Record<string, any>)) && !('token_name' in (value as Record<string, any>))) || ((value as Record<string, any>)['tokenName'] === undefined && (value as Record<string, any>)['token_name'] === undefined)) return false;
     if (!('verification' in value) || value['verification'] === undefined) return false;
     if (!('image' in value) || value['image'] === undefined) return false;
     return true;
@@ -113,11 +99,11 @@ export function PriceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Pri
     };
 }
 
-  export function PriceToJSON(json: any): Price {
-      return PriceToJSONTyped(json, false);
-  }
+export function PriceToJSON(json: any): Price {
+    return PriceToJSONTyped(json, false);
+}
 
-  export function PriceToJSONTyped(value?: Price | null, ignoreDiscriminator: boolean = false): any {
+export function PriceToJSONTyped(value?: Price | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

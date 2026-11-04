@@ -1,84 +1,19 @@
 import React from 'react';
+import IcPlus28 from '../../icons/components/IcPlus28';
+import IcArrowUpOutline28 from '../../icons/components/IcArrowUpOutline28';
+import IcArrowDownOutline28 from '../../icons/components/IcArrowDownOutline28';
+import IcMinus28 from '../../icons/components/IcMinus28';
 
-export const BuyIcon = () => {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-        >
-            <path
-                d="M14 21.5V14M14 14V6.5M14 14H21.5M14 14H6.5"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-};
+// Home-screen action glyphs rendered at 28px inside the 44px action circle.
+// Sourced from the generated design-system icon set; colour is inherited from
+// the surrounding button via `currentColor`.
+export const BuyIcon = () => <IcPlus28 className="h-7 w-7" />;
 
-export const SendIcon = () => {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-        >
-            <path
-                d="M14 6.5V21.5M14 6.5L7.5 13M14 6.5L20.5 13"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-};
+export const SendIcon = () => <IcArrowUpOutline28 className="h-7 w-7" />;
 
-export const ReceiveIcon = () => {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-        >
-            <path
-                d="M14 21.5V6.5M14 21.5L7.5 15M14 21.5L20.5 15"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-};
+export const ReceiveIcon = () => <IcArrowDownOutline28 className="h-7 w-7" />;
 
-export const SellIcon = () => {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 28 28"
-            fill="none"
-        >
-            <path
-                d="M6.5 14H21.5"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </svg>
-    );
-};
+export const SellIcon = () => <IcMinus28 className="h-7 w-7" />;
 
 export const GlobalIcon = () => {
     return (

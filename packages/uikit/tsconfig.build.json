@@ -1,0 +1,19 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        // Keeps `tsc -w` from re-emitting every dist file on startup after
+        // `build:pkg` already produced matching outputs. Without this, the
+        // watch process rewrites ~1000 JS files and Vite full-reloads for
+        // the whole burst.
+        "incremental": true,
+        "tsBuildInfoFile": "./tsconfig.build.tsbuildinfo"
+    },
+    "exclude": [
+        "node_modules",
+        "**/stories",
+        "**/*.ct.tsx",
+        "**/*Harness.tsx",
+        "playwright",
+        "playwright-ct.config.ts"
+    ]
+}

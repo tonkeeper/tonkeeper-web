@@ -1,6 +1,6 @@
 import { fromNano } from '@ton/core';
 import BigNumber from 'bignumber.js';
-import { FiatCurrency, FiatCurrencySymbolsConfig } from '../entries/fiat';
+import { FiatCurrency, getFiatCurrencyState } from '../entries/fiat';
 
 type LocaleFormat = {
     groupingSeparator: string;
@@ -21,6 +21,8 @@ type AmountFormatOptions = {
 type DisplayFormatOptions = {
     unit?: string;
     currency?: FiatCurrency;
+    /** Skips display rounding, so every significant decimal is shown. */
+    exact?: boolean;
 };
 
 type AmountNumber = string | number | BigNumber | BigNumber.Value;
@@ -76,7 +78,7 @@ export class AmountFormatter {
         }
 
         if (options.currency) {
-            const conf = FiatCurrencySymbolsConfig[options.currency];
+            const conf = getFiatCurrencyState(options.currency);
             if (conf) {
                 if (conf.side === 'start') {
                     prefix += conf.symbol + ' ';
@@ -139,7 +141,7 @@ export class AmountFormatter {
             return zero;
         }
 
-        const normalized = this.normalize(bn.abs());
+        const normalized = options.exact ? bn.abs() : this.normalize(bn.abs());
         const plain = this.trimTrailingZeroes(normalized.toFixed());
         const [intPart, decPart = ''] = plain.split('.');
 
@@ -156,7 +158,7 @@ export class AmountFormatter {
     }
 
     private wrapCurrency(value: string, currency: FiatCurrency): string {
-        const conf = FiatCurrencySymbolsConfig[currency];
+        const conf = getFiatCurrencyState(currency);
         if (!conf) return `${value} ${currency}`;
         return conf.side === 'start' ? `${conf.symbol} ${value}` : `${value} ${conf.symbol}`;
     }

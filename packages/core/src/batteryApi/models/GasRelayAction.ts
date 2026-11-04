@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { GasRelayFee } from './GasRelayFee';
+import {
+    GasRelayFeeFromJSON,
+    GasRelayFeeFromJSONTyped,
+    GasRelayFeeToJSON,
+    GasRelayFeeToJSONTyped,
+} from './GasRelayFee';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
@@ -29,22 +36,24 @@ import {
 export interface GasRelayAction {
     /**
      * 
-     * @type {number}
-     * @memberof GasRelayAction
      */
     amount: number;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof GasRelayAction
      */
     relayer: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof GasRelayAction
      */
     target: AccountAddress;
+    /**
+     * 
+     */
+    isBattery?: boolean;
+    /**
+     * 
+     */
+    relayerFee?: GasRelayFee;
 }
 
 /**
@@ -70,14 +79,16 @@ export function GasRelayActionFromJSONTyped(json: any, ignoreDiscriminator: bool
         'amount': json['amount'],
         'relayer': AccountAddressFromJSON(json['relayer']),
         'target': AccountAddressFromJSON(json['target']),
+        'isBattery': json['is_battery'] == null ? undefined : json['is_battery'],
+        'relayerFee': json['relayer_fee'] == null ? undefined : GasRelayFeeFromJSON(json['relayer_fee']),
     };
 }
 
-  export function GasRelayActionToJSON(json: any): GasRelayAction {
-      return GasRelayActionToJSONTyped(json, false);
-  }
+export function GasRelayActionToJSON(json: any): GasRelayAction {
+    return GasRelayActionToJSONTyped(json, false);
+}
 
-  export function GasRelayActionToJSONTyped(value?: GasRelayAction | null, ignoreDiscriminator: boolean = false): any {
+export function GasRelayActionToJSONTyped(value?: GasRelayAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -87,6 +98,8 @@ export function GasRelayActionFromJSONTyped(json: any, ignoreDiscriminator: bool
         'amount': value['amount'],
         'relayer': AccountAddressToJSON(value['relayer']),
         'target': AccountAddressToJSON(value['target']),
+        'is_battery': value['isBattery'],
+        'relayer_fee': GasRelayFeeToJSON(value['relayerFee']),
     };
 }
 

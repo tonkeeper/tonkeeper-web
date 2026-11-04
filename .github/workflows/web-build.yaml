@@ -6,10 +6,34 @@ on:
                 required: true
                 type: string
             release_tag:
-                description: 'Release tag to stamp into package.json (e.g. v1.2.3). Omit on PR/manual deploys.'
+                description:
+                    'Release tag to stamp into package.json (e.g. v1.2.3). Omit on PR/manual
+                    deploys.'
                 required: false
                 type: string
                 default: ''
+            migration_old_origin:
+                description:
+                    'Origin the wallet is migrating away from. Falls back to
+                    vars.MIGRATION_OLD_ORIGIN, then the build-time default.'
+                required: false
+                type: string
+                default: ''
+            migration_new_origin:
+                description:
+                    'Origin this build is served from. Falls back to vars.MIGRATION_NEW_ORIGIN, then
+                    the build-time default.'
+                required: false
+                type: string
+                default: ''
+            pages_project:
+                description:
+                    'Cloudflare Pages project to publish into. The rollback build for the old domain
+                    goes into tonkeeper-web-migration: Pages rolls back only between deployments of
+                    one project, and the old domain is attached to that one.'
+                required: false
+                type: string
+                default: 'tonkeeper-web'
         secrets:
             CLOUDFLARE_API_TOKEN:
                 required: true
@@ -26,24 +50,53 @@ on:
                 required: true
                 type: string
             release_tag:
-                description: 'Release tag to stamp into package.json (e.g. v1.2.3). Leave empty for branch builds.'
+                description:
+                    'Release tag to stamp into package.json (e.g. v1.2.3). Leave empty for branch
+                    builds.'
                 required: false
                 type: string
                 default: ''
+            migration_old_origin:
+                description: 'Origin the wallet is migrating away from'
+                required: false
+                type: string
+                default: ''
+            migration_new_origin:
+                description: 'Origin this build is served from'
+                required: false
+                type: string
+                default: ''
+            pages_project:
+                description: 'Cloudflare Pages project to publish into'
+                required: false
+                type: string
+                default: 'tonkeeper-web'
 env:
-    node-version: 20.11.1
+    node-version: 22.22.2
+    NODE_AUTH_TOKEN: ${{ github.token }}
+
+permissions:
+    contents: read
+    issues: write
+    packages: read
+    pull-requests: write
 
 jobs:
     web-build:
         name: web-build
         runs-on: ubuntu-latest
         timeout-minutes: 10
+        env:
+            NODE_OPTIONS: --max-old-space-size=6144
 
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
+            # A manual run starts from a branch; a release build must be the tag it stamps.
             - name: Checkout to git repository
               uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.release_tag }}
 
             - name: Set up Node
               uses: actions/setup-node@v4
@@ -69,14 +122,16 @@ jobs:
                       ${{ runner.os }}-yarn-
 
             - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
+              run: yarn install --immutable
 
             - name: Run build
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:web
+              run: yarn build:web
+              env:
+                  WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
+                  MIGRATION_OLD_ORIGIN:
+                      ${{ inputs.migration_old_origin || vars.MIGRATION_OLD_ORIGIN }}
+                  MIGRATION_NEW_ORIGIN:
+                      ${{ inputs.migration_new_origin || vars.MIGRATION_NEW_ORIGIN }}
 
             - name: Publish to Cloudflare Pages
               id: deploy
@@ -85,8 +140,21 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   command:
-                      pages deploy apps/web/dist --project-name=tonkeeper-web --branch=${{
-                      inputs.environment }}
+                      pages deploy apps/web/dist --project-name=${{ inputs.pages_project ||
+                      'tonkeeper-web' }} --branch=${{ inputs.environment }}
+
+            # Older release tags, such as the rollback build, predate these checks.
+            - name: Check /migrate never redirects off-origin
+              if: hashFiles('scripts/check-migrate-redirects.mjs') != ''
+              run: node scripts/check-migrate-redirects.mjs "$DEPLOYMENT_URL"
+              env:
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+
+            - name: Check served security headers
+              if: hashFiles('scripts/check-deployed-headers.mjs') != ''
+              run: node scripts/check-deployed-headers.mjs "$DEPLOYMENT_URL" web
+              env:
+                  DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
 
             - name: Summary
               run: |

@@ -228,19 +228,19 @@ const useTrc20TrxDefaultFee = () => {
 };
 
 export const useTrc20TransferDefaultFees = () => {
-    const { meanPrices: batteryMeanPricesCharges } = useBatteryServiceConfig();
+    const batteryMeanPricesCharges = useBatteryServiceConfig()?.meanPrices;
     const tonMeanPriceTronUsdt = useMemo(
         () =>
             AssetAmount.fromRelativeAmount({
                 asset: TON_ASSET,
-                amount: batteryMeanPricesCharges.tonMeanPriceTronUsdt ?? 0
+                amount: batteryMeanPricesCharges?.tonMeanPriceTronUsdt ?? 0
             }),
-        [batteryMeanPricesCharges.tonMeanPriceTronUsdt]
+        [batteryMeanPricesCharges?.tonMeanPriceTronUsdt]
     );
     const batteryUnitTonRate = useBatteryUnitTonRate();
     const { data: tonRate } = useRate(tonAssetAddressToString(TON_ASSET.address));
 
-    const chargesPerTransfer = batteryMeanPricesCharges.batteryMeanPriceTronUsdt;
+    const chargesPerTransfer = batteryMeanPricesCharges?.batteryMeanPriceTronUsdt;
     const { fiatAmount: batteryFiatFee } = useFormatFiat(
         tonRate,
         !chargesPerTransfer ? undefined : batteryUnitTonRate.multipliedBy(chargesPerTransfer)

@@ -21,8 +21,6 @@ import { mapValues } from '../runtime';
 export interface ModelError {
     /**
      * 
-     * @type {string}
-     * @memberof ModelError
      */
     error: string;
 }
@@ -49,11 +47,11 @@ export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-  export function ModelErrorToJSON(json: any): ModelError {
-      return ModelErrorToJSONTyped(json, false);
-  }
+export function ModelErrorToJSON(json: any): ModelError {
+    return ModelErrorToJSONTyped(json, false);
+}
 
-  export function ModelErrorToJSONTyped(value?: ModelError | null, ignoreDiscriminator: boolean = false): any {
+export function ModelErrorToJSONTyped(value?: ModelError | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

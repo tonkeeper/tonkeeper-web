@@ -29,8 +29,6 @@ import {
 export interface AndroidBatteryPurchaseRequest {
     /**
      * 
-     * @type {Array<AndroidBatteryPurchaseRequestPurchasesInner>}
-     * @memberof AndroidBatteryPurchaseRequest
      */
     purchases: Array<AndroidBatteryPurchaseRequestPurchasesInner>;
 }
@@ -57,11 +55,11 @@ export function AndroidBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function AndroidBatteryPurchaseRequestToJSON(json: any): AndroidBatteryPurchaseRequest {
-      return AndroidBatteryPurchaseRequestToJSONTyped(json, false);
-  }
+export function AndroidBatteryPurchaseRequestToJSON(json: any): AndroidBatteryPurchaseRequest {
+    return AndroidBatteryPurchaseRequestToJSONTyped(json, false);
+}
 
-  export function AndroidBatteryPurchaseRequestToJSONTyped(value?: AndroidBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
+export function AndroidBatteryPurchaseRequestToJSONTyped(value?: AndroidBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

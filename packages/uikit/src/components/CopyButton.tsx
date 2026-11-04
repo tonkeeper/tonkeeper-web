@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 import { CopyIcon, DoneIcon } from './Icon';
-import { IconButton } from './fields/IconButton';
+import { LegacyIconButton } from './fields/IconButton';
 import { useAppSdk } from '../hooks/appSdk';
 import styled from 'styled-components';
 
-const IconButtonStyled = styled(IconButton)`
+const IconButtonStyled = styled(LegacyIconButton)`
     padding: 0;
     color: ${p => p.theme.iconTertiary};
 `;

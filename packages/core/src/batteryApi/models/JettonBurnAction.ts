@@ -36,26 +36,18 @@ import {
 export interface JettonBurnAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof JettonBurnAction
      */
     sender: AccountAddress;
     /**
      * 
-     * @type {string}
-     * @memberof JettonBurnAction
      */
     sendersWallet: string;
     /**
      * amount in quanta of tokens
-     * @type {string}
-     * @memberof JettonBurnAction
      */
     amount: string;
     /**
      * 
-     * @type {JettonPreview}
-     * @memberof JettonBurnAction
      */
     jetton: JettonPreview;
 }
@@ -65,7 +57,7 @@ export interface JettonBurnAction {
  */
 export function instanceOfJettonBurnAction(value: object): value is JettonBurnAction {
     if (!('sender' in value) || value['sender'] === undefined) return false;
-    if (!('sendersWallet' in value) || value['sendersWallet'] === undefined) return false;
+    if ((!('sendersWallet' in (value as Record<string, any>)) && !('senders_wallet' in (value as Record<string, any>))) || ((value as Record<string, any>)['sendersWallet'] === undefined && (value as Record<string, any>)['senders_wallet'] === undefined)) return false;
     if (!('amount' in value) || value['amount'] === undefined) return false;
     if (!('jetton' in value) || value['jetton'] === undefined) return false;
     return true;
@@ -88,11 +80,11 @@ export function JettonBurnActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function JettonBurnActionToJSON(json: any): JettonBurnAction {
-      return JettonBurnActionToJSONTyped(json, false);
-  }
+export function JettonBurnActionToJSON(json: any): JettonBurnAction {
+    return JettonBurnActionToJSONTyped(json, false);
+}
 
-  export function JettonBurnActionToJSONTyped(value?: JettonBurnAction | null, ignoreDiscriminator: boolean = false): any {
+export function JettonBurnActionToJSONTyped(value?: JettonBurnAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

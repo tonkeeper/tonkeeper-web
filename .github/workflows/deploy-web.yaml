@@ -10,6 +10,16 @@ on:
                     - dev
                     - main
                     - showcase
+            migration_old_origin:
+                description: 'Origin the wallet is migrating away from'
+                required: false
+                type: string
+                default: ''
+            migration_new_origin:
+                description: 'Origin this build is served from'
+                required: false
+                type: string
+                default: ''
 
 jobs:
     web-deploy:
@@ -17,6 +27,8 @@ jobs:
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: ${{ inputs.environment }}
+            migration_old_origin: ${{ inputs.migration_old_origin }}
+            migration_new_origin: ${{ inputs.migration_new_origin }}
         secrets: inherit
 
     web-tests:

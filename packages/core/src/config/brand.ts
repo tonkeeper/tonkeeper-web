@@ -17,19 +17,10 @@
 export interface BrandConfig {
     /** Display name of the chain, e.g. used in "... in the TON network". */
     chainName: string;
-    /** Full name of the native coin, e.g. "Toncoin". */
+    /** Full name of the native coin, e.g. "Gram". */
     coinName: string;
-    /**
-     * PURE ticker/symbol of the native coin, e.g. "GRAM". Use this next to amounts and anywhere a
-     * value might be passed onward (analytics, etc.) — never the transitional {@link coinSymbolWithEx}.
-     */
+    /** Ticker/symbol of the native coin, e.g. "GRAM". */
     coinSymbol: string;
-    /**
-     * Transitional DISPLAY-ONLY ticker with the old name in parentheses, e.g. "GRAM (ex TON)".
-     * Use only as a standalone label where we want to surface the rename; NEVER send to an API or
-     * use as an identifier — use {@link coinSymbol} for that.
-     */
-    coinSymbolWithEx: string;
     /** Native coin icon data URI. */
     coinIcon: string;
     /** Native chain/network icon data URI. */
@@ -49,9 +40,8 @@ const NATIVE_CHAIN_ICON = `data:image/svg+xml,${encodeURIComponent(NATIVE_CHAIN_
 
 export const BRAND_CONFIG: BrandConfig = {
     chainName: 'TON',
-    coinName: 'Gram (ex\u00A0Toncoin)',
+    coinName: 'Gram',
     coinSymbol: 'GRAM',
-    coinSymbolWithEx: 'GRAM (ex\u00A0TON)',
     coinIcon: NATIVE_COIN_ICON,
     chainIcon: NATIVE_CHAIN_ICON
 };

@@ -36,20 +36,14 @@ import {
 export interface JettonQuantity {
     /**
      * 
-     * @type {string}
-     * @memberof JettonQuantity
      */
     quantity: string;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof JettonQuantity
      */
     walletAddress: AccountAddress;
     /**
      * 
-     * @type {JettonPreview}
-     * @memberof JettonQuantity
      */
     jetton: JettonPreview;
 }
@@ -59,7 +53,7 @@ export interface JettonQuantity {
  */
 export function instanceOfJettonQuantity(value: object): value is JettonQuantity {
     if (!('quantity' in value) || value['quantity'] === undefined) return false;
-    if (!('walletAddress' in value) || value['walletAddress'] === undefined) return false;
+    if ((!('walletAddress' in (value as Record<string, any>)) && !('wallet_address' in (value as Record<string, any>))) || ((value as Record<string, any>)['walletAddress'] === undefined && (value as Record<string, any>)['wallet_address'] === undefined)) return false;
     if (!('jetton' in value) || value['jetton'] === undefined) return false;
     return true;
 }
@@ -80,11 +74,11 @@ export function JettonQuantityFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function JettonQuantityToJSON(json: any): JettonQuantity {
-      return JettonQuantityToJSONTyped(json, false);
-  }
+export function JettonQuantityToJSON(json: any): JettonQuantity {
+    return JettonQuantityToJSONTyped(json, false);
+}
 
-  export function JettonQuantityToJSONTyped(value?: JettonQuantity | null, ignoreDiscriminator: boolean = false): any {
+export function JettonQuantityToJSONTyped(value?: JettonQuantity | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

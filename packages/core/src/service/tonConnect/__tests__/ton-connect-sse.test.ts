@@ -206,6 +206,7 @@ describe('TonConnectSSE.handleMessage', () => {
             expect(onRequest).toHaveBeenCalledWith({
                 connection: expect.objectContaining({ clientSessionId }),
                 id: 'req-1',
+                walletId,
                 kind: 'sendTransaction',
                 payload
             });
@@ -294,7 +295,7 @@ describe('TonConnectSSE.handleMessage', () => {
                 payload
             );
             expect(onRequest).toHaveBeenCalledWith(
-                expect.objectContaining({ kind: 'signData', payload })
+                expect.objectContaining({ kind: 'signData', walletId, payload })
             );
             expect(mocks.replyHttpBadRequestResponse).not.toHaveBeenCalled();
         });
@@ -334,6 +335,28 @@ describe('TonConnectSSE.handleMessage', () => {
             await handleMessage(makeSignDataRequest());
 
             expect(onRequest).not.toHaveBeenCalled();
+            expect(mocks.replyHttpBadRequestResponse).toHaveBeenCalledWith(
+                expect.objectContaining({ message: 'Unknown session' })
+            );
+        });
+
+        it('rejects with "Unknown session" when the session id is stored under several wallets', async () => {
+            mocks.getAccounts.mockResolvedValue([
+                {
+                    allTonWallets: [
+                        { id: walletId, publicKey: 'public-key' },
+                        { id: 'wallet-2', publicKey: 'public-key' }
+                    ]
+                }
+            ]);
+
+            const { handleMessage, onRequest } = await setupSse();
+
+            await handleMessage(makeSignDataRequest());
+
+            expect(onRequest).not.toHaveBeenCalled();
+            expect(mocks.checkTonConnectFromAndNetwork).not.toHaveBeenCalled();
+            expect(mocks.setActiveAccountAndWalletByWalletId).not.toHaveBeenCalled();
             expect(mocks.replyHttpBadRequestResponse).toHaveBeenCalledWith(
                 expect.objectContaining({ message: 'Unknown session' })
             );

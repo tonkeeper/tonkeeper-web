@@ -1,9 +1,18 @@
-import { delay } from '@tonkeeper/core/dist/utils/common';
-import { BrowserWindow, Menu, ipcMain } from 'electron';
+import { delay, isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
+import { BrowserWindow, IpcMainInvokeEvent, Menu, WebContents, ipcMain, shell } from 'electron';
 import isDev from 'electron-is-dev';
 import path from 'path';
 import { Cookie } from 'tough-cookie';
-import { handleBackgroundMessage } from '../electron/background';
+import { authorizedOpenUrlProtocols, handleBackgroundMessage } from '../electron/background';
+import { isAppDocumentUrl } from '../constants';
+import {
+    TELEGRAM_AUTH_DATA_URL,
+    isAppCorsRequest,
+    isAppDocumentRequest,
+    isAppPermissionCheck,
+    isAppPermissionRequest,
+    isCorsExemptUrl
+} from './requestPolicy';
 import { Message } from '../libs/message';
 import { createAppMenu } from './menu';
 import { cookieJar } from './cookie';
@@ -14,6 +23,85 @@ import AppUpdate from './autoUpdate';
 // whether you're running in development or production).
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+
+const WALLET_CONNECT_INFRA_HOSTS = [
+    'relay.walletconnect.org',
+    'relay.walletconnect.com',
+    'pulse.walletconnect.org',
+    'verify.walletconnect.org'
+];
+
+const isWalletConnectInfraUrl = (url: string): boolean => {
+    try {
+        return WALLET_CONNECT_INFRA_HOSTS.includes(new URL(url).host);
+    } catch {
+        return false;
+    }
+};
+
+const TELEGRAM_LOGIN_POPUP_URL = 'https://oauth.telegram.org/auth';
+
+const isAppDocument = (url: string) => isAppDocumentUrl(url, MAIN_WINDOW_WEBPACK_ENTRY);
+
+const isTelegramLoginPopup = (url: string) => {
+    try {
+        const { origin, pathname } = new URL(url);
+        return `${origin}${pathname}` === TELEGRAM_LOGIN_POPUP_URL;
+    } catch {
+        return false;
+    }
+};
+
+const openOutside = (url: string) => {
+    if (isValidUrlProtocol(url, authorizedOpenUrlProtocols)) {
+        shell.openExternal(url);
+    }
+};
+
+const isAppSender = (event: IpcMainInvokeEvent, appContents: WebContents | undefined) => {
+    const frame = event.senderFrame;
+    return (
+        !!frame &&
+        !!appContents &&
+        event.sender === appContents &&
+        frame.parent === null &&
+        isAppDocument(frame.url)
+    );
+};
+
+const denyNewWindows = (contents: WebContents) => {
+    contents.setWindowOpenHandler(({ url }) => {
+        openOutside(url);
+        return { action: 'deny' };
+    });
+};
+
+const lockAppNavigation = (contents: WebContents) => {
+    contents.on('will-navigate', event => {
+        if (!isAppDocument(event.url)) {
+            event.preventDefault();
+            openOutside(event.url);
+        }
+    });
+
+    // The Telegram login widget needs its popup inside the app session so the
+    // auth cookies land in the shared cookie jar. The popup shows a remote
+    // page, so it does not inherit the app's preload.
+    contents.setWindowOpenHandler(({ url }) => {
+        if (isTelegramLoginPopup(url)) {
+            return {
+                action: 'allow',
+                overrideBrowserWindowOptions: { webPreferences: { preload: undefined } }
+            };
+        }
+        openOutside(url);
+        return { action: 'deny' };
+    });
+
+    contents.on('did-create-window', window => {
+        denyNewWindows(window.webContents);
+    });
+};
 
 export abstract class MainWindow {
     static mainWindow: BrowserWindow | undefined = undefined;
@@ -53,6 +141,8 @@ export abstract class MainWindow {
         const menu = Menu.buildFromTemplate(createAppMenu(new AppUpdate()));
         Menu.setApplicationMenu(menu);
 
+        lockAppNavigation(this.mainWindow.webContents);
+
         // and load the index.html of the app.
         this.mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
@@ -61,12 +151,27 @@ export abstract class MainWindow {
             this.mainWindow.webContents.openDevTools();
         }
 
+        const { session } = this.mainWindow.webContents;
+        const onSelectHidDevice = (
+            event: Electron.Event,
+            details: Electron.SelectHidDeviceDetails,
+            callback: (deviceId?: string | null) => void
+        ) => {
+            event.preventDefault();
+            callback(details.deviceList[0]?.deviceId);
+        };
+        session.on('select-hid-device', onSelectHidDevice);
+
         this.mainWindow.on('closed', () => {
             ipcMain.removeHandler('message');
+            session.off('select-hid-device', onSelectHidDevice);
             this.mainWindow = undefined;
         });
 
         ipcMain.handle('message', async (event, message: Message) => {
+            if (!isAppSender(event, this.mainWindow?.webContents)) {
+                return new Error('Unauthorized sender');
+            }
             try {
                 return await handleBackgroundMessage(this.mainWindow, message);
             } catch (e) {
@@ -74,29 +179,41 @@ export abstract class MainWindow {
             }
         });
 
+        const appWebContentsId = this.mainWindow.webContents.id;
+
         this.mainWindow.webContents.session.webRequest.onBeforeSendHeaders(
             { urls: [] },
             (details, callback) => {
+                const requestHeaders = { ...details.requestHeaders };
+
+                /* The WalletConnect relay authenticates browser clients by
+                   their Origin against the Reown project allowlist. The
+                   packaged app's renderer loads over file://, which cannot
+                   be allowlisted; with no Origin header at all the relay
+                   treats the app as a native client and always accepts it. */
+                if (isWalletConnectInfraUrl(details.url)) {
+                    delete requestHeaders.origin;
+                    delete requestHeaders.Origin;
+                }
+
+                if (!isAppDocumentRequest(details, appWebContentsId, MAIN_WINDOW_WEBPACK_ENTRY)) {
+                    callback({ requestHeaders });
+                    return;
+                }
+
+                /* patch tg auth headers  */
+                if (details.url === TELEGRAM_AUTH_DATA_URL) {
+                    requestHeaders.origin = 'https://wallet.tonkeeper.com';
+                    requestHeaders.Origin = 'https://wallet.tonkeeper.com';
+                    requestHeaders.referer = 'https://wallet.tonkeeper.com';
+                    requestHeaders.Referer = 'https://wallet.tonkeeper.com';
+                }
+
                 cookieJar.getCookies(details.url).then(cookies => {
-                    const result = cookies
+                    requestHeaders.cookie = cookies
                         .map(cookie => `${cookie.key}=${cookie.value}`)
                         .join('; ');
-
-                    /* patch tg auth headers  */
-                    if (details.url === 'https://oauth.telegram.org/auth/get') {
-                        details.requestHeaders.origin = 'https://wallet.tonkeeper.com';
-                        details.requestHeaders.Origin = 'https://wallet.tonkeeper.com';
-                        details.requestHeaders.referer = 'https://wallet.tonkeeper.com';
-                        details.requestHeaders.Referer = 'https://wallet.tonkeeper.com';
-                    }
-
-                    callback({
-                        ...details,
-                        requestHeaders: {
-                            ...details.requestHeaders,
-                            cookie: result
-                        }
-                    });
+                    callback({ requestHeaders });
                 });
             }
         );
@@ -104,14 +221,10 @@ export abstract class MainWindow {
         this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
             const setCookie = details.responseHeaders['set-cookie'] ?? [];
 
-            const patchMercuryCors = details.url.startsWith('https://api.mercuryo.io');
-            const patchTonkeeperCors = /https:\/\/(\w+\.){0,2}tonkeeper.com([?/].*)?/.test(
-                details.url
-            );
-            const patchTgCors = details.url === 'https://oauth.telegram.org/auth/get';
-
-            /* patch cors  */
-            if (patchMercuryCors || patchTonkeeperCors || patchTgCors) {
+            if (
+                isCorsExemptUrl(details.url) &&
+                isAppCorsRequest(details, appWebContentsId, MAIN_WINDOW_WEBPACK_ENTRY)
+            ) {
                 const corsHeader =
                     Object.keys(details.responseHeaders).find(
                         k => k.toLowerCase() === 'access-control-allow-origin'
@@ -128,14 +241,29 @@ export abstract class MainWindow {
             });
         });
 
-        this.mainWindow.webContents.session.on('select-hid-device', (event, details, callback) => {
-            event.preventDefault();
-            if (details.deviceList.length > 0) {
-                callback(details.deviceList[0].deviceId);
-            } else {
-                callback(undefined);
+        this.mainWindow.webContents.session.setPermissionRequestHandler(
+            (contents, permission, callback, details) => {
+                callback(
+                    isAppPermissionRequest(
+                        permission,
+                        details,
+                        contents.id === appWebContentsId,
+                        MAIN_WINDOW_WEBPACK_ENTRY
+                    )
+                );
             }
-        });
+        );
+
+        this.mainWindow.webContents.session.setPermissionCheckHandler(
+            (contents, permission, requestingOrigin, details) =>
+                isAppPermissionCheck(
+                    permission,
+                    requestingOrigin,
+                    details,
+                    contents === null || contents.id === appWebContentsId,
+                    MAIN_WINDOW_WEBPACK_ENTRY
+                )
+        );
 
         this.mainWindow.webContents.session.setDevicePermissionHandler(details => {
             const allowedConnections = ['usb', 'hid'];

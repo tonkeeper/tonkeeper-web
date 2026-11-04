@@ -21,14 +21,10 @@ import { mapValues } from '../runtime';
 export interface Metadata {
     /**
      * hex encoded bytes
-     * @type {string}
-     * @memberof Metadata
      */
     encryptedBinary: string;
     /**
      * hex encoded bytes
-     * @type {string}
-     * @memberof Metadata
      */
     decryptionKey?: string;
 }
@@ -37,7 +33,7 @@ export interface Metadata {
  * Check if a given object implements the Metadata interface.
  */
 export function instanceOfMetadata(value: object): value is Metadata {
-    if (!('encryptedBinary' in value) || value['encryptedBinary'] === undefined) return false;
+    if ((!('encryptedBinary' in (value as Record<string, any>)) && !('encrypted_binary' in (value as Record<string, any>))) || ((value as Record<string, any>)['encryptedBinary'] === undefined && (value as Record<string, any>)['encrypted_binary'] === undefined)) return false;
     return true;
 }
 
@@ -56,11 +52,11 @@ export function MetadataFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-  export function MetadataToJSON(json: any): Metadata {
-      return MetadataToJSONTyped(json, false);
-  }
+export function MetadataToJSON(json: any): Metadata {
+    return MetadataToJSONTyped(json, false);
+}
 
-  export function MetadataToJSONTyped(value?: Metadata | null, ignoreDiscriminator: boolean = false): any {
+export function MetadataToJSONTyped(value?: Metadata | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

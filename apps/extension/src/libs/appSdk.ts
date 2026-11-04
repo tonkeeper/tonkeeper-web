@@ -1,7 +1,6 @@
 import { BaseApp, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import browser from 'webextension-polyfill';
-import packageJson from '../../package.json';
 import { ExtensionStorage } from './storage';
 import { checkForError } from './utils';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
@@ -58,7 +57,7 @@ export class ExtensionAppSdk extends BaseApp implements IAppSdk {
         }
     };
 
-    version = packageJson.version ?? 'Unknown';
+    version = __APP_VERSION__;
 
     targetEnv = 'extension' as const;
 

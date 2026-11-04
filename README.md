@@ -8,7 +8,7 @@ browsers. We recommend using the latest available browser version.
 ## Building locally
 
 ```sh
-# Install `Node.js` version v20.7.0
+# Install `Node.js` version v22.22.2
 nvm use
 
 # Install `Yarn` version 4.0.2
@@ -68,9 +68,9 @@ Keychain - Certificate Type - `Developer ID Application`
 
 ## Regenerating API clients
 
-`packages/core` ships auto-generated TypeScript clients for several Tonkeeper
-backends. Some of the swagger specs live in **private** GitHub repositories,
-so regeneration requires a GitHub Personal Access Token (never commit it):
+`packages/core` ships auto-generated TypeScript clients for several Tonkeeper backends. Some of the
+swagger specs live in **private** GitHub repositories, so regeneration requires a GitHub Personal
+Access Token (never commit it):
 
 1. Create a fine-grained PAT at
    [github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens/new)

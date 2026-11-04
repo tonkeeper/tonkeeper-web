@@ -1,0 +1,49 @@
+/*
+ * Tailwind entry for the migration app. Unlike the wallet's entry it declares
+ * no `--tk-*` custom properties: nothing here rewrites a theme at runtime, so
+ * `tailwind.config.ts` holds the few dark-theme colors as literals instead.
+ *
+ * The faces are the wallet's own files, referenced in place rather than
+ * copied, so the licensed font lives in one spot in the repo.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('../../../packages/uikit/src/styles/fonts/TT-Firs-Neue-Normal.woff2')
+            format('woff2');
+        font-weight: 450;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('../../../packages/uikit/src/styles/fonts/TT-Firs-Neue-Medium.woff2')
+            format('woff2');
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: 'TT Firs Neue';
+        src: url('../../../packages/uikit/src/styles/fonts/TT-Firs-Neue-DemiBold.woff2')
+            format('woff2');
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    :root {
+        font-feature-settings: 'ss07' 1, 'ss09' 1, 'ss17' 1, 'ss18' 1;
+    }
+
+    body {
+        @apply bg-backgroundPage font-sans text-textPrimary antialiased;
+    }
+}

@@ -21,32 +21,22 @@ import { mapValues } from '../runtime';
 export interface AccountAddress {
     /**
      * 
-     * @type {string}
-     * @memberof AccountAddress
      */
     address: string;
     /**
      * Display name. Data collected from different sources like moderation lists, dns, collections names and over.
-     * @type {string}
-     * @memberof AccountAddress
      */
     name?: string;
     /**
      * Is this account was marked as part of scammers activity
-     * @type {boolean}
-     * @memberof AccountAddress
      */
     isScam: boolean;
     /**
      * 
-     * @type {string}
-     * @memberof AccountAddress
      */
     icon?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof AccountAddress
      */
     isWallet: boolean;
 }
@@ -56,8 +46,8 @@ export interface AccountAddress {
  */
 export function instanceOfAccountAddress(value: object): value is AccountAddress {
     if (!('address' in value) || value['address'] === undefined) return false;
-    if (!('isScam' in value) || value['isScam'] === undefined) return false;
-    if (!('isWallet' in value) || value['isWallet'] === undefined) return false;
+    if ((!('isScam' in (value as Record<string, any>)) && !('is_scam' in (value as Record<string, any>))) || ((value as Record<string, any>)['isScam'] === undefined && (value as Record<string, any>)['is_scam'] === undefined)) return false;
+    if ((!('isWallet' in (value as Record<string, any>)) && !('is_wallet' in (value as Record<string, any>))) || ((value as Record<string, any>)['isWallet'] === undefined && (value as Record<string, any>)['is_wallet'] === undefined)) return false;
     return true;
 }
 
@@ -79,11 +69,11 @@ export function AccountAddressFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function AccountAddressToJSON(json: any): AccountAddress {
-      return AccountAddressToJSONTyped(json, false);
-  }
+export function AccountAddressToJSON(json: any): AccountAddress {
+    return AccountAddressToJSONTyped(json, false);
+}
 
-  export function AccountAddressToJSONTyped(value?: AccountAddress | null, ignoreDiscriminator: boolean = false): any {
+export function AccountAddressToJSONTyped(value?: AccountAddress | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

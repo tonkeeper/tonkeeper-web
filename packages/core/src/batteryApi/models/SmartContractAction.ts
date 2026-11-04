@@ -36,38 +36,31 @@ import {
 export interface SmartContractAction {
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof SmartContractAction
      */
     executor: AccountAddress;
     /**
      * 
-     * @type {AccountAddress}
-     * @memberof SmartContractAction
      */
     contract: AccountAddress;
     /**
-     * amount in nanotons
-     * @type {number}
-     * @memberof SmartContractAction
+     * amount in nanograms
+     * @deprecated
      */
-    tonAttached: number;
+    tonAttached?: number;
+    /**
+     * amount in nanograms
+     */
+    gramAttached: number;
     /**
      * 
-     * @type {string}
-     * @memberof SmartContractAction
      */
     operation: string;
     /**
      * 
-     * @type {string}
-     * @memberof SmartContractAction
      */
     payload?: string;
     /**
      * 
-     * @type {Refund}
-     * @memberof SmartContractAction
      */
     refund?: Refund;
 }
@@ -78,7 +71,7 @@ export interface SmartContractAction {
 export function instanceOfSmartContractAction(value: object): value is SmartContractAction {
     if (!('executor' in value) || value['executor'] === undefined) return false;
     if (!('contract' in value) || value['contract'] === undefined) return false;
-    if (!('tonAttached' in value) || value['tonAttached'] === undefined) return false;
+    if ((!('gramAttached' in (value as Record<string, any>)) && !('gram_attached' in (value as Record<string, any>))) || ((value as Record<string, any>)['gramAttached'] === undefined && (value as Record<string, any>)['gram_attached'] === undefined)) return false;
     if (!('operation' in value) || value['operation'] === undefined) return false;
     return true;
 }
@@ -95,18 +88,19 @@ export function SmartContractActionFromJSONTyped(json: any, ignoreDiscriminator:
         
         'executor': AccountAddressFromJSON(json['executor']),
         'contract': AccountAddressFromJSON(json['contract']),
-        'tonAttached': json['ton_attached'],
+        'tonAttached': json['ton_attached'] == null ? undefined : json['ton_attached'],
+        'gramAttached': json['gram_attached'],
         'operation': json['operation'],
         'payload': json['payload'] == null ? undefined : json['payload'],
         'refund': json['refund'] == null ? undefined : RefundFromJSON(json['refund']),
     };
 }
 
-  export function SmartContractActionToJSON(json: any): SmartContractAction {
-      return SmartContractActionToJSONTyped(json, false);
-  }
+export function SmartContractActionToJSON(json: any): SmartContractAction {
+    return SmartContractActionToJSONTyped(json, false);
+}
 
-  export function SmartContractActionToJSONTyped(value?: SmartContractAction | null, ignoreDiscriminator: boolean = false): any {
+export function SmartContractActionToJSONTyped(value?: SmartContractAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -116,6 +110,7 @@ export function SmartContractActionFromJSONTyped(json: any, ignoreDiscriminator:
         'executor': AccountAddressToJSON(value['executor']),
         'contract': AccountAddressToJSON(value['contract']),
         'ton_attached': value['tonAttached'],
+        'gram_attached': value['gramAttached'],
         'operation': value['operation'],
         'payload': value['payload'],
         'refund': RefundToJSON(value['refund']),

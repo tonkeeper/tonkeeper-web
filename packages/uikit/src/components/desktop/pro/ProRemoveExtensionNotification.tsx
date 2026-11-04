@@ -25,7 +25,7 @@ import { ConfirmMainButtonProps } from '../../transfer/common';
 import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
 import { useFormatFiat, useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { SpinnerIcon } from '../../Icon';
+import { Loader } from '../../Loader';
 import { hexToRGBA } from '../../../libs/css';
 import { useToast } from '../../../hooks/useNotification';
 import { IExtensionActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
@@ -171,7 +171,7 @@ const ProRemoveExtensionNotificationContent: FC<
                         <Body2Styled>{t('swap_blockchain_fee')}</Body2Styled>
                         <FiatEquivalentWrapper>
                             <Label2>
-                                {isEstimating && <SpinnerIcon />}
+                                {isEstimating && <Loader size="small" />}
                                 {!!estimationError && <>—</>}
                                 {estimation?.fee?.extra &&
                                     estimation.fee.extra.toStringAssetRelativeAmount()}

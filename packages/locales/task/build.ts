@@ -1,9 +1,5 @@
-import { spawnSync } from 'child_process';
-import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
-
-dotenv.config();
 
 const namespaces = ['tonkeeper', 'tonkeeper-web'];
 
@@ -28,34 +24,6 @@ interface Message {
     description?: string;
 }
 
-const unzip = (zipFile: string) => {
-    spawnSync('unzip', ['-d', src, zipFile]);
-};
-
-const loadTransactions = async () => {
-    if (process.env.TOLGEE_TOKEN === undefined) return;
-    // eslint-disable-next-line no-console
-    console.log('TOLGEE_TOKEN is set');
-
-    if (fs.existsSync(src)) {
-        fs.rmSync(src, { recursive: true, force: true });
-    }
-    if (!fs.existsSync(src)) {
-        fs.mkdirSync(src);
-    }
-
-    const file = await fetch(
-        `https://app.tolgee.io/v2/projects/export?ak=${process.env.TOLGEE_TOKEN}`
-    );
-
-    const zipFile = path.join(src, 'translations.zip');
-    fs.writeFileSync(zipFile, Buffer.from(await file.arrayBuffer()));
-
-    await unzip(zipFile);
-
-    fs.unlinkSync(zipFile);
-};
-
 const createDirFolders = () => {
     if (fs.existsSync(dist)) {
         fs.rmSync(dist, { recursive: true, force: true });
@@ -75,6 +43,32 @@ const fillMissingLocales = (
         Object.entries(defaultResource).forEach(([key, value]) => {
             if (translation[key] === undefined) {
                 translation[key] = value;
+            }
+        });
+    });
+};
+/**
+ * i18next picks a plural suffix through `Intl.PluralRules`, which rejects the underscore codes
+ * the extension's `_locales` layout imposes on Chinese (`zh_CN`, `zh_TW`). With no rule i18next
+ * looks the bare key up and falls back to English, so those locales get the bare key filled from
+ * the `_other` form — the only plural category Chinese has.
+ */
+const hasPluralRule = (locale: string) => {
+    try {
+        return new Intl.PluralRules(locale).resolvedOptions().pluralCategories.length > 0;
+    } catch {
+        return false;
+    }
+};
+const fillPluralBaseKeys = (resources: Record<string, { translation: Record<string, string> }>) => {
+    Object.entries(resources).forEach(([locale, { translation }]) => {
+        if (hasPluralRule(locale)) {
+            return;
+        }
+        Object.entries(translation).forEach(([key, value]) => {
+            const base = key.endsWith('_other') ? key.slice(0, -'_other'.length) : undefined;
+            if (base && translation[base] === undefined) {
+                translation[base] = value;
             }
         });
     });
@@ -110,26 +104,12 @@ const writeFiles = (
     fs.writeFileSync(path.join(dist, i18n, 'resources.json'), JSON.stringify(resources, null, 2));
 };
 
-// By some reason toglee update variables with placeholders
-const fixMessage = (message: string) => {
-    // Replace '{{'value'}}' with {{value}}
-    message = message.replace(/'\{\{\s*'([^}]+)'\s*\}\}'/g, '{{$1}}');
-
-    // Replace {value} with %{value}, excluding already existing %{value} or {{value}}
-    message = message.replace(/(?<!\{)(?<!%)({([^{}]+)})(?!\})/g, '%{$2}');
-
-    // U+2028 / U+2029 are valid JSON but trip strict parsers (incl. tsc resolveJsonModule).
-    // Tolgee occasionally emits them where a real newline was intended.
-    message = message.replace(/[\u2028\u2029]/g, '\n');
-    return message;
-};
-
 const toDict = (parentKey: string | undefined, value: object): Record<string, string> => {
     return Object.entries(value).reduce((acc, [key, message]) => {
         key = key.replace(/\./g, '_').replace(/-/g, '_');
         const item_key = parentKey ? `${parentKey}_${key}` : key;
         if (typeof message === 'string') {
-            acc[item_key] = fixMessage(message);
+            acc[item_key] = message;
             return acc;
         } else {
             const dict = toDict(item_key, message);
@@ -142,7 +122,6 @@ const main = async () => {
     console.log('----------Build Locales----------');
 
     createDirFolders();
-    await loadTransactions();
 
     let resources: Record<string, { translation: Record<string, string> }> = {};
     let defaultResource: Record<string, string> = {};
@@ -174,6 +153,7 @@ const main = async () => {
     }
 
     fillMissingLocales(resources, defaultResource);
+    fillPluralBaseKeys(resources);
     writeFiles(resources, defaultResource);
     checkForDuplicates(resources);
 

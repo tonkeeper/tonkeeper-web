@@ -4,9 +4,9 @@ import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { H2Label2Responsive } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';
-import { TextArea } from '../fields/Input';
+import { TextArea } from '../fields/TextArea';
 import { isValidSeed, isValidSKOrSeed } from '@tonkeeper/core/dist/service/mnemonicService';
-import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { ModalFooter, ModalFooterPortal } from '../../primitives/Modal';
 import { SKSigningAlgorithm } from '@tonkeeper/core/dist/service/sign';
 
 const Block = styled.div`
@@ -82,8 +82,8 @@ export const SKInput: FC<{
                             : t('sk_input_label')
                     }
                 />
-                <NotificationFooterPortal>
-                    <NotificationFooter>
+                <ModalFooterPortal>
+                    <ModalFooter>
                         <ButtonResponsiveSize
                             fullWidth
                             primary
@@ -94,8 +94,8 @@ export const SKInput: FC<{
                         >
                             {t('continue')}
                         </ButtonResponsiveSize>
-                    </NotificationFooter>
-                </NotificationFooterPortal>
+                    </ModalFooter>
+                </ModalFooterPortal>
             </Block>
         </CenterContainer>
     );

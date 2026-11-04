@@ -4,12 +4,14 @@
 /* eslint-disable */
 import type { AddFundsOptionSchema } from './AddFundsOptionSchema';
 import type { RampSourceSchema } from './RampSourceSchema';
+import type { WalletModeSchema } from './WalletModeSchema';
 /**
  * User sees the Receive tokens screen with QR code and address
  */
 export type DepositViewReceiveTokensSchema = {
     eventName: string;
     from: RampSourceSchema;
+    wallet_mode: WalletModeSchema;
     add_funds_option: AddFundsOptionSchema;
     /**
      * Which network tab is selected on the Receive tokens screen

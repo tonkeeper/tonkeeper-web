@@ -37,8 +37,13 @@ export default class ExtensionPlatform {
     }
 
     static async getActiveTabLogo() {
-        const [tab] = await ExtensionPlatform.getActiveTabs();
+        const tab = await ExtensionPlatform.getActiveTab();
         return (tab && tab.favIconUrl) ?? '';
+    }
+
+    static async getActiveTab() {
+        const [tab] = await ExtensionPlatform.getActiveTabs();
+        return tab;
     }
 
     private static getActiveTabs() {
