@@ -548,7 +548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/cli@npm:^6.2.0":
+"@capacitor/cli@npm:6.2.1":
   version: 6.2.1
   resolution: "@capacitor/cli@npm:6.2.1"
   dependencies:
@@ -573,6 +573,34 @@ __metadata:
     cap: bin/capacitor
     capacitor: bin/capacitor
   checksum: 10/00aa74d642012b1b10343f311b30a02e7da84c41757925d247fa813c6a95886e78fb715120c3a0a3c2a74b14be47a69829dae8ecb0e1cfbd3532288fe54430be
+  languageName: node
+  linkType: hard
+
+"@capacitor/cli@patch:@capacitor/cli@npm%3A6.2.1#~/.yarn/patches/@capacitor-cli-npm-6.2.1-d301b955ee.patch":
+  version: 6.2.1
+  resolution: "@capacitor/cli@patch:@capacitor/cli@npm%3A6.2.1#~/.yarn/patches/@capacitor-cli-npm-6.2.1-d301b955ee.patch::version=6.2.1&hash=c818f4"
+  dependencies:
+    "@ionic/cli-framework-output": "npm:^2.2.5"
+    "@ionic/utils-fs": "npm:^3.1.6"
+    "@ionic/utils-subprocess": "npm:2.1.11"
+    "@ionic/utils-terminal": "npm:^2.3.3"
+    commander: "npm:^9.3.0"
+    debug: "npm:^4.3.4"
+    env-paths: "npm:^2.2.0"
+    kleur: "npm:^4.1.4"
+    native-run: "npm:^2.0.0"
+    open: "npm:^8.4.0"
+    plist: "npm:^3.0.5"
+    prompts: "npm:^2.4.2"
+    rimraf: "npm:^4.4.1"
+    semver: "npm:^7.3.7"
+    tar: "npm:^6.1.11"
+    tslib: "npm:^2.4.0"
+    xml2js: "npm:^0.5.0"
+  bin:
+    cap: bin/capacitor
+    capacitor: bin/capacitor
+  checksum: 10/23e950777c06a365ef5b02dcef275b0eef68aa23272b26d240716bde9402607d7e8bd2bc9873799b44b9c6715e5d11d56b32af4832bf43793451e1709b602fdb
   languageName: node
   linkType: hard
 
@@ -1318,8 +1346,8 @@ __metadata:
   linkType: hard
 
 "@electron/get@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@electron/get@npm:3.0.0"
+  version: 3.1.0
+  resolution: "@electron/get@npm:3.1.0"
   dependencies:
     debug: "npm:^4.1.1"
     env-paths: "npm:^2.2.0"
@@ -1332,7 +1360,7 @@ __metadata:
   dependenciesMeta:
     global-agent:
       optional: true
-  checksum: 10/1e92f10c1d50dde4be1a21c361101a5c7484b7ad7a3fe1ca60ba9405c314a18739c061dfca26e8bdbe6a12a2346817cc1fc711e8e8fe6ff1261104a4dfa92fc5
+  checksum: 10/0645d6da26e7133cf5eab109f2a381edbe35083b1a1c62c1f4fedf15e63db464b1c4f66f850ab25520d8a8271d82ef7ad4f75fe8106a7002895e26dacdea1e5e
   languageName: node
   linkType: hard
 
@@ -5443,7 +5471,7 @@ __metadata:
     "@capacitor/app": "npm:^6.0.1"
     "@capacitor/browser": "npm:^7.0.1"
     "@capacitor/camera": "npm:^6.1.1"
-    "@capacitor/cli": "npm:^6.2.0"
+    "@capacitor/cli": "patch:@capacitor/cli@npm%3A6.2.1#~/.yarn/patches/@capacitor-cli-npm-6.2.1-d301b955ee.patch"
     "@capacitor/clipboard": "npm:^6.0.1"
     "@capacitor/core": "npm:^6.2.0"
     "@capacitor/device": "npm:^6.0.2"

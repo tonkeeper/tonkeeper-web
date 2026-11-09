@@ -10,7 +10,7 @@ env:
 jobs:
     extension-build:
         name: extension-build
-        runs-on: macos-14
+        runs-on: ubuntu-latest
         timeout-minutes: 10
 
         steps:

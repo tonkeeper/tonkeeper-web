@@ -30,6 +30,8 @@ env:
     RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
     # @tonkeeper/chainkit installs from GitHub Packages; the public repo has no package access of its own.
     NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+    # The bundle outgrew Node's default 2 GB heap.
+    NODE_OPTIONS: --max-old-space-size=6144
 
 jobs:
     desktop-build:
@@ -141,7 +143,7 @@ jobs:
 
     extension-build:
         name: extension-build
-        runs-on: macos-14
+        runs-on: ubuntu-latest
         timeout-minutes: 10
 
         steps:
