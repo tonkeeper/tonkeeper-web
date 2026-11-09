@@ -1,0 +1,14 @@
+diff --git a/resources/spec.ejs b/resources/spec.ejs
+index e07a8a3dac52b7ac5e165d203bc26d0ac336c6ec..e05c0824309ac909c6cd507b6ee79a29e0158302 100644
+--- a/resources/spec.ejs
++++ b/resources/spec.ejs
+@@ -24,7 +24,8 @@ print('\n\n\n') }
+ 
+ %>%install
+ mkdir -p %{buildroot}/usr/
+-cp <%= process.platform === 'darwin' ? '-R' : '-r' %> usr/* %{buildroot}/usr/
++# rpm 4.20+ runs this section in a per-build directory, so the staged files are named from the top dir.
++cp <%= process.platform === 'darwin' ? '-R' : '-r' %> %{_topdir}/BUILD/usr/* %{buildroot}/usr/
+ 
+ 
+ %files

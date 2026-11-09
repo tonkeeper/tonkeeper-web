@@ -173,6 +173,7 @@
         "ws@npm:8.20.1": "8.21.3",
         "ws@npm:^7.4.6": "7.5.11",
         "ws@npm:^8.13.0": "8.21.3",
-        "appdmg@npm:^0.6.4": "patch:appdmg@npm%3A0.6.6#~/.yarn/patches/appdmg-npm-0.6.6-4054c7e0c9.patch"
+        "appdmg@npm:^0.6.4": "patch:appdmg@npm%3A0.6.6#~/.yarn/patches/appdmg-npm-0.6.6-4054c7e0c9.patch",
+        "electron-installer-redhat@npm:^3.2.0": "patch:electron-installer-redhat@npm%3A3.4.0#~/.yarn/patches/electron-installer-redhat-npm-3.4.0-7f790e86e4.patch"
     }
 }

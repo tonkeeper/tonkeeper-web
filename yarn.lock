@@ -11579,9 +11579,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-installer-redhat@npm:^3.2.0":
+"electron-installer-redhat@npm:3.4.0":
   version: 3.4.0
   resolution: "electron-installer-redhat@npm:3.4.0"
+  dependencies:
+    "@malept/cross-spawn-promise": "npm:^1.0.0"
+    debug: "npm:^4.1.1"
+    electron-installer-common: "npm:^0.10.2"
+    fs-extra: "npm:^9.0.0"
+    lodash: "npm:^4.17.15"
+    word-wrap: "npm:^1.2.3"
+    yargs: "npm:^16.0.2"
+  bin:
+    electron-installer-redhat: src/cli.js
+  checksum: 10/57859d17c97e0ae734495441de14a4e7e6fed3f463f08d7df433c1e5bdc3c3b28f4cca10f609d46704c9f85fa458a7d928ab9328ed944758a5e5d34ff745b8f5
+  conditions: (os=darwin | os=linux)
+  languageName: node
+  linkType: hard
+
+"electron-installer-redhat@patch:electron-installer-redhat@npm%3A3.4.0#~/.yarn/patches/electron-installer-redhat-npm-3.4.0-7f790e86e4.patch":
+  version: 3.4.0
+  resolution: "electron-installer-redhat@patch:electron-installer-redhat@npm%3A3.4.0#~/.yarn/patches/electron-installer-redhat-npm-3.4.0-7f790e86e4.patch::version=3.4.0&hash=7f7ce2"
   dependencies:
     "@malept/cross-spawn-promise": "npm:^1.0.0"
     debug: "npm:^4.1.1"
