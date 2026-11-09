@@ -420,6 +420,41 @@ describe('WalletConnectStorage', () => {
         expect(backing.storage[AppKey.WALLET_CONNECT]).toBeDefined();
     });
 
+    it('hands storage a JSON copy that structured clone accepts', async () => {
+        const backing = new MemoryStorage();
+        const set = backing.set.bind(backing);
+        backing.set = async <R>(key: string, value: R) => set(key, structuredClone(value));
+        const storage = new WalletConnectStorage(backing);
+
+        // Telemetry events keep their methods on the stored record.
+        await storage.setItem('wc@2:core:0.1//event-client', [
+            { eventId: 'e1', addTrace: () => undefined, setError: () => undefined }
+        ]);
+
+        expect(backing.storage[AppKey.WALLET_CONNECT]).toEqual({
+            'wc@2:core:0.1//event-client': [{ eventId: 'e1' }]
+        });
+    });
+
+    it('keeps writing after a write fails', async () => {
+        const backing = new MemoryStorage();
+        const set = backing.set.bind(backing);
+        let failNext = true;
+        backing.set = async <R>(key: string, value: R) => {
+            if (failNext) {
+                failNext = false;
+                throw new Error('write failed');
+            }
+            return set(key, value);
+        };
+        const storage = new WalletConnectStorage(backing);
+
+        await expect(storage.setItem('a', 1)).rejects.toThrow('write failed');
+        await storage.setItem('b', 2);
+
+        expect(backing.storage[AppKey.WALLET_CONNECT]).toEqual({ a: 1, b: 2 });
+    });
+
     it('serializes concurrent writes without losing entries', async () => {
         const storage = new WalletConnectStorage(new MemoryStorage());
 

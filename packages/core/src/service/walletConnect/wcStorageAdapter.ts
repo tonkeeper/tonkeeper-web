@@ -29,11 +29,17 @@ export class WalletConnectStorage {
     }
 
     private mutate(fn: (map: Record<string, unknown>) => void): Promise<void> {
-        this.writeChain = this.writeChain.then(async () => {
-            const map = await this.read();
-            fn(map);
-            await this.storage.set(AppKey.WALLET_CONNECT, map);
-        });
+        // A failed write must not reject every write queued after it.
+        this.writeChain = this.writeChain
+            .catch(() => undefined)
+            .then(async () => {
+                const map = await this.read();
+                fn(map);
+                // Desktop storage crosses Electron IPC, which rejects what structured clone
+                // cannot copy; the SDK keeps telemetry events with their methods. Web storage
+                // keeps this same JSON copy.
+                await this.storage.set(AppKey.WALLET_CONNECT, JSON.parse(JSON.stringify(map)));
+            });
         return this.writeChain as Promise<void>;
     }
 
