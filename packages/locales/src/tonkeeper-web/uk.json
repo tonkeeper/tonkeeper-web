@@ -1233,5 +1233,13 @@
     "domain_move_not_mine_title": "Гаманці не додано",
     "domain_move_not_mine_description": "До цього застосунку нічого не додано. Ви можете перенести гаманці вручну з %{host} або продовжити без них.",
     "domain_move_move_manually": "Перенести вручну",
-    "domain_move_continue_without": "Продовжити без імпорту"
+    "domain_move_continue_without": "Продовжити без імпорту",
+    "desktop_legacy_app_title": "Видалити старий застосунок Tonkeeper?",
+    "desktop_legacy_app_description": "Tonkeeper тепер називається Keeper. Ваші гаманці та налаштування вже в цьому застосунку, тому старий застосунок Tonkeeper у папці «Програми» більше не потрібен.",
+    "desktop_legacy_app_trash": "Перемістити в Смітник",
+    "desktop_legacy_app_keep": "Залишити",
+    "desktop_legacy_app_running_title": "Tonkeeper тепер називається Keeper",
+    "desktop_legacy_app_running_description": "Це нова версія Tonkeeper з новою назвою. Ваші гаманці та налаштування вже тут. Старий застосунок Tonkeeper досі відкритий: закрийте його, щоб продовжити в Keeper.",
+    "desktop_legacy_app_running_quit_old": "Закрити Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Закрити Keeper"
 }

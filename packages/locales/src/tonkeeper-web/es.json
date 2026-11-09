@@ -1229,5 +1229,13 @@
     "domain_move_not_mine_title": "Billeteras no añadidas",
     "domain_move_not_mine_description": "No se añadió nada a esta app. Puedes mover tus billeteras manualmente desde %{host} o continuar sin ellas.",
     "domain_move_move_manually": "Mover manualmente",
-    "domain_move_continue_without": "Continuar sin importar"
+    "domain_move_continue_without": "Continuar sin importar",
+    "desktop_legacy_app_title": "¿Eliminar la antigua app Tonkeeper?",
+    "desktop_legacy_app_description": "Tonkeeper ahora es Keeper. Tus billeteras y ajustes ya están en esta app, así que la antigua app Tonkeeper en Aplicaciones ya no es necesaria.",
+    "desktop_legacy_app_trash": "Trasladar a la papelera",
+    "desktop_legacy_app_keep": "Conservar",
+    "desktop_legacy_app_running_title": "Tonkeeper ahora es Keeper",
+    "desktop_legacy_app_running_description": "Esta es la nueva versión de Tonkeeper con un nombre nuevo. Tus billeteras y ajustes ya están aquí. La antigua app Tonkeeper sigue abierta: ciérrala para continuar en Keeper.",
+    "desktop_legacy_app_running_quit_old": "Cerrar Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Cerrar Keeper"
 }

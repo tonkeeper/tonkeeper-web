@@ -1226,5 +1226,13 @@
     "domain_move_not_mine_title": "Cüzdanlar eklenmedi",
     "domain_move_not_mine_description": "Bu uygulamaya hiçbir şey eklenmedi. Cüzdanlarınızı %{host} üzerinden elle taşıyabilir veya onlarsız devam edebilirsiniz.",
     "domain_move_move_manually": "Elle taşı",
-    "domain_move_continue_without": "İçe aktarmadan devam et"
+    "domain_move_continue_without": "İçe aktarmadan devam et",
+    "desktop_legacy_app_title": "Eski Tonkeeper uygulaması kaldırılsın mı?",
+    "desktop_legacy_app_description": "Tonkeeper artık Keeper. Cüzdanlarınız ve ayarlarınız zaten bu uygulamada, bu yüzden Uygulamalar klasöründeki eski Tonkeeper uygulamasına artık gerek yok.",
+    "desktop_legacy_app_trash": "Çöp Sepeti’ne Taşı",
+    "desktop_legacy_app_keep": "Sakla",
+    "desktop_legacy_app_running_title": "Tonkeeper artık Keeper",
+    "desktop_legacy_app_running_description": "Bu, Tonkeeper’ın yeni adıyla yeni sürümü. Cüzdanlarınız ve ayarlarınız zaten burada. Eski Tonkeeper uygulaması hâlâ açık: Keeper ile devam etmek için ondan çıkın.",
+    "desktop_legacy_app_running_quit_old": "Tonkeeper’dan Çık",
+    "desktop_legacy_app_running_quit_this": "Keeper’dan Çık"
 }

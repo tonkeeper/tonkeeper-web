@@ -9,7 +9,12 @@ import {
     readLanguage,
     readStorageSnapshot
 } from './storage';
-import { deliverTgAuthResult, readTgAuthResult, TgAuthWindow } from './telegramAuth';
+import {
+    deliverTgAuthResult,
+    readTgAuthResult,
+    TgAuthWindow,
+    tgAuthForwardTarget
+} from './telegramAuth';
 
 /**
  * Every screen here acts on this origin's wallet data, so none of them is shown
@@ -29,8 +34,13 @@ const tgAuthDelivered =
     tgAuthResult !== undefined &&
     deliverTgAuthResult(tgAuthResult, window as unknown as TgAuthWindow, NEW_ORIGIN);
 
+const tgAuthForward =
+    tgAuthResult !== undefined && !tgAuthDelivered
+        ? tgAuthForwardTarget(window.location, NEW_ORIGIN)
+        : undefined;
+
 // A result nobody asked for is dropped, so it isn't carried on to the new origin.
-if (tgAuthResult !== undefined && !tgAuthDelivered) {
+if (tgAuthResult !== undefined && !tgAuthDelivered && !tgAuthForward) {
     history.replaceState(null, '', window.location.pathname + window.location.search);
 }
 
@@ -73,6 +83,8 @@ const render = async (rendered: RenderedScreen) => {
 
 if (tgAuthDelivered) {
     // The mobile app closes its browser tab and a popup closes itself; this page has nothing to show.
+} else if (tgAuthForward) {
+    window.location.replace(tgAuthForward);
 } else if (target) {
     // `replace` keeps this origin out of the back stack, so Back from the new
     // origin doesn't bounce straight back here.

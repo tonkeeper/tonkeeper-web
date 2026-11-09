@@ -13,6 +13,7 @@ import {
 } from '@tonkeeper/core/dist/service/telegramOauth';
 import { noteCheckAnswerNone } from './migration/analytics';
 import { settleCheckAnswer } from './migration/handoffRequest';
+import { keepForwardedTgAuthResult } from './telegramAuthReturn';
 
 const resumePath = settleCheckAnswer(window.location);
 
@@ -31,6 +32,8 @@ try {
     if (tgAuthResult) {
         if (isInTgAuthInjectionContext()) {
             EntryPoint = <AppTgOauthRedirect tgAuthResult={tgAuthResult} />;
+        } else if (keepForwardedTgAuthResult(tgAuthResult)) {
+            history.replaceState(null, '', window.location.pathname);
         } else if (!sendTgAuthResultToOpener(tgAuthResult)) {
             history.replaceState(null, '', window.location.pathname + window.location.search);
         }

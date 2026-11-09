@@ -65,11 +65,13 @@ describe('fuseMismatches', () => {
 });
 
 describe('fuseBinaryPath', () => {
+    const names = { appName: 'Keeper', executableName: 'Tonkeeper' };
+
     it('points at the Electron framework on macOS', () => {
-        expect(fuseBinaryPath('out/app', 'darwin', 'Tonkeeper')).toBe(
+        expect(fuseBinaryPath('out/app', 'darwin', names)).toBe(
             path.join(
                 'out/app',
-                'Tonkeeper.app',
+                'Keeper.app',
                 'Contents',
                 'Frameworks',
                 'Electron Framework.framework',
@@ -79,11 +81,9 @@ describe('fuseBinaryPath', () => {
     });
 
     it('points at the executable on Windows and Linux', () => {
-        expect(fuseBinaryPath('out/app', 'win32', 'Tonkeeper')).toBe(
+        expect(fuseBinaryPath('out/app', 'win32', names)).toBe(
             path.join('out/app', 'Tonkeeper.exe')
         );
-        expect(fuseBinaryPath('out/app', 'linux', 'Tonkeeper')).toBe(
-            path.join('out/app', 'Tonkeeper')
-        );
+        expect(fuseBinaryPath('out/app', 'linux', names)).toBe(path.join('out/app', 'Tonkeeper'));
     });
 });

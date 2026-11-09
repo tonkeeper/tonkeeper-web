@@ -1221,5 +1221,13 @@
     "domain_move_not_mine_title": "Carteiras não adicionadas",
     "domain_move_not_mine_description": "Nada foi adicionado a este app. Você pode mover suas carteiras manualmente de %{host} ou continuar sem elas.",
     "domain_move_move_manually": "Mover manualmente",
-    "domain_move_continue_without": "Continuar sem importar"
+    "domain_move_continue_without": "Continuar sem importar",
+    "desktop_legacy_app_title": "Remover o app Tonkeeper antigo?",
+    "desktop_legacy_app_description": "Tonkeeper agora é Keeper. Suas carteiras e configurações já estão neste app, então o app Tonkeeper antigo em Aplicativos não é mais necessário.",
+    "desktop_legacy_app_trash": "Mover para o Lixo",
+    "desktop_legacy_app_keep": "Manter",
+    "desktop_legacy_app_running_title": "Tonkeeper agora é Keeper",
+    "desktop_legacy_app_running_description": "Esta é a nova versão do Tonkeeper com um novo nome. Suas carteiras e configurações já estão aqui. O app Tonkeeper antigo ainda está aberto: feche-o para continuar no Keeper.",
+    "desktop_legacy_app_running_quit_old": "Fechar Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Fechar Keeper"
 }

@@ -1298,5 +1298,13 @@
     "domain_move_not_mine_title": "Кошельки не добавлены",
     "domain_move_not_mine_description": "В это приложение ничего не добавлено. Вы можете перенести кошельки вручную с %{host} или продолжить без них.",
     "domain_move_move_manually": "Перенести вручную",
-    "domain_move_continue_without": "Продолжить без импорта"
+    "domain_move_continue_without": "Продолжить без импорта",
+    "desktop_legacy_app_title": "Удалить старое приложение Tonkeeper?",
+    "desktop_legacy_app_description": "Tonkeeper теперь называется Keeper. Ваши кошельки и настройки уже в этом приложении, поэтому старое приложение Tonkeeper в папке «Программы» больше не нужно.",
+    "desktop_legacy_app_trash": "Переместить в Корзину",
+    "desktop_legacy_app_keep": "Оставить",
+    "desktop_legacy_app_running_title": "Tonkeeper теперь называется Keeper",
+    "desktop_legacy_app_running_description": "Это новая версия Tonkeeper с новым названием. Ваши кошельки и настройки уже здесь. Старое приложение Tonkeeper всё ещё открыто: закройте его, чтобы продолжить в Keeper.",
+    "desktop_legacy_app_running_quit_old": "Закрыть Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Закрыть Keeper"
 }

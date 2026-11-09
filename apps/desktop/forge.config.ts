@@ -27,6 +27,9 @@ const isPrerelease = process.env.GITHUB_REF_NAME?.includes('-') ?? false;
 const githubToken = process.env.GITHUB_TOKEN;
 const requestedArchitecture = getRequestedArchitecture(process.argv);
 const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const appName = 'Keeper';
+// Squirrel.Windows starts the app through this file name from the Start-menu shortcut and the
+// deb/rpm packages install it as their bin, so it stays Tonkeeper for installed users.
 const executableName = 'Tonkeeper';
 
 // Bundle libsecret + transitive deps into the AppImage so it runs on systems
@@ -122,9 +125,9 @@ const squirrelRemoteReleases = githubToken
 
 const devAndRpmOptions = {
     // Compatibility identifiers stay Tonkeeper so upgrades retain the existing
-    // install and data. genericName and description are display-only metadata.
+    // install and data. productName, genericName and description are display-only.
     name: 'Tonkeeper',
-    productName: 'Tonkeeper',
+    productName: appName,
     genericName: 'Keeper',
     license: 'Apache-2.0',
     maintainer: 'Ton Apps Group',
@@ -160,8 +163,15 @@ const config: ForgeConfig = {
     packagerConfig: {
         asar: true,
         icon: path.join(__dirname, 'public', 'icon'),
-        name: 'Tonkeeper',
+        name: appName,
         executableName,
+        // Squirrel.Windows names the Start-menu and desktop shortcuts from this metadata and the
+        // installer title. Installed users keep the shortcut they have, so a new name adds a second.
+        win32metadata: {
+            FileDescription: 'Tonkeeper',
+            ProductName: 'Tonkeeper',
+            InternalName: 'Tonkeeper'
+        },
         protocols: [
             {
                 name: 'Keeper Protocol',
@@ -184,6 +194,7 @@ const config: ForgeConfig = {
         new MakerSquirrel(
             {
                 name: 'Tonkeeper',
+                title: 'Tonkeeper',
                 authors: 'Ton Apps Group',
                 description: 'Secure multichain crypto wallet',
                 iconUrl: 'https://tonkeeper.com/assets/icon.ico',
@@ -205,7 +216,7 @@ const config: ForgeConfig = {
                         x: 200,
                         y: 170,
                         type: 'file',
-                        path: `${process.cwd()}/out/Tonkeeper-darwin-${arch}/Tonkeeper.app`
+                        path: `${process.cwd()}/out/${appName}-darwin-${arch}/${appName}.app`
                     },
                     { x: 400, y: 170, type: 'link', path: '/Applications' }
                 ]
@@ -270,7 +281,10 @@ const config: ForgeConfig = {
         }),
         postPackage: async (_config, { platform, outputPaths }) => {
             for (const outputPath of outputPaths) {
-                const binaryPath = fuseBinaryPath(outputPath, platform, executableName);
+                const binaryPath = fuseBinaryPath(outputPath, platform, {
+                    appName,
+                    executableName
+                });
                 const mismatches = fuseMismatches(readFileSync(binaryPath));
                 if (mismatches.length > 0) {
                     throw new Error(
@@ -279,7 +293,7 @@ const config: ForgeConfig = {
                 }
 
                 if (platform === 'darwin') {
-                    restoreAdHocSignature(path.join(outputPath, `${executableName}.app`));
+                    restoreAdHocSignature(path.join(outputPath, `${appName}.app`));
                 }
             }
         },

@@ -11,7 +11,12 @@ import {
     WalletVersion
 } from '../entries/wallet';
 import { Flatten } from '../utils/types';
-import { loginViaTG } from './telegramOauth';
+import {
+    forgetPendingProTrial,
+    loginViaTG,
+    rememberPendingProTrial,
+    TGLoginData
+} from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
@@ -213,12 +218,22 @@ export async function startProServiceTrial(
     token: string,
     lang?: string
 ): Promise<string> {
-    const tgData = await loginViaTG(botId, lang);
+    rememberPendingProTrial(token);
+    let tgData: TGLoginData | null;
+    try {
+        tgData = await loginViaTG(botId, lang);
+    } finally {
+        forgetPendingProTrial();
+    }
 
     if (!tgData) {
         throw new Error('Unable to activate Trial');
     }
 
+    return activateProServiceTrial(token, tgData);
+}
+
+export async function activateProServiceTrial(token: string, tgData: TGLoginData): Promise<string> {
     const result = await TiersService.activateTrial(`Bearer ${token}`, tgData);
 
     if (!result.ok || !result.auth_token) {

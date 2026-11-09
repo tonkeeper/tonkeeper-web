@@ -1234,5 +1234,13 @@
     "domain_move_not_mine_title": "Портфейлите не са добавени",
     "domain_move_not_mine_description": "Нищо не е добавено в това приложение. Можете да преместите портфейлите си ръчно от %{host} или да продължите без тях.",
     "domain_move_move_manually": "Премести ръчно",
-    "domain_move_continue_without": "Продължи без импортиране"
+    "domain_move_continue_without": "Продължи без импортиране",
+    "desktop_legacy_app_title": "Да се премахне ли старото приложение Tonkeeper?",
+    "desktop_legacy_app_description": "Tonkeeper вече е Keeper. Портфейлите и настройките ви вече са в това приложение, затова старото приложение Tonkeeper в „Приложения“ не е нужно.",
+    "desktop_legacy_app_trash": "Премести в кошчето",
+    "desktop_legacy_app_keep": "Запази",
+    "desktop_legacy_app_running_title": "Tonkeeper вече е Keeper",
+    "desktop_legacy_app_running_description": "Това е новата версия на Tonkeeper с ново име. Портфейлите и настройките ви вече са тук. Старото приложение Tonkeeper все още е отворено: затворете го, за да продължите в Keeper.",
+    "desktop_legacy_app_running_quit_old": "Затвори Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Затвори Keeper"
 }

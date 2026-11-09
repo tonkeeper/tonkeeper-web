@@ -7,6 +7,7 @@ import { WEB_PUSH_APP_ID } from '@tonkeeper/core/dist/service/chainkit/deviceAut
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { DocumentLanguageSync } from '@tonkeeper/uikit/dist/components/DocumentLanguageSync';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
+import { ProTrialTelegramReturn } from '@tonkeeper/uikit/dist/components/pro/ProTrialTelegramReturn';
 // Header/Footer disabled while multichain home stabilises.
 // import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 // import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
@@ -256,6 +257,7 @@ const Loader: FC = () => {
                     <QrScanner />
                 </Suspense>
                 <ModalsRoot />
+                <ProTrialTelegramReturn />
             </CryptoStrategyInstaller>
         </AppContext.Provider>
     );

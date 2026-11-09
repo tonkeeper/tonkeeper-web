@@ -1221,5 +1221,13 @@
     "domain_move_not_mine_title": "Chưa thêm ví",
     "domain_move_not_mine_description": "Chưa có gì được thêm vào ứng dụng này. Bạn có thể chuyển ví thủ công từ %{host}, hoặc tiếp tục mà không có chúng.",
     "domain_move_move_manually": "Chuyển thủ công",
-    "domain_move_continue_without": "Tiếp tục mà không nhập"
+    "domain_move_continue_without": "Tiếp tục mà không nhập",
+    "desktop_legacy_app_title": "Xóa ứng dụng Tonkeeper cũ?",
+    "desktop_legacy_app_description": "Tonkeeper giờ là Keeper. Ví và cài đặt của bạn đã có trong ứng dụng này, nên ứng dụng Tonkeeper cũ trong thư mục Ứng dụng không còn cần thiết.",
+    "desktop_legacy_app_trash": "Chuyển vào Thùng rác",
+    "desktop_legacy_app_keep": "Giữ lại",
+    "desktop_legacy_app_running_title": "Tonkeeper giờ là Keeper",
+    "desktop_legacy_app_running_description": "Đây là phiên bản mới của Tonkeeper với tên mới. Ví và cài đặt của bạn đã có ở đây. Ứng dụng Tonkeeper cũ vẫn đang mở: hãy thoát nó để tiếp tục trong Keeper.",
+    "desktop_legacy_app_running_quit_old": "Thoát Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Thoát Keeper"
 }

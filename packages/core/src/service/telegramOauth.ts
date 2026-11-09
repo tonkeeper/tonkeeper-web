@@ -122,3 +122,60 @@ export function sendTgAuthResultToOpener(tgAuthResult: string): boolean {
         return false;
     }
 }
+
+const PENDING_TRIAL_TOKEN_KEY = 'tk-pro-trial-pending-token';
+const TG_AUTH_RETURN_KEY = 'tk-tg-auth-return';
+
+const sessionStore = (): Storage | undefined => {
+    try {
+        return getWindow()?.sessionStorage;
+    } catch {
+        return undefined;
+    }
+};
+
+/**
+ * Keeps the Pro auth token while Telegram's login runs. A shell whose login
+ * takes the whole tab away (web) comes back to a fresh page, where the token
+ * held in memory is gone.
+ */
+export function rememberPendingProTrial(authToken: string) {
+    sessionStore()?.setItem(PENDING_TRIAL_TOKEN_KEY, authToken);
+}
+
+export function forgetPendingProTrial() {
+    sessionStore()?.removeItem(PENDING_TRIAL_TOKEN_KEY);
+}
+
+/** Keeps a login result that arrived with a page load for the app to pick up once it has booted. */
+export function keepTgAuthReturn(base64Result: string) {
+    sessionStore()?.setItem(TG_AUTH_RETURN_KEY, base64Result);
+}
+
+/**
+ * The trial login this tab left for, with the result it came back with. Read
+ * once: both halves are cleared either way, so a login abandoned on Telegram's
+ * page is not resumed by a later visit.
+ */
+export function takeProTrialReturn(): { authToken: string; tgData: TGLoginData } | undefined {
+    const store = sessionStore();
+    if (!store) {
+        return undefined;
+    }
+
+    const authToken = store.getItem(PENDING_TRIAL_TOKEN_KEY);
+    const base64Result = store.getItem(TG_AUTH_RETURN_KEY);
+    store.removeItem(PENDING_TRIAL_TOKEN_KEY);
+    store.removeItem(TG_AUTH_RETURN_KEY);
+
+    if (!authToken || !base64Result) {
+        return undefined;
+    }
+
+    try {
+        const bytes = Uint8Array.from(atob(base64Result), char => char.charCodeAt(0));
+        return { authToken, tgData: JSON.parse(new TextDecoder().decode(bytes)) };
+    } catch {
+        return undefined;
+    }
+}

@@ -1,7 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { describe, expect, it, vi } from 'vitest';
 
-import { deliverTgAuthResult, readTgAuthResult, TgAuthWindow } from './telegramAuth';
+import {
+    deliverTgAuthResult,
+    readTgAuthResult,
+    TgAuthWindow,
+    tgAuthForwardTarget
+} from './telegramAuth';
 
 const NEW_ORIGIN = 'https://web.keeperwallet.com';
 
@@ -58,5 +63,30 @@ describe('delivering the result', () => {
 
         expect(deliverTgAuthResult('bm90IGpzb24=', target, NEW_ORIGIN)).toBe(false);
         expect(target.close).not.toHaveBeenCalled();
+    });
+});
+
+describe('forwarding the result to the new origin', () => {
+    it('sends on a result the new origin asked for, fragment untouched', () => {
+        const location = { search: '?tg-auth=forward', hash: `#tgAuthResult=${base64url}` };
+
+        expect(tgAuthForwardTarget(location, NEW_ORIGIN)).toBe(
+            `${NEW_ORIGIN}/?tg-auth=forward#tgAuthResult=${base64url}`
+        );
+    });
+
+    it('keeps any other result here', () => {
+        expect(
+            tgAuthForwardTarget({ search: '', hash: `#tgAuthResult=${base64url}` }, NEW_ORIGIN)
+        ).toBeUndefined();
+        expect(
+            tgAuthForwardTarget(
+                { search: '?tg-auth=other', hash: `#tgAuthResult=${base64url}` },
+                NEW_ORIGIN
+            )
+        ).toBeUndefined();
+        expect(
+            tgAuthForwardTarget({ search: '?tg-auth=forward', hash: '' }, NEW_ORIGIN)
+        ).toBeUndefined();
     });
 });

@@ -6,6 +6,25 @@
  */
 const TG_AUTH_RESULT = /[#?&]tgAuthResult=([A-Za-z0-9\-_]*)$/;
 
+/**
+ * The new origin's wallet opens Telegram's popup without an opener and asks to
+ * come back here with this query; the new origin reads the same one in
+ * `apps/web/src/telegramAuthReturn.ts`.
+ */
+const TG_AUTH_FORWARD_SEARCH = '?tg-auth=forward';
+
+/**
+ * Where a result the new origin asked for goes on to, fragment untouched. Any
+ * other result has nobody waiting for it there and is not carried over.
+ */
+export const tgAuthForwardTarget = (
+    location: Pick<Location, 'search' | 'hash'>,
+    newOrigin: string
+): string | undefined =>
+    location.search === TG_AUTH_FORWARD_SEARCH && TG_AUTH_RESULT.test(location.hash)
+        ? `${newOrigin}/${location.search}${location.hash}`
+        : undefined;
+
 /** The result as standard base64, the form the mobile bridge expects. */
 export const readTgAuthResult = (hash: string): string | undefined => {
     const match = TG_AUTH_RESULT.exec(hash);

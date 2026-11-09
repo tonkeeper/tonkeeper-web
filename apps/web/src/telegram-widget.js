@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* patched version of 'https://telegram.org/js/telegram-widget.js?22' */
+/* PATCHED */ import { TG_AUTH_FORWARD_SEARCH } from './telegramAuthReturn';
 
 
 (function(window) {
@@ -519,7 +520,13 @@
         }
 
 /* PATCHED */ const origin = 'https://wallet.tonkeeper.com';
-/* PATCHED */ var popup_url = Telegram.Login.widgetsOrigin + '/auth?bot_id=' + encodeURIComponent(options.bot_id) + '&origin=' + encodeURIComponent(origin) + (options.request_access ? '&request_access=' + encodeURIComponent(options.request_access) : '') + ('&lang=' + encodeURIComponent(options.lang)) + '&return_to=' + encodeURIComponent(origin);
+/* PATCHED */ var popup_url = Telegram.Login.widgetsOrigin + '/auth?bot_id=' + encodeURIComponent(options.bot_id) + '&origin=' + encodeURIComponent(origin) + (options.request_access ? '&request_access=' + encodeURIComponent(options.request_access) : '') + ('&lang=' + encodeURIComponent(options.lang)) + '&return_to=' + encodeURIComponent(origin + '/' + TG_AUTH_FORWARD_SEARCH);
+/* PATCHED */ // Telegram hands a popup's result only to an opener on the bot's domain, which
+/* PATCHED */ // this origin is not, and closes a popup it can close before redirecting it.
+/* PATCHED */ // The tab itself goes instead: Telegram redirects it to return_to, the old
+/* PATCHED */ // domain forwards it back here, and the app finishes the login it left for.
+/* PATCHED */ location.assign(popup_url);
+/* PATCHED */ return;
         var popup = window.open(popup_url, '_blank', 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',status=0,location=0,menubar=0,toolbar=0');
         TelegramLogin.popups[bot_id] = {
           window: popup,

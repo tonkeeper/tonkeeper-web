@@ -54,6 +54,17 @@ export const setProtocolHandlerWindowsLinux = () => {
  * @description Create logic (OSX) for open url from protocol
  */
 export const setProtocolHandlerOSX = () => {
+    // macOS only keeps one instance per bundle path; copies at other paths (the DMG, the
+    // pre-rename Tonkeeper.app) would otherwise run against the same data folder at once.
+    if (!app.requestSingleInstanceLock()) {
+        app.quit();
+        return;
+    }
+
+    app.on('second-instance', () => {
+        MainWindow.bringToFront();
+    });
+
     app.whenReady().then(() => {
         initMainWindow();
     });

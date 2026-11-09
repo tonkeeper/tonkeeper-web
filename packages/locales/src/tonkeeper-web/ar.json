@@ -1229,5 +1229,13 @@
     "domain_move_not_mine_title": "لم تتم إضافة المحافظ",
     "domain_move_not_mine_description": "لم يُضَف أي شيء إلى هذا التطبيق. يمكنك نقل محافظك يدويًا من %{host}، أو المتابعة من دونها.",
     "domain_move_move_manually": "النقل يدويًا",
-    "domain_move_continue_without": "المتابعة دون استيراد"
+    "domain_move_continue_without": "المتابعة دون استيراد",
+    "desktop_legacy_app_title": "هل تريد إزالة تطبيق Tonkeeper القديم؟",
+    "desktop_legacy_app_description": "أصبح Tonkeeper الآن Keeper. محافظك وإعداداتك موجودة بالفعل في هذا التطبيق، لذلك لم تعد بحاجة إلى تطبيق Tonkeeper القديم في مجلد التطبيقات.",
+    "desktop_legacy_app_trash": "نقل إلى سلة المهملات",
+    "desktop_legacy_app_keep": "الاحتفاظ",
+    "desktop_legacy_app_running_title": "أصبح Tonkeeper الآن Keeper",
+    "desktop_legacy_app_running_description": "هذا هو الإصدار الجديد من Tonkeeper باسم جديد. محافظك وإعداداتك موجودة هنا بالفعل. لا يزال تطبيق Tonkeeper القديم مفتوحًا: أغلقه للمتابعة في Keeper.",
+    "desktop_legacy_app_running_quit_old": "إغلاق Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "إغلاق Keeper"
 }

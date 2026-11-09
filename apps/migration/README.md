@@ -226,6 +226,7 @@ The screens follow this origin's storage, so seed or clear it to pick one:
 /ton-connect?v=2&id=x              forwarded, query intact
 /recover                           the phrases, for a profile holding a secret
 /#tgAuthResult=…                   Telegram login result, handed to the mobile bridge or the opener
+/?tg-auth=forward#tgAuthResult=…   the new origin's login popup (no opener), sent on to the same URL there
 /img/…                             token and Battery images other builds still load from here
 ```
 

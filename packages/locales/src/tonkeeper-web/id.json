@@ -1229,5 +1229,13 @@
     "domain_move_not_mine_title": "Dompet tidak ditambahkan",
     "domain_move_not_mine_description": "Tidak ada yang ditambahkan ke aplikasi ini. Anda bisa memindahkan dompet secara manual dari %{host}, atau lanjutkan tanpanya.",
     "domain_move_move_manually": "Pindahkan secara manual",
-    "domain_move_continue_without": "Lanjutkan tanpa mengimpor"
+    "domain_move_continue_without": "Lanjutkan tanpa mengimpor",
+    "desktop_legacy_app_title": "Hapus aplikasi Tonkeeper lama?",
+    "desktop_legacy_app_description": "Tonkeeper sekarang menjadi Keeper. Dompet dan pengaturan Anda sudah ada di aplikasi ini, jadi aplikasi Tonkeeper lama di Aplikasi tidak diperlukan lagi.",
+    "desktop_legacy_app_trash": "Pindahkan ke Tong Sampah",
+    "desktop_legacy_app_keep": "Simpan",
+    "desktop_legacy_app_running_title": "Tonkeeper sekarang menjadi Keeper",
+    "desktop_legacy_app_running_description": "Ini adalah versi baru Tonkeeper dengan nama baru. Dompet dan pengaturan Anda sudah ada di sini. Aplikasi Tonkeeper lama masih terbuka: tutup untuk melanjutkan di Keeper.",
+    "desktop_legacy_app_running_quit_old": "Tutup Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Tutup Keeper"
 }

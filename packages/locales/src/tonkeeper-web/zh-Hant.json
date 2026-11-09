@@ -1245,5 +1245,13 @@
     "domain_move_not_mine_title": "未新增錢包",
     "domain_move_not_mine_description": "此應用程式中未新增任何內容。您可以從 %{host} 手動移轉錢包，或不匯入直接繼續。",
     "domain_move_move_manually": "手動移轉",
-    "domain_move_continue_without": "不匯入，繼續"
+    "domain_move_continue_without": "不匯入，繼續",
+    "desktop_legacy_app_title": "移除舊版 Tonkeeper App？",
+    "desktop_legacy_app_description": "Tonkeeper 現已更名為 Keeper。你的錢包和設定已在此 App 中，「應用程式」中的舊版 Tonkeeper App 已不再需要。",
+    "desktop_legacy_app_trash": "丟到垃圾桶",
+    "desktop_legacy_app_keep": "保留",
+    "desktop_legacy_app_running_title": "Tonkeeper 現已更名為 Keeper",
+    "desktop_legacy_app_running_description": "這是更名後的新版 Tonkeeper。你的錢包和設定已在這裡。舊版 Tonkeeper App 仍在執行：請結束它以繼續使用 Keeper。",
+    "desktop_legacy_app_running_quit_old": "結束 Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "結束 Keeper"
 }

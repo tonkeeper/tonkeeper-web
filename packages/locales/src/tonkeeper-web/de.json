@@ -1242,5 +1242,13 @@
     "domain_move_not_mine_title": "Wallets nicht hinzugefügt",
     "domain_move_not_mine_description": "Dieser App wurde nichts hinzugefügt. Sie können Ihre Wallets manuell von %{host} übertragen oder ohne sie fortfahren.",
     "domain_move_move_manually": "Manuell übertragen",
-    "domain_move_continue_without": "Ohne Import fortfahren"
+    "domain_move_continue_without": "Ohne Import fortfahren",
+    "desktop_legacy_app_title": "Alte Tonkeeper-App entfernen?",
+    "desktop_legacy_app_description": "Tonkeeper heißt jetzt Keeper. Deine Wallets und Einstellungen sind bereits in dieser App, die alte Tonkeeper-App im Ordner „Programme“ wird nicht mehr benötigt.",
+    "desktop_legacy_app_trash": "In den Papierkorb legen",
+    "desktop_legacy_app_keep": "Behalten",
+    "desktop_legacy_app_running_title": "Tonkeeper heißt jetzt Keeper",
+    "desktop_legacy_app_running_description": "Das ist die neue Version von Tonkeeper mit neuem Namen. Deine Wallets und Einstellungen sind bereits hier. Die alte Tonkeeper-App ist noch geöffnet: Beende sie, um in Keeper fortzufahren.",
+    "desktop_legacy_app_running_quit_old": "Tonkeeper beenden",
+    "desktop_legacy_app_running_quit_this": "Keeper beenden"
 }

@@ -18,11 +18,16 @@ const expectedFuses = Object.entries(electronFuses)
     .filter(([key]) => key !== 'version')
     .map(([key, enabled]) => ({ index: Number(key), enabled: enabled as boolean }));
 
-export function fuseBinaryPath(outputPath: string, platform: string, executableName: string) {
+export function fuseBinaryPath(
+    outputPath: string,
+    platform: string,
+    names: { appName: string; executableName: string }
+) {
+    const { appName, executableName } = names;
     if (platform === 'darwin' || platform === 'mas') {
         return path.join(
             outputPath,
-            `${executableName}.app`,
+            `${appName}.app`,
             'Contents',
             'Frameworks',
             'Electron Framework.framework',

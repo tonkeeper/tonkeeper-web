@@ -2,6 +2,7 @@ import { delay, hideSensitiveData } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, app, powerMonitor } from 'electron';
 import log from 'electron-log/main';
 import { updateElectronApp } from 'update-electron-app';
+import { settleLegacyAppCopies } from './electron/legacyAppCopy';
 import { MainWindow } from './electron/mainWindow';
 import { startUpdateCheck } from './electron/updateCheck';
 import {
@@ -61,6 +62,9 @@ setDefaultProtocolClient();
 switch (process.platform) {
     case 'darwin':
         setProtocolHandlerOSX();
+        app.whenReady()
+            .then(settleLegacyAppCopies)
+            .catch(e => log.error('legacy app copy check failed', e));
         break;
     case 'linux':
     case 'win32':

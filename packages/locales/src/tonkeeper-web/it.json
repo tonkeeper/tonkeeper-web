@@ -1221,5 +1221,13 @@
     "domain_move_not_mine_title": "Wallet non aggiunti",
     "domain_move_not_mine_description": "Non è stato aggiunto nulla a questa app. Puoi trasferire i tuoi wallet manualmente da %{host}, oppure continuare senza.",
     "domain_move_move_manually": "Trasferisci manualmente",
-    "domain_move_continue_without": "Continua senza importare"
+    "domain_move_continue_without": "Continua senza importare",
+    "desktop_legacy_app_title": "Rimuovere la vecchia app Tonkeeper?",
+    "desktop_legacy_app_description": "Tonkeeper ora si chiama Keeper. I tuoi wallet e le impostazioni sono già in questa app, quindi la vecchia app Tonkeeper in Applicazioni non serve più.",
+    "desktop_legacy_app_trash": "Sposta nel Cestino",
+    "desktop_legacy_app_keep": "Mantieni",
+    "desktop_legacy_app_running_title": "Tonkeeper ora si chiama Keeper",
+    "desktop_legacy_app_running_description": "Questa è la nuova versione di Tonkeeper con un nuovo nome. I tuoi wallet e le impostazioni sono già qui. La vecchia app Tonkeeper è ancora aperta: chiudila per continuare in Keeper.",
+    "desktop_legacy_app_running_quit_old": "Chiudi Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "Chiudi Keeper"
 }

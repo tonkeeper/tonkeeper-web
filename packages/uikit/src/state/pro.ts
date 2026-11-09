@@ -16,7 +16,9 @@ import {
     PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { takeProTrialReturn } from '@tonkeeper/core/dist/service/telegramOauth';
 import {
+    activateProServiceTrial,
     authViaSeedPhrase,
     authViaTonConnect,
     getBackupState,
@@ -414,6 +416,26 @@ export const useActivateTrialMutation = () => {
         await client.invalidateQueries([QueryKey.pro]);
 
         return token;
+    });
+};
+
+/** Finishes a trial login that left the tab for Telegram and came back with a result. */
+export const useResumeProTrialMutation = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation<boolean, Error>(async () => {
+        const pending = takeProTrialReturn();
+        if (!pending) {
+            return false;
+        }
+
+        const token = await activateProServiceTrial(pending.authToken, pending.tgData);
+
+        await sdk.subscriptionService.activateTrial(token);
+        await client.invalidateQueries([QueryKey.pro]);
+
+        return true;
     });
 };
 

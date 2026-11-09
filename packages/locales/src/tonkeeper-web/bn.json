@@ -1229,5 +1229,13 @@
     "domain_move_not_mine_title": "ওয়ালেট যোগ করা হয়নি",
     "domain_move_not_mine_description": "এই অ্যাপে কিছুই যোগ করা হয়নি। আপনি %{host} থেকে ম্যানুয়ালি আপনার ওয়ালেট সরাতে পারেন, অথবা সেগুলো ছাড়াই চালিয়ে যেতে পারেন।",
     "domain_move_move_manually": "ম্যানুয়ালি সরান",
-    "domain_move_continue_without": "ইমপোর্ট না করে চালিয়ে যান"
+    "domain_move_continue_without": "ইমপোর্ট না করে চালিয়ে যান",
+    "desktop_legacy_app_title": "পুরনো Tonkeeper অ্যাপ সরাবেন?",
+    "desktop_legacy_app_description": "Tonkeeper এখন Keeper। আপনার ওয়ালেট ও সেটিংস ইতিমধ্যে এই অ্যাপে আছে, তাই Applications-এ থাকা পুরনো Tonkeeper অ্যাপের আর প্রয়োজন নেই।",
+    "desktop_legacy_app_trash": "ট্র্যাশে সরান",
+    "desktop_legacy_app_keep": "রেখে দিন",
+    "desktop_legacy_app_running_title": "Tonkeeper এখন Keeper",
+    "desktop_legacy_app_running_description": "এটি নতুন নামে Tonkeeper-এর নতুন সংস্করণ। আপনার ওয়ালেট ও সেটিংস ইতিমধ্যে এখানে আছে। পুরনো Tonkeeper অ্যাপটি এখনও খোলা: Keeper-এ চালিয়ে যেতে সেটি বন্ধ করুন।",
+    "desktop_legacy_app_running_quit_old": "Tonkeeper বন্ধ করুন",
+    "desktop_legacy_app_running_quit_this": "Keeper বন্ধ করুন"
 }

@@ -1234,5 +1234,13 @@
     "domain_move_not_mine_title": "Hamyonlar qo'shilmadi",
     "domain_move_not_mine_description": "Bu ilovaga hech narsa qo'shilmadi. Hamyonlaringizni %{host} dan qo'lda ko'chirishingiz yoki ularsiz davom etishingiz mumkin.",
     "domain_move_move_manually": "Qo'lda ko'chirish",
-    "domain_move_continue_without": "Import qilmasdan davom etish"
+    "domain_move_continue_without": "Import qilmasdan davom etish",
+    "desktop_legacy_app_title": "Eski Tonkeeper ilovasi o‘chirilsinmi?",
+    "desktop_legacy_app_description": "Tonkeeper endi Keeper deb ataladi. Hamyonlaringiz va sozlamalaringiz allaqachon shu ilovada, shuning uchun Ilovalar jildidagi eski Tonkeeper ilovasi endi kerak emas.",
+    "desktop_legacy_app_trash": "Savatga ko‘chirish",
+    "desktop_legacy_app_keep": "Qoldirish",
+    "desktop_legacy_app_running_title": "Tonkeeper endi Keeper deb ataladi",
+    "desktop_legacy_app_running_description": "Bu Tonkeeper’ning yangi nomdagi yangi versiyasi. Hamyonlaringiz va sozlamalaringiz allaqachon shu yerda. Eski Tonkeeper ilovasi hali ochiq: Keeper’da davom etish uchun uni yoping.",
+    "desktop_legacy_app_running_quit_old": "Tonkeeper’ni yopish",
+    "desktop_legacy_app_running_quit_this": "Keeper’ni yopish"
 }

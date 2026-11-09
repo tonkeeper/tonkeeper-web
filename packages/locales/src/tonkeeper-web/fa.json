@@ -1229,5 +1229,13 @@
     "domain_move_not_mine_title": "کیف پول‌ها اضافه نشدند",
     "domain_move_not_mine_description": "چیزی به این برنامه اضافه نشد. می‌توانید کیف پول‌هایتان را به‌صورت دستی از %{host} منتقل کنید، یا بدون آن‌ها ادامه دهید.",
     "domain_move_move_manually": "انتقال دستی",
-    "domain_move_continue_without": "ادامه بدون وارد کردن"
+    "domain_move_continue_without": "ادامه بدون وارد کردن",
+    "desktop_legacy_app_title": "برنامه قدیمی Tonkeeper حذف شود؟",
+    "desktop_legacy_app_description": "Tonkeeper اکنون Keeper نام دارد. کیف پول‌ها و تنظیمات شما از قبل در این برنامه هستند، بنابراین برنامه قدیمی Tonkeeper در پوشه Applications دیگر لازم نیست.",
+    "desktop_legacy_app_trash": "انتقال به سطل زباله",
+    "desktop_legacy_app_keep": "نگه داشتن",
+    "desktop_legacy_app_running_title": "Tonkeeper اکنون Keeper نام دارد",
+    "desktop_legacy_app_running_description": "این نسخه جدید Tonkeeper با نامی تازه است. کیف پول‌ها و تنظیمات شما از قبل اینجا هستند. برنامه قدیمی Tonkeeper هنوز باز است: برای ادامه در Keeper از آن خارج شوید.",
+    "desktop_legacy_app_running_quit_old": "خروج از Tonkeeper",
+    "desktop_legacy_app_running_quit_this": "خروج از Keeper"
 }

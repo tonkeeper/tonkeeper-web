@@ -1229,5 +1229,13 @@
     "domain_move_not_mine_title": "वॉलेट नहीं जोड़े गए",
     "domain_move_not_mine_description": "इस ऐप में कुछ नहीं जोड़ा गया। आप अपने वॉलेट %{host} से मैन्युअल रूप से ला सकते हैं, या उनके बिना जारी रख सकते हैं।",
     "domain_move_move_manually": "मैन्युअल रूप से लाएँ",
-    "domain_move_continue_without": "इम्पोर्ट किए बिना जारी रखें"
+    "domain_move_continue_without": "इम्पोर्ट किए बिना जारी रखें",
+    "desktop_legacy_app_title": "पुराना Tonkeeper ऐप हटाएँ?",
+    "desktop_legacy_app_description": "Tonkeeper अब Keeper है। आपके वॉलेट और सेटिंग्स पहले से इस ऐप में हैं, इसलिए Applications में पुराने Tonkeeper ऐप की अब ज़रूरत नहीं है।",
+    "desktop_legacy_app_trash": "ट्रैश में ले जाएँ",
+    "desktop_legacy_app_keep": "रखें",
+    "desktop_legacy_app_running_title": "Tonkeeper अब Keeper है",
+    "desktop_legacy_app_running_description": "यह नए नाम के साथ Tonkeeper का नया संस्करण है। आपके वॉलेट और सेटिंग्स पहले से यहाँ हैं। पुराना Tonkeeper ऐप अभी भी खुला है: Keeper में जारी रखने के लिए उसे बंद करें।",
+    "desktop_legacy_app_running_quit_old": "Tonkeeper बंद करें",
+    "desktop_legacy_app_running_quit_this": "Keeper बंद करें"
 }
