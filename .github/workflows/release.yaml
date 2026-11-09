@@ -32,6 +32,9 @@ env:
     NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
     # The bundle outgrew Node's default 2 GB heap.
     NODE_OPTIONS: --max-old-space-size=6144
+    # The inline desktop and extension builds read it at build time; without it WalletConnect
+    # ships with no project and the relay answers "Project not found".
+    WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
 
 jobs:
     desktop-build:

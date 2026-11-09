@@ -30,6 +30,9 @@ env:
     NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
     # The bundle outgrew Node's default 2 GB heap.
     NODE_OPTIONS: --max-old-space-size=6144
+    # The inline desktop and extension builds read it at build time; without it WalletConnect
+    # ships with no project and the relay answers "Project not found".
+    WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
 
 jobs:
     # Strip assets from existing pre-releases/drafts of the SAME base version
@@ -78,6 +81,17 @@ jobs:
                           gh release delete-asset "$tag" "$asset" --repo "$REPO" --yes
                       done <<< "$assets"
                   done <<< "$tags"
+
+            # Every build job uploads into this one draft. action-gh-release cannot find a draft by
+            # its tag, so a job that got there first with it would open a second release.
+            - name: Create the draft pre-release
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  gh release view "$RELEASE_TAG" --repo "$REPO" > /dev/null 2>&1 ||
+                      gh release create "$RELEASE_TAG" --repo "$REPO" --verify-tag --draft \
+                          --prerelease --title "Tonkeeper $RELEASE_TAG" --notes ""
 
     desktop-build:
         name: desktop-build
@@ -218,15 +232,12 @@ jobs:
                   cmd: build:extension
 
             - name: Upload extension to draft pre-release
-              uses: softprops/action-gh-release@v2
-              with:
-                  tag_name: ${{ env.RELEASE_TAG }}
-                  name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
-                  draft: true
-                  prerelease: true
-                  files: |
-                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{ env.RELEASE_TAG }}.zip
-                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{ env.RELEASE_TAG }}.zip
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release upload "$RELEASE_TAG" --repo "${{ github.repository }}" --clobber \
+                      "apps/extension/dist/tonkeeper_chrome_$RELEASE_TAG.zip" \
+                      "apps/extension/dist/tonkeeper_firefox_$RELEASE_TAG.zip"
 
     # Runs after all builds succeed — flips the draft to published.
     # Body and title are left untouched so manually authored release notes survive.
@@ -236,11 +247,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Publish GitHub pre-release
-              uses: softprops/action-gh-release@v2
-              with:
-                  tag_name: ${{ env.RELEASE_TAG }}
-                  draft: false
-                  prerelease: true
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release edit "$RELEASE_TAG" --repo "${{ github.repository }}" \
+                      --draft=false --prerelease
 
             - name: Summary
               run: |
