@@ -16,6 +16,8 @@ on:
 
 env:
     node-version: 22.22.2
+    # @tonkeeper/chainkit installs from GitHub Packages; the public repo has no package access of its own.
+    NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
 
 jobs:
     desktop-build:

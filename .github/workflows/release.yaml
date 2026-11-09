@@ -18,12 +18,18 @@ concurrency:
     group: release-${{ github.ref }}
     cancel-in-progress: false
 
+# A called workflow cannot hold more than its caller: web-build needs the last three.
 permissions:
     contents: write
+    issues: write
+    packages: read
+    pull-requests: write
 
 env:
     node-version: 22.22.2
     RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+    # @tonkeeper/chainkit installs from GitHub Packages; the public repo has no package access of its own.
+    NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
 
 jobs:
     desktop-build:

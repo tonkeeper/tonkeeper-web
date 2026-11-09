@@ -73,7 +73,7 @@ on:
                 default: 'tonkeeper-web'
 env:
     node-version: 22.22.2
-    NODE_AUTH_TOKEN: ${{ github.token }}
+    NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
 
 permissions:
     contents: read
