@@ -1,0 +1,55 @@
+diff --git a/dist/src/MakerAppimage.js b/dist/src/MakerAppimage.js
+index a57b183ad759c91aa36691a430e87c385ba63f62..273833152b7fe442e9c0190920d1673f5c9d4af0 100644
+--- a/dist/src/MakerAppimage.js
++++ b/dist/src/MakerAppimage.js
+@@ -37,7 +37,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ Object.defineProperty(exports, "__esModule", { value: true });
+ const maker_base_1 = __importDefault(require("@electron-forge/maker-base"));
+ const path_1 = __importDefault(require("path"));
+-const appBuilder = __importStar(require("app-builder-lib/out/util/appBuilder"));
++// app-builder-lib 26 dropped the Go app-builder binary; its AppImage target builds in JS.
++const app_builder_lib_1 = require("app-builder-lib");
++const appImageUtil_1 = require("app-builder-lib/out/targets/appimage/appImageUtil");
+ const fs_1 = require("fs");
+ const child_process_1 = require("child_process");
+ const patch_apprun_1 = require("./patch-apprun");
+@@ -114,32 +116,20 @@ class MakerAppImage extends maker_base_1.default {
+             if (config !== undefined && config.chmodChromeSandbox !== undefined) {
+                 yield (0, child_process_1.exec)(`chmod ${config.chmodChromeSandbox} ${path_1.default.join(dir, "chrome-sandbox")}`);
+             }
+-            const args = [
+-                "appimage",
+-                "--stage",
++            yield (0, appImageUtil_1.buildLegacyFuse2AppImage)({
++                appDir: dir,
+                 stageDir,
+-                "--arch",
+-                "x64",
+-                "--output",
+-                appPath,
+-                "--app",
+-                dir,
+-                "--configuration",
+-                JSON.stringify({
++                arch: app_builder_lib_1.Arch.x64,
++                output: appPath,
++                options: {
+                     productName: appName,
+                     productFilename: appName,
+                     desktopEntry: desktopEntry,
+                     executableName: executableName,
+                     icons: icons,
+                     fileAssociations: [],
+-                }),
+-            ];
+-            // the --template option allows us to replace AppRun bash script with a custom version, e.g. a libstdc++ bootstrapper.
+-            if (config !== undefined && config.template) {
+-                args.push("--template");
+-                args.push(config.template);
+-            }
+-            const result = yield appBuilder.executeAppBuilderAsJson(args);
++                },
++            });
+             yield (0, patch_apprun_1.patchAppImage)(appPath);
+             return [appPath];
+         });

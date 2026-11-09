@@ -147,8 +147,8 @@ const osxNotarize =
           } as NotaryToolCredentials)
         : undefined;
 
-// The AppImage maker imports app-builder-lib internals that the pinned app-builder-lib no longer
-// ships, so a top-level import fails config loading on every platform. Load it only where it runs.
+// The AppImage maker is yarn-patched (.yarn/patches) to build through app-builder-lib 26, which no
+// longer ships the app-builder binary the published maker calls.
 const linuxAppImageMakers = () => {
     if (process.platform !== 'linux' || requestedArchitecture !== 'x64') {
         return [];

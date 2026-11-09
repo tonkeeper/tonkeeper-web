@@ -4274,6 +4274,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pengx17/electron-forge-maker-appimage@patch:@pengx17/electron-forge-maker-appimage@npm%3A1.2.1#~/.yarn/patches/@pengx17-electron-forge-maker-appimage-npm-1.2.1-238cde1a2b.patch":
+  version: 1.2.1
+  resolution: "@pengx17/electron-forge-maker-appimage@patch:@pengx17/electron-forge-maker-appimage@npm%3A1.2.1#~/.yarn/patches/@pengx17-electron-forge-maker-appimage-npm-1.2.1-238cde1a2b.patch::version=1.2.1&hash=de41c0"
+  dependencies:
+    "@electron-forge/maker-base": "npm:^7.3.0"
+    "@electron-forge/shared-types": "npm:^7.3.0"
+    app-builder-lib: "npm:^24.13.3"
+  checksum: 10/de1a949de17251ec2c4175c6504724d2c329d9d714496fa2b30dce326308c2d0f36b728b6b5e376680e46055b5e6f327d962a8939403a7032ea5eed4350824ed
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -5298,7 +5309,7 @@ __metadata:
     "@electron-forge/publisher-github": "npm:7.11.1"
     "@electron-forge/shared-types": "npm:7.11.1"
     "@electron/fuses": "npm:^1.8.0"
-    "@pengx17/electron-forge-maker-appimage": "npm:1.2.1"
+    "@pengx17/electron-forge-maker-appimage": "patch:@pengx17/electron-forge-maker-appimage@npm%3A1.2.1#~/.yarn/patches/@pengx17-electron-forge-maker-appimage-npm-1.2.1-238cde1a2b.patch"
     "@tanstack/react-query": "npm:4.3.4"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"

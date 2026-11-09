@@ -8,7 +8,9 @@
     "description": "",
     "scripts": {
         "playwright": "yarn playwright install",
-        "test": "npx playwright test"
+        "test": "npx playwright test",
+        "qa": "playwright test -c playwright.qa.config.ts",
+        "qa:setup": "playwright test -c playwright.qa.config.ts --project setup"
     },
     "devDependencies": {
         "@playwright/test": "^1.62.1",
