@@ -1,5 +1,18 @@
+diff --git a/dist/src/Config.d.ts b/dist/src/Config.d.ts
+index 2fd0e34fe82acd63eaaa8bd960f75d6913b52952..6750ff1baf2476016370e7a35de78d065b55e840 100644
+--- a/dist/src/Config.d.ts
++++ b/dist/src/Config.d.ts
+@@ -136,4 +136,8 @@ export interface MakerAppImageConfigOptions {
+ }
+ export interface MakerAppImageConfig {
+     options?: MakerAppImageConfigOptions;
++    /**
++     * Shared libraries to bundle into the AppImage's usr/lib, for systems that lack them.
++     */
++    libraries?: string[];
+ }
 diff --git a/dist/src/MakerAppimage.js b/dist/src/MakerAppimage.js
-index a57b183ad759c91aa36691a430e87c385ba63f62..273833152b7fe442e9c0190920d1673f5c9d4af0 100644
+index a57b183ad759c91aa36691a430e87c385ba63f62..1f538d20c92517129aeb723cee11758672e337cc 100644
 --- a/dist/src/MakerAppimage.js
 +++ b/dist/src/MakerAppimage.js
 @@ -37,7 +37,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
@@ -13,7 +26,18 @@ index a57b183ad759c91aa36691a430e87c385ba63f62..273833152b7fe442e9c0190920d1673f
  const fs_1 = require("fs");
  const child_process_1 = require("child_process");
  const patch_apprun_1 = require("./patch-apprun");
-@@ -114,32 +116,20 @@ class MakerAppImage extends maker_base_1.default {
+@@ -109,37 +111,31 @@ class MakerAppImage extends maker_base_1.default {
+                 (0, fs_1.rmdirSync)(stageDir);
+             }
+             (0, fs_1.mkdirSync)(stageDir, { recursive: true });
++            // AppRun puts usr/lib on LD_LIBRARY_PATH, so libraries staged there load before the system ones.
++            const libDir = path_1.default.join(stageDir, "usr", "lib");
++            for (const library of this.config?.libraries ?? []) {
++                (0, fs_1.mkdirSync)(libDir, { recursive: true });
++                (0, fs_1.copyFileSync)(library, path_1.default.join(libDir, path_1.default.basename(library)));
++            }
+             // if the user passed us a chmodChromeSandbox parameter, use that to modify the permissions of chrome-sandbox.
+             // this sets up the ability to run the application conditionally with --no-sandbox on select systems.
              if (config !== undefined && config.chmodChromeSandbox !== undefined) {
                  yield (0, child_process_1.exec)(`chmod ${config.chmodChromeSandbox} ${path_1.default.join(dir, "chrome-sandbox")}`);
              }

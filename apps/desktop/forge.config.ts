@@ -14,7 +14,7 @@ import path from 'path';
 
 import { MakerDebConfigOptions } from '@electron-forge/maker-deb/dist/Config';
 import { spawnSync } from 'child_process';
-import { existsSync, readFileSync, readdirSync, renameSync, rmSync, unlinkSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 import { mainWindowName } from './src/constants';
@@ -32,73 +32,16 @@ const appName = 'Keeper';
 // deb/rpm packages install it as their bin, so it stays Tonkeeper for installed users.
 const executableName = 'Tonkeeper';
 
-// Bundle libsecret + transitive deps into the AppImage so it runs on systems
-// where libsecret is not preinstalled. See github.com/tonkeeper/tonkeeper-web/issues/374
-function bundleLibsecretIntoAppImage(appImagePath: string) {
-    const workDir = path.dirname(appImagePath);
-    const linuxdeploy = process.env.LINUXDEPLOY_PATH || 'linuxdeploy';
+// The AppImage carries libsecret so the keychain works on systems without it. See
+// github.com/tonkeeper/tonkeeper-web/issues/374. Only the library itself goes in: its dependencies
+// (glib, libgcrypt) come with every desktop Electron runs on, and the build host's copies would
+// need the build host's glibc.
+function appImageLibraries() {
     const libsecret = process.env.LIBSECRET_PATH || '/usr/lib/x86_64-linux-gnu/libsecret-1.so.0';
-
-    const skipOrThrow = (message: string) => {
-        if (isCI) throw new Error(message);
-        console.warn(`[libsecret bundling] ${message}, skipping ${appImagePath}`);
-    };
-
-    if (
-        spawnSync(linuxdeploy, ['--appimage-extract-and-run', '--version'], { stdio: 'ignore' })
-            .status !== 0
-    ) {
-        skipOrThrow('linuxdeploy not available');
-        return;
-    }
-    if (!existsSync(libsecret)) {
-        skipOrThrow(`${libsecret} not found`);
-        return;
-    }
-
-    const appDir = path.join(workDir, 'squashfs-root');
-    if (existsSync(appDir)) rmSync(appDir, { recursive: true, force: true });
-
-    const beforeFiles = new Set(readdirSync(workDir));
-    const extract = spawnSync(appImagePath, ['--appimage-extract'], {
-        cwd: workDir,
-        stdio: 'inherit'
-    });
-    if (extract.status !== 0) throw new Error('AppImage --appimage-extract failed');
-
-    const deploy = spawnSync(
-        linuxdeploy,
-        [
-            '--appimage-extract-and-run',
-            '--appdir',
-            appDir,
-            '--library',
-            libsecret,
-            '--output',
-            'appimage'
-        ],
-        {
-            cwd: workDir,
-            stdio: 'inherit',
-            env: {
-                ...process.env,
-                LD_LIBRARY_PATH: [path.join(appDir, 'usr', 'lib'), process.env.LD_LIBRARY_PATH]
-                    .filter(Boolean)
-                    .join(path.delimiter)
-            }
-        }
-    );
-    if (deploy.status !== 0) throw new Error('linuxdeploy --output appimage failed');
-
-    const newAppImage = readdirSync(workDir).find(
-        f => f.endsWith('.AppImage') && !beforeFiles.has(f)
-    );
-    if (!newAppImage) throw new Error('linuxdeploy did not produce a new AppImage');
-
-    unlinkSync(appImagePath);
-    renameSync(path.join(workDir, newAppImage), appImagePath);
-    rmSync(appDir, { recursive: true, force: true });
-    console.log(`[libsecret bundling] repacked ${appImagePath}`);
+    if (existsSync(libsecret)) return [libsecret];
+    if (isCI) throw new Error(`${libsecret} not found`);
+    console.warn(`[AppImage] ${libsecret} not found, building without it`);
+    return [];
 }
 
 // Flipping fuses and writing the asar integrity hash invalidate Electron's
@@ -148,7 +91,7 @@ const osxNotarize =
         : undefined;
 
 // The AppImage maker is yarn-patched (.yarn/patches) to build through app-builder-lib 26, which no
-// longer ships the app-builder binary the published maker calls.
+// longer ships the app-builder binary the published maker calls, and to bundle `libraries`.
 const linuxAppImageMakers = () => {
     if (process.platform !== 'linux' || requestedArchitecture !== 'x64') {
         return [];
@@ -156,7 +99,9 @@ const linuxAppImageMakers = () => {
 
     const MakerAppImage: typeof MakerAppImageType =
         require('@pengx17/electron-forge-maker-appimage').default;
-    return [new MakerAppImage({ options: devAndRpmOptions }, ['linux'])];
+    return [
+        new MakerAppImage({ options: devAndRpmOptions, libraries: appImageLibraries() }, ['linux'])
+    ];
 };
 
 const config: ForgeConfig = {
@@ -313,14 +258,6 @@ const config: ForgeConfig = {
                 throw new Error('Linux x64 CI build did not produce an AppImage');
             }
 
-            for (const result of makeResults) {
-                if (result.platform !== 'linux' || result.arch !== 'x64') continue;
-                for (const artifact of result.artifacts) {
-                    if (artifact.endsWith('.AppImage')) {
-                        bundleLibsecretIntoAppImage(artifact);
-                    }
-                }
-            }
             return makeResults;
         }
     }

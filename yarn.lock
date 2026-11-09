@@ -4304,12 +4304,12 @@ __metadata:
 
 "@pengx17/electron-forge-maker-appimage@patch:@pengx17/electron-forge-maker-appimage@npm%3A1.2.1#~/.yarn/patches/@pengx17-electron-forge-maker-appimage-npm-1.2.1-238cde1a2b.patch":
   version: 1.2.1
-  resolution: "@pengx17/electron-forge-maker-appimage@patch:@pengx17/electron-forge-maker-appimage@npm%3A1.2.1#~/.yarn/patches/@pengx17-electron-forge-maker-appimage-npm-1.2.1-238cde1a2b.patch::version=1.2.1&hash=de41c0"
+  resolution: "@pengx17/electron-forge-maker-appimage@patch:@pengx17/electron-forge-maker-appimage@npm%3A1.2.1#~/.yarn/patches/@pengx17-electron-forge-maker-appimage-npm-1.2.1-238cde1a2b.patch::version=1.2.1&hash=b8e29e"
   dependencies:
     "@electron-forge/maker-base": "npm:^7.3.0"
     "@electron-forge/shared-types": "npm:^7.3.0"
     app-builder-lib: "npm:^24.13.3"
-  checksum: 10/de1a949de17251ec2c4175c6504724d2c329d9d714496fa2b30dce326308c2d0f36b728b6b5e376680e46055b5e6f327d962a8939403a7032ea5eed4350824ed
+  checksum: 10/e5764ba7f02620cebf4f8677df1fe322f2f8eaae25419fcca9726d1c7806feb20ce16eb8bd9bf3d9576db9ed631b8f081f87a506aedfbb00d0edf195d56141b3
   languageName: node
   linkType: hard
 
