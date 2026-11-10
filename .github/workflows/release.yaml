@@ -3,6 +3,9 @@ name: Release
 on:
     # Fires when a GitHub Release is published as stable (prerelease unchecked).
     # This is the primary trigger: create tag → pre-release → verify → promote to release.
+    # It ships the desktop app only: a stable release is what desktop auto-update serves. Web
+    # (web-release.yaml), iPad (ipad-build.yaml) and the extension (build-extension.yaml) ship on
+    # their own schedule from the same tag.
     release:
         types: [released]
     # Manual fallback: provide an existing stable tag to re-run or recover a release.
@@ -18,12 +21,9 @@ concurrency:
     group: release-${{ github.ref }}
     cancel-in-progress: false
 
-# A called workflow cannot hold more than its caller: web-build needs the last three.
 permissions:
     contents: write
-    issues: write
     packages: read
-    pull-requests: write
 
 env:
     node-version: 22.22.2
@@ -32,8 +32,8 @@ env:
     NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
     # The bundle outgrew Node's default 2 GB heap.
     NODE_OPTIONS: --max-old-space-size=6144
-    # The inline desktop and extension builds read it at build time; without it WalletConnect
-    # ships with no project and the relay answers "Project not found".
+    # The desktop build reads it at build time; without it WalletConnect ships with no project and
+    # the relay answers "Project not found".
     WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
 
 jobs:
@@ -125,68 +125,10 @@ jobs:
               if: always() && runner.os == 'macOS'
               run: rm ${{ github.workspace }}/AuthKey.p8
 
-    ipad-build:
-        uses: ./.github/workflows/ipad-build.yaml
-        with:
-            release_tag: ${{ inputs.tag || github.event.release.tag_name }}
-        secrets: inherit
-
-    web-build:
-        uses: ./.github/workflows/web-build.yaml
-        with:
-            environment: 'main'
-            release_tag: ${{ inputs.tag || github.event.release.tag_name }}
-        secrets: inherit
-
-    extension-build:
-        name: extension-build
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-              with:
-                  ref: ${{ env.RELEASE_TAG }}
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: corepack enable
-
-            - name: Set version from tag
-              run: node scripts/set-version.js
-              env:
-                  RELEASE_TAG: ${{ env.RELEASE_TAG }}
-
-            - name: Install dependencies
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Build extension
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:extension
-
-            - name: Upload extension to release
-              uses: softprops/action-gh-release@v2
-              with:
-                  tag_name: ${{ env.RELEASE_TAG }}
-                  name: 'Tonkeeper ${{ env.RELEASE_TAG }}'
-                  draft: false
-                  prerelease: false
-                  files: |
-                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{ env.RELEASE_TAG }}.zip
-                      ${{ github.workspace }}/apps/extension/dist/tonkeeper_firefox_${{ env.RELEASE_TAG }}.zip
-
-    # Runs after all builds succeed — marks the release as latest
+    # Runs after the desktop builds succeed — marks the release as latest
     publish-release:
         name: publish-release
-        needs: [desktop-build, ipad-build, web-build, extension-build]
+        needs: [desktop-build]
         runs-on: ubuntu-latest
         steps:
             - name: Mark release as latest
