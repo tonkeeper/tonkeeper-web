@@ -212,8 +212,9 @@ export const App: FC<{ isInCustomPopup: boolean }> = ({ isInCustomPopup }) => {
  * Extension popup geometry — Container plus the 385px-min / 600px-tall
  * shape every entry path used to set via `FullSizeWrapper` / `Wrapper`.
  * Routes use `AppLayout` for chrome; this wrapper only constrains the
- * popup box itself. In the Chrome side panel the browser owns the viewport,
- * so the box follows it full-height instead of the fixed popup shape.
+ * popup box itself. In the Chrome side panel the browser owns the viewport
+ * and lets the user narrow it to 320px, so the box follows it in both
+ * directions instead of the fixed popup shape.
  */
 const ExtensionPopupRoot = styled(Container)`
     min-width: 385px;
@@ -221,6 +222,7 @@ const ExtensionPopupRoot = styled(Container)`
     width: var(--app-width);
 
     body[data-app-view='side-panel'] & {
+        min-width: 0;
         height: 100vh;
     }
 
