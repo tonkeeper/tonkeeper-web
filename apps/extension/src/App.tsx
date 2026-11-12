@@ -48,18 +48,11 @@ import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state
 import { useActiveAccountQuery, useAccountsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { AppLayout } from '@tonkeeper/uikit/dist/components/layout/AppLayout';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, {
-    FC,
-    PropsWithChildren,
-    Suspense,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef
-} from 'react';
+import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo, useRef } from 'react';
 import { MemoryRouter, Route, Switch, useLocation, useParams } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import browser from 'webextension-polyfill';
+import { browserTranslate } from './libs/translate';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { EvmInjectedSubscription } from './components/EvmInjectedSubscription';
 import { connectToBackground } from './event';
@@ -151,8 +144,7 @@ const ExtensionGlobalStyle = createGlobalStyle`
 `;
 
 export const App: FC<{ isInCustomPopup: boolean }> = ({ isInCustomPopup }) => {
-    const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
-    const t = useTWithReplaces(browserT);
+    const t = useTWithReplaces(browserTranslate);
 
     sdk.addWalletPage.isInCustomPopup = isInCustomPopup;
 

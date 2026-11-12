@@ -268,8 +268,13 @@ export const HomeMultichain: FC<{ compact?: boolean }> = ({ compact = false }) =
             {!compact && (
                 <>
                     {/* Reserves exactly the fixed tab bar: 64px of tabs plus
-                        the home-indicator inset it pads itself with. */}
-                    <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" aria-hidden />
+                        the home-indicator inset it pads itself with. The
+                        extension lays the page out as a fixed-height flex
+                        column, which would shrink it. */}
+                    <div
+                        className="h-[calc(4rem+env(safe-area-inset-bottom))] shrink-0"
+                        aria-hidden
+                    />
                     <MultichainMobileTabBar />
                 </>
             )}

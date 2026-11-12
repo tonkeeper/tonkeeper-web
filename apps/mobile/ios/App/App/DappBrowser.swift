@@ -168,9 +168,7 @@ class TabRateLimiter {
             config.allowsInlineMediaPlayback = true
             config.mediaTypesRequiringUserActionForPlayback = []
             config.userContentController = contentController
-            if #available(iOS 14.0, *) {
-                config.limitsNavigationsToAppBoundDomains = false
-            }
+            config.limitsNavigationsToAppBoundDomains = false
 
             let webView = WKWebView(frame: self.bridge?.viewController?.view.bounds ?? .zero, configuration: config)
             webView.translatesAutoresizingMaskIntoConstraints = false
