@@ -5359,7 +5359,6 @@ __metadata:
     electron: "npm:^41.10.3"
     electron-is-dev: "npm:^2.0.0"
     electron-log: "npm:^5.0.1"
-    electron-squirrel-startup: "npm:^1.0.0"
     electron-store: "npm:^8.1.0"
     eslint: "npm:^8.0.1"
     eslint-plugin-import: "npm:^2.25.0"
@@ -11642,15 +11641,6 @@ __metadata:
     lazy-val: "npm:^1.0.5"
     mime: "npm:^2.5.2"
   checksum: 10/6bad1c64604807405cb762daf916e971abf0a70f79b41562f020c5bfe3ae2a81ffc3df3321a6abbb01b96e0bd01b38ab6d5ec8b3ebd0dbac36b53fe0dcef6046
-  languageName: node
-  linkType: hard
-
-"electron-squirrel-startup@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "electron-squirrel-startup@npm:1.0.0"
-  dependencies:
-    debug: "npm:^2.2.0"
-  checksum: 10/7618cd2ba8de141e89f5ce37b8f2bc442d5c0200845536123493ad278c50d560a7af0570c076092e43a6638f73ff383ab8d2ce88b11d99f8eafb5b08f9db1da8
   languageName: node
   linkType: hard
 

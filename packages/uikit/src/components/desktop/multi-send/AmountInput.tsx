@@ -16,6 +16,7 @@ import { Body2 } from '../../Text';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { BRAND_CONFIG } from '@tonkeeper/core/dist/config/brand';
+import { useLatestRef } from '../../../hooks/useLatestRef';
 
 const AmountInputFieldStyled = styled(InputFieldStyled)<{ color?: string }>`
     text-align: right;
@@ -147,18 +148,21 @@ export const AmountInput: FC<{
         [currencyAmount, asset, price, field]
     );
 
+    const latest = useLatestRef({ field, onInput });
+
     useEffect(() => {
-        if (!field.value || !isFetched) {
+        const { field: currentField, onInput: reinput } = latest.current;
+        if (!currentField.value || !isFetched) {
             return;
         }
 
-        if (!price && field.value.inFiat) {
+        if (!price && currentField.value.inFiat) {
             setCurrencyAmount({ inFiat: false, tokenValue: '', fiatValue: '', inputValue: '' });
-            field.onChange(null);
+            currentField.onChange(null);
         } else {
-            onInput(field.value.inFiat, field.value.value);
+            reinput(currentField.value.inFiat, currentField.value.value);
         }
-    }, [price, isFetched, field, onInput]);
+    }, [price, isFetched, latest]);
 
     const tokenId = useId();
     const fiatId = useId();

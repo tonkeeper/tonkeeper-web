@@ -74,10 +74,12 @@ const walletAuthHeader = (wallet: MultichainWalletAuthHeadersSource, accessToken
 const withAuthHeaders = (
     init: RequestInit | undefined,
     accessToken: string,
+    userId: string,
     wallet?: MultichainWalletAuthHeadersSource
 ): RequestInit => {
     const headers = new Headers(init?.headers);
     headers.set('Authorization', `Bearer ${accessToken}`);
+    headers.set('F', userId);
     if (wallet) {
         const token = walletAuthHeader(wallet, accessToken);
         if (token) {
@@ -104,7 +106,8 @@ export const createMultichainAuthorizedFetch = (
             return fetchImpl(input, init);
         }
 
-        const response = await fetchImpl(input, withAuthHeaders(init, accessToken, wallet));
+        const userId = await session.getUserId();
+        const response = await fetchImpl(input, withAuthHeaders(init, accessToken, userId, wallet));
         if (response.status !== 401) {
             return response;
         }
@@ -113,7 +116,7 @@ export const createMultichainAuthorizedFetch = (
         if (!refreshed || refreshed === accessToken) {
             return response;
         }
-        return fetchImpl(input, withAuthHeaders(init, refreshed, wallet));
+        return fetchImpl(input, withAuthHeaders(init, refreshed, userId, wallet));
     };
 };
 

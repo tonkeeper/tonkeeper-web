@@ -3,6 +3,7 @@ import { BrowserWindow, app, powerMonitor } from 'electron';
 import log from 'electron-log/main';
 import { updateElectronApp } from 'update-electron-app';
 import { settleLegacyAppCopies } from './electron/legacyAppCopy';
+import { handleSquirrelEvent } from './electron/squirrelEvents';
 import { MainWindow } from './electron/mainWindow';
 import { startUpdateCheck } from './electron/updateCheck';
 import {
@@ -32,8 +33,7 @@ log.hooks.push((message, _, transportName) => {
     return message;
 });
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
+if (handleSquirrelEvent()) {
     app.quit();
 }
 

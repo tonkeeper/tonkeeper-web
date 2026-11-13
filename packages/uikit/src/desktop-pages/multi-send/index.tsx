@@ -1,4 +1,5 @@
 import React, { FC, useEffect } from 'react';
+import { useLatestRef } from '../../hooks/useLatestRef';
 import styled from 'styled-components';
 import { DesktopBackButton, DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body3, Label2 } from '../../components/Text';
@@ -118,11 +119,12 @@ export const DesktopMultiSendPage: FC = () => {
     const wallet = useActiveWallet();
     const isStandardWallet = isStandardTonWallet(wallet);
 
+    const latestNavigate = useLatestRef(navigate);
     useEffect(() => {
         if (lists && !lists.length && !isStandardWallet) {
-            navigate('./list/' + 1);
+            latestNavigate.current('./list/' + 1);
         }
-    }, [lists, isStandardWallet, navigate]);
+    }, [lists, isStandardWallet, latestNavigate]);
 
     if (!isStandardWallet) {
         return <Navigate to={AppRoute.home} />;

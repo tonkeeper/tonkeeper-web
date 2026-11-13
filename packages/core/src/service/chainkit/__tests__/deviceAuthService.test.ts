@@ -102,6 +102,7 @@ const verifyProof = async (
 interface RecordedCall {
     url: string;
     body?: Record<string, string | number>;
+    headers: Headers;
 }
 
 interface Route {
@@ -132,7 +133,7 @@ beforeEach(() => {
     routes = {};
     vi.stubGlobal('fetch', async (url: string, init?: RequestInit) => {
         const body = init?.body ? JSON.parse(init.body as string) : undefined;
-        calls.push({ url, body });
+        calls.push({ url, body, headers: new Headers(init?.headers) });
         const route = routes[url]?.shift();
         if (!route) throw new Error(`unexpected fetch: ${url}`);
         return new Response(JSON.stringify(route.json), { status: route.status });
@@ -192,6 +193,15 @@ describe('DeviceAuthService', () => {
                 message
             )
         ).resolves.toBe(true);
+    });
+
+    it('sends the install id as F when it registers the device', async () => {
+        const storage = new MemoryStorage();
+        await storage.set(AppKey.USER_ID, 'install-1');
+        await registerFirstSession(storage);
+
+        const [register] = callsTo(REGISTER_URL);
+        expect(register.headers.get('F')).toBe('install-1');
     });
 
     it('persists the rotating pair but keeps the JWT out of storage', async () => {

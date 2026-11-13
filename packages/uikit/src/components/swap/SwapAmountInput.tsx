@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { useLatestRef } from '../../hooks/useLatestRef';
 import { styled } from 'styled-components';
 import { Num2Class } from '../Text';
 import BigNumber from 'bignumber.js';
@@ -67,14 +68,18 @@ export const SwapAmountInput: FC<{
         }
     };
 
+    // Syncs the field when `value` changes from outside. `value` reaches the parent debounced, so
+    // re-running on every keystroke would overwrite what is typed with the stale value.
+    const latestInput = useLatestRef(input);
     useEffect(() => {
+        const typed = latestInput.current;
         if (!value) {
             setInput('');
         } else {
-            if (!input.endsWith(getDecimalSeparator())) {
+            if (!typed.endsWith(getDecimalSeparator())) {
                 try {
                     const bnInput = new BigNumber(
-                        removeGroupSeparator(input).replace(getDecimalSeparator(), '.')
+                        removeGroupSeparator(typed).replace(getDecimalSeparator(), '.')
                     );
 
                     if (!bnInput.eq(value)) {
@@ -85,7 +90,7 @@ export const SwapAmountInput: FC<{
                 }
             }
         }
-    }, [value, input]);
+    }, [value, latestInput]);
 
     const decimalSeparator = getDecimalSeparator();
     return (

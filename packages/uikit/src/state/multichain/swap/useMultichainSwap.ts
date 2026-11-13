@@ -197,6 +197,7 @@ export const CROSS_SWAP_QUOTE_REFETCH_MS = 30_000;
 
 export const useCrossSwapQuote = (args: CrossSwapQuoteArgs) => {
     const { baseUrl, queryParams } = useSwapsConfig();
+    const sdk = useAppSdk();
     const addresses = useMultichainSwapAddresses();
     const account = useActiveAccount();
     const walletId = multichainApiWalletCredentials(account)?.walletId;
@@ -225,7 +226,14 @@ export const useCrossSwapQuote = (args: CrossSwapQuoteArgs) => {
     return useQuery<CrossSwapQuote, Error>(
         [QueryKey.crossSwapQuote, baseUrl, walletId, request],
         context => {
-            const fetchQuote = () => createCrossSwapQuote(baseUrl, request!, queryParams, walletId);
+            const fetchQuote = async () =>
+                createCrossSwapQuote(
+                    baseUrl,
+                    request!,
+                    queryParams,
+                    walletId,
+                    await sdk.userIdentity.getPersistentUserId()
+                );
             const requestKey = JSON.stringify(context.queryKey);
             if (pricedRequestKey.current === requestKey) return fetchQuote();
             return runSwapRedOperation(
@@ -278,6 +286,7 @@ export const usePrepareCrossSwap = (
     enabled: boolean
 ) => {
     const { baseUrl, queryParams } = useSwapsConfig();
+    const sdk = useAppSdk();
     const account = useActiveAccount();
     const walletId = multichainApiWalletCredentials(account)?.walletId;
     const inline =
@@ -291,9 +300,16 @@ export const usePrepareCrossSwap = (
             : undefined;
     return useQuery<CrossSwapPrepare, Error>(
         [QueryKey.crossSwapPrepare, baseUrl, walletId, route?.routeId, approvalMode, !!inline],
-        () =>
+        async () =>
             inline ??
-            prepareCrossSwapRoute(baseUrl, route!.routeId, approvalMode, queryParams, walletId),
+            prepareCrossSwapRoute(
+                baseUrl,
+                route!.routeId,
+                approvalMode,
+                queryParams,
+                walletId,
+                await sdk.userIdentity.getPersistentUserId()
+            ),
         { enabled: enabled && !!baseUrl && !!route, retry: false }
     );
 };

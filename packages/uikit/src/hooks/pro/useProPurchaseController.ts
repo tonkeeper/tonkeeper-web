@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useLatestRef } from '../useLatestRef';
 import {
     IDisplayPlan,
     isPurchaseError,
@@ -70,26 +71,28 @@ export const useProPurchaseController = () => {
         reset();
     }, [isPurchasingError, purchaseError, reset, toast, t]);
 
+    const latestOnSuccess = useLatestRef({ status, onCurrentClose, navigate });
     useEffect(() => {
         if (!isPurchasingSuccess) return;
+        const current = latestOnSuccess.current;
 
-        if (status === PurchaseStatuses.CANCELED) {
+        if (current.status === PurchaseStatuses.CANCELED) {
             toast(t('purchase_canceled'));
 
             return;
         }
 
-        if (status === PurchaseStatuses.PENDING) {
+        if (current.status === PurchaseStatuses.PENDING) {
             toast(t('purchase_processing'));
         }
 
-        if (status === PurchaseStatuses.SUCCESS) {
+        if (current.status === PurchaseStatuses.SUCCESS) {
             toast(t('purchase_success'));
         }
 
-        onCurrentClose();
-        navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
-    }, [isPurchasingSuccess, status, onCurrentClose, navigate, toast, t]);
+        current.onCurrentClose();
+        current.navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
+    }, [isPurchasingSuccess, latestOnSuccess, toast, t]);
 
     const handlePurchase = async (props: IOnPurchaseProps) => {
         const { plans, selectedSource, selectedPlanId } = props;

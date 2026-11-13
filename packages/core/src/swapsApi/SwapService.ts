@@ -238,12 +238,14 @@ export async function createCrossSwapQuote(
     baseUrl: string,
     request: CreateCrossSwapQuoteRequest,
     query: Record<string, string> = {},
-    walletId?: string
+    walletId?: string,
+    userId?: string
 ): Promise<CrossSwapQuote> {
     try {
         return await crosschainApi(baseUrl, query).createCrossSwapQuote({
             createCrossSwapQuoteRequest: request,
-            xWalletID: walletId
+            xWalletID: walletId,
+            f: userId
         });
     } catch (e) {
         throw await toCrossSwapQuoteError(e);
@@ -255,13 +257,15 @@ export async function prepareCrossSwapRoute(
     routeId: string,
     approvalMode: CrossSwapApprovalMode,
     query: Record<string, string> = {},
-    walletId?: string
+    walletId?: string,
+    userId?: string
 ): Promise<CrossSwapPrepare> {
     try {
         return await crosschainApi(baseUrl, query).prepareCrossSwapRoute({
             routeId,
             prepareCrossSwapRouteRequest: { approvalMode },
-            xWalletID: walletId
+            xWalletID: walletId,
+            f: userId
         });
     } catch (e) {
         throw await toCrossSwapQuoteError(e);

@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useMemo } from 'react';
+import { useLatestRef } from '../../../hooks/useLatestRef';
 import { styled } from 'styled-components';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 import { Body2, Body3, Label2 } from '../../Text';
@@ -97,26 +98,28 @@ const ProRemoveExtensionNotificationContent: FC<
         formatDecimals(estimation?.fee?.extra?.stringWeiAmount ?? 0)
     );
 
+    const latestFormatDate = useLatestRef(formatDate);
     useEffect(() => {
         if (!removeMutation.isSuccess || !finalExpiresDate) return;
 
         toast(
-            `${t('extension_cancellation_success')} ${formatDate(finalExpiresDate, {
+            `${t('extension_cancellation_success')} ${latestFormatDate.current(finalExpiresDate, {
                 day: 'numeric',
                 month: 'short',
                 year: 'numeric',
                 inputUnit: 'seconds'
             })}`
         );
-    }, [removeMutation.isSuccess, finalExpiresDate, toast, t, formatDate]);
+    }, [removeMutation.isSuccess, finalExpiresDate, toast, t, latestFormatDate]);
 
+    const { mutate: estimateFee } = estimateFeeMutation;
     useEffect(() => {
-        estimateFeeMutation.mutate({
+        estimateFee({
             selectedWallet,
             extensionContract,
             destroyValue
         });
-    }, [selectedWallet, extensionContract, destroyValue, estimateFeeMutation]);
+    }, [selectedWallet, extensionContract, destroyValue, estimateFee]);
 
     const removeMutate = async () =>
         removeMutation.mutateAsync({

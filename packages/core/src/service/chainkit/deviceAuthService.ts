@@ -1,5 +1,6 @@
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
+import { UserIdentityService } from '../../user-identity';
 import { ChainKitSessionTokenProvider } from './chainKitClient';
 import { multichainApiOrigin } from '../multichainEndpoints';
 import {
@@ -133,7 +134,19 @@ export class DeviceAuthService implements ChainKitSessionTokenProvider {
 
     private inFlight: Promise<Session> | null = null;
 
-    constructor(private readonly storage: IStorage, private readonly config: DeviceAuthConfig) {}
+    private readonly userIdentity: UserIdentityService;
+
+    constructor(private readonly storage: IStorage, private readonly config: DeviceAuthConfig) {
+        this.userIdentity = new UserIdentityService(storage);
+    }
+
+    /**
+     * The install id sent as `F`: the backend links the device and its wallets to it, which is
+     * the only way revenue analytics can tell which install a wallet belongs to.
+     */
+    getUserId(): Promise<string> {
+        return this.userIdentity.getPersistentUserId();
+    }
 
     /** The current device JWT, or `null` when no session can be established. */
     async getAccessToken(): Promise<string | null> {
@@ -277,7 +290,7 @@ export class DeviceAuthService implements ChainKitSessionTokenProvider {
     private async tokensRequest(url: string, body: object): Promise<DeviceTokensResponse> {
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', F: await this.getUserId() },
             body: JSON.stringify(body)
         });
         if (response.status === 401) {

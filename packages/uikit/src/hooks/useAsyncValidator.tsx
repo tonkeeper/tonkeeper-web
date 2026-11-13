@@ -25,16 +25,21 @@ export const AsyncValidatorsStateProvider: FC<
 
     const setFieldValidationState = useCallback(
         (fieldName: string, state: AsyncValidationState) => {
-            _setFieldValidationState(s => ({ ...s, [fieldName]: state }));
+            _setFieldValidationState(s =>
+                s[fieldName] === state ? s : { ...s, [fieldName]: state }
+            );
             onStateChange?.(state);
         },
         [onStateChange]
     );
 
+    const value = useMemo(
+        () => ({ fieldValidationState, setFieldValidationState }),
+        [fieldValidationState, setFieldValidationState]
+    );
+
     return (
-        <AsyncValidatorContext.Provider value={{ fieldValidationState, setFieldValidationState }}>
-            {children}
-        </AsyncValidatorContext.Provider>
+        <AsyncValidatorContext.Provider value={value}>{children}</AsyncValidatorContext.Provider>
     );
 };
 
@@ -71,7 +76,9 @@ export function useAsyncValidator<
     validator: (val: T) => Promise<ErrorOption | undefined | null | { success: true; result: R }>,
     debounceTime?: number
 ): [AsyncValidationState, R | undefined] {
-    const context = useContext(AsyncValidatorContext);
+    // The effect writes to the provider's state, so it must depend on the stable setter only:
+    // depending on the whole context object makes every write restart the validation.
+    const setFieldValidationState = useContext(AsyncValidatorContext)?.setFieldValidationState;
     const finalDebounceTime = debounceTime === undefined ? 500 : debounceTime;
     const [validationState, setValidationState] = useState<'idle' | 'validating' | 'succeed'>(
         'idle'
@@ -83,7 +90,7 @@ export function useAsyncValidator<
     useEffect(() => {
         let shouldCancel = false;
         setValidationState('idle');
-        context?.setFieldValidationState(fieldName, 'idle');
+        setFieldValidationState?.(fieldName, 'idle');
         setValidationProduct(undefined);
         const validate = async (): Promise<void> => {
             if (fieldValue) {
@@ -94,12 +101,12 @@ export function useAsyncValidator<
                     return;
                 }
                 setValidationState('validating');
-                context?.setFieldValidationState(fieldName, 'validating');
+                setFieldValidationState?.(fieldName, 'validating');
                 const validationResult = await validator(fieldValue);
                 if (!shouldCancel) {
                     if (!validationResult) {
                         setValidationState('succeed');
-                        context?.setFieldValidationState(fieldName, 'succeed');
+                        setFieldValidationState?.(fieldName, 'succeed');
                         return;
                     }
 
@@ -110,11 +117,11 @@ export function useAsyncValidator<
                     ) {
                         setValidationProduct(validationResult.result);
                         setValidationState('succeed');
-                        context?.setFieldValidationState(fieldName, 'succeed');
+                        setFieldValidationState?.(fieldName, 'succeed');
                     } else {
                         setError(fieldName, validationResult as ErrorOption);
                         setValidationState('idle');
-                        context?.setFieldValidationState(fieldName, 'idle');
+                        setFieldValidationState?.(fieldName, 'idle');
                     }
                 }
             }
@@ -125,7 +132,15 @@ export function useAsyncValidator<
         return () => {
             shouldCancel = true;
         };
-    }, [fieldValue, fieldName, validator, finalDebounceTime, clearErrors, setError, context]);
+    }, [
+        fieldValue,
+        fieldName,
+        validator,
+        finalDebounceTime,
+        clearErrors,
+        setError,
+        setFieldValidationState
+    ]);
 
     return [validationState, validationProduct];
 }

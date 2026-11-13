@@ -55,6 +55,7 @@ import {
 import { WalletEmoji } from '@tonkeeper/uikit/dist/components/shared/emoji/WalletEmoji';
 import { getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
 import { useSubjectValue } from '@tonkeeper/uikit/dist/libs/useAtom';
+import { useLatestRef } from '@tonkeeper/uikit/dist/hooks/useLatestRef';
 import { AccountAndWalletInfo } from '@tonkeeper/uikit/dist/components/account/AccountAndWalletInfo';
 import { AccountConnectionInjected } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -109,20 +110,23 @@ export const MobileDappBrowserTab: FC<{
     const activeWallet = useActiveWallet();
 
     const asideLastSelectedWalletId = useSubjectValue(asideWalletSelected$);
+    // Re-points the dApp only when the wallet changes: `tab` changes on every navigation inside it.
+    const latestTab = useLatestRef(tab);
     useEffect(() => {
         if (activeWallet.id === asideLastSelectedWalletId) {
-            capacitorTonConnectInjectedConnector.changeConnectedWalletToActive(tab);
+            capacitorTonConnectInjectedConnector.changeConnectedWalletToActive(latestTab.current);
         }
-    }, [activeWallet.id, asideLastSelectedWalletId, tab]);
+    }, [activeWallet.id, asideLastSelectedWalletId, latestTab]);
 
     const { data: activeConnection } = useInjectedDappConnectionByOrigin(originFromUrl(tab.url));
     const [bannerData, setBannerData] = useState<WalletId | undefined>(undefined);
     const [runEffect, setRunEffect] = useState(0);
+    const connectedWalletId = activeConnection?.wallet.id;
     useEffect(() => {
-        if (!activeConnection) {
+        if (!connectedWalletId) {
             setBannerData(undefined);
         } else {
-            setBannerData(activeConnection.wallet.id);
+            setBannerData(connectedWalletId);
             const timeout = setTimeout(() => {
                 setBannerData(undefined);
             }, 4000);
@@ -131,7 +135,7 @@ export const MobileDappBrowserTab: FC<{
                 clearTimeout(timeout);
             };
         }
-    }, [activeConnection, runEffect]);
+    }, [connectedWalletId, runEffect]);
 
     return (
         <Wrapper>

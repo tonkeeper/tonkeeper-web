@@ -1,4 +1,5 @@
 import { FC, useCallback, useEffect } from 'react';
+import { useLatestRef } from '../../hooks/useLatestRef';
 import { Notification } from '../Notification';
 import { ConfirmView, ConfirmViewHeading, ConfirmViewHeadingSlot } from '../transfer/ConfirmView';
 import {
@@ -60,17 +61,19 @@ const CancelLegacySubscription: FC<{ pluginAddress: string; onClose: () => void 
             });
     }, [wallet, pluginAddress, t, sdk, unsubscribeMutation]);
 
+    const { mutate: estimate } = estimation;
+    const latestOnClose = useLatestRef(onClose);
     useEffect(() => {
         if (!isStandardTonWallet(wallet) || wallet.version !== WalletVersion.V4R2) {
             console.error('Unexpected wallet is used to unsubscribe from legacy subscription');
-            return onClose();
+            return latestOnClose.current();
         }
-        estimation.mutate({
+        estimate({
             selectedWallet: wallet,
             extensionContract: pluginAddress,
             destroyValue
         });
-    }, [wallet, pluginAddress, estimation, onClose]);
+    }, [wallet, pluginAddress, estimate, latestOnClose]);
 
     return (
         <ConfirmView

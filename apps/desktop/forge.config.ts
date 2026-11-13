@@ -28,9 +28,11 @@ const githubToken = process.env.GITHUB_TOKEN;
 const requestedArchitecture = getRequestedArchitecture(process.argv);
 const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 const appName = 'Keeper';
-// Squirrel.Windows starts the app through this file name from the Start-menu shortcut and the
-// deb/rpm packages install it as their bin, so it stays Tonkeeper for installed users.
-const executableName = 'Tonkeeper';
+// Squirrel.Mac renames an installed Tonkeeper.app to <executableName>.app when it applies an update,
+// and Electron Packager writes it as CFBundleDisplayName. On Windows, Squirrel starts the app
+// through this file name from existing shortcuts, and the deb/rpm packages install it as their bin,
+// so it stays Tonkeeper there.
+const executableName = process.platform === 'darwin' ? appName : 'Tonkeeper';
 
 // The AppImage carries libsecret so the keychain works on systems without it. See
 // github.com/tonkeeper/tonkeeper-web/issues/374. Only the library itself goes in: its dependencies
@@ -110,11 +112,11 @@ const config: ForgeConfig = {
         icon: path.join(__dirname, 'public', 'icon'),
         name: appName,
         executableName,
-        // Squirrel.Windows names the Start-menu and desktop shortcuts from this metadata and the
-        // installer title. Installed users keep the shortcut they have, so a new name adds a second.
+        // Squirrel.Windows names the Start-menu and desktop shortcuts after ProductName. The update
+        // hook removes the shortcuts with the old name (src/electron/squirrelEvents.ts).
         win32metadata: {
-            FileDescription: 'Tonkeeper',
-            ProductName: 'Tonkeeper',
+            FileDescription: appName,
+            ProductName: appName,
             InternalName: 'Tonkeeper'
         },
         protocols: [
@@ -138,11 +140,13 @@ const config: ForgeConfig = {
     makers: [
         new MakerSquirrel(
             {
+                // The package id names the install folder and the update channel, so it stays.
                 name: 'Tonkeeper',
-                title: 'Tonkeeper',
+                title: appName,
                 authors: 'Ton Apps Group',
                 description: 'Secure multichain crypto wallet',
-                iconUrl: 'https://tonkeeper.com/assets/icon.ico',
+                iconUrl:
+                    'https://raw.githubusercontent.com/tonkeeper/tonkeeper-web/main/apps/desktop/public/icon.ico',
                 setupIcon: path.join(process.cwd(), 'public', 'icon.ico'),
                 loadingGif: path.join(process.cwd(), 'public', 'install.gif'),
                 ...squirrelRemoteReleases

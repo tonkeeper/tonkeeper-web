@@ -91,14 +91,15 @@ const ProInstallExtensionNotificationContent: FC<
         formatDecimals(estimation?.fee?.extra?.stringWeiAmount ?? 0)
     );
 
+    const { mutate: estimateFee } = estimateFeeMutation;
     useEffect(() => {
         if (!targetAuth?.wallet) return;
 
-        estimateFeeMutation.mutate({
+        estimateFee({
             selectedWallet: targetAuth.wallet,
             ...extensionData
         });
-    }, [targetAuth?.wallet, estimateFeeMutation, extensionData]);
+    }, [targetAuth?.wallet, estimateFee, extensionData]);
 
     const price = useMemo(
         () =>

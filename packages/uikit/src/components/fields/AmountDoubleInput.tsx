@@ -8,6 +8,7 @@ import React, {
     useState
 } from 'react';
 import styled from 'styled-components';
+import { useLatestRef } from '../../hooks/useLatestRef';
 import { replaceTypedDecimalSeparator, seeIfValueValid } from '../transfer/amountView/AmountViewUI';
 import { getTextWidth, getUiFontFamily } from '../../hooks/textWidth';
 import { formatSendValue, isNumeric, removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
@@ -304,9 +305,10 @@ export const AmountDoubleInput = forwardRef<
         });
     };
 
+    const latestInput = useLatestRef({ onInput, inputValue: currencyAmount.inputValue });
     useEffect(() => {
-        onInput(currencyAmount.inputValue);
-    }, [currencyAmount.inputValue, onInput]);
+        latestInput.current.onInput(latestInput.current.inputValue);
+    }, [currencies, latestInput]);
 
     const zeroValue = () => {
         const decimals = notActiveCurrency.decimals;

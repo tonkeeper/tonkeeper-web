@@ -220,8 +220,9 @@ export const registerMultichainWallet = async (
         throw new Error('multichain wallet register: no device session');
     }
 
+    const userId = await session.getUserId();
     const challengeResponse = await fetchImpl(walletsUrl('challenge'), {
-        headers: { Authorization: `Bearer ${info.accessToken}` }
+        headers: { Authorization: `Bearer ${info.accessToken}`, F: userId }
     });
     if (!challengeResponse.ok) {
         throw new Error(`multichain wallet challenge failed: ${challengeResponse.status}`);
@@ -238,7 +239,8 @@ export const registerMultichainWallet = async (
         method: 'POST',
         headers: {
             Authorization: `Bearer ${info.accessToken}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            F: userId
         },
         body: JSON.stringify({
             challenge,
