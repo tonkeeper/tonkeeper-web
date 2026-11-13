@@ -2,6 +2,7 @@ import { delay, hideSensitiveData } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, app, powerMonitor } from 'electron';
 import log from 'electron-log/main';
 import { updateElectronApp } from 'update-electron-app';
+import { startKeeperBundleMove } from './electron/keeperBundle';
 import { settleLegacyAppCopies } from './electron/legacyAppCopy';
 import { handleSquirrelEvent } from './electron/squirrelEvents';
 import { MainWindow } from './electron/mainWindow';
@@ -32,6 +33,11 @@ log.hooks.push((message, _, transportName) => {
 
     return message;
 });
+
+if (startKeeperBundleMove()) {
+    log.info('moving the app to Keeper.app');
+    app.exit(0);
+}
 
 if (handleSquirrelEvent()) {
     app.quit();

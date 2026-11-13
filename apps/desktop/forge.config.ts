@@ -28,11 +28,11 @@ const githubToken = process.env.GITHUB_TOKEN;
 const requestedArchitecture = getRequestedArchitecture(process.argv);
 const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
 const appName = 'Keeper';
-// Squirrel.Mac renames an installed Tonkeeper.app to <executableName>.app when it applies an update,
-// and Electron Packager writes it as CFBundleDisplayName. On Windows, Squirrel starts the app
-// through this file name from existing shortcuts, and the deb/rpm packages install it as their bin,
-// so it stays Tonkeeper there.
-const executableName = process.platform === 'darwin' ? appName : 'Tonkeeper';
+// Squirrel.Windows starts the app through this file name from existing shortcuts and the deb/rpm
+// packages install it as their bin. On macOS, Squirrel renames an installed bundle to
+// <executableName>.app on update and then fails to relaunch it; the app moves itself to Keeper.app
+// instead (src/electron/keeperBundle.ts).
+const executableName = 'Tonkeeper';
 
 // The AppImage carries libsecret so the keychain works on systems without it. See
 // github.com/tonkeeper/tonkeeper-web/issues/374. Only the library itself goes in: its dependencies
