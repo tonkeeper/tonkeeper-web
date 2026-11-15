@@ -10,7 +10,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { SlidersIcon } from '../../components/Icon';
 import { Link } from '../../components/shared/Link';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
@@ -99,7 +99,8 @@ export const DesktopNFTS: FC<{
     nfts: NFT[] | undefined;
     emptyPageTitle: string;
     pageTitle: string;
-}> = ({ nfts, emptyPageTitle, pageTitle }) => {
+    collectiblesAccessory?: ReactNode;
+}> = ({ nfts, emptyPageTitle, pageTitle, collectiblesAccessory }) => {
     const { t } = useTranslation();
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
@@ -133,6 +134,7 @@ export const DesktopNFTS: FC<{
                 />
             </DesktopViewHeader>
             <PullToRefresh invalidate={QueryKey.nft} />
+            {collectiblesAccessory && <NFTPageBody>{collectiblesAccessory}</NFTPageBody>}
             {!nfts.length ? (
                 <NFTEmptyPage>
                     <NFTEmptyContainer>

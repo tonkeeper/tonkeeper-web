@@ -46,10 +46,11 @@ import { AppProRoute, AppRoute, MultichainRoute } from '@tonkeeper/uikit/dist/li
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import StartScreen from '@tonkeeper/uikit/dist/pages/import/StartScreen';
 import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense, useMemo } from 'react';
+import React, { FC, ReactNode, Suspense, useMemo } from 'react';
 import { Route, Switch, useLocation, useParams } from 'react-router-dom';
 import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
+import GiftTradingEntry, { isLoopbackGiftTradingPage } from './giftTrading/GiftTradingEntry';
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { UrlTonConnectSubscription } from './components/UrlTonConnectSubscription';
@@ -258,6 +259,14 @@ export const DesktopContent: FC<{
         );
     }
 
+    const collectiblesAccessory =
+        import.meta.env.VITE_GIFT_TRADING_LAB === 'true' &&
+        location.pathname === AppRoute.purchases &&
+        activeAccount.type === 'watch-only' &&
+        isLoopbackGiftTradingPage(window.location) ? (
+            <GiftTradingEntry key={activeAccount.id} />
+        ) : undefined;
+
     return (
         <AppLayout sidebar={<AsideMenu />}>
             <Switch>
@@ -266,7 +275,9 @@ export const DesktopContent: FC<{
                 <Route path={AppRoute.settings} component={PreferencesContent} />
                 <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
                 <Route path={AppRoute.accountSettings} component={DesktopAccountSettingsPage} />
-                <Route path="*" component={WalletContent} />
+                <Route path="*">
+                    <WalletContent collectiblesAccessory={collectiblesAccessory} />
+                </Route>
             </Switch>
             <BackgroundElements />
         </AppLayout>
@@ -288,7 +299,7 @@ const MultichainStakingPositionRoute: FC<{ compact?: boolean }> = ({ compact }) 
     );
 };
 
-const WalletContent = () => {
+const WalletContent: FC<{ collectiblesAccessory?: ReactNode }> = ({ collectiblesAccessory }) => {
     return (
         <WalletLayout>
             <DesktopWalletHeader />
@@ -299,7 +310,9 @@ const WalletContent = () => {
                     <Wrapper>
                         <Switch>
                             <Route path={AppRoute.activity} component={DesktopHistoryPage} />
-                            <Route path={AppRoute.purchases} component={DesktopCollectables} />
+                            <Route path={AppRoute.purchases}>
+                                <DesktopCollectables collectiblesAccessory={collectiblesAccessory} />
+                            </Route>
                             <Route path={AppRoute.dns} component={DesktopDns} />
                             <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
                             <Route

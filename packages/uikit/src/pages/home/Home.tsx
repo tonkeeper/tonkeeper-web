@@ -1,6 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { HomeSkeleton } from '../../components/Skeleton';
 import { Balance } from '../../components/home/Balance';
 import { CompactView } from '../../components/home/CompactView';
@@ -19,17 +19,20 @@ import {
 const HomeAssets: FC<{
     balances: PortfolioBalance[];
     nfts: NFT[];
-}> = ({ balances, nfts }) => {
+    collectiblesAccessory?: ReactNode;
+}> = ({ balances, nfts, collectiblesAccessory }) => {
     const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
 
     if (balances.length + nfts.length < 11 || balances.length < 4 || !isNftEnabled) {
-        return <CompactView balances={balances} nfts={nfts} />;
+        return (
+            <CompactView balances={balances} nfts={nfts} collectiblesAccessory={isNftEnabled ? collectiblesAccessory : undefined} />
+        );
     } else {
-        return <TabsView balances={balances} nfts={nfts} />;
+        return <TabsView balances={balances} nfts={nfts} collectiblesAccessory={collectiblesAccessory} />;
     }
 };
 
-const Home = () => {
+const Home: FC<{ collectiblesAccessory?: ReactNode }> = ({ collectiblesAccessory }) => {
     const { isFetched } = usePreFetchRates();
 
     const { data: balances, tokenError } = usePortfolioBalancesForList();
@@ -47,7 +50,7 @@ const Home = () => {
             <MobileCancelLegacySubscriptionBanner />
             <Balance error={tokenError} isFetching={isLoading} />
             <HomeActions chain={BLOCKCHAIN_NAME.TON} />
-            <HomeAssets balances={balances} nfts={nfts} />
+            <HomeAssets balances={balances} nfts={nfts} collectiblesAccessory={collectiblesAccessory} />
         </>
     );
 };

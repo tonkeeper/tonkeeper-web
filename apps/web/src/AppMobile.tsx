@@ -45,6 +45,7 @@ import React, { FC, ReactNode, Suspense, useLayoutEffect, useMemo, useRef } from
 import { Route, Switch, useLocation, useParams } from 'react-router-dom';
 import { ThemeProvider, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
+import GiftTradingEntry, { isLoopbackGiftTradingPage } from './giftTrading/GiftTradingEntry';
 import { UrlTonConnectSubscription } from './components/UrlTonConnectSubscription';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
@@ -248,6 +249,14 @@ export const MobileContent: FC<{
         );
     }
 
+    const collectiblesAccessory =
+        import.meta.env.VITE_GIFT_TRADING_LAB === 'true' &&
+        location.pathname === AppRoute.home &&
+        activeAccount.type === 'watch-only' &&
+        isLoopbackGiftTradingPage(window.location) ? (
+            <GiftTradingEntry key={activeAccount.id} />
+        ) : undefined;
+
     return (
         <AppLayout
             standalone={standalone}
@@ -293,7 +302,7 @@ export const MobileContent: FC<{
                         <Header />
                         <InnerBody>
                             <Suspense fallback={<HomeSkeleton />}>
-                                <Home />
+                                <Home collectiblesAccessory={collectiblesAccessory} />
                             </Suspense>
                         </InnerBody>
                     </>
