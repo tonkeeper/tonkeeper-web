@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Tonkeeper Pro</string>
+	<string>Keeper Pro</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -53,11 +53,11 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Tonkeeper need access to your camera to read QR codes.</string>
+	<string>Keeper needs access to your camera to read QR codes.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Tonkeeper use Face ID to securely authenticate your access to mnemonic key.</string>
+	<string>Keeper uses Face ID to securely confirm access to your recovery phrase.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Tonkeeper use photo library to read QR codes from images.</string>
+	<string>Keeper uses your photo library to read QR codes from images.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>NSUserActivityTypeBrowsingWeb</string>

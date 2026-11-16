@@ -28,7 +28,7 @@ import { RootErrorBoundary } from '@tonkeeper/uikit/dist/components/shared/RootE
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useProApiUrl } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useAccountsStateQuery,
@@ -163,10 +163,11 @@ export const App = () => (
 );
 
 const ThemeAndContent = () => {
+    const { data } = useProBackupState();
     return (
         <UserThemeProvider
             displayType="full-width"
-            isPro
+            isPro={Boolean(data?.valid)}
             isProSupported
             proDisplayType={CAPACITOR_APPLICATION_ID === 'mobile' ? 'mobile' : 'desktop'}
         >
