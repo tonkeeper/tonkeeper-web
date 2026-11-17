@@ -10,6 +10,7 @@ import {
     NftItem
 } from '@tonkeeper/core/dist/tonApiV2';
 import { isTONDNSDomain } from '@tonkeeper/core/dist/utils/nft';
+import { loadAllNftPages } from '@tonkeeper/core/dist/utils/nftPagination';
 import { joinUrl } from '@tonkeeper/core/dist/utils/url';
 import { useMemo } from 'react';
 import { isSpamNft, isUnverifiedNft } from './nft-classification';
@@ -151,16 +152,24 @@ export { isSpamNft, isUnverifiedNft } from './nft-classification';
 export const useWalletNftList = () => {
     const wallet = useActiveWallet();
     const { tonApiV2 } = useActiveApi();
+    const network = useActiveTonNetwork();
 
-    return useQuery<NFT[], Error>([wallet.rawAddress, QueryKey.nft], async () => {
-        const { nftItems } = await new AccountsApi(tonApiV2).getAccountNftItems({
-            accountId: wallet.rawAddress,
-            offset: 0,
-            limit: 1000,
-            indirectOwnership: true
-        });
-        return nftItems;
-    });
+    return useQuery<NFT[], Error>(
+        [wallet.rawAddress, QueryKey.nft, network],
+        ({ signal }) =>
+            loadAllNftPages(async (offset, limit, requestSignal) => {
+                const { nftItems } = await new AccountsApi(tonApiV2).getAccountNftItems(
+                    {
+                        accountId: wallet.rawAddress,
+                        offset,
+                        limit,
+                        indirectOwnership: true
+                    },
+                    { signal: requestSignal }
+                );
+                return nftItems;
+            }, signal)
+    );
 };
 export const useWalletFilteredNftList = () => {
     const { data: nfts, ...rest } = useWalletNftList();
