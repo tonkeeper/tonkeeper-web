@@ -1,5 +1,5 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
-import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { Label1 } from '../Text';
@@ -92,7 +92,8 @@ const collectibles = 'collectibles';
 export const TabsView: FC<{
     balances: PortfolioBalance[];
     nfts: NFT[];
-}> = ({ balances, nfts }) => {
+    collectiblesAccessory?: ReactNode;
+}> = ({ balances, nfts, collectiblesAccessory }) => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const tab = useMemo(() => {
@@ -121,7 +122,10 @@ export const TabsView: FC<{
         <>
             <Tabs tab={tab} onTab={onTab} />
             {tab === HomeTabs.COLLECTIBLES ? (
-                <NftsList nfts={nfts} />
+                <>
+                    {collectiblesAccessory}
+                    <NftsList nfts={nfts} />
+                </>
             ) : (
                 <JettonList balances={balances} />
             )}
