@@ -66,7 +66,7 @@ export const EnterPasscodeModal: FC<{
 
     return (
         <Modal isOpen={isOpen} onClose={onCancel} afterClose={reset} bare>
-            <div className="flex h-full flex-col bg-backgroundPage pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+            <div className="flex h-full flex-col bg-backgroundPage">
                 <div className="flex h-16 shrink-0 items-center px-4">
                     <CloseButton onClick={onCancel} />
                 </div>

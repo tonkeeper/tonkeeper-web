@@ -66,6 +66,8 @@ interface ModalContextValue {
     setTopBarTitle: (title: ReactNode) => void;
     footerElement: HTMLDivElement | null;
     headerElement: HTMLDivElement | null;
+    /** The sheet reaches the bottom screen edge, so its last row must clear the home indicator. */
+    mobileSheet: boolean;
 }
 
 const ModalContext = createContext<ModalContextValue>({
@@ -73,7 +75,8 @@ const ModalContext = createContext<ModalContextValue>({
     setOnCloseInterceptor: () => {},
     setTopBarTitle: () => {},
     footerElement: null,
-    headerElement: null
+    headerElement: null,
+    mobileSheet: false
 });
 
 // ── Props ──────────────────────────────────────────────────────────
@@ -463,9 +466,10 @@ export const Modal: FC<ModalProps> = ({
             setOnCloseInterceptor,
             setTopBarTitle,
             footerElement,
-            headerElement
+            headerElement,
+            mobileSheet: useMobileSheet
         }),
-        [footerElement, headerElement]
+        [footerElement, headerElement, useMobileSheet]
     );
 
     if (!mounted) return null;
@@ -530,7 +534,11 @@ export const Modal: FC<ModalProps> = ({
                                           : 'max-h-[calc(var(--app-height)-32px)]'
                                   )
                                 : isMobileFull
-                                ? 'h-full w-full'
+                                ? cn(
+                                      // A full-screen sheet starts below the status bar and the notch.
+                                      'h-full w-full pt-[env(safe-area-inset-top)]',
+                                      bare && 'pb-[env(safe-area-inset-bottom)]'
+                                  )
                                 : mobileHeight === 'half'
                                 ? 'min-h-[50vh] max-h-[80vh] w-full rounded-t-large'
                                 : 'max-h-[90vh] w-full rounded-t-large',
@@ -606,7 +614,10 @@ export const Modal: FC<ModalProps> = ({
                                             : undefined
                                     }
                                     className={cn(
-                                        'flex flex-1 flex-col overflow-y-auto px-4 pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0',
+                                        'flex flex-1 flex-col overflow-y-auto px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0',
+                                        useMobileSheet
+                                            ? 'pb-[calc(1rem+env(safe-area-inset-bottom))]'
+                                            : 'pb-4',
                                         // Reserves the same height the top bar would have taken
                                         // so the heading clears the floating close button.
                                         floatingCloseButton && 'pt-16'
@@ -712,14 +723,18 @@ export const ModalFooterPortal: FC<PropsWithChildren> = ({ children }) => {
 export const ModalFooter: FC<PropsWithChildren<{ className?: string }>> = ({
     children,
     className
-}) => (
-    <div
-        className={cn(
-            'relative flex w-full flex-col gap-2 px-4 pb-4',
-            'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-backgroundPage before:[mask-image:linear-gradient(to_top,#000_0%,#000000eb_20%,#000000ab_40%,#00000054_60%,#00000014_80%,transparent_100%)]',
-            className
-        )}
-    >
-        {children}
-    </div>
-);
+}) => {
+    const { mobileSheet } = useContext(ModalContext);
+    return (
+        <div
+            className={cn(
+                'relative flex w-full flex-col gap-2 px-4',
+                mobileSheet ? 'pb-[calc(1rem+env(safe-area-inset-bottom))]' : 'pb-4',
+                'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-backgroundPage before:[mask-image:linear-gradient(to_top,#000_0%,#000000eb_20%,#000000ab_40%,#00000054_60%,#00000014_80%,transparent_100%)]',
+                className
+            )}
+        >
+            {children}
+        </div>
+    );
+};

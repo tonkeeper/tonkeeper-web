@@ -166,7 +166,7 @@ const ThemeAndContent = () => {
     const { data } = useProBackupState();
     return (
         <UserThemeProvider
-            displayType="full-width"
+            displayType={CAPACITOR_APPLICATION_ID === 'mobile' ? 'compact' : 'full-width'}
             isPro={Boolean(data?.valid)}
             isProSupported
             proDisplayType={CAPACITOR_APPLICATION_ID === 'mobile' ? 'mobile' : 'desktop'}
