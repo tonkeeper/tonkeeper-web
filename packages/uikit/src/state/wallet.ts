@@ -1239,6 +1239,7 @@ export const useMutateRenameAccount = <T extends Account>() => {
         await storage.updateAccountInState(account);
 
         await client.invalidateQueries([QueryKey.account]);
+        await client.invalidateQueries([QueryKey.dashboardData]);
 
         return account.clone() as T;
     });
@@ -1301,6 +1302,7 @@ export const useMutateRenameAccountDerivations = <T extends AccountMAM>() => {
         await storage.updateAccountInState(account);
 
         await client.invalidateQueries([QueryKey.account]);
+        await client.invalidateQueries([QueryKey.dashboardData]);
 
         return account.clone() as T;
     });
