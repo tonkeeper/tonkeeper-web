@@ -8,24 +8,25 @@ import { TonAsset } from '../../../../entries/crypto/asset/ton-asset';
 import { AssetAmount } from '../../../../entries/crypto/asset/asset-amount';
 import { scaledUIMultiplierOne } from '../../../../entries/crypto/asset/scaled-ui';
 import { TonEstimation } from '../../../../entries/send';
+import { AccountsApi, JettonBalance } from '../../../../tonApiV2';
 import {
-    AccountsApi,
-    GaslessApi,
-    GaslessTx,
-    JettonBalance,
-    SignRawParams
-} from '../../../../tonApiV2';
+    Configuration,
+    DefaultApi,
+    EmulationApi,
+    GaslessEstimation,
+    MessageConsequences
+} from '../../../../batteryApi';
 import { WalletOutgoingMessage } from '../../encoder/types';
 import { GaslessMessageSender } from '../gasless-message-sender';
 
 const address = (n: number) => Address.parse('0:' + n.toString(16).padStart(64, '0'));
 
 const walletAddress = address(1);
-const relayerAddress = address(2);
+const batteryExcess = address(2);
 const jettonMaster = address(3);
 const ownJettonWallet = address(4);
 const recipientJettonWallet = address(5);
-const attackerAddress = address(6);
+const recipient = address(6);
 
 const wallet = {
     id: walletAddress.toRawString(),
@@ -61,27 +62,22 @@ const outgoing: WalletOutgoingMessage = {
     sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
 };
 
-const relayerResponse = {
-    relayAddress: relayerAddress.toRawString(),
-    commission: '999999999',
-    from: walletAddress.toRawString(),
-    validUntil: 0,
-    messages: [
-        {
-            address: attackerAddress.toRawString(),
-            amount: toNano(1000).toString(),
-            payload: beginCell().storeUint(0x1337, 32).endCell().toBoc().toString('hex')
-        }
-    ]
-} as SignRawParams;
+const jettonTransferAction = (to: Address) => ({
+    type: 'JettonTransfer',
+    status: 'ok',
+    jettonTransfer: { recipient: { address: to.toRawString() } }
+});
 
 const setup = () => {
-    const gaslessEstimate = vi
-        .spyOn(GaslessApi.prototype, 'gaslessEstimate')
-        .mockResolvedValue(relayerResponse);
-    const gaslessSend = vi
-        .spyOn(GaslessApi.prototype, 'gaslessSend')
-        .mockResolvedValue({} as GaslessTx);
+    const estimateGaslessCost = vi
+        .spyOn(DefaultApi.prototype, 'estimateGaslessCost')
+        .mockResolvedValue({ commission: '12000' } as GaslessEstimation);
+    const sendMessage = vi.spyOn(DefaultApi.prototype, 'sendMessage').mockResolvedValue();
+    vi.spyOn(EmulationApi.prototype, 'emulateMessageToWallet').mockResolvedValue({
+        event: {
+            actions: [jettonTransferAction(recipient), jettonTransferAction(batteryExcess)]
+        }
+    } as unknown as MessageConsequences);
     vi.spyOn(AccountsApi.prototype, 'getAccountJettonBalance').mockResolvedValue({
         walletAddress: { address: ownJettonWallet.toRawString() },
         jetton: { address: jettonMaster.toRawString() }
@@ -89,81 +85,99 @@ const setup = () => {
     const toExternal = vi
         .spyOn(
             GaslessMessageSender.prototype as unknown as {
-                toExternal: (outgoing: WalletOutgoingMessage) => Promise<Cell>;
+                toExternal: (outgoing: WalletOutgoingMessage, commission: bigint) => Promise<Cell>;
             },
             'toExternal'
         )
         .mockResolvedValue(external);
 
     const sender = new GaslessMessageSender(
-        { payWithAsset, relayerAddress: relayerAddress.toRawString() },
-        {} as APIConfig,
+        {
+            payWithAsset,
+            excessAddress: batteryExcess.toRawString(),
+            messageTtl: 300,
+            authToken: 'token'
+        },
+        { tonApi: {} as APIConfig, batteryApi: {} as Configuration },
         wallet,
         {} as CellSigner
     );
 
-    return { sender, toExternal, gaslessSend, gaslessEstimate };
+    return { sender, toExternal, sendMessage, estimateGaslessCost };
 };
 
-const signedMessages = (toExternal: ReturnType<typeof setup>['toExternal']) =>
-    (toExternal.mock.calls[0][0] as WalletOutgoingMessage).messages;
-
-const destination = (message: MessageRelaxed) =>
-    message.info.type === 'internal' ? message.info.dest : undefined;
+const encodeCommission = (sender: GaslessMessageSender, amount: bigint) =>
+    (
+        sender as unknown as {
+            encodeCommissionTransfer: (amount: bigint) => Promise<MessageRelaxed>;
+        }
+    ).encodeCommissionTransfer(amount);
 
 describe('GaslessMessageSender', () => {
     afterEach(() => {
         vi.restoreAllMocks();
     });
 
-    it('signs the outgoing messages unchanged and never asks the relayer what to sign', async () => {
-        const { sender, toExternal, gaslessSend, gaslessEstimate } = setup();
+    it('prices the locally built message set with the Battery and hides the fee transfer', async () => {
+        const { sender, toExternal, estimateGaslessCost } = setup();
+
+        const estimation = await sender.estimate(outgoing);
+
+        expect(toExternal.mock.calls[0]).toEqual([outgoing, 1n]);
+        expect(estimateGaslessCost).toHaveBeenCalledWith({
+            jettonMaster: jettonMaster.toRawString(),
+            estimateGaslessCostRequest: {
+                payload: external.toBoc().toString('base64'),
+                battery: false
+            },
+            xTonConnectAuth: 'token'
+        });
+        expect(estimation.fee.type === 'ton-asset' && estimation.fee.extra.stringWeiAmount).toBe(
+            '12000'
+        );
+        expect(estimation.event?.actions).toEqual([jettonTransferAction(recipient)]);
+    });
+
+    it('signs the confirmed commission and sends through the Battery', async () => {
+        const { sender, toExternal, sendMessage } = setup();
 
         const result = await sender
             .withConfirmedCommission(confirmedEstimation(payWithAsset, '12345'))
             .send(outgoing);
 
         expect(result).toBe(external);
-        expect(gaslessEstimate).not.toHaveBeenCalled();
-        const messages = signedMessages(toExternal);
-        expect(messages).toHaveLength(2);
-        expect(messages[0]).toBe(outgoing.messages[0]);
-        expect(messages.some(m => destination(m)?.equals(attackerAddress))).toBe(false);
-        expect(gaslessSend).toHaveBeenCalledWith({
-            gaslessSendRequest: {
-                walletPublicKey: wallet.publicKey,
-                boc: external.toBoc().toString('base64')
-            }
+        expect(toExternal.mock.calls[0]).toEqual([outgoing, 12345n]);
+        expect(sendMessage).toHaveBeenCalledWith({
+            xTonConnectAuth: 'token',
+            sendMessageRequest: { boc: external.toBoc().toString('base64') }
         });
     });
 
-    it('pays the confirmed commission to the configured relayer from the own jetton wallet', async () => {
-        const { sender, toExternal } = setup();
+    it('pays the commission from the own jetton wallet to the Battery excess account', async () => {
+        const { sender } = setup();
 
-        await sender
-            .withConfirmedCommission(confirmedEstimation(payWithAsset, '12345'))
-            .send(outgoing);
+        const commission = await encodeCommission(sender, 12345n);
 
-        const commission = signedMessages(toExternal)[1];
-        expect(destination(commission)?.equals(ownJettonWallet)).toBe(true);
-
+        expect(
+            commission.info.type === 'internal' && commission.info.dest.equals(ownJettonWallet)
+        ).toBe(true);
         const body = commission.body.beginParse();
         expect(body.loadUint(32)).toBe(0xf8a7ea5);
         body.loadUintBig(64);
         expect(body.loadCoins()).toBe(12345n);
-        expect(body.loadAddress().equals(relayerAddress)).toBe(true);
-        expect(body.loadAddress().equals(relayerAddress)).toBe(true);
+        expect(body.loadAddress().equals(batteryExcess)).toBe(true);
+        expect(body.loadAddress().equals(batteryExcess)).toBe(true);
         expect(body.loadMaybeRef()).toBeNull();
         body.loadCoins();
         expect(body.loadRef().beginParse().loadUint(32)).toBe(0x878da6e3);
     });
 
     it('refuses to sign without a confirmed commission', async () => {
-        const { sender, toExternal, gaslessSend } = setup();
+        const { sender, toExternal, sendMessage } = setup();
 
         await expect(sender.send(outgoing)).rejects.toThrow('Gasless commission is not confirmed');
         expect(toExternal).not.toHaveBeenCalled();
-        expect(gaslessSend).not.toHaveBeenCalled();
+        expect(sendMessage).not.toHaveBeenCalled();
     });
 
     it('rejects an estimation priced in another asset or in TON battery charges', () => {

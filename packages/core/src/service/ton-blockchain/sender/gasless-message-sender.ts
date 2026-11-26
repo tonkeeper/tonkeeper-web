@@ -1,28 +1,15 @@
 import { APIConfig } from '../../../entries/apis';
 import { walletContractFromState } from '../../wallet/contractService';
-import {
-    externalMessage,
-    getServerTime,
-    getTonkeeperQueryId,
-    getTTL,
-    getWalletSeqNo
-} from '../utils';
+import { externalMessage, getServerTime, getTonkeeperQueryId, getWalletSeqNo } from '../utils';
 import { CellSigner } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { TonWalletStandard } from '../../../entries/wallet';
-import {
-    Address,
-    beginCell,
-    internal,
-    MessageRelaxed,
-    SendMode,
-    storeMessageRelaxed,
-    toNano
-} from '@ton/core';
+import { Address, beginCell, internal, MessageRelaxed, SendMode, toNano } from '@ton/core';
 import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 import { ISender } from './ISender';
 import { JettonEncoder } from '../encoder/jetton-encoder';
-import { AccountEvent, GaslessApi } from '../../../tonApiV2';
+import { AccountEvent } from '../../../tonApiV2';
+import { Configuration, DefaultApi, EmulationApi } from '../../../batteryApi';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TonEstimation } from '../../../entries/send';
@@ -31,35 +18,44 @@ const GASLESS_OP_CODE = 0x878da6e3;
 
 const commissionTransferAmount = toNano(0.1);
 
-export class GaslessMessageSender implements ISender {
-    private readonly gaslessApi: GaslessApi;
+/** The battery prices the message set it is shown; the fee transfer in it must not be empty. */
+const estimationCommission = 1n;
 
+/**
+ * Pays the network fee of a jetton transfer in the jetton itself through the Battery relayer, as the
+ * native apps do. Every signed message is built on the device: the caller's outgoing set plus a
+ * commission transfer to the Battery excess account. The Battery only prices that exact set.
+ */
+export class GaslessMessageSender implements ISender {
     constructor(
-        private readonly gaslessConfig: {
+        private readonly config: {
             payWithAsset: TonAsset;
-            relayerAddress: string;
+            excessAddress: string;
+            messageTtl: number;
+            authToken: string;
         },
-        private readonly api: APIConfig,
+        private readonly api: {
+            tonApi: APIConfig;
+            batteryApi: Configuration;
+        },
         private readonly wallet: TonWalletStandard,
         private readonly signer: CellSigner,
         private readonly confirmedCommission?: bigint
-    ) {
-        this.gaslessApi = new GaslessApi(this.api.tonApiV2);
-    }
+    ) {}
 
     public get excessAddress() {
-        return this.gaslessConfig.relayerAddress;
+        return this.config.excessAddress;
     }
 
     /**
-     * Binds the sender to the commission the user saw. Without it `send` refuses to sign, so a relayer
-     * cannot raise the fee between the confirm screen and the signature.
+     * Binds the sender to the commission the user saw. Without it `send` refuses to sign, so the
+     * relayer cannot raise the fee between the confirm screen and the signature.
      */
     public withConfirmedCommission(estimation: TonEstimation) {
         const { fee } = estimation;
         if (
             fee.type !== 'ton-asset' ||
-            fee.extra.asset.id !== this.gaslessConfig.payWithAsset.id ||
+            fee.extra.asset.id !== this.config.payWithAsset.id ||
             !fee.extra.weiAmount.isInteger() ||
             fee.extra.weiAmount.isNegative()
         ) {
@@ -67,7 +63,7 @@ export class GaslessMessageSender implements ISender {
         }
 
         return new GaslessMessageSender(
-            this.gaslessConfig,
+            this.config,
             this.api,
             this.wallet,
             this.signer,
@@ -75,72 +71,96 @@ export class GaslessMessageSender implements ISender {
         );
     }
 
-    /**
-     * Signs only messages built on the device: the caller's outgoing set plus a commission transfer to
-     * the configured relayer, for the amount bound by `withConfirmedCommission`. Nothing from the
-     * relayer's response reaches the signature.
-     */
     public async send(outgoing: WalletOutgoingMessage) {
         if (this.confirmedCommission === undefined) {
             throw new Error('Gasless commission is not confirmed');
         }
-        this.assertSupported(outgoing);
 
-        const commission = await this.encodeCommissionTransfer(this.confirmedCommission);
+        const external = await this.toExternal(outgoing, this.confirmedCommission);
 
-        const external = await this.toExternal({
-            messages: [...outgoing.messages, commission],
-            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
-        });
-
-        await this.gaslessApi.gaslessSend({
-            gaslessSendRequest: {
-                walletPublicKey: this.wallet.publicKey,
-                boc: external.toBoc().toString('base64')
-            }
+        await new DefaultApi(this.api.batteryApi).sendMessage({
+            xTonConnectAuth: this.config.authToken,
+            sendMessageRequest: { boc: external.toBoc().toString('base64') }
         });
 
         return external;
     }
 
-    public async estimate(outgoing: WalletOutgoingMessage) {
-        const params = await this.getGaslessParams(outgoing);
+    public async estimate(outgoing: WalletOutgoingMessage): Promise<TonEstimation> {
+        const priced = await this.toExternal(outgoing, estimationCommission);
+        const { commission } = await new DefaultApi(this.api.batteryApi).estimateGaslessCost({
+            jettonMaster: tonAssetAddressToString(this.config.payWithAsset.address),
+            estimateGaslessCostRequest: {
+                payload: priced.toBoc().toString('base64'),
+                battery: false
+            },
+            xTonConnectAuth: this.config.authToken
+        });
 
         return {
             fee: {
-                type: 'ton-asset' as const,
-                extra: new AssetAmount({
-                    asset: this.gaslessConfig.payWithAsset,
-                    weiAmount: params.commission
-                })
+                type: 'ton-asset',
+                extra: new AssetAmount({ asset: this.config.payWithAsset, weiAmount: commission })
             },
-            event: this.hideGaslessFeeCallFromEstimation(params.emulation)?.event
+            event: await this.emulate(outgoing, BigInt(commission))
         };
     }
 
-    private async toExternal({ messages, sendMode }: WalletOutgoingMessage) {
-        const timestamp = await getServerTime(this.api);
-        const seqno = await getWalletSeqNo(this.api, this.wallet.rawAddress);
+    /** What the transfer does, for the confirm screen; the fee is shown apart, so its transfer is hidden. */
+    private async emulate(
+        outgoing: WalletOutgoingMessage,
+        commission: bigint
+    ): Promise<AccountEvent | undefined> {
+        try {
+            const external = await this.toExternal(outgoing, commission);
+            const response = await new EmulationApi(this.api.batteryApi).emulateMessageToWallet({
+                xTonConnectAuth: this.config.authToken,
+                emulateMessageToWalletRequest: { boc: external.toBoc().toString('base64') }
+            });
+            // The Battery serves the tonapi event schema, as `BatteryMessageSender` relies on.
+            const event = response.event as unknown as AccountEvent;
+            const excess = Address.parse(this.config.excessAddress);
+            return {
+                ...event,
+                actions: event.actions.filter(
+                    action =>
+                        !(
+                            action.type === 'JettonTransfer' &&
+                            action.jettonTransfer?.recipient &&
+                            Address.parse(action.jettonTransfer.recipient.address).equals(excess)
+                        )
+                )
+            };
+        } catch {
+            return undefined;
+        }
+    }
+
+    private async toExternal(outgoing: WalletOutgoingMessage, commission: bigint) {
+        this.assertSupported(outgoing);
+
+        const timestamp = await getServerTime(this.api.tonApi);
+        const seqno = await getWalletSeqNo(this.api.tonApi, this.wallet.rawAddress);
 
         const contract = walletContractFromState(this.wallet) as WalletContractV5R1;
         const transfer = await contract.createTransfer({
             authType: 'internal',
             seqno,
             signer: this.signer,
-            timeout: getTTL(timestamp),
-            sendMode,
-            messages
+            timeout: timestamp + this.config.messageTtl,
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            messages: [...outgoing.messages, await this.encodeCommissionTransfer(commission)]
         });
         return externalMessage(contract, seqno, transfer);
     }
 
     private async encodeCommissionTransfer(jettonAmount: bigint): Promise<MessageRelaxed> {
         const { customPayload, stateInit, jettonWalletAddress } = await new JettonEncoder(
-            this.api,
+            this.api.tonApi,
             this.wallet.rawAddress
-        ).jettonCustomPayload(tonAssetAddressToString(this.gaslessConfig.payWithAsset.address));
+        ).jettonCustomPayload(tonAssetAddressToString(this.config.payWithAsset.address));
 
-        const relayer = Address.parse(this.gaslessConfig.relayerAddress);
+        const excess = Address.parse(this.config.excessAddress);
 
         return internal({
             to: Address.parse(jettonWalletAddress),
@@ -149,8 +169,8 @@ export class GaslessMessageSender implements ISender {
             body: JettonEncoder.encodeTransferBody({
                 queryId: getTonkeeperQueryId(),
                 jettonAmount,
-                toAddress: relayer,
-                responseAddress: relayer,
+                toAddress: excess,
+                responseAddress: excess,
                 forwardAmount: JettonEncoder.jettonTransferForwardAmount,
                 forwardPayload: beginCell().storeUint(GASLESS_OP_CODE, 32).endCell(),
                 customPayload
@@ -167,57 +187,5 @@ export class GaslessMessageSender implements ISender {
         if (outgoing.sendMode > SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS) {
             throw new Error(`Unsupported send mode for gasless: ${outgoing.sendMode}`);
         }
-    }
-
-    private async getGaslessParams(outgoing: WalletOutgoingMessage) {
-        this.assertSupported(outgoing);
-
-        const messageToEstimate = beginCell()
-            .storeWritable(storeMessageRelaxed(outgoing.messages[0]))
-            .endCell();
-
-        return this.gaslessApi.gaslessEstimate({
-            masterId: tonAssetAddressToString(this.gaslessConfig.payWithAsset.address),
-            gaslessEstimateRequest: {
-                walletAddress: this.wallet.rawAddress,
-                walletPublicKey: this.wallet.publicKey,
-                messages: [
-                    {
-                        boc: messageToEstimate.toBoc().toString('hex')
-                    }
-                ],
-                returnEmulation: true,
-                throwErrorIfNotEnoughJettons: true
-            },
-            acceptLanguage: 'en'
-        });
-    }
-
-    private hideGaslessFeeCallFromEstimation(estimation: { event: AccountEvent } | undefined) {
-        if (!estimation) {
-            return undefined;
-        }
-
-        const actions = estimation.event.actions;
-
-        if (actions.length >= 2) {
-            const action = actions[0];
-            if (
-                action.type === 'JettonTransfer' &&
-                'jettonTransfer' in action &&
-                action.jettonTransfer
-            ) {
-                const eventInfo = action.jettonTransfer as {
-                    recipient: {
-                        name: string;
-                    };
-                };
-                if (eventInfo.recipient.name.toLowerCase() === 'tonkeeper battery') {
-                    actions.shift();
-                }
-            }
-        }
-
-        return { ...estimation, event: { ...estimation.event, actions } };
     }
 }

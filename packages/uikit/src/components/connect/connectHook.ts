@@ -64,7 +64,6 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useTonTransactionNotification } from '../modals/TonTransactionNotificationControlled';
 import { useActiveAccount, useActiveApi, useActiveWallet } from '../../state/wallet';
 import { requireBatteryServiceConfig, useBatteryServiceConfig } from '../../state/battery';
-import { useGaslessConfig } from '../../state/gasless';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { useAppContext } from '../../hooks/appContext';
 
@@ -102,7 +101,6 @@ export const useProcessOpenedLink = (options?: {
     const walletAddress = useActiveWallet().rawAddress;
     const isMultichainAccount = useActiveAccount().type === 'multichain';
     const batteryConfig = useBatteryServiceConfig();
-    const gaslessConfig = useGaslessConfig();
 
     return useMutation<null | TonConnectHttpConnectionParams, Error, string>(async openedUrl => {
         let url = openedUrl;
@@ -157,7 +155,7 @@ export const useProcessOpenedLink = (options?: {
                 api,
                 walletAddress,
                 batteryResponse: requireBatteryServiceConfig(batteryConfig).excessAccount,
-                gaslessResponse: gaslessConfig?.relayAddress
+                gaslessResponse: requireBatteryServiceConfig(batteryConfig).excessAccount
             });
             if (transactionRequest) {
                 if (transactionRequest.type === 'complex') {

@@ -14,7 +14,8 @@ import {
 
 /**
  * Round trip of small transfers between the QA wallets, all within the pair:
- * A swaps USDT to GRAM, sends GRAM and USDT to B, B sends both back.
+ * A swaps USDT to GRAM, sends GRAM and USDT to B, B sends both back, then USDT once more each
+ * way with the fee paid in USDT through the gasless relayer.
  * Every signing tap goes through `signPlanned`, so a run signs only what the approved
  * plan (`qa/out/<QA_TICKET>/plan.json`) lists.
  */
@@ -78,7 +79,8 @@ async function multichainSendToConfirm(
     page: Page,
     asset: { search: string; row: RegExp },
     recipient: string,
-    amount: string
+    amount: string,
+    feeMethod?: string
 ): Promise<Locator> {
     const search = page.getByPlaceholder('Search by ticker or name');
     await pressUntilVisible(page.getByRole('button', { name: 'Send', exact: true }), search);
@@ -91,16 +93,28 @@ async function multichainSendToConfirm(
     const confirm = page.getByRole('dialog').filter({ hasText: 'Confirm Action' });
     await expect(confirm).toContainText(shortAddress(recipient));
     await waitUntilConfirmable(page, confirm);
+    if (feeMethod) await pickMultichainFeeMethod(page, confirm, feeMethod);
     return confirm;
+}
+
+/** The fee row opens the method picker; once picked, the row ends with the method's name. */
+async function pickMultichainFeeMethod(page: Page, confirm: Locator, method: string) {
+    const feeRow = confirm.getByText(/·/).last();
+    const picker = page.getByRole('dialog').filter({ hasText: 'Choose method' });
+    await pressUntilVisible(feeRow, picker);
+    await picker.getByText(method, { exact: true }).click();
+    await expect(confirm).toContainText(new RegExp(`·\\s*${method}`), { timeout: 30_000 });
+    await waitUntilConfirmable(page, confirm);
 }
 
 async function multichainSend(
     page: Page,
     t: PlannedTransaction,
-    asset: { search: string; row: RegExp }
+    asset: { search: string; row: RegExp },
+    feeMethod?: string
 ) {
     const recipient = walletEnv(t.to as 'A' | 'B').tonAddress;
-    const confirm = await multichainSendToConfirm(page, asset, recipient, t.amount);
+    const confirm = await multichainSendToConfirm(page, asset, recipient, t.amount, feeMethod);
     await expect(confirm).toContainText(t.amount);
 
     await signPlanned(plan, t.id, async () => {
@@ -110,8 +124,16 @@ async function multichainSend(
     await expect(page.getByText('Done')).toBeVisible({ timeout: 60_000 });
 }
 
-/** Legacy TON send: from the token page for a jetton, from the header for GRAM. */
-async function legacySend(page: Page, t: PlannedTransaction, jettonLabel?: string) {
+/**
+ * Legacy TON send: from the token page for a jetton, from the header for GRAM. `feeInJetton` pays
+ * the fee in the sent jetton through the gasless relayer.
+ */
+async function legacySend(
+    page: Page,
+    t: PlannedTransaction,
+    jettonLabel?: string,
+    feeInJetton = false
+) {
     const recipient = walletEnv(t.to as 'A' | 'B').tonAddress;
     // A legacy-only install gets the one-time multichain promo over its home screen.
     const promo = page.getByRole('button', { name: 'Later', exact: true });
@@ -141,6 +163,23 @@ async function legacySend(page: Page, t: PlannedTransaction, jettonLabel?: strin
     await expect(modal).toContainText(
         new RegExp(`(?<![\\d.])${amount}0*\\s*${jettonLabel ?? 'GRAM'}`)
     );
+    if (feeInJetton && jettonLabel) {
+        await modal.getByText('Change Payment Method').click();
+        await modal.getByText(jettonLabel, { exact: true }).last().click();
+        // Without a Battery token the password is asked first, to sign the TonProof login.
+        await expect
+            .poll(
+                async () => {
+                    if (await modal.getByText('Enter password').isVisible()) {
+                        await modal.getByRole('textbox').fill(walletPassword());
+                        await page.getByRole('button', { name: 'Confirm', exact: true }).click();
+                    }
+                    return modal.innerText();
+                },
+                { timeout: 60_000, intervals: [1_000] }
+            )
+            .toMatch(new RegExp(`0\\.0\\d+\\s*${jettonLabel}`));
+    }
 
     await signPlanned(plan, t.id, async () => {
         await page.getByRole('button', { name: 'Confirm and Send' }).click();
@@ -198,4 +237,17 @@ test('B sends USDT back to A', async ({ walletB }) => {
 
 test('B sends GRAM back to A', async ({ walletB }) => {
     await legacySend(walletB, tx('send-b-a-gram'));
+});
+
+test('A sends USDT to B, fee in USDT (gasless)', async ({ walletA }) => {
+    await multichainSend(
+        walletA,
+        tx('gasless-a-b-usdt'),
+        { search: 'USD₮', row: /^USD₮.*TON/ },
+        'USD₮'
+    );
+});
+
+test('B sends USDT back to A, fee in USDT (gasless)', async ({ walletB }) => {
+    await legacySend(walletB, tx('gasless-b-a-usdt'), 'USD₮', true);
 });

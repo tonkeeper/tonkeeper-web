@@ -106,8 +106,6 @@ export enum QueryKey {
     batteryPurchases = 'batteryPurchases',
     estimateBatteryPurchase = 'estimateBatteryPurchase',
 
-    gaslessConfig = 'gaslessConfig',
-
     twoFAWalletConfig = 'twoFAWalletConfig',
     twoFAActivationProcess = 'twoFAActivationProcess',
     twoFARemovingProcess = 'twoFARemovingProcess',

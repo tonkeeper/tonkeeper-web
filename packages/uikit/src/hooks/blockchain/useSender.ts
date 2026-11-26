@@ -22,7 +22,8 @@ import {
     useBatteryServiceConfig,
     useBatteryUnitTonRate,
     useRequestBatteryAuthToken,
-    useCanSeeBattery
+    useCanSeeBattery,
+    useBatteryOnChainRechargeMethods
 } from '../../state/battery';
 import { useGetAccountSigner } from '../../state/mnemonic';
 import { useCallback, useMemo } from 'react';
@@ -34,14 +35,13 @@ import {
 import { Account, AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { getMultisigSignerInfo } from '../../state/multisig';
-import { GaslessConfig, Multisig } from '@tonkeeper/core/dist/tonApiV2';
+import { Multisig } from '@tonkeeper/core/dist/tonApiV2';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import {
     isStandardTonWallet,
     TonWalletStandard,
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
-import { useGaslessConfig } from '../../state/gasless';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
@@ -86,7 +86,7 @@ export const useAvailableTonSendersChoices = (
     const { data: batteryBalance } = useBatteryBalance();
     const account = useActiveAccount();
     const { batteryReservedAmount } = useActiveConfig();
-    const gaslessConfig = useGaslessConfig();
+    const gaslessJettons = useGaslessJettonMasters();
     const canUseBattery = useCanSeeBattery();
     const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const [walletInfo] = useAssets();
@@ -103,7 +103,7 @@ export const useAvailableTonSendersChoices = (
             batteryBalance,
             account.type,
             batteryReservedAmount,
-            gaslessConfig,
+            gaslessJettons,
             canUseBattery,
             walletInfo,
             twoFaConfig,
@@ -161,7 +161,7 @@ export const useAvailableTonSendersChoices = (
                 }
             }
 
-            if (isGaslessEnabled && isGaslessAvailable({ asset, account, gaslessConfig })) {
+            if (isGaslessEnabled && isGaslessAvailable({ asset, account, gaslessJettons })) {
                 if (
                     walletInfo!.ton.info.balance <
                     JettonEncoder.jettonTransferAmount + toNano(0.005)
@@ -202,7 +202,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const { data: twoFaConfig } = useTwoFAWalletConfig();
     const batteryUnitTonRate = useBatteryUnitTonRate();
-    const gaslessConfig = useGaslessConfig();
+    const gaslessJettons = useGaslessJettonMasters();
     const { data: jettons } = useJettonList();
     const batteryAuthTokenWithBalance =
         canUseBattery && batteryAuthToken && batteryBalance?.batteryUnitsBalance.gt(0)
@@ -220,8 +220,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             batteryConfig,
             twoFaConfig?.status,
             batteryUnitTonRate,
-            gaslessConfig?.relayAddress,
-            gaslessConfig?.gasJettons,
+            gaslessJettons,
             jettons,
             isGaslessEnabled
         ],
@@ -277,7 +276,8 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             }
 
             if (
-                gaslessConfig &&
+                batteryAuthToken &&
+                batteryConfig &&
                 isGaslessEnabled &&
                 payload.messagesVariants?.gasless &&
                 isStandardTonWallet(account.activeTonWallet) &&
@@ -289,16 +289,18 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 ).toRawString();
                 if (
                     assetAddress &&
-                    gaslessConfig.gasJettons.some(j => j.masterId === assetAddress) &&
+                    gaslessJettons?.includes(assetAddress) &&
                     jettons?.balances.some(j => j.jetton.address === assetAddress)
                 ) {
                     const asset = jettonToTonAsset(assetAddress, jettons);
                     const gaslessSender = new GaslessMessageSender(
                         {
-                            relayerAddress: gaslessConfig.relayAddress,
-                            payWithAsset: asset
+                            payWithAsset: asset,
+                            excessAddress: batteryConfig.excessAccount,
+                            messageTtl: batteryConfig.messageTtl,
+                            authToken: batteryAuthToken
                         },
-                        api,
+                        { tonApi: api, batteryApi },
                         account.activeTonWallet,
                         estimationSigner
                     );
@@ -340,7 +342,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
     const activeAccount = useActiveAccount();
     const { mutateAsync } = useRequestBatteryAuthToken();
     const accounts = useAccountsState();
-    const gaslessConfig = useGaslessConfig();
+    const gaslessJettons = useGaslessJettonMasters();
     const twoFaApi = useTwoFAApi();
     const { data: twoFAConfig } = useTwoFAWalletConfigMayBeOfMultisigHost();
     const batteryUnitTonRate = useBatteryUnitTonRate();
@@ -392,7 +394,10 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         if (!senderChoice) {
             return undefined;
         }
-        if (senderChoice.type === 'battery' && authToken === undefined) {
+        if (
+            (senderChoice.type === 'battery' || senderChoice.type === 'gasless') &&
+            authToken === undefined
+        ) {
             return undefined;
         }
 
@@ -431,24 +436,30 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
 
             if (senderChoice.type === 'gasless') {
                 if (
-                    !gaslessConfig ||
                     !isGaslessEnabled ||
                     !isGaslessAvailable({
                         asset: senderChoice.asset,
                         account: activeAccount,
-                        gaslessConfig
+                        gaslessJettons
                     })
                 ) {
                     throw new Error(
                         `Jetton ${senderChoice.asset.symbol} not configured for gasless`
                     );
                 }
+                const token = authToken ?? (await mutateAsync());
+                if (!token) {
+                    throw new Error('Auth token not found');
+                }
+                const { excessAccount, messageTtl } = requireBatteryServiceConfig(batteryConfig);
                 return new GaslessMessageSender(
                     {
                         payWithAsset: senderChoice.asset,
-                        relayerAddress: gaslessConfig.relayAddress
+                        excessAddress: excessAccount,
+                        messageTtl,
+                        authToken: token
                     },
-                    api,
+                    { tonApi: api, batteryApi },
                     wallet,
                     estimationSigner
                 );
@@ -487,7 +498,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         batteryApi,
         batteryConfig,
         mutateAsync,
-        gaslessConfig,
+        gaslessJettons,
         twoFaApi,
         twoFAConfig,
         batteryUnitTonRate,
@@ -507,7 +518,7 @@ export const useGetSender = () => {
     const activeAccount = useActiveAccount();
     const { mutateAsync } = useRequestBatteryAuthToken();
     const accounts = useAccountsState();
-    const gaslessConfig = useGaslessConfig();
+    const gaslessJettons = useGaslessJettonMasters();
     const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const twoFaApi = useTwoFAApi();
 
@@ -663,24 +674,30 @@ export const useGetSender = () => {
 
             if (senderChoice.type === 'gasless') {
                 if (
-                    !gaslessConfig ||
                     !isGaslessEnabled ||
                     !isGaslessAvailable({
                         asset: senderChoice.asset,
                         account: activeAccount,
-                        gaslessConfig
+                        gaslessJettons
                     })
                 ) {
                     throw new Error(
                         `Jetton ${senderChoice.asset.symbol} not configured for gasless`
                     );
                 }
+                const token = authToken ?? (await mutateAsync());
+                if (!token) {
+                    throw new Error('Auth token not found');
+                }
+                const { excessAccount, messageTtl } = requireBatteryServiceConfig(batteryConfig);
                 return new GaslessMessageSender(
                     {
                         payWithAsset: senderChoice.asset,
-                        relayerAddress: gaslessConfig.relayAddress
+                        excessAddress: excessAccount,
+                        messageTtl,
+                        authToken: token
                     },
-                    api,
+                    { tonApi: api, batteryApi },
                     wallet,
                     signer
                 );
@@ -722,7 +739,7 @@ export const useGetSender = () => {
             getSigner,
             activeAccount,
             mutateAsync,
-            gaslessConfig,
+            gaslessJettons,
             twoFaApi,
             twoFAConfig,
             openTwoFaConfirmTelegram,
@@ -737,22 +754,30 @@ export const useGetSender = () => {
     );
 };
 
+/** Jettons the Battery relayer takes as the fee, from its recharge methods (as the native apps). */
+const useGaslessJettonMasters = () => {
+    const { data: methods } = useBatteryOnChainRechargeMethods();
+    return useMemo(
+        () =>
+            methods
+                ?.filter(m => m.supportGasless && m.jettonMaster)
+                .map(m => Address.parse(m.jettonMaster!).toRawString()),
+        [methods]
+    );
+};
+
 const isGaslessAvailable = ({
-    gaslessConfig,
+    gaslessJettons,
     account,
     asset
 }: {
-    gaslessConfig: GaslessConfig | undefined;
+    gaslessJettons: string[] | undefined;
     asset: TonAsset | undefined;
     account: Account;
-}) => {
-    if (!gaslessConfig) {
-        return false;
-    }
-    return (
-        asset &&
-        gaslessConfig.gasJettons.some(j => j.masterId === tonAssetAddressToString(asset.address)) &&
-        isStandardTonWallet(account.activeTonWallet) &&
-        account.activeTonWallet.version === WalletVersion.V5R1
-    );
-};
+}) =>
+    !!asset &&
+    !!gaslessJettons?.includes(
+        Address.parse(tonAssetAddressToString(asset.address)).toRawString()
+    ) &&
+    isStandardTonWallet(account.activeTonWallet) &&
+    account.activeTonWallet.version === WalletVersion.V5R1;
