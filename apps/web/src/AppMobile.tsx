@@ -198,55 +198,73 @@ export const MobileContent: FC<{
         );
     }
 
-    // Multichain portfolio renders its own content directly. No legacy
-    // Home selector, no AppLayout, no Suspense — fully independent
-    // until the new chrome lands.
-    if (activeAccount.type === 'multichain') {
-        return (
-            <>
-                <MultichainScrollRoot standalone={standalone}>
-                    <Switch>
-                        <Route path={`${MultichainRoute.asset}/:assetId`}>
-                            <MultichainAssetRoute />
-                        </Route>
-                        <Route path={MultichainRoute.history}>
-                            <MultichainHistory />
-                        </Route>
-                        <Route path={MultichainRoute.collectiblesSettings}>
-                            <MultichainCollectiblesSettingsPage />
-                        </Route>
-                        <Route path={MultichainRoute.collectibles}>
-                            <MultichainCollectiblesPage />
-                        </Route>
-                        <Route path={MultichainRoute.trade}>
-                            <MultichainTradePage />
-                        </Route>
-                        <Route path={`${MultichainRoute.staking}/:poolAddress`}>
-                            <MultichainStakingPositionRoute />
-                        </Route>
-                        <Route path={`${MultichainRoute.browserCategory}/:id`}>
-                            <BrowserCategoryPage />
-                        </Route>
-                        <Route path={MultichainRoute.browser}>
-                            <MultichainBrowserPage />
-                        </Route>
-                        <Route path={MultichainRoute.settings}>
-                            <MultichainSettingsRouting />
-                        </Route>
-                        <Route path="*">
-                            <HomeMultichain />
-                        </Route>
-                    </Switch>
-                </MultichainScrollRoot>
-                <MultichainBackgroundElements />
-                <Suspense>
-                    <WebTonConnectSubscription />
-                    <UrlTonConnectSubscription />
-                    <MultichainConnectSubscription />
-                </Suspense>
-            </>
-        );
-    }
+    // One subscription instance for both shells: a dApp request for a wallet of the other
+    // account type switches the shell, and the pending request must survive that.
+    return (
+        <>
+            {activeAccount.type === 'multichain' ? (
+                <MultichainMobileContent standalone={standalone} />
+            ) : (
+                <LegacyMobileContent standalone={standalone} />
+            )}
+            <Suspense>
+                <WebTonConnectSubscription />
+            </Suspense>
+        </>
+    );
+};
+
+// Multichain portfolio renders its own content directly. No legacy
+// Home selector, no AppLayout, no Suspense — fully independent
+// until the new chrome lands.
+const MultichainMobileContent: FC<{ standalone: boolean }> = ({ standalone }) => {
+    return (
+        <>
+            <MultichainScrollRoot standalone={standalone}>
+                <Switch>
+                    <Route path={`${MultichainRoute.asset}/:assetId`}>
+                        <MultichainAssetRoute />
+                    </Route>
+                    <Route path={MultichainRoute.history}>
+                        <MultichainHistory />
+                    </Route>
+                    <Route path={MultichainRoute.collectiblesSettings}>
+                        <MultichainCollectiblesSettingsPage />
+                    </Route>
+                    <Route path={MultichainRoute.collectibles}>
+                        <MultichainCollectiblesPage />
+                    </Route>
+                    <Route path={MultichainRoute.trade}>
+                        <MultichainTradePage />
+                    </Route>
+                    <Route path={`${MultichainRoute.staking}/:poolAddress`}>
+                        <MultichainStakingPositionRoute />
+                    </Route>
+                    <Route path={`${MultichainRoute.browserCategory}/:id`}>
+                        <BrowserCategoryPage />
+                    </Route>
+                    <Route path={MultichainRoute.browser}>
+                        <MultichainBrowserPage />
+                    </Route>
+                    <Route path={MultichainRoute.settings}>
+                        <MultichainSettingsRouting />
+                    </Route>
+                    <Route path="*">
+                        <HomeMultichain />
+                    </Route>
+                </Switch>
+            </MultichainScrollRoot>
+            <MultichainBackgroundElements />
+            <Suspense>
+                <UrlTonConnectSubscription />
+                <MultichainConnectSubscription />
+            </Suspense>
+        </>
+    );
+};
+
+const LegacyMobileContent: FC<{ standalone: boolean }> = ({ standalone }) => {
+    const location = useLocation();
 
     return (
         <AppLayout
@@ -321,7 +339,6 @@ const Notifications = () => {
         <Suspense>
             <SendActionNotification />
             <ReceiveNotification />
-            <WebTonConnectSubscription />
             <MultichainConnectSubscription />
             <NftNotification />
             <SendNftNotification />

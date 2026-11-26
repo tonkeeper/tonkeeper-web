@@ -58,7 +58,7 @@ interface TonConnectRequest {
     message: string;
 }
 
-export const subscribeTonConnect = ({
+const openBridgeSubscription = ({
     storage,
     handleMessage,
     connections,
@@ -122,6 +122,35 @@ export const subscribeTonConnect = ({
         eventSource.removeEventListener('error', onError);
 
         eventSource.close();
+    };
+};
+
+/**
+ * Without an explicit `lastEventId` the id is read from storage when the
+ * connection opens, so every reconnect resumes after the last handled event
+ * and the bridge does not replay it.
+ */
+export const subscribeTonConnect = (params: Parameters<typeof openBridgeSubscription>[0]) => {
+    if (params.lastEventId !== undefined) {
+        return openBridgeSubscription(params);
+    }
+
+    let closed = false;
+    let close = () => {};
+
+    getLastEventId(params.storage)
+        .then(lastEventId => {
+            if (closed) return;
+            close = openBridgeSubscription({ ...params, lastEventId });
+        })
+        .catch(() => {
+            if (closed) return;
+            close = openBridgeSubscription(params);
+        });
+
+    return () => {
+        closed = true;
+        close();
     };
 };
 

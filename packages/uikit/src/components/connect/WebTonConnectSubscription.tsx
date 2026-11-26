@@ -21,8 +21,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectConnection,
-    useTonConnectLastEventId
+    useDisconnectTonConnectConnection
 } from '../../state/tonConnect';
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
 import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
@@ -46,7 +45,6 @@ const WebTonConnectSubscription = () => {
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const { data: appConnections } = useAppTonConnectConnections('http');
-    const { data: lastEventId } = useTonConnectLastEventId();
 
     const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
@@ -167,17 +165,13 @@ const WebTonConnectSubscription = () => {
             storage: sdk.storage,
             handleMessage,
             connections: appConnections?.flatMap(i => i.connections),
-            lastEventId: lastEventId ?? undefined,
             bridgeEndpoint: mainnetConfig.ton_connect_bridge
         });
 
-        return () => {
-            close();
-        };
+        return close;
     }, [
         sdk,
         appConnections,
-        lastEventId,
         disconnect,
         setRequest,
         setActiveWallet,

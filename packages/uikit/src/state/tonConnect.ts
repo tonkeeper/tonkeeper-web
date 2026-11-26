@@ -19,7 +19,6 @@ import {
     getTonWalletConnections,
     setAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
@@ -83,16 +82,6 @@ export const useAppTonConnectConnections = <T extends AccountConnection['type']>
         },
         { enabled: wallets !== undefined && hasTonConnectCapableAccount }
     );
-};
-
-export const useTonConnectLastEventId = () => {
-    const sdk = useAppSdk();
-
-    // A wallet with no TonConnect history has no stored event id; react-query
-    // rejects `undefined` as query data, so the absence is stored as `null`.
-    return useQuery([QueryKey.tonConnectLastEventId], async () => {
-        return (await getLastEventId(sdk.storage)) ?? null;
-    });
 };
 
 export type ConnectedDApp = {

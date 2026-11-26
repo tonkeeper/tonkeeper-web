@@ -386,8 +386,6 @@ export const useCompleteHttpConnection = () => {
                 }
             }
         }
-        await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
-
         return undefined;
     });
 };

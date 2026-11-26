@@ -207,57 +207,72 @@ export const DesktopContent: FC<{
         );
     }
 
-    // Multichain portfolio runs in its own desktop shell — sidebar
-    // (balance + active wallet) + centered 520px content column. The
-    // legacy AppLayout / DesktopTokens chrome is not used.
-    if (activeAccount.type === 'multichain') {
-        const account = activeAccount as AccountMultichain;
-        return (
-            <>
-                <MultichainDesktopShell account={account}>
-                    <Switch>
-                        <Route path={`${MultichainRoute.asset}/:assetId`}>
-                            <MultichainAssetRoute compact />
-                        </Route>
-                        <Route path={MultichainRoute.history}>
-                            <MultichainHistory compact />
-                        </Route>
-                        <Route path={MultichainRoute.collectiblesSettings}>
-                            <MultichainCollectiblesSettingsPage compact />
-                        </Route>
-                        <Route path={MultichainRoute.collectibles}>
-                            <MultichainCollectiblesPage compact />
-                        </Route>
-                        <Route path={MultichainRoute.trade}>
-                            <MultichainTradePage compact />
-                        </Route>
-                        <Route path={`${MultichainRoute.staking}/:poolAddress`}>
-                            <MultichainStakingPositionRoute compact />
-                        </Route>
-                        <Route path={`${MultichainRoute.browserCategory}/:id`}>
-                            <BrowserCategoryPage compact />
-                        </Route>
-                        <Route path={MultichainRoute.browser}>
-                            <MultichainBrowserPage compact />
-                        </Route>
-                        <Route path={MultichainRoute.settings}>
-                            <MultichainSettingsRouting compact />
-                        </Route>
-                        <Route path="*">
-                            <HomeMultichain compact />
-                        </Route>
-                    </Switch>
-                </MultichainDesktopShell>
-                <MultichainBackgroundElements />
-                <Suspense>
-                    <WebTonConnectSubscription />
-                    <UrlTonConnectSubscription />
-                    <MultichainConnectSubscription />
-                </Suspense>
-            </>
-        );
-    }
+    // One subscription instance for both shells: a dApp request for a wallet of the other
+    // account type switches the shell, and the pending request must survive that.
+    return (
+        <>
+            {activeAccount.type === 'multichain' ? (
+                <MultichainDesktopContent account={activeAccount as AccountMultichain} />
+            ) : (
+                <LegacyDesktopContent />
+            )}
+            <Suspense>
+                <WebTonConnectSubscription />
+            </Suspense>
+        </>
+    );
+};
 
+// Multichain portfolio runs in its own desktop shell — sidebar
+// (balance + active wallet) + centered 520px content column. The
+// legacy AppLayout / DesktopTokens chrome is not used.
+const MultichainDesktopContent: FC<{ account: AccountMultichain }> = ({ account }) => {
+    return (
+        <>
+            <MultichainDesktopShell account={account}>
+                <Switch>
+                    <Route path={`${MultichainRoute.asset}/:assetId`}>
+                        <MultichainAssetRoute compact />
+                    </Route>
+                    <Route path={MultichainRoute.history}>
+                        <MultichainHistory compact />
+                    </Route>
+                    <Route path={MultichainRoute.collectiblesSettings}>
+                        <MultichainCollectiblesSettingsPage compact />
+                    </Route>
+                    <Route path={MultichainRoute.collectibles}>
+                        <MultichainCollectiblesPage compact />
+                    </Route>
+                    <Route path={MultichainRoute.trade}>
+                        <MultichainTradePage compact />
+                    </Route>
+                    <Route path={`${MultichainRoute.staking}/:poolAddress`}>
+                        <MultichainStakingPositionRoute compact />
+                    </Route>
+                    <Route path={`${MultichainRoute.browserCategory}/:id`}>
+                        <BrowserCategoryPage compact />
+                    </Route>
+                    <Route path={MultichainRoute.browser}>
+                        <MultichainBrowserPage compact />
+                    </Route>
+                    <Route path={MultichainRoute.settings}>
+                        <MultichainSettingsRouting compact />
+                    </Route>
+                    <Route path="*">
+                        <HomeMultichain compact />
+                    </Route>
+                </Switch>
+            </MultichainDesktopShell>
+            <MultichainBackgroundElements />
+            <Suspense>
+                <UrlTonConnectSubscription />
+                <MultichainConnectSubscription />
+            </Suspense>
+        </>
+    );
+};
+
+const LegacyDesktopContent = () => {
     return (
         <AppLayout sidebar={<AsideMenu />}>
             <Switch>
@@ -346,7 +361,6 @@ const BackgroundElements = () => {
         <Suspense>
             <SendActionNotification />
             <ReceiveNotification />
-            <WebTonConnectSubscription />
             <NftNotification />
             <SendNftNotification />
             <AddFavoriteNotification />

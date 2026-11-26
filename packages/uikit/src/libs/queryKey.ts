@@ -33,7 +33,6 @@ export enum QueryKey {
     allowedFiatCurrencies = 'allowedFiatCurrencies',
 
     tonConnectConnection = 'tonConnectConnection',
-    tonConnectLastEventId = 'tonConnectLastEventId',
     walletConnectSessions = 'walletConnectSessions',
     evmInjectedConnections = 'evmInjectedConnections',
     subscribed = 'subscribed',
